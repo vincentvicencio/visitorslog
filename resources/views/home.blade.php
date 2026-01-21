@@ -15,6 +15,11 @@
                     @endif
 
                     {{ __('You are logged in!') }}
+
+                    <form action="/form" method="post">
+                        @csrf
+                        <button type="submit">Add Visitor</button>
+                    </form>
                 </div>
             </div>
         </div>
