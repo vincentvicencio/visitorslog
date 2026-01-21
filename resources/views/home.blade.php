@@ -16,6 +16,11 @@
 
                     {{ __('You are logged in!') }}
                 </div>
+
+                <form action="/visitorlog" method="POST">
+                    @csrf
+                    <input type="submit" value="btn">
+                </form>
             </div>
         </div>
     </div>
