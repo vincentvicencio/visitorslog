@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Visitor;
 
+
 class VisitorController extends Controller
 {
+
     public function store(Request $request)
     {
         // Validation
@@ -41,18 +43,22 @@ class VisitorController extends Controller
             'location'     => $request->location,
             'image_path'   => $imagePath,
             'time_in'      => now(),
-            'time_out'     => now(),
-            'status'       => 1,
-            'created_by'   => "",
-            'updated_by'   => "",
-            'deleted_by'   => "",
-            'created_at'   => now(),
-            'updated_at'   => now(),
-            'deleted_at'   => now(),
+            'time_out'     => null,
+            'status'       => null,
+            'created_by'   => null,
+            'updated_by'   => null,
+            'deleted_by'   => null,
+            'created_at'   => null,
+            'updated_at'   => null,
+            'deleted_at'   => null,
         ]);
 
-        return redirect()->back()->with('success', 'Visitor added successfully!');
+         return redirect()->route('form')
+        ->with('success', 'Visitor information saved successfully.');
+
     }
+
+
     public function index()
     {
         // Your logic here

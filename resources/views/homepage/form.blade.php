@@ -7,8 +7,10 @@
     <title>Document</title>
 </head>
 <body>
+   
+
     <form action="{{ route('visitor.store') }}" method="post" enctype="multipart/form-data">
-    @csrf
+        @csrf
 
     Add Visitor Log Here<br><br>
 
@@ -22,7 +24,7 @@
     <input type="text" name="last_name"><br>
 
     <label>Phone Number:</label>
-    <input type="text" name="phone_number"><br>
+    <input type="text" inputmode="numeric" pattern="[0-9]*" name="phone_number"><br>
 
     <label>Visitor Type:</label>
     <select name="visitor_type">
@@ -33,17 +35,22 @@
     </select><br>
 
     <label>Visitor ID:</label>
-    <input type="number" name="visitor_id"><br>
+    <input type="text" inputmode="numeric" pattern="[0-9]*" name="visitor_id"><br>
 
     <label>Location:</label>
-    <input type="number" name="location"><br>
+    <input type="text" inputmode="numeric" pattern="[0-9]*" name="location"><br>
 
     <label>Image:</label>
-    <input type="file" name="image_path" accept=".png,.jpg,.jpeg"><br>
+    <input type="file" name="image_path" accept="image/*" capture="environment"> <br>
 
-    <button type="submit">Add Visitor</button>
+    <button type="submit" onclick="this.disabled=true; this.form.submit();">
+    Add Visitor
+</button>
+
+</form>
+<form action="/home" method="get">
+    <button type="submit">Home</button>
 </form>
 
-    
 </body>
 </html>

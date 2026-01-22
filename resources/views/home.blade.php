@@ -16,10 +16,25 @@
 
                     {{ __('You are logged in!') }}
 
-                    <form action="/form" method="post">
+                    <form action="/form" method="get">
                         @csrf
                         <button type="submit">Add Visitor</button>
                     </form>
+
+                    <form action="/IDNumber" method="post">
+                        @csrf
+                        <button type="submit">Register ID</button>
+                    </form>
+
+                    <form action="/visitor_type" method="post">
+                        @csrf
+                        <button type="submit">Add Visitor Type</button>
+                    </form>
+
+                    {{-- <form action="/visitor_type" method="post">
+                        @csrf
+                        <button type="submit">Try List</button>
+                    </form> --}}
                 </div>
             </div>
         </div>

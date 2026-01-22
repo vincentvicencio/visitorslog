@@ -13,24 +13,24 @@ return new class extends Migration
     {
         Schema::create('visitors', function (Blueprint $table) {
             $table->id();
-            $table->string('user_name');
-            $table->string('first_name');
-            $table->string('middle_name');
-            $table->string('last_name');
-            $table->string(column: 'phone_number');
-            $table->integer('visitor_type');
-            $table->integer('visitor_id');
-            $table->integer('location');
-            $table->string('image_path');
-            $table->timestamp('time_in');
-            $table->timestamp('time_out');
-            $table->tinyinteger('status');
-            $table->string('created_by');
-            $table->string('updated_by');
-            $table->string('deleted_by');
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
-            $table->timestamp(column: 'deleted_at');
+            $table->string('user_name')->nullable();
+            $table->string('first_name')->nullable();
+            $table->string('middle_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string(column: 'phone_number')->nullable();
+            $table->integer('visitor_type')->nullable();
+            $table->integer('visitor_id')->nullable();
+            $table->integer('location')->nullable();
+            $table->string('image_path')->nullable();
+            $table->timestamp('time_in')->nullable();
+            $table->timestamp('time_out')->nullable();
+            $table->tinyInteger('status')->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
+            $table->string('deleted_by')->nullable();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
+            $table->timestamp(column: 'deleted_at')->nullable();
         });
     }
 
