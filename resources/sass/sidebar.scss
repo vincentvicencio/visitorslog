@@ -147,7 +147,10 @@
     }
 
 
-    @media (max-width: 768px) {
+    @media (max-width:880px) {
+        body{
+            background-color: red !important;
+        }
         .side-menu {
             left: -260px; /* Initially hide sidebar */
             transition: left 0.3s ease-in-out;
@@ -227,4 +230,19 @@
 .nav-link.active {
     background-color: #3492E9 !important; 
     border-radius: 8px;
+}
+
+
+body {
+    margin-left: 240px;
+    transition: margin-left 0.3s ease;
+    padding: 20px 60px 60px 60px;
+}
+// 768px
+@media (max-width: 880px) {
+    body {
+        margin-left: 0;
+        transition: margin-left 0.3s ease-in-out;
+        padding: 20px;
+    }
 }
