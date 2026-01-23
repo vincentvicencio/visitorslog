@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+@include('layouts.sidebar')
 @include('layouts.head')
 
 <body>

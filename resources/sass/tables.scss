@@ -1,0 +1,221 @@
+
+    .visitor-log-sheet-table{
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    #visitorsTable{
+        border-radius: 10px ;
+        
+    }
+    .table-header th{
+        background-color: #0F4383;
+        color: white;
+        text-align: center;
+    }
+    
+    .table-pagination{
+        background-color: #0f43830e;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 3px;
+        border-radius: 5px;
+    }
+    .table-pagination .bi{
+        font-size: 16px;
+    }
+    .arrow-holder-pagination{
+        display: flex;
+        flex-direction: row;
+        gap: 3px;
+        width: 135px;
+    }
+
+    .arrow-holder-pagination .bi{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        padding: 5px 25px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        color: rgba(128, 128, 128, 0.8);
+    }
+    .number-holder-pagination{
+        font-weight: bold;
+        color: rgba(128, 128, 128, 0.5);
+    }
+
+
+
+
+    .search-field{
+        width: 100%;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        font-weight: bold;
+        font-variant: small-caps;
+        color: #0F4383;
+        font-size: 16px;
+        padding: 0px 0px 0px 10px;
+    }
+    .search-field input{
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        padding: 2px 2px 2px 16px;
+        background-color: rgb(235, 235, 235);
+        margin-left: 10px;
+        margin-right: 20px;
+        font-size: 14px;
+    }
+
+    .number-per-page{
+        font-size: 14px;
+        width: 80px;
+        border-color: rgb(235, 235, 235);
+        padding: 2px 2px 2px 16px;
+        background-color: rgb(235, 235, 235);
+        border-radius: 5px;
+        margin-left: 10px;
+    }
+
+
+
+
+
+
+
+.page-header{
+    position: relative;
+}
+
+.top-button {
+    position: absolute;
+    top: 50%;   /* distance from top of page-header */
+    transform: translate(0%,-50%);
+    right: 20px; /* distance from right of page-header */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0F4383;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+.top-button:hover{
+    background-color: #0f43837f;
+}
+
+.pagination-first, .pagination-prev,
+.pagination-next, .pagination-last{
+    transition: 0.2s ease;
+}
+
+.pagination-first:hover, .pagination-prev:hover,
+.pagination-next:hover, .pagination-last:hover{
+    transition: 0.2s ease;
+    color: black;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+#visitorsTable td:nth-child(2),
+#visitorsTable td:nth-child(3),
+#visitorsTable td:nth-child(4),
+#visitorsTable td:nth-child(8),
+#visitorsTable td:nth-child(9) {
+    text-align: center;
+}
+
+.view-button{
+    background-color: #0F4383;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    transition: 0.2s ease;
+}
+.view-button:hover{
+    background-color: #0f438381;
+}
+.status{
+    background-color: white;
+    border: 1px solid green;
+    color: green;
+    border-radius: 5px;
+    font-size: 12px;
+    width: 50px;
+    display: inline-block;
+}
+
+.status-cell {
+    text-align: center;      /* horizontal */
+    vertical-align: middle;  /* vertical */
+}
+
+
+
+
+
+
+
+
+
+
+#usertypesTable{
+    border-radius: 10px ;
+    
+}
+
+#usertypesTable td:nth-child(2),
+#usertypesTable td:nth-child(4) {
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+#usertypesTable td:nth-child(1),
+#usertypesTable td:nth-child(2),
+#usertypesTable td:nth-child(3),
+#usertypesTable td:nth-child(4) {
+    text-align: center;
+}
+
+
+
+
+#userTable{
+    border-radius: 10px ;
+    
+}
+
+#userTable td:nth-child(1),
+#userTable td:nth-child(2),
+#userTable td:nth-child(3),
+#userTable td:nth-child(4),
+#userTable td:nth-child(5) {
+    text-align: center;
+}
+
+
+#visitortypeTable{
+    border-radius: 10px ;
+    
+}
+#visitortypeTable td:nth-child(1),
+#visitortypeTable td:nth-child(2),
+#visitortypeTable td:nth-child(3),
+#visitortypeTable td:nth-child(4) {
+    text-align: center;
+}
+
+
+#IDTable{
+    border-radius: 10px ;
+    
+}
+#IDTable{
+    text-align: center;
+}
