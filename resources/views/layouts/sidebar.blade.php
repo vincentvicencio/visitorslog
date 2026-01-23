@@ -27,31 +27,45 @@
         <div class="menu fw-bold mt-3 py-1 ps-4">Menu</div>
 
         <div class="sidebar-menu d-flex flex-column vh-100">
-            <div class="sidebar-menu-button {{ Request::is('visitorlog') ? 'selected' : '' }}">
-                <i class="bi bi-person-lines-fill  fs-6 p-2"></i>
-                Visitor Log Sheets
-            </div>
-            <div class="sidebar-menu-button">
-                <i class="bi bi-people-fill  fs-6 p-2"></i>
-                User Type
-            </div>
-            <div class="sidebar-menu-button">
-                <i class="bi bi-person-add  fs-6 p-2"></i>
-                User
-            </div>
-            <div class="sidebar-menu-button">
-                <i class="bi bi-person-badge  fs-6 p-2"></i>
-                Visitor Type
-            </div>
-            <div class="sidebar-menu-button">
-                <i class="bi bi-person-vcard  fs-6 p-2"></i>
-                ID Numbers
-            </div>
-            <div class="sidebar-menu-button">
-                <i class="bi bi-journals  fs-6 p-2"></i>
-                Reports
-            </div>
-        </div>
+
+        <a href="{{ url('visitorlog') }}"
+        class="sidebar-menu-button {{ Request::is('visitorlog') ? 'selected' : '' }}">
+            <i class="bi bi-person-lines-fill fs-6 p-2"></i>
+            Visitor Log Sheets
+        </a>
+
+        <a href="{{ url('usertype') }}"
+        class="sidebar-menu-button {{ Request::is('usertype') ? 'selected' : '' }}">
+            <i class="bi bi-people-fill fs-6 p-2"></i>
+            User Type
+        </a>
+
+        <a href="{{ url('users') }}"
+        class="sidebar-menu-button {{ Request::is('users') ? 'selected' : '' }}">
+            <i class="bi bi-person-add fs-6 p-2"></i>
+            User
+        </a>
+
+        <a href="{{ url('visitortype') }}"
+        class="sidebar-menu-button {{ Request::is('visitortype') ? 'selected' : '' }}">
+            <i class="bi bi-person-badge fs-6 p-2"></i>
+            Visitor Type
+        </a>
+
+        <a href="{{ url('id') }}"
+        class="sidebar-menu-button {{ Request::is('id') ? 'selected' : '' }}">
+            <i class="bi bi-person-vcard fs-6 p-2"></i>
+            ID Numbers
+        </a>
+
+        <a href="{{ url('report') }}"
+        class="sidebar-menu-button {{ Request::is('report') ? 'selected' : '' }}">
+            <i class="bi bi-journals fs-6 p-2"></i>
+            Reports
+        </a>
+
+    </div>
+
         
             <div class="logout-button d-flex mt-auto pe-4 fw-bold">
                 <i class="bi bi-box-arrow-left p-2"></i>
