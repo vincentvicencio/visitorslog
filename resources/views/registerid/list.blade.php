@@ -51,21 +51,32 @@
 <table>
     <thead>
         <tr>
-            <th>Visitor ID</th>
             <th>Visitor Type</th>
-            <th>Created At</th>
+            <th>Visitor ID</th>
+            <th>Created By</th>
+            <th>updated By</th>
+            <th>Created Date</th>
+            <th>Updated Date</th>
         </tr>
     </thead>
     <tbody>
         @forelse($registeredIds as $index => $visitor)
         <tr>
+            @foreach ($visitorTypes as $type)
+                @if ($type->id == $visitor->visitor_type)
+                    <td>{{ $type->name }}</td>
+                @endif
+            @endforeach
+            {{-- <td>{{ $visitor->visitor_type }}</td> --}}
             <td>{{ $visitor->id_number }}</td>
-            <td>{{ $visitor->visitor_type }}</td>
-            <td>{{ $visitor->created_at->format('Y-m-d H:i') }}</td>
+            <td>{{ $visitor->created_by }}</td>
+            <td>{{ $visitor->updated_by }}</td>
+            <td>{{ $visitor->created_at->format('Y-m-d H:i') }}</td>    
+            <td>{{ $visitor->updated_at->format('Y-m-d H:i') }}</td>
         </tr>
         @empty
         <tr>
-            <td colspan="4" style="text-align:center;">No visitor IDs registered yet.</td>
+            <td colspan="6" style="text-align:center;">No visitor IDs registered yet.</td>
         </tr>
         @endforelse
     </tbody>

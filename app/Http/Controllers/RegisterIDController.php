@@ -19,10 +19,13 @@ class RegisterIDController extends Controller
     public function list()
     {
         // Get all registered IDs, latest first
-        $registeredIds = RegisteredID::orderBy('created_at', 'asc')->get();
+        $registeredIds = RegisteredID::where('deleted_at', null)
+                   ->orderBy('visitor_type', 'asc')
+                   ->get();
+        $visitorTypes = VisitorType::orderBy('id', 'asc')->get();
 
         // Pass to the view
-        return view('registerid.list', compact('registeredIds'));
+        return view('registerid.list', compact('registeredIds', 'visitorTypes'));
     }
 
     // Save via AJAX

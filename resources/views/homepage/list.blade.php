@@ -90,8 +90,16 @@
             <td>{{ $visitor->created_at->format('Y-m-d') }}</td>
             <td>In: {{ $visitor->time_in}} Out: {{ $visitor->time_out }}</td>
             <td>{{ $visitor->created_by }}</td>
-            <td>{{ $visitor->status }}</td>
-            <td><button class="home-button">View Details</button> <button class="timeout-button">Timeout</button></td>
+            <td>{{ $visitor->status == 1 ? 'Active' : 'Inactive' }}</td>
+            <td>
+                <form id="editForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="visitor_id" value="{{ $visitor->visitor_id }}">
+
+                    <button type="button" id="detailsBtn" class="home-button">View Details</button>
+                    <button type="button" id="timeoutBtn" class="timeout-button">Timeout</button>
+                </form>
+            </td>
             {{-- <a href="/visitors/{{ $visitor->id }}/edit">Edit</a> --}}
         </tr>
         @empty
@@ -101,6 +109,34 @@
         @endforelse
     </tbody>
 </table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    document.getElementById('detailsBtn').addEventListener('click', function() {
+        const form = document.getElementById('editForm');
+        form.action = "{{ route('visitor.view') }}";
+        form.submit();
+    });
+
+    document.getElementById('timeoutBtn').addEventListener('click', function() {
+        const form = document.getElementById('editForm');
+        form.action = "{{ route('visitor.timeout') }}";
+        form.submit();
+    });
+</script>
+@if(session('success'))
+    <script>
+        alert('{{ session('success') }}');
+    </script>
+@endif
+
+@if(session('error'))
+    <script>
+        alert('{{ session('error') }}');
+    </script>
+@endif
+
+
 
 </body>
 </html>

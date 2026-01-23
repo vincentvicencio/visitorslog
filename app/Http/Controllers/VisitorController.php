@@ -19,9 +19,54 @@ class VisitorController extends Controller
 
     public function list()
     {
-        $visitors = Visitor::orderBy('id', 'asc')->get();
+        $visitors = Visitor::where('status', 1)
+                   ->orderBy('id', 'asc')
+                   ->get();
+
         return view('homepage.list', compact('visitors'));
+
     }
+
+    public function timeout(Request $request)
+    {
+        $request->validate([
+            'visitor_id' => 'required|exists:visitors,visitor_id',
+        ]);
+
+        $visitor = Visitor::where('visitor_id', $request->visitor_id)->latest('id')->first();
+
+        if ($visitor) {
+            $visitor->time_out = now();
+            $visitor->status = 0; // timed out
+            $visitor->save();
+
+            // ✅ Set flash message
+            return redirect()->back()->with('success', 'Visitor timed out successfully!');
+        }
+
+        return redirect()->back()->with('error', 'Visitor not found.');
+    }
+
+    public function view(Request $request)
+    {
+        $request->validate([
+            'visitor_id' => 'required|exists:visitors,visitor_id',
+        ]);
+
+        // Get only one visitor with visitor_id and status = 1
+        $visitor = Visitor::where('visitor_id', $request->visitor_id)
+                        ->where('status', 1)
+                        ->latest('id') // most recent if multiple
+                        ->first();     // only one record
+
+        if ($visitor) {
+            return view('homepage.view', compact('visitor'));
+        }
+
+        // Optional: handle case where visitor not found
+        return redirect()->back()->with('error', 'Visitor not found or inactive.');
+    }
+
 
     public function save(Request $request)
     {
@@ -37,6 +82,12 @@ class VisitorController extends Controller
                 function ($attribute, $value, $fail) use ($request) {
                     // Check if visitor ID exists in the registered IDs table
                     $existing = RegisteredID::where('id_number', $value)->first();
+                    $timein = Visitor::where('visitor_id', $value)
+                                ->whereNull('time_out')
+                                ->first();
+                    if ($timein) {
+                        $fail('This Visitor ID is already checked in and has not timed out.');
+                    }
 
                     if (!$existing) {
                         // ID does not exist in registered IDs
@@ -46,15 +97,13 @@ class VisitorController extends Controller
                         $fail('This Visitor ID is registered under a different visitor type.');
                     }
                 },
-                Rule::unique('visitors', 'visitor_id')
-                    ->where(function ($query) use ($request) {
-                        return $query->where('visitor_id', $request->visitor_id);
-                    }),
+                // Rule::unique('visitors', 'visitor_id')
+                //     ->where(function ($query) use ($request) {
+                //         return $query->where('visitor_id', $request->visitor_id);
+                //     }),
             ],
 
             'image_path' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ], [
-            'visitor_id.unique' => 'Visitor ID is already registered.',
         ]);
 
 
@@ -77,8 +126,6 @@ class VisitorController extends Controller
             $visitor->location     = $request->location;
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
-            $visitor->time_out     = null;
-            $visitor->status       = null;
             $visitor->save();
 
 

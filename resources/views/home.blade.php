@@ -31,11 +31,6 @@
                         @csrf
                         <button type="submit">Add Visitor Type</button>
                     </form>
-
-                    {{-- <form action="/visitor_type" method="post">
-                        @csrf
-                        <button type="submit">Try List</button>
-                    </form> --}}
                 </div>
             </div>
         </div>
