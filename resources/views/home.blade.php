@@ -16,7 +16,7 @@
 
                     {{ __('You are logged in!') }}
 
-                    <form action="/form" method="get">
+                    <form action="/visitor" method="post">
                         @csrf
                         <button type="submit">Add Visitor</button>
                     </form>

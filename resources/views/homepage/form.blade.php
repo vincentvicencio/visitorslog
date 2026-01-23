@@ -1,56 +1,105 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Add Visitor</title>
 </head>
 <body>
-   
 
-    <form action="{{ route('visitor.store') }}" method="post" enctype="multipart/form-data">
-        @csrf
+<form id="addVisitorForm" enctype="multipart/form-data">
+    @csrf
 
-    Add Visitor Log Here<br><br>
+    <h3>Add Visitor Log</h3>
 
     <label>First Name:</label>
-    <input type="text" name="first_name"><br>
+    <input type="text" name="first_name" required><br>
 
     <label>Middle Name:</label>
     <input type="text" name="middle_name"><br>
 
     <label>Last Name:</label>
-    <input type="text" name="last_name"><br>
+    <input type="text" name="last_name" required><br>
 
     <label>Phone Number:</label>
-    <input type="text" inputmode="numeric" pattern="[0-9]*" name="phone_number"><br>
+    <input type="text" name="phone_number"><br>
 
     <label>Visitor Type:</label>
-    <select name="visitor_type">
-        <option disabled selected>Select Visitor Type</option>
-        <option value="Applicant">Applicant</option>
-        <option value="OJT">OJT</option>
-        <option value="Trainee">Trainee</option>
+    <select name="visitor_type" required>
+        <option value="" disabled selected>Select Visitor Type</option>
+        @foreach ($visitors as $type)
+            <option value="{{ $type->id }}">{{ $type->name }}</option>
+        @endforeach
     </select><br>
 
     <label>Visitor ID:</label>
-    <input type="text" inputmode="numeric" pattern="[0-9]*" name="visitor_id"><br>
+    <input type="text" name="visitor_id" required><br>
 
     <label>Location:</label>
-    <input type="text" inputmode="numeric" pattern="[0-9]*" name="location"><br>
+    <input type="text" name="location"><br>
 
     <label>Image:</label>
-    <input type="file" name="image_path" accept="image/*" capture="environment"> <br>
+    <input type="file" name="image_path" accept="image/*"><br><br>
 
-    <button type="submit" onclick="this.disabled=true; this.form.submit();">
-    Add Visitor
-</button>
-
+    <button type="submit">Add Visitor</button>
 </form>
+
+<br>
+
 <form action="/home" method="get">
     <button type="submit">Home</button>
 </form>
+
+<form action="/visitors" method="get">
+    <button type="submit">Visitor List</button>
+</form>
+
+<div id="result" style="margin-top:20px;"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function () {
+
+    $('#addVisitorForm').on('submit', function (e) {
+        e.preventDefault();
+
+        let formData = new FormData(this);
+
+        $.ajax({
+            url: "{{ route('visitor.save') }}", // ✅ correct POST route
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                $('#result')
+                    .css('color', 'green')
+                    .text(response.message);
+
+                $('#addVisitorForm')[0].reset();
+            },
+            error: function (xhr) {
+                let msg = 'Something went wrong.';
+                if (xhr.status === 422) {
+                    msg = Object.values(xhr.responseJSON.errors)[0][0];
+                }
+                $('#result')
+                    .css('color', 'red')
+                    .text(msg);
+            }
+        });
+    });
+
+});
+</script>
 
 </body>
 </html>

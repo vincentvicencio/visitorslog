@@ -18,7 +18,7 @@ class VisitorTypeController extends Controller
     public function list()
     {
         // Get all registered IDs, latest first
-        $visitorTypes = VisitorType::orderBy('asc', 'desc')->get();
+        $visitorTypes = VisitorType::orderBy('id', 'asc')->get();
 
         // Pass to the view
         return view('visitor_types.list', compact('visitorTypes'));
@@ -27,45 +27,45 @@ class VisitorTypeController extends Controller
 
     // Save via AJAX
      public function save(Request $request)
-{
-    $request->validate([
-        'visitor_type' => [
-            'required',
-            'string',
-            Rule::unique('visitor_types', 'name')
-                ->where(function ($query) use ($request) {
-                    return $query->whereRaw('LOWER(name) = ?', [
-                        strtolower($request->visitor_type)
-                    ]);
-                }),
-        ],
-    ], [
-        'visitor_type.unique' => 'Visitor Type already exists.',
-    ]);
-
-    try {
-        $id = new VisitorType();
-        $id->name = ucfirst(strtolower($request->visitor_type)); // normalize case
-        $id->created_by = null;
-        $id->updated_by = null;
-        $id->deleted_by = null;
-        $id->created_at = now();
-        $id->updated_at = now();
-        $id->deleted_at = null;
-        $id->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Visitor Type added successfully!',
+    {
+        $request->validate([
+            'visitor_type' => [
+                'required',
+                'string',
+                Rule::unique('visitor_types', 'name')
+                    ->where(function ($query) use ($request) {
+                        return $query->whereRaw('LOWER(name) = ?', [
+                            strtolower($request->visitor_type)
+                        ]);
+                    }),
+            ],
+        ], [
+            'visitor_type.unique' => 'Visitor Type already exists.',
         ]);
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Error saving Visitor Type: ' . $e->getMessage(),
-        ]);
+        try {
+            $id = new VisitorType();
+            $id->name = ucfirst(strtolower($request->visitor_type)); // normalize case
+            $id->created_by = null;
+            $id->updated_by = null;
+            $id->deleted_by = null;
+            $id->created_at = now();
+            $id->updated_at = now();
+            $id->deleted_at = null;
+            $id->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Visitor Type added successfully!',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving Visitor Type: ' . $e->getMessage(),
+            ]);
+        }
     }
-}
 
     // public function save(Request $request)
     // {

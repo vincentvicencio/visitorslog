@@ -16,14 +16,11 @@ class Visitor extends Model
         'visitor_id',
         'location',
         'image_path',
-        'time_in',
         'time_out',
         'status',
         'created_by',
         'updated_by',
         'deleted_by',
-        'created_at',
-        'updated_at',
         'deleted_at',
     ];
 }
