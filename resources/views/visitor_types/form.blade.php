@@ -1,3 +1,6 @@
+@extends('layout')
+
+@section('content')
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,54 +25,63 @@
 <form action="/home" method="get">
     <button type="submit">Home</button>
 </form>
-<form action="/visitorTypes" method="get">
+{{-- <form action="/visitortype" method="post">
     @csrf
     <button type="submit">Visitor Type List</button>
-</form>
+</form> --}}
 
-<div id="result" style="margin-top:20px;"></div>
+ <a class="dropdown-item" href="{{ route('visitortype.index') }}" id="detailsBtn">
+        <i class="bi bi-eye me-2"></i> Back
+    </a>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
-    $('#visitorTypeForm').submit(function(e) {
-        e.preventDefault();
+    $(document).ready(function () {
 
-        let formData = $(this).serialize();
+        $('#visitorTypeForm').on('submit', function (e) {
+            e.preventDefault();
 
-        $.ajax({
-            url: '/visitorType/save',
-            method: 'POST',
-            data: formData,
-            success: function(response) {
-                if (response.success) {
-                    $('#result')
-                        .css('color', 'green')
-                        .text(response.message);
+            let formData = new FormData(this);
 
-                    $('#visitorTypeForm')[0].reset();
-                } else {
-                    $('#result')
-                        .css('color', 'red')
-                        .text(response.message || 'Error Adding Visitor Type.');
+            $.ajax({
+                url: "{{ route('visitorType.save') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    // ✅ success alert
+                    alert(response.message);
+
+                    // ✅ redirect after OK
+                    window.location.href = "{{ route('visitortype.index') }}";
+                },
+                error: function (xhr) {
+                    let msg = 'Something went wrong.';
+
+                    // ✅ Laravel validation errors (422)
+                    if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                        // get FIRST validation message
+                        msg = Object.values(xhr.responseJSON.errors)[0][0];
+                    }
+
+                    // ✅ Custom server error (500)
+                    else if (xhr.responseJSON?.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+
+                    alert(msg);
                 }
-            },
-            error: function(xhr) {   // ✅ fixed
-                if (xhr.status === 422) {
-                    let errors = xhr.responseJSON.errors;
-                    $('#result')
-                        .css('color', 'red')
-                        .text(errors.visitor_type[0]); // validation message
-                } else {
-                    $('#result')
-                        .css('color', 'red')
-                        .text('Unexpected error occurred.');
-                }
-            }
+            });
         });
+
     });
-});
 </script>
 
 
 </body>
 </html>
+@endsection

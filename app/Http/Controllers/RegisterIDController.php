@@ -11,7 +11,9 @@ class RegisterIDController extends Controller
     // Show the form
     public function index()
     {
-        $visitorTypes = VisitorType::orderBy('id', 'asc')->get();
+        $visitorTypes = VisitorType::where('deleted_at', null)
+                   ->orderBy('id', 'asc')
+                   ->get();
         return view('registerid.form', compact('visitorTypes'));
     }
 
@@ -48,7 +50,6 @@ class RegisterIDController extends Controller
         $registeredID->visitor_type = $request->visitor_type;
 
         $registeredID->created_at = now();
-        $registeredID->updated_at = now();
         $registeredID->save();
 
         // 3️⃣ RESPONSE
@@ -56,6 +57,24 @@ class RegisterIDController extends Controller
             'success' => true,
             'message' => 'Visitor ID registered successfully!',
         ]);
+    }
+
+    public function delete(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:registered_visitor_ids,id',
+        ]);
+            $visitor = RegisteredID::findOrFail($request->id);
+        if ($visitor) {
+            
+            // $visitor = VisitorType::findOrFail($request->id);
+            $visitor->deleted_at = now();
+            $visitor->save();
+            return redirect()->back()->with('success', 'Visitor ID deleted successfully!');
+        }
+
+
+        return redirect()->back()->with('error', 'Visitor ID not found.');
     }
 
 }

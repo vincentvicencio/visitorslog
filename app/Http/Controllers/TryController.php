@@ -12,7 +12,8 @@ class TryController extends Controller
 {
     public function show()
     {
-        $visitors = Visitor::where('status', 1)
+        $visitors = Visitor::where('status', 0)
+                   ->whereNull('time_out')
                    ->orderBy('id', 'asc')
                    ->get();
          $visitorTypes = VisitorType::orderBy('id', 'asc')->get();
@@ -30,7 +31,9 @@ class TryController extends Controller
     public function show_visitortype()
     {
         // Get all registered IDs, latest first
-        $visitorTypes = VisitorType::orderBy('id', 'asc')->get();
+        $visitorTypes = VisitorType::where('deleted_at', null)
+        ->orderBy('id', 'asc')
+        ->get();
         // Pass to the view
         return view('pages.visitortype', compact('visitorTypes'));
     }

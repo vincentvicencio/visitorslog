@@ -7,13 +7,16 @@ use App\Models\Visitor;
 use App\Models\VisitorType;
 use App\Models\RegisteredID;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 
 class VisitorController extends Controller
 {
     public function index()
     {
-        $visitors = VisitorType::orderBy('id', 'asc')->get();
+        $visitors = VisitorType::where('deleted_at', null)
+                   ->orderBy('id', 'asc')
+                   ->get();
         return view('homepage.form', compact('visitors'));
     }
 
@@ -27,45 +30,94 @@ class VisitorController extends Controller
 
     }
 
-    public function timeout(Request $request)
+    // public function timeout(Request $request)
+    // {
+    //     $request->validate([
+    //         'visitor_id' => 'required|exists:visitors,visitor_id',
+    //     ]);
+
+    //     $visitor = Visitor::where('visitor_id', $request->visitor_id)->latest('id')->first();
+
+    //     if ($visitor) {
+    //         $visitor->time_out = now();
+    //         $visitor->status = 0; // timed out
+    //         $visitor->save();
+
+    //         // ✅ Set flash message
+    //         return redirect()->back()->with('success', 'Visitor timed out successfully!');
+    //     }
+
+    //     return redirect()->back()->with('error', 'Visitor not found.');
+    // }
+
+    public function timeoutAjax(Request $request)
     {
-        $request->validate([
-            'visitor_id' => 'required|exists:visitors,visitor_id',
-        ]);
+        $visitor = Visitor::where('visitor_id', $request->visitor_id)->first();
 
-        $visitor = Visitor::where('visitor_id', $request->visitor_id)->latest('id')->first();
-
-        if ($visitor) {
-            $visitor->time_out = now();
-            $visitor->status = 0; // timed out
-            $visitor->save();
-
-            // ✅ Set flash message
-            return redirect()->back()->with('success', 'Visitor timed out successfully!');
+        if (!$visitor) {
+            return response()->json([
+                'message' => 'Visitor not found'
+            ], 404);
         }
 
-        return redirect()->back()->with('error', 'Visitor not found.');
+        if ($visitor->status == 1) {
+            return response()->json([
+                'message' => 'Visitor already timed out'
+            ], 400);
+        }
+
+        $visitor->update([
+            'time_out' => Carbon::now(),
+            'status'   => 1,
+            'updated_by' => auth()->user()->name ?? 'Admin',
+        ]);
+
+        return response()->json([
+            'message' => 'Visitor successfully timed out'
+        ]);
     }
 
+    // public function view(Request $request)
+    // {
+    //     $request->validate([
+    //         'visitor_id' => 'required|exists:visitors,visitor_id',
+    //     ]);
+
+    //     // Get only one visitor with visitor_id and status = 1
+    //     $visitor = Visitor::where('visitor_id', $request->visitor_id)
+    //                     ->where('status', 1)
+    //                     ->latest('id') // most recent if multiple
+    //                     ->first();     // only one record
+
+    //     if ($visitor) {
+    //         return view('homepage.view', compact('visitor'));
+    //     }
+
+    //     // Optional: handle case where visitor not found
+    //     return redirect()->back()->with('error', 'Visitor not found or inactive.');
+    // }
     public function view(Request $request)
     {
         $request->validate([
             'visitor_id' => 'required|exists:visitors,visitor_id',
         ]);
 
-        // Get only one visitor with visitor_id and status = 1
         $visitor = Visitor::where('visitor_id', $request->visitor_id)
-                        ->where('status', 1)
-                        ->latest('id') // most recent if multiple
-                        ->first();     // only one record
+            ->where('status', 0)
+            ->latest('id')
+            ->first();
 
-        if ($visitor) {
-            return view('homepage.view', compact('visitor'));
+        if (!$visitor) {
+            return response()->json([
+                'message' => 'Visitor not found or inactive'
+            ], 404);
         }
 
-        // Optional: handle case where visitor not found
-        return redirect()->back()->with('error', 'Visitor not found or inactive.');
+        return response()->json([
+            'redirect' => route('visitor.view.page', $visitor->visitor_id)
+        ]);
     }
+
 
 
     public function save(Request $request)
@@ -97,10 +149,6 @@ class VisitorController extends Controller
                         $fail('This Visitor ID is registered under a different visitor type.');
                     }
                 },
-                // Rule::unique('visitors', 'visitor_id')
-                //     ->where(function ($query) use ($request) {
-                //         return $query->where('visitor_id', $request->visitor_id);
-                //     }),
             ],
 
             'image_path' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -124,19 +172,20 @@ class VisitorController extends Controller
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->visitor_id;
             $visitor->location     = $request->location;
+            $visitor->created_by   = auth()->user()->name ?? 'Admin';
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
             $visitor->save();
 
 
             return response()->json([
-                'success' => true,
-                'message' => 'Visitor information saved successfully!',
-            ]);
+                'message' => 'Visitor successfully added'
+            ], 200);
+
+
 
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
                 'message' => 'Error saving visitor: ' . $e->getMessage(),
             ], 500);
         }

@@ -16,6 +16,7 @@ class Visitor extends Model
         'visitor_id',
         'location',
         'image_path',
+        'status',
         'time_out',
         'created_by',
         'updated_by',

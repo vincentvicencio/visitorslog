@@ -7,9 +7,16 @@
             <div class="page-title fs-2">Registered IDs</div>
             <div class="page-subtitle mb-3">Manage and monitor all registered ID entries</div>
         </div>
-        <div class="top-button">
+        {{-- <div class="top-button">
             Register ID
-        </div>
+        </div> --}}
+        <form action="/IDNumber" method="post">
+            @csrf
+            <button class="top-button" type="submit">
+                Register ID
+            </button>
+            
+        </form>
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
@@ -84,8 +91,18 @@
                         <td>{{ $visitor->id_number }}</td>
                         <td>{{ $visitor->created_by }}</td>
                         <td>{{ $visitor->updated_by ?? '-' }}</td>
-                        <td>{{ $visitor->created_at->format('Y-m-d H:i') }}</td>    
-                        <td>{{ $visitor->updated_at->format('Y-m-d H:i') }}</td>
+                        <td>
+                            {{ $visitor->created_at->format('F d, Y') }}<br>
+                            {{ $visitor->created_at->format('l') }}
+                        </td> 
+                        <td>
+                            @if ($visitor->updated_at == $visitor->created_at)
+                               -
+                            @else
+                                {{ $visitor->updated_at->format('F d, Y') }}<br>
+                                {{ $visitor->updated_at->format('l') }}
+                            @endif
+                        </td>
                         <td class="text-center">
                             <div class="dropdown">
                                 <button 
@@ -98,14 +115,14 @@
 
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="#">
+                                        <a class="dropdown-item" href="{{ route('registerID.edit', ['id' => $visitor->id]) }}">
                                             <i class="bi bi-pencil-square me-2"></i> Edit
                                         </a>
                                     </li>
                                     <li>
-                                        <button class="dropdown-item text-danger">
+                                        <a class="dropdown-item text-danger" href="{{ route('registerID.delete', ['id' => $visitor->id]) }}">
                                             <i class="bi bi-trash me-2"></i> Delete
-                                        </button>
+                                        </a>
                                     </li>
                                 </ul>
                             </div>

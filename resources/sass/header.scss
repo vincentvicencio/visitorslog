@@ -121,7 +121,7 @@
         position: absolute !important; /* Force absolute positioning */
         top: 100% !important; /* Drop it directly below the toggle */
         right: 8px !important; /* Align to the left edge of the toggle */
-        z-index: 10; /* Ensure it's above everything else */
+        z-index: 9999 !important; /* Ensure it's above everything else */
         margin: auto;
         
     }
