@@ -173,7 +173,7 @@
 </select>
 
 <input type="text" id="reg_emp_code" name="emp_code" placeholder="Employee Code" class="form-control" required>
-<input type="text" id="reg_loc" name="reg_loc" placeholder="Location" class="form-control" required>
+<!-- <input type="text" id="reg_loc" name="reg_loc" placeholder="Location" class="form-control" required> -->
 <input type="password" id="reg_password" name="password" placeholder="Password" class="form-control" required>
 
     <button type="submit" class="btn btn-primary">Register User</button>
@@ -251,7 +251,7 @@ $(document).ready(function() {
 
     $('#openPopup2').click(function() { $('#popupContainer2').fadeIn(); });
 $('#closePopup2').click(function() { $('#popupContainer2').fadeOut(); });
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Handle AJAX Submission
 $('#registered_user_form').on('submit', function(e) {
     e.preventDefault(); 
@@ -344,6 +344,136 @@ $('#edit_user_form').on('submit', function(e) {
         }
     });
 });
+    // --- 1. GLOBAL VARIABLES ---
+    let currentPage = 1;
+
+    // --- 2. INITIALIZATION ---
+    // Mark all rows as matches initially so pagination shows them all
+    $("#employeeTableBody tr").addClass('search-match');
+    applyPagination();
+
+    // --- 3. SEARCH LOGIC ---
+    $("#tableSearch").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        var $rows = $("#employeeTableBody tr");
+
+        $rows.each(function() {
+            var rowText = $(this).text().toLowerCase();
+            // Check if row is the "No results" row or if it matches search
+            var isMatch = rowText.indexOf(value) > -1;
+            
+            if (isMatch) {
+                $(this).addClass('search-match');
+            } else {
+                $(this).removeClass('search-match');
+            }
+        });
+
+        currentPage = 1; // Reset to first page on new search
+        applyPagination(); 
+    });
+
+    // --- 4. PAGINATION CORE FUNCTION ---
+    function applyPagination() {
+        const limit = parseInt($('#entriesPerPage').val()) || 10;
+        const $allRows = $("#employeeTableBody tr");
+        const $rowsToPaginate = $allRows.filter('.search-match');
+
+        const totalRows = $rowsToPaginate.length;
+        const totalPages = Math.ceil(totalRows / limit) || 1;
+
+        // Boundary checks
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        // Hide all rows, then show only the current slice
+        $allRows.hide();
+        const start = (currentPage - 1) * limit;
+        const end = start + limit;
+        $rowsToPaginate.slice(start, end).show();
+
+        // Update the custom pagination UI text
+        $('.number-holder-pagination').text(`Page ${currentPage} of ${totalPages}`);
+
+        // Visual feedback for arrows (opacity and cursor)
+        updateArrowStyles(currentPage, totalPages);
+    }
+
+    function updateArrowStyles(curr, total) {
+        const isFirst = curr === 1;
+        const isLast = curr === total;
+
+        $('.pagination-first, .pagination-prev').css({
+            'opacity': isFirst ? '0.3' : '1',
+            'cursor': isFirst ? 'default' : 'pointer'
+        });
+        $('.pagination-next, .pagination-last').css({
+            'opacity': isLast ? '0.3' : '1',
+            'cursor': isLast ? 'default' : 'pointer'
+        });
+    }
+
+    // --- 5. EVENT LISTENERS ---
+
+    // Entries Per Page Change
+    $('#entriesPerPage').on('change', function() {
+        currentPage = 1;
+        applyPagination();
+    });
+
+    // Arrow Click Events
+    $(document).on('click', '.pagination-first', function() {
+        if (currentPage > 1) {
+            currentPage = 1;
+            applyPagination();
+        }
+    });
+
+    $(document).on('click', '.pagination-prev', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            applyPagination();
+        }
+    });
+
+    $(document).on('click', '.pagination-next', function() {
+        const limit = parseInt($('#entriesPerPage').val());
+        const totalPages = Math.ceil($("#employeeTableBody tr.search-match").length / limit);
+        if (currentPage < totalPages) {
+            currentPage++;
+            applyPagination();
+        }
+    });
+
+    $(document).on('click', '.pagination-last', function() {
+        const limit = parseInt($('#entriesPerPage').val());
+        const totalPages = Math.ceil($("#employeeTableBody tr.search-match").length / limit);
+        if (currentPage < totalPages) {
+            currentPage = totalPages;
+            applyPagination();
+        }
+    });
+
+    // --- 6. EXISTING MODAL & AJAX LOGIC ---
+    // (Keep your Register, Edit, and Delete AJAX code here...)
+    $('#openPopup2').click(function() { $('#popupContainer2').fadeIn(); });
+    $('#closePopup2').click(function() { $('#popupContainer2').fadeOut(); });
+
+    // Handle Dropdown placement (if needed for table scrolling)
+    $(document).on('shown.bs.dropdown', '.dropdown', function () {
+        const $menu = $(this).find('.dropdown-menu');
+        $('body').append($menu);
+        const offset = $(this).offset();
+        $menu.css({
+            'display': 'block',
+            'top': offset.top + $(this).outerHeight(),
+            'left': offset.left
+        });
+    });
+
+    $(document).on('hide.bs.dropdown', '.dropdown', function () {
+        $('body > .dropdown-menu').remove();
+    });
 });
 </script>
 @endsection

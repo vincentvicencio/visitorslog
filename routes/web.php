@@ -27,6 +27,9 @@ Route::post('/addusers', [Registered_UsersController::class, 'addusers'])->name(
 Route::get('/get-user/{id}', [Registered_UsersController::class, 'getUser']);
 Route::post('/update-user/{id}', [Registered_UsersController::class, 'updateUser'])->name('updateuser');
 
+Route::get('/usertype/{id}/edit', [User_TypesController::class, 'edit']);
+Route::put('/usertype/{id}', [User_TypesController::class, 'update']);
+Route::delete('/usertype/{id}', [User_TypesController::class, 'destroy']);
 
 // View route
 Route::get('/usertype', [TryController::class, 'show_usertype'])->name('usertype');

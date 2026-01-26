@@ -230,22 +230,6 @@ applyPagination();
             $('#editTypeModal').fadeIn(200);
         });
     });
-
-    $('#edit_type_form').on('submit', function(e) {
-        e.preventDefault();
-        let id = $('#edit_type_id').val();
-        
-        $.ajax({
-            url: '/usertype/' + id,
-            type: 'POST',
-            data: $(this).serialize(),
-            success: function(response) {
-                alert(response.success);
-                location.reload();
-            },
-            error: function() { alert("Error updating role."); }
-        });
-    });
     $(document).on('click', '.delete-type', function() {
         if (confirm("Are you sure you want to delete this role?")) {
             let id = $(this).data('id');
@@ -264,6 +248,55 @@ applyPagination();
     });
 
     $('#closeEditType').click(function() { $('#editTypeModal').fadeOut(200); });
+// --- 6. EDIT FUNCTIONALITY ---
+
+// Step A: Open Modal and Populate Data
+$(document).on('click', '.edit-type', function() {
+    let id = $(this).data('id'); // Gets the ID from data-id="{{ $role->id }}"
+    
+    // Clear previous input just in case
+    $('#edit_type_name').val('Loading...');
+
+    // Fetch current data from your Laravel Route
+    // This expects a route like: Route::get('/usertype/{id}/edit', [Controller::class, 'edit']);
+    $.get('/usertype/' + id + '/edit', function(data) {
+        $('#edit_type_id').val(data.id);       // Hidden input for the ID
+        $('#edit_type_name').val(data.name);  // Input for the Role Name
+        $('#editTypeModal').fadeIn(200);      // Show the modal
+    }).fail(function() {
+        alert("Could not fetch data. Please check if the route exists.");
+    });
+});
+
+// Step B: Submit the Edit Form
+$('#edit_type_form').on('submit', function(e) {
+    e.preventDefault();
+    
+    let id = $('#edit_type_id').val();
+    const $submitBtn = $(this).find('button[type="submit"]');
+    
+    $submitBtn.prop('disabled', true).text('Updating...');
+
+    $.ajax({
+        // This matches Route::put('/usertype/{id}', [Controller::class, 'update']);
+        url: '/usertype/' + id,
+        type: 'POST', // Use POST because we are using @method('PUT') in the form
+        data: $(this).serialize(),
+        success: function(response) {
+            alert(response.success || "Role updated successfully!");
+            location.reload(); // Refresh to show changes
+        },
+        error: function(xhr) {
+            $submitBtn.prop('disabled', false).text('Update Role');
+            alert("Error: " + (xhr.responseJSON.message || "Update failed."));
+        }
+    });
+});
+
+// Step C: Close Modal
+$('#closeEditType').click(function() { 
+    $('#editTypeModal').fadeOut(200); 
+});
 
 });
     </script>
