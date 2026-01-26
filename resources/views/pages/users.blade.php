@@ -17,10 +17,10 @@
         padding: 15px;
         border-bottom: 1px solid #eee;
     }
-    .table-scroll-container {
+    /* .table-scroll-container {
         position: relative;
         overflow: visible !important;
-    }
+    } */
 
     #userTable {
         width: 100% !important;
@@ -78,7 +78,23 @@
             @forelse($registeredUsers as $user)
     <tr>
         <td>{{ $user->first_name }}</td>
-        <td>{{ $user->user_type }}</td>
+        <!-- <td>{{ $user->user_type }}</td> -->
+         <!-- <td>{{ (int) $user->user_type }}</td> -->
+          <td>
+            @switch((int)$user->user_type)
+                @case(1)
+                    Admin
+                    @break
+                @case(2)
+                    Guard
+                    @break
+                @case(3)
+                    Receptionist
+                    @break
+                @default
+                    Unknown
+            @endswitch
+        </td>
         <td>{{ $user->created_by }}</td>
         <td>{{ $user->updated_by}}</td>
         <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
@@ -309,28 +325,24 @@ $(document).on('click', '.delete-user', function() {
 });
 
 
-// 1. Open Edit Popup and Load Data
 $(document).on('click', '.edit-user', function() {
     var userId = $(this).data('id');
     
     $.get("/get-user/" + userId, function(data) {
         $('#edit_user_id').val(data.id);
-        $('#edit_user_type').val(data.role_id); // Adjust based on your DB column name
+        $('#edit_user_type').val(data.role_id); 
         $('#edit_emp_code').val(data.emp_code);
         $('#editPopupContainer').fadeIn();
     });
 });
 
-// 2. Close Edit Popup
 $('#closeEditPopup').click(function() { $('#editPopupContainer').fadeOut(); });
 $('#edit_user_form').on('submit', function(e) {
     e.preventDefault();
     
-    // Get the ID from your hidden input field in the edit modal
     var userId = $('#edit_user_id').val(); 
 
     $.ajax({
-        // This MUST match the route: /update-user/{id}
         url: "/update-user/" + userId, 
         type: "POST",
         data: $(this).serialize(), // This sends _token and your form inputs

@@ -36,27 +36,32 @@ public function show_usertype()
     {
         // return view('pages.users');
         $registeredUsers = RegisteredUser::all();
-
         // 3. Pass the variable to the view
         // return view('pages.users', compact('registeredUsers'));
+    
+    $roles = \App\Models\user_types::get('name');
+   
 
-    $roles = \App\Models\user_types::all();
     
     // Check if there is a search query
     $search = $request->input('search');
     
-    $registeredUsers = \App\Models\RegisteredUser::when($search, function ($query, $search) {
-        return $query->where('user_name', 'like', "%{$search}%")
-                     ->orWhere('first_name', 'like', "%{$search}%")
-                     ->orWhere('last_name', 'like', "%{$search}%");
-    })->get();
+    $registeredUsers = \App\Models\RegisteredUser::with('userType')
+    ->when($search, function ($query, $search) {
+        $query->where('user_name', 'like', "%{$search}%")
+              ->orWhere('first_name', 'like', "%{$search}%")
+              ->orWhere('last_name', 'like', "%{$search}%");
+    })
+    ->get();
+    // dd($registeredUsers);
 
-    $allEmployeesFromSession = session('all_emp', []); 
-
+    $allEmployeesFromSession = session('all_emp', []);
+    //  dd($allEmployeesFromSession);
     // return view('home', compact('roles', 'registeredUsers', 'allEmployeesFromSession'));
     return view('pages.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession'));
 
     }
+
     public function show_visitortype()
     {
         // Get all registered IDs, latest first

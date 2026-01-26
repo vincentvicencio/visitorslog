@@ -139,89 +139,271 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-   $(document).ready(function() {
+//    $(document).ready(function() {
     
-    // --- 1. SEARCH FUNCTIONALITY ---
+//     // --- 1. SEARCH FUNCTIONALITY ---
+//     $("#typeSearch").on("keyup", function() {
+//         var value = $(this).val().toLowerCase();
+//         $("#userTypeTableBody tr").filter(function() {
+//             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+//         });
+//     });
+// function applyPagination() {
+//     var limit = parseInt($('#entriesPerPage').val());
+//     var $rows = $("#userTypeTableBody tr");
+//     $rows.hide();
+//     $rows.slice(0, limit).show();
+// }
+// $('#entriesPerPage').on('change', applyPagination);
+// applyPagination();
+//     // --- 3. MODAL CONTROLS ---
+//     $('#openAddTypePopup').click(function() { 
+//         $('#addTypeModal').fadeIn(200); 
+//     });
+
+//     $('#closeAddType').click(function() { 
+//         $('#addTypeModal').fadeOut(200); 
+//     });
+
+//     $(window).click(function(event) {
+//         if (event.target.id == 'addTypeModal') {
+//             $('#addTypeModal').fadeOut(200);
+//         }
+//     });
+
+//     $('#add_type_form').off('submit').on('submit', function(e) {
+//         e.preventDefault();
+
+//         const $submitBtn = $(this).find('button[type="submit"]');
+//         $submitBtn.prop('disabled', true).text('Saving...');
+
+//         $.ajax({
+//             url: "{{ route('addusertype') }}", 
+//             type: "POST",
+//             data: $(this).serialize(),
+//             success: function(response) {
+//                 alert("Role added successfully!");
+//                 location.reload();
+//             },
+//             error: function(xhr) {
+//                 $submitBtn.prop('disabled', false).text('Save Role');
+//                 let errorMsg = xhr.responseJSON.errors?.user_type ? 
+//                                xhr.responseJSON.errors.user_type[0] : 
+//                                "Check if role already exists.";
+//                 alert("Error: " + errorMsg);
+//             }
+//         });
+//     });
+//     $(document).on('shown.bs.dropdown', '.dropdown', function () {
+//         const $button = $(this).find('.dropdown-toggle');
+//         const $menu = $(this).find('.dropdown-menu');
+//         $('body').append($menu);
+        
+//         const offset = $button.offset();
+        
+//         $menu.css({
+//             'display': 'block',
+//             'position': 'absolute',
+//             'top': (offset.top + $button.outerHeight()) + 'px',
+//             'left': offset.left + 'px',
+//             'width': 'auto',
+//             'z-index': 10000
+//         });
+//     });
+
+//     $(document).on('hide.bs.dropdown', '.dropdown', function () {
+//         const $menu = $('body > .dropdown-menu');
+//         $(this).append($menu);
+//         $menu.css({
+//             'display': 'none',
+//             'position': '',
+//             'top': '',
+//             'left': '',
+//             'z-index': ''
+//         });
+//     });    
+//     $(document).on('click', '.edit-type', function() {
+//         let id = $(this).data('id');
+//         $.get('/usertype/' + id + '/edit', function(data) {
+//             $('#edit_type_id').val(data.id);
+//             $('#edit_type_name').val(data.name);
+//             $('#editTypeModal').fadeIn(200);
+//         });
+//     });
+//     $(document).on('click', '.delete-type', function() {
+//         if (confirm("Are you sure you want to delete this role?")) {
+//             let id = $(this).data('id');
+            
+//             $.ajax({
+//                 url: '/usertype/' + id,
+//                 type: 'DELETE',
+//                 data: { _token: "{{ csrf_token() }}" },
+//                 success: function(response) {
+//                     alert(response.success);
+//                     location.reload();
+//                 },
+//                 error: function() { alert("Error deleting role."); }
+//             });
+//         }
+//     });
+
+//     $('#closeEditType').click(function() { $('#editTypeModal').fadeOut(200); });
+// // --- 6. EDIT FUNCTIONALITY ---
+
+// // Step A: Open Modal and Populate Data
+// $(document).on('click', '.edit-type', function() {
+//     let id = $(this).data('id'); // Gets the ID from data-id="{{ $role->id }}"
+    
+//     // Clear previous input just in case
+//     $('#edit_type_name').val('Loading...');
+
+//     // Fetch current data from your Laravel Route
+//     // This expects a route like: Route::get('/usertype/{id}/edit', [Controller::class, 'edit']);
+//     $.get('/usertype/' + id + '/edit', function(data) {
+//         $('#edit_type_id').val(data.id);       // Hidden input for the ID
+//         $('#edit_type_name').val(data.name);  // Input for the Role Name
+//         $('#editTypeModal').fadeIn(200);      // Show the modal
+//     }).fail(function() {
+//         alert("Could not fetch data. Please check if the route exists.");
+//     });
+// });
+
+// // Step B: Submit the Edit Form
+// $('#edit_type_form').on('submit', function(e) {
+//     e.preventDefault();
+    
+//     let id = $('#edit_type_id').val();
+//     const $submitBtn = $(this).find('button[type="submit"]');
+    
+//     $submitBtn.prop('disabled', true).text('Updating...');
+
+//     $.ajax({
+//         // This matches Route::put('/usertype/{id}', [Controller::class, 'update']);
+//         url: '/usertype/' + id,
+//         type: 'POST', // Use POST because we are using @method('PUT') in the form
+//         data: $(this).serialize(),
+//         success: function(response) {
+//             alert(response.success || "Role updated successfully!");
+//             location.reload(); // Refresh to show changes
+//         },
+//         error: function(xhr) {
+//             $submitBtn.prop('disabled', false).text('Update Role');
+//             alert("Error: " + (xhr.responseJSON.message || "Update failed."));
+//         }
+//     });
+// });
+
+// // Step C: Close Modal
+// $('#closeEditType').click(function() { 
+//     $('#editTypeModal').fadeOut(200); 
+// });
+
+// });
+
+$(document).ready(function() {
+    // --- 1. GLOBAL VARIABLES ---
+    let currentPage = 1;
+
+    // --- 2. INITIALIZATION ---
+    function initTable() {
+        $("#userTypeTableBody tr").addClass('search-match');
+        applyPagination();
+    }
+    initTable();
+
+    // --- 3. THE CORE PAGINATION FUNCTION ---
+    function applyPagination() {
+        const limit = parseInt($('#entriesPerPage').val()) || 10;
+        const $allRows = $("#userTypeTableBody tr");
+        
+        // Filter rows that match the search criteria
+        const $rowsToPaginate = $allRows.filter('.search-match');
+        const totalRows = $rowsToPaginate.length;
+        const totalPages = Math.ceil(totalRows / limit) || 1;
+
+        // Boundary checks
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        // Hide all, then show only the current page slice
+        $allRows.hide();
+        const start = (currentPage - 1) * limit;
+        const end = start + limit;
+        $rowsToPaginate.slice(start, end).show();
+
+        // Update pagination text
+        $('.number-holder-pagination').text(`Page ${currentPage} of ${totalPages}`);
+
+        updateArrowStyles(currentPage, totalPages);
+    }
+
+    function updateArrowStyles(curr, total) {
+        const isFirst = curr === 1;
+        const isLast = curr === total;
+        $('.pagination-first, .pagination-prev').css({'opacity': isFirst ? '0.3' : '1', 'cursor': isFirst ? 'default' : 'pointer'});
+        $('.pagination-next, .pagination-last').css({'opacity': isLast ? '0.3' : '1', 'cursor': isLast ? 'default' : 'pointer'});
+    }
+
+    // --- 4. EVENT LISTENERS ---
+
+    // Search Logic
     $("#typeSearch").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $("#userTypeTableBody tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        const value = $(this).val().toLowerCase();
+        $("#userTypeTableBody tr").each(function() {
+            const rowText = $(this).text().toLowerCase();
+            const isMatch = rowText.indexOf(value) > -1;
+            $(this).toggleClass('search-match', isMatch);
         });
-    });
-function applyPagination() {
-    var limit = parseInt($('#entriesPerPage').val());
-    var $rows = $("#userTypeTableBody tr");
-    $rows.hide();
-    $rows.slice(0, limit).show();
-}
-$('#entriesPerPage').on('change', applyPagination);
-applyPagination();
-    // --- 3. MODAL CONTROLS ---
-    $('#openAddTypePopup').click(function() { 
-        $('#addTypeModal').fadeIn(200); 
+        currentPage = 1; 
+        applyPagination(); 
     });
 
-    $('#closeAddType').click(function() { 
-        $('#addTypeModal').fadeOut(200); 
+    // Entries Per Page Change
+    $('#entriesPerPage').on('change', function() {
+        currentPage = 1;
+        applyPagination();
     });
 
-    $(window).click(function(event) {
-        if (event.target.id == 'addTypeModal') {
-            $('#addTypeModal').fadeOut(200);
-        }
+    // Navigation Arrow Clicks
+    $(document).on('click', '.pagination-first', function() { currentPage = 1; applyPagination(); });
+    $(document).on('click', '.pagination-prev', function() { if(currentPage > 1) { currentPage--; applyPagination(); } });
+    $(document).on('click', '.pagination-next', function() { 
+        const limit = parseInt($('#entriesPerPage').val());
+        const totalPages = Math.ceil($("#userTypeTableBody tr.search-match").length / limit);
+        if(currentPage < totalPages) { currentPage++; applyPagination(); }
+    });
+    $(document).on('click', '.pagination-last', function() { 
+        const limit = parseInt($('#entriesPerPage').val());
+        const totalPages = Math.ceil($("#userTypeTableBody tr.search-match").length / limit);
+        currentPage = totalPages; 
+        applyPagination(); 
     });
 
-    $('#add_type_form').off('submit').on('submit', function(e) {
+    // --- 5. MODAL & AJAX OPERATIONS ---
+
+    // Open Add Modal
+    $('#openAddTypePopup').click(function() { $('#addTypeModal').fadeIn(200); });
+    $('#closeAddType').click(function() { $('#addTypeModal').fadeOut(200); });
+
+    // Handle Add Form
+    $('#add_type_form').on('submit', function(e) {
         e.preventDefault();
-
-        const $submitBtn = $(this).find('button[type="submit"]');
-        $submitBtn.prop('disabled', true).text('Saving...');
+        const $btn = $(this).find('button[type="submit"]');
+        $btn.prop('disabled', true).text('Saving...');
 
         $.ajax({
             url: "{{ route('addusertype') }}", 
             type: "POST",
             data: $(this).serialize(),
-            success: function(response) {
-                alert("Role added successfully!");
-                location.reload();
-            },
+            success: function() { location.reload(); },
             error: function(xhr) {
-                $submitBtn.prop('disabled', false).text('Save Role');
-                let errorMsg = xhr.responseJSON.errors?.user_type ? 
-                               xhr.responseJSON.errors.user_type[0] : 
-                               "Check if role already exists.";
-                alert("Error: " + errorMsg);
+                $btn.prop('disabled', false).text('Save Role');
+                alert("Error: " + (xhr.responseJSON.message || "Failed to add."));
             }
         });
     });
-    $(document).on('shown.bs.dropdown', '.dropdown', function () {
-        const $button = $(this).find('.dropdown-toggle');
-        const $menu = $(this).find('.dropdown-menu');
-        $('body').append($menu);
-        
-        const offset = $button.offset();
-        
-        $menu.css({
-            'display': 'block',
-            'position': 'absolute',
-            'top': (offset.top + $button.outerHeight()) + 'px',
-            'left': offset.left + 'px',
-            'width': 'auto',
-            'z-index': 10000
-        });
-    });
 
-    $(document).on('hide.bs.dropdown', '.dropdown', function () {
-        const $menu = $('body > .dropdown-menu');
-        $(this).append($menu);
-        $menu.css({
-            'display': 'none',
-            'position': '',
-            'top': '',
-            'left': '',
-            'z-index': ''
-        });
-    });    
+    // Open Edit Modal
     $(document).on('click', '.edit-type', function() {
         let id = $(this).data('id');
         $.get('/usertype/' + id + '/edit', function(data) {
@@ -230,46 +412,22 @@ applyPagination();
             $('#editTypeModal').fadeIn(200);
         });
     });
-    $(document).on('click', '.delete-type', function() {
-        if (confirm("Are you sure you want to delete this role?")) {
-            let id = $(this).data('id');
-            
-            $.ajax({
-                url: '/usertype/' + id,
-                type: 'DELETE',
-                data: { _token: "{{ csrf_token() }}" },
-                success: function(response) {
-                    alert(response.success);
-                    location.reload();
-                },
-                error: function() { alert("Error deleting role."); }
-            });
-        }
-    });
 
     $('#closeEditType').click(function() { $('#editTypeModal').fadeOut(200); });
-// --- 6. EDIT FUNCTIONALITY ---
 
-// Step A: Open Modal and Populate Data
-$(document).on('click', '.edit-type', function() {
-    let id = $(this).data('id'); // Gets the ID from data-id="{{ $role->id }}"
-    
-    // Clear previous input just in case
-    $('#edit_type_name').val('Loading...');
-
-    // Fetch current data from your Laravel Route
-    // This expects a route like: Route::get('/usertype/{id}/edit', [Controller::class, 'edit']);
-    $.get('/usertype/' + id + '/edit', function(data) {
-        $('#edit_type_id').val(data.id);       // Hidden input for the ID
-        $('#edit_type_name').val(data.name);  // Input for the Role Name
-        $('#editTypeModal').fadeIn(200);      // Show the modal
-    }).fail(function() {
-        alert("Could not fetch data. Please check if the route exists.");
-    });
-});
-
-// Step B: Submit the Edit Form
-$('#edit_type_form').on('submit', function(e) {
+    // Handle Edit Form
+    // $('#edit_type_form').on('submit', function(e) {
+    //     e.preventDefault();
+    //     let id = $('#edit_type_id').val();
+    //     $.ajax({
+    //         url: '/usertype/' + id,
+    //         type: 'POST', // Handled as PUT via @method('PUT')
+    //         data: $(this).serialize(),
+    //         success: function() { location.reload(); },
+    //         error: function() { alert("Update failed."); }
+    //     });
+    // });
+    $('#edit_type_form').on('submit', function(e) {
     e.preventDefault();
     
     let id = $('#edit_type_id').val();
@@ -298,6 +456,37 @@ $('#closeEditType').click(function() {
     $('#editTypeModal').fadeOut(200); 
 });
 
+    // Handle Delete
+    $(document).on('click', '.delete-type', function() {
+        if (confirm("Delete this role?")) {
+            let id = $(this).data('id');
+            $.ajax({
+                url: '/usertype/' + id,
+                type: 'DELETE',
+                data: { _token: "{{ csrf_token() }}" },
+                success: function() { location.reload(); }
+            });
+        }
+    });
+
+    // Dropdown Overflow Fix
+    $(document).on('shown.bs.dropdown', '.dropdown', function () {
+        const $btn = $(this).find('.dropdown-toggle');
+        const $menu = $(this).find('.dropdown-menu');
+        $('body').append($menu);
+        const offset = $btn.offset();
+        $menu.css({
+            'display': 'block',
+            'position': 'absolute',
+            'top': (offset.top + $btn.outerHeight()) + 'px',
+            'left': offset.left + 'px',
+            'z-index': 10000
+        });
+    });
+
+    $(document).on('hide.bs.dropdown', '.dropdown', function () {
+        $('body > .dropdown-menu').remove();
+    });
 });
     </script>
 @endsection

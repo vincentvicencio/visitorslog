@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class RegisteredUser extends Model
 {
     protected $table = 'registered_users';
-protected $fillable = ['user_name', 'first_name', 'last_name', 'password', 'user_type', 'created_by', 'updated_by', 'deleted_by'];
+    protected $fillable = ['user_name',
+    'first_name',
+    'last_name',
+    'password',
+    'user_type',
+    'created_by',
+    'updated_by',
+    'deleted_by'
+    ];
 
+    public function userType()
+    {
+        return $this->belongsTo(\App\Models\User_types::class, 'user_type', 'id');
+    }
 }
