@@ -31,6 +31,10 @@
                         @csrf
                         <button type="submit">Add Visitor Type</button>
                     </form>
+                    <form action="/addusers" method="post">
+                        @csrf
+                        <button type="submit">User</button>
+                    </form>
                 </div>
 
                 <form action="/visitorlog" method="POST">

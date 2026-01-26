@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('password');
             $table->integer('user_type');
+            $table->string('location');
             $table->string('created_by');
             $table->string('updated_by');
             $table->string('deleted_by');

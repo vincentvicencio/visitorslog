@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\TryController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\User_TypesController;
+use App\Http\Controllers\Registered_UsersController;
+use App\Http\Controllers\HomeController;
+use App\Models\RegisteredUser;
+use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,6 +20,27 @@ Auth::routes();
 
 // home route
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::post('/addusertype', [User_TypesController::class, 'addusertype'])->name('addusertype');
+Route::post('/addusers', [Registered_UsersController::class, 'addusers'])->name('addusers');
+
+Route::get('/get-user/{id}', [Registered_UsersController::class, 'getUser']);
+Route::post('/update-user/{id}', [Registered_UsersController::class, 'updateUser'])->name('updateuser');
+
+
+// View route
+Route::get('/usertype', [TryController::class, 'show_usertype'])->name('usertype');
+
+// Action route
+Route::post('/add-user-type', [User_TypesController::class, 'addusertype'])->name('addusertype');
+
+
+Route::post('/delete-user/{id}', [Registered_UsersController::class, 'deleteUser'])->name('deleteuser');    
+Route::post('/delete-usertype/{id}', [User_TypesController::class, 'deleteUsertype'])->name('deleteusertype');
+Route::post('/update-usertype', [User_TypesController::class, 'updateUsertype'])->name('updateusertype');
+Route::get('/get-usertype/{id}', [User_TypesController::class, 'getUsertype']); 
+Route::post('/fetch-users-by-type', [Registered_UsersController::class, 'fetchUsersByType'])->name('fetchUsersByType');
+Route::post('/fetch-users-by-name', [Registered_UsersController::class, 'fetchUsersByName'])->name('fetchUsersByName'); 
 
 // visitor routes
 Route::post('/visitor', [VisitorController::class, 'index'])->name('visitor.index');    //checked

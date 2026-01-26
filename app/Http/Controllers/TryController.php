@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\VisitorType;
+use App\Models\UserType;
+use App\Models\RegisteredUser;
 use App\Models\RegisteredID;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
 class TryController extends Controller
@@ -19,13 +23,39 @@ class TryController extends Controller
 
         return view('pages.visitorlog', compact('visitors', 'visitorTypes'));
     }
-    public function show_usertype()
+    // In TryController.php
+public function show_usertype()
+{
+    // Fetch roles from the database using your User_types model
+    $roles = \App\Models\User_types::all(); 
+    
+    // Pass the $roles variable to the view
+    return view('pages.usertype', compact('roles'));
+}
+    public function show_user(Request $request)
     {
-        return view('pages.usertype');
-    }
-    public function show_user()
-    {
-        return view('pages.users');
+        // return view('pages.users');
+        $registeredUsers = RegisteredUser::all();
+
+        // 3. Pass the variable to the view
+        // return view('pages.users', compact('registeredUsers'));
+
+    $roles = \App\Models\user_types::all();
+    
+    // Check if there is a search query
+    $search = $request->input('search');
+    
+    $registeredUsers = \App\Models\RegisteredUser::when($search, function ($query, $search) {
+        return $query->where('user_name', 'like', "%{$search}%")
+                     ->orWhere('first_name', 'like', "%{$search}%")
+                     ->orWhere('last_name', 'like', "%{$search}%");
+    })->get();
+
+    $allEmployeesFromSession = session('all_emp', []); 
+
+    // return view('home', compact('roles', 'registeredUsers', 'allEmployeesFromSession'));
+    return view('pages.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession'));
+
     }
     public function show_visitortype()
     {
@@ -46,4 +76,6 @@ class TryController extends Controller
     {
         return view('pages.report');
     }
+
+    
 }

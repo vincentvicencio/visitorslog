@@ -69,7 +69,13 @@
         
             <div class="logout-button d-flex mt-auto pe-4 fw-bold">
                 <i class="bi bi-box-arrow-left p-2"></i>
-                Log out
+                <!-- Log out -->
+                 <a  href="{{ route('logout') }}"                onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                                        {{ __('Logout') }}>Logout</a>
+                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
             </div>
 
         <br>
