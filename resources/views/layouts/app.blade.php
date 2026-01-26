@@ -98,6 +98,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- ✅ Your compiled app scripts -->
-    @vite(['resources/js/app.js', 'resources/js/RegisteredId.js'])
+     @vite(['resources/js/app.js', 'resources/js/RegisteredId.js'])
+
 </body>
 </html>

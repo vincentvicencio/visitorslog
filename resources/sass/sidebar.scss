@@ -15,7 +15,6 @@
         // padding-top: 80px;
         transition: left 0.3s ease;
         box-sizing: border-box;
-        border-radius: 0px 20px 20px 0px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     .sidebar-menu-button {
@@ -149,14 +148,9 @@
         position: relative;
         top: -7px;
     }
-    .user-name{
-    }
 
 
     @media (max-width:880px) {
-        body{
-            background-color: red !important;
-        }
         .side-menu {
             left: -260px; /* Initially hide sidebar */
             transition: left 0.3s ease-in-out;
@@ -185,6 +179,12 @@
             top: 90px;
             width: 25%;
             left: 70%;
+        }
+        .side-menu-icon-1{
+            display: none !important;
+        }
+        .side-menu-icon-2{
+            display: none !important;
         }
     }
 
@@ -249,6 +249,6 @@ body {
     body {
         margin-left: 0;
         transition: margin-left 0.3s ease-in-out;
-        padding: 20px;
+        padding:40px 20px 20px 20px;
     }
 }
