@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\RegisteredID;
 use App\Models\VisitorType;
+use Carbon\Carbon;
 
 class RegisterIDController extends Controller
 {
@@ -24,7 +25,9 @@ class RegisterIDController extends Controller
         $registeredIds = RegisteredID::where('deleted_at', null)
                    ->orderBy('visitor_type', 'asc')
                    ->get();
-        $visitorTypes = VisitorType::orderBy('id', 'asc')->get();
+        $visitorTypes = VisitorType::where('deleted_at', null)
+                   ->orderBy('id', 'asc')
+                   ->get();
 
         // Pass to the view
         return view('registerid.list', compact('registeredIds', 'visitorTypes'));
@@ -35,8 +38,8 @@ class RegisterIDController extends Controller
     {
         // 1️⃣ VALIDATION
         $request->validate([
-            // Check if visitor_id already exists
-            'visitor_id'   => 'required|numeric|unique:registered_visitor_ids,id_number',
+            // Check if id_number already exists
+            'id_number'   => 'required|numeric|unique:registered_visitor_ids,id_number',
 
             // Check if visitor_type exists in visitor_types table (ID)
             'visitor_type' => 'required|exists:visitor_types,id',
@@ -53,28 +56,76 @@ class RegisterIDController extends Controller
         $registeredID->save();
 
         // 3️⃣ RESPONSE
+        if (!$registeredID) {
+            return response()->json([
+                'message' => 'Visitor Id not found'
+            ], 404);
+        }
+
         return response()->json([
-            'success' => true,
-            'message' => 'Visitor ID registered successfully!',
+            'message' => 'Visitor Id successfully registered'
         ]);
     }
 
-    public function delete(Request $request)
+    public function editAjax(Request $request)
     {
         $request->validate([
             'id' => 'required|exists:registered_visitor_ids,id',
+            'id_number' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) use ($request) {
+                    $exists = RegisteredID::whereRaw('id_number = ?', [$value])
+                        ->where('id', '!=', $request->id)  // exclude current record
+                        ->whereNull('deleted_at')
+                        ->exists();
+                    if ($exists) {
+                        $fail('Visitor ID already exists.');
+                    }
+                },
+            ],
         ]);
-            $visitor = RegisteredID::findOrFail($request->id);
-        if ($visitor) {
-            
-            // $visitor = VisitorType::findOrFail($request->id);
-            $visitor->deleted_at = now();
-            $visitor->save();
-            return redirect()->back()->with('success', 'Visitor ID deleted successfully!');
+
+        $visitor = RegisteredID::find($request->id);
+
+        $visitor->update([
+            'id_number' => $request->id_number,
+            'visitor_type' => $request->visitor_type,
+            'updated_at' => now(),
+            'updated_by' => auth()->user()->name ?? 'Admin',
+        ]);
+
+        return response()->json([
+            'message' => 'Visitor ID successfully updated'
+        ], 200);
+    }
+
+
+
+    public function deleteAjax(Request $request)
+    {
+        $visitor = RegisteredID::where('id', $request->id)->first();
+
+        if (!$visitor) {
+            return response()->json([
+                'message' => 'Visitor Id not found'
+            ], 404);
         }
 
+        if ($visitor->deleted_at !== null) {
+            return response()->json([
+                'message' => 'Visitor Id already deleted'
+            ], 400);
+        }
 
-        return redirect()->back()->with('error', 'Visitor ID not found.');
+        $visitor->update([
+            'deleted_at' => Carbon::now(),
+            'deleted_by' => auth()->user()->name ?? 'Admin',
+        ]);
+
+        return response()->json([
+            'message' => 'Visitor Id successfully deleted'
+        ]);
     }
 
 }

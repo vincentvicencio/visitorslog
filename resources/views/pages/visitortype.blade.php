@@ -1,71 +1,5 @@
 @extends('layout')
-    <style>
-        /* Modal overlay */
-        .modal {
-            display: none; /* hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8); /* dark translucent background */
-            justify-content: center;
-            align-items: center;
-        }
 
-        /* Modal content box */
-        .modal-content {
-            position: relative;
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            max-width: 90%;
-            max-height: 90%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        /* Image inside modal */
-        .modal-image {
-            max-width: 100%;
-            max-height: 80vh;
-            border-radius: 6px;
-        }
-
-        /* Close button */
-        .closeBtn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .closeBtn:hover {
-            color: #000;
-        }
-
-        /* Button to open modal */
-        .openModalBtn {
-            padding: 8px 16px;
-            background-color: #007bff;
-            border: none;
-            color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .openModalBtn:hover {
-            background-color: #0056b3;
-        }
-
-    </style>
 @section('content')
 <div class="user-types-container mt-4">
     <div class="page-header">
@@ -73,16 +7,9 @@
             <div class="page-title fs-2">Visitor Type</div>
             <div class="page-subtitle mb-3">Manage and organize different visitor categories</div>
         </div>
-        {{-- <div class="top-button">
+        <div class="top-button" id="addBtn">
             Add Visitor Type
-        </div> --}}
-         <form action="/visitor_type" method="post">
-            @csrf
-            <button class="top-button" type="submit">
-                Add Visitor Type
-            </button>
-            
-        </form>
+        </div>
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
@@ -108,16 +35,6 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- <tr>
-                    <td><strong>Juan_DC</strong></td>
-                    <td>Receptionist</td>
-                    <td>-</td>
-                    <td>January 22, 2026 <br> Thursday, 8:30 AM</td>
-
-
-
-                </tr> --}}
-
                 @forelse($visitorTypes as $index => $visitor)
                     <tr>
                         <td><strong>{{ $visitor->name }}</strong></td>
@@ -136,24 +53,14 @@
                                     aria-expanded="false">
                                     Action
                                 </button>
-
-                                {{-- <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('visitorType.edit', ['id' => $visitor->id]) }}">
-                                            <i class="bi bi-pencil-square me-2"></i> Edit
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item text-danger" href="{{ route('visitorType.delete', ['id' => $visitor->id]) }}">
-                                            <i class="bi bi-trash me-2"></i> Delete
-                                        </a>
-                                    </li>
-                                </ul> --}}
                                 <ul class="dropdown-menu">
                                     <li>
                                         <button 
-                                            class="dropdown-item editBtn"
-                                            data-id="{{ $visitor->id }}">
+                                            class="dropdown-item"
+                                            id="editBtn"
+                                            data-id="{{ $visitor->id }}"
+                                            data-name="{{ $visitor->name }}"
+                                            >
                                             <i class="bi bi-pencil-square me-2"></i> Edit
                                         </button>
 
@@ -161,7 +68,8 @@
                                     <li>
                                         <button 
                                             type="button"
-                                            class="dropdown-item text-danger deleteBtn"
+                                            class="dropdown-item text-danger"
+                                            id="deleteBtn"
                                             data-id="{{ $visitor->id }}">
                                             <i class="bi bi-trash me-2"></i> Delete
                                         </button>
@@ -182,59 +90,10 @@
         <x-table-pagination/>
     </div>
 </div>
-<div id="simpleModal" class="modal">
-    <div class="modal-content">
-        <span class="closeBtn">&times;</span>
-        <img src="path/to/image.jpg" alt="Modal Image" class="modal-image">   
-    </div>
-</div>
+@vite('resources/js/visitortype.js')
+
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-$(document).on('click', '.deleteBtn', function () {
-    let id = $(this).data('id');
-
-    if (!id) return;
-
-    if (!confirm('Are you sure you want to delete this Visitor Type?')) {
-        return;
-    }
-
-    $.ajax({
-        url: "{{ route('visitorType.delete.ajax') }}",
-        type: "POST",
-        data: {
-            id: id,
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function (response) {
-            alert(response.message);
-            location.reload();
-        },
-        error: function (xhr) {
-            alert(xhr.responseJSON?.message ?? 'Delete failed.');
-        }
-    });
-});
-
-document.querySelectorAll('.editBtn').forEach(button => {
-    button.addEventListener('click', function() {
-        const id = this.getAttribute('data-id');
-        if (id) {
-            // alert('Edit functionality is not implemented yet.');
-            document.getElementById('simpleModal').style.display = 'block';
-            
-        }
-    });
-});
-
-document.querySelectorAll('.closeBtn').forEach(button => {
-    button.addEventListener('click', function() {
-        document.getElementById('simpleModal').style.display = 'none';
-    });
-});
-
-</script>
 
 
 @endsection

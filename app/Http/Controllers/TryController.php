@@ -16,7 +16,9 @@ class TryController extends Controller
                    ->whereNull('time_out')
                    ->orderBy('id', 'asc')
                    ->get();
-         $visitorTypes = VisitorType::orderBy('id', 'asc')->get();
+        $visitorTypes = VisitorType::where('deleted_at', null)
+                   ->orderBy('id', 'asc')
+                   ->get();
 
         return view('pages.visitorlog', compact('visitors', 'visitorTypes'));
     }
@@ -40,9 +42,11 @@ class TryController extends Controller
     public function show_id()
     {
         $registeredIds = RegisteredID::where('deleted_at', null)
-                   ->orderBy('visitor_type', 'asc')
+                   ->orderBy('id', 'asc')
                    ->get();
-        $visitorTypes = VisitorType::orderBy('id', 'asc')->get();
+        $visitorTypes = VisitorType::where('deleted_at', null)
+                   ->orderBy('id', 'asc')
+                   ->get();
         return view('pages.id', compact('registeredIds', 'visitorTypes'));
     }
     public function show_report()

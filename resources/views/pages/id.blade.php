@@ -7,16 +7,9 @@
             <div class="page-title fs-2">Registered IDs</div>
             <div class="page-subtitle mb-3">Manage and monitor all registered ID entries</div>
         </div>
-        {{-- <div class="top-button">
+        <div class="top-button" id="addBtn">
             Register ID
-        </div> --}}
-        <form action="/IDNumber" method="post">
-            @csrf
-            <button class="top-button" type="submit">
-                Register ID
-            </button>
-            
-        </form>
+        </div>
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
@@ -44,42 +37,6 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- <tr>
-                    <td><strong>Juan Dela Cruz</strong></td>
-                    <td>1234</td>
-                    <td>Receptionist</td>
-                    <td>-</td>
-                    <td>January 22, 2026, Thursday</td>
-                    <td>January 23, 2026, Friday</td>
-                    <td class="text-center">
-                        <div class="dropdown">
-                            <button 
-                                class="btn btn-sm btn-primary dropdown-toggle"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                Action
-                            </button>
-
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="bi bi-pencil-square me-2"></i> Edit
-                                    </a>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item text-danger">
-                                        <i class="bi bi-trash me-2"></i> Delete
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-
-
-
-                </tr> --}}
-
                  @forelse($registeredIds as $index => $visitor)
                     <tr>
                         @foreach ($visitorTypes as $type)
@@ -115,14 +72,26 @@
 
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="{{ route('registerID.edit', ['id' => $visitor->id]) }}">
+                                        <button 
+                                            class="dropdown-item"
+                                            id="editBtn"
+                                            data-id="{{ $visitor->id }}"
+                                            data-type="{{ $visitor->visitor_type }}"
+                                            data-name="{{ $visitor->id_number }}"
+                                            >
                                             <i class="bi bi-pencil-square me-2"></i> Edit
-                                        </a>
+                                        </button>
+
                                     </li>
                                     <li>
-                                        <a class="dropdown-item text-danger" href="{{ route('registerID.delete', ['id' => $visitor->id]) }}">
+                                        <button 
+                                            type="button"
+                                            class="dropdown-item text-danger"
+                                            id="deleteBtn"
+                                            data-id="{{ $visitor->id }}">
                                             <i class="bi bi-trash me-2"></i> Delete
-                                        </a>
+                                        </button>
+
                                     </li>
                                 </ul>
                             </div>
@@ -139,5 +108,10 @@
         <x-table-pagination/>
     </div>
 </div>
+
+@vite('resources/js/registeredid.js')
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @endsection

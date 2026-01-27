@@ -1,4 +1,4 @@
-<div class="toast-container top-0 end-0 p-3">
+<div class="toast-container top-0 end-0 p-3" id="toast-container">
     <div class="toast position-fixed top-0 end-0 my-4 mx-3" role="alert" aria-live="assertive" aria-atomic="true"
         data-bs-delay="1000">
         <div class="toast-header">

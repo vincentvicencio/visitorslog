@@ -66,55 +66,39 @@ class VisitorTypeController extends Controller
             ]);
         }
     }
+    public function editAjax(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:visitor_types,id',
+            'visitor_type' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) use ($request) {
+                    $exists = VisitorType::whereRaw('LOWER(name) = ?', [strtolower($value)])
+                        ->where('id', '!=', $request->id)  // exclude current record
+                        ->whereNull('deleted_at')
+                        ->exists();
+                    if ($exists) {
+                        $fail('Visitor Type already exists.');
+                    }
+                },
+            ],
+        ]);
 
-    // public function save(Request $request)
-    // {
-    //     // Validate input
-    //     $request->validate([
-    //         'visitor_type' => 'required|string',
-    //     ]);
+        $visitor = VisitorType::find($request->id);
 
-    //     try {
-    //         $id = new VisitorType();
-    //         $id->name = $request->visitor_type;
-    //         $id->created_by = null;
-    //         $id->updated_by = null;
-    //         $id->deleted_by = null;
-    //         $id->created_at = now();
-    //         $id->updated_at = now();
-    //         $id->deleted_at = null;
-    //         $id->save();
+        $visitor->update([
+            'name' => ucfirst(strtolower($request->visitor_type)),
+            'updated_at' => now(),
+            'updated_by' => auth()->user()->name ?? 'Admin',
+        ]);
 
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Visitor Type added successfully!',
-    //         ]);
-
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Error saving Visitor Type: ' . $e->getMessage(),
-    //         ]);
-    //     }
-    // }
-
-    // public function delete(Request $request)
-    // {
-    //     $request->validate([
-    //         'id' => 'required|exists:visitor_types,id',
-    //     ]);
-    //         $visitor = VisitorType::findOrFail($request->id);
-    //     if ($visitor) {
-            
-    //         // $visitor = VisitorType::findOrFail($request->id);
-    //         $visitor->deleted_at = now();
-    //         $visitor->save();
-    //         return redirect()->back()->with('success', 'Visitor Type deleted successfully!');
-    //     }
+        return response()->json([
+            'message' => 'Visitor type successfully updated'
+        ], 200);
+    }
 
 
-    //     return redirect()->back()->with('error', 'Visitor Type not found.');
-    // }
 
     public function deleteAjax(Request $request)
     {
