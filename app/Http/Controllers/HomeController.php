@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
+use App\Models\User_types;
 class HomeController extends Controller
 {
     /**
@@ -35,8 +36,8 @@ class HomeController extends Controller
 // }
 public function index(Request $request)
 {
-    $roles = \App\Models\user_types::all();
-    
+    $roles = \App\Models\User_types::all();
+    // dd($roles);
     // Check if there is a search query
     $search = $request->input('search');
     

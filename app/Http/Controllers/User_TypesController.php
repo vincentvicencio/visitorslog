@@ -22,31 +22,21 @@ class User_TypesController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+    public function destroy($id) 
+    {
+        try {
+            $role = User_types::findOrFail($id);
 
-    // public function edit($id) {
-    //     $role = User_types::findOrFail($id);
-    //     return response()->json($role);
-    // }
+            // Perform a "Soft Update" instead of a hard delete
+            $role->update([
+                'deleted_at' => now(), // Sets the current timestamp
+                'deleted_by' => auth()->user()->first_name ?? 'System' // Sets the name of the logged-in user
+            ]);
 
-    // public function update(Request $request, $id) {
-    //     // Validation: Ignore current ID for unique check
-    //     $request->validate([
-    //         'user_type' => 'required|string|max:255|unique:user_types,name,' . $id
-    //     ]);
-        
-    //     $role = User_types::findOrFail($id);
-    //     $role->update([
-    //         'name' => $request->user_type,
-    //         'updated_by' => Auth::user()->name ?? 'System'
-    //     ]);
-
-    //     return response()->json(['success' => 'Role updated successfully!']);
-    // }
-
-    public function destroy($id) {
-        $role = User_types::findOrFail($id);
-        $role->delete();
-        return response()->json(['success' => 'Role deleted successfully!']);
+            return response()->json(['success' => 'Role deleted successfully!']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete role.'], 500);
+        }
     }
 
     // 1. Return the data to the AJAX 'get' request

@@ -39,7 +39,7 @@ public function show_usertype()
         // 3. Pass the variable to the view
         // return view('pages.users', compact('registeredUsers'));
     
-    $roles = \App\Models\user_types::get('name');
+    $roles = \App\Models\user_types::all();
    
 
     
@@ -47,6 +47,7 @@ public function show_usertype()
     $search = $request->input('search');
     
     $registeredUsers = \App\Models\RegisteredUser::with('userType')
+    ->whereNull('deleted_at') // <--- Add this line here
     ->when($search, function ($query, $search) {
         $query->where('user_name', 'like', "%{$search}%")
               ->orWhere('first_name', 'like', "%{$search}%")

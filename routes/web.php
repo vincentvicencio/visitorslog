@@ -21,11 +21,16 @@ Auth::routes();
 // home route
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+Route::middleware(['auth'])->group(function () {
+    Route::post('/addusers', [Registered_UsersController::class, 'addusers']);
+    Route::post('/update-user/{id}', [Registered_UsersController::class, 'updateUser']);
+});
+
 Route::post('/addusertype', [User_TypesController::class, 'addusertype'])->name('addusertype');
 Route::post('/addusers', [Registered_UsersController::class, 'addusers'])->name('addusers');
 
 Route::get('/get-user/{id}', [Registered_UsersController::class, 'getUser']);
-Route::post('/update-user/{id}', [Registered_UsersController::class, 'updateUser'])->name('updateuser');
+// Route::post('/update-user/{id}', [Registered_UsersController::class, 'updateUser'])->name('updateuser');
 
 Route::get('/usertype/{id}/edit', [User_TypesController::class, 'edit']);
 Route::put('/usertype/{id}', [User_TypesController::class, 'update']);
