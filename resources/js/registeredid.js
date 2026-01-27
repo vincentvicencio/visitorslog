@@ -17,20 +17,18 @@ export function openTextInputModal(id, visitor_type, id_number) {
     textInputModal.show();
 }
 export function openTextInputModalBlank() {
-    const input = document.getElementById('visitorID');
-    input.value = '';
-    const visitorType = document.getElementById('visitortype');
-    visitorType.value = '';
+    // const input = document.getElementById('visitorID');
+    // const visitorType = document.getElementById('visitortype');
     textInputModal.show();
 }
 
 // Handle submit
 document.getElementById('registerIDSubmit').addEventListener('click', () => {
-    const id_number = document.getElementById('visitorID');
-    const id = id_number.dataset.id;
+    const visitor_id = document.getElementById('visitorID');
+    const id = visitor_id.dataset.id;
     const visitorType = document.getElementById('visitortype');
     const visitor_type = visitorType.value.trim();
-    const visitor_id = id_number.value.trim();
+    const id_number = visitor_id.value.trim();
     if (!visitor_id) {
         Triggers.showToast('Textfields cannot be empty.');
         return;
@@ -43,7 +41,7 @@ document.getElementById('registerIDSubmit').addEventListener('click', () => {
             type: 'POST',
             data: {
                 visitor_type: visitor_type,
-                id_number: visitor_id,
+                id_number: id_number,
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
@@ -71,7 +69,7 @@ document.getElementById('registerIDSubmit').addEventListener('click', () => {
             data: {
                 id: id,
                 visitor_type: visitor_type,
-                id_number: visitor_id,
+                id_number: id_number,
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {

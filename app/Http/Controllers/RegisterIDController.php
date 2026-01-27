@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\RegisteredID;
 use App\Models\VisitorType;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class RegisterIDController extends Controller
 {
@@ -38,20 +39,29 @@ class RegisterIDController extends Controller
     {
         // 1️⃣ VALIDATION
         $request->validate([
-            // Check if id_number already exists
-            'id_number'   => 'required|numeric|unique:registered_visitor_ids,id_number',
+            'id_number' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $exists = RegisteredID::where('id_number', $value)
+                        ->whereNull('deleted_at')
+                        ->exists();
 
-            // Check if visitor_type exists in visitor_types table (ID)
-            'visitor_type' => 'required|exists:visitor_types,id',
+                    if ($exists) {
+                        $fail('Visitor ID already exists.');
+                    }
+                },
+            ],
         ]);
+
+
 
         // 2️⃣ SAVE DATA
         $registeredID = new RegisteredID();
-        $registeredID->id_number = $request->visitor_id;
-
+        $registeredID->id_number = $request->id_number;
         // visitor_type IS ALREADY the ID from visitor_types table
         $registeredID->visitor_type = $request->visitor_type;
-
+        $registeredID->created_by = auth()->user()->name ?? 'Admin';
         $registeredID->created_at = now();
         $registeredID->save();
 
