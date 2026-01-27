@@ -23,44 +23,31 @@ class TryController extends Controller
 
         return view('pages.visitorlog', compact('visitors', 'visitorTypes'));
     }
-    // In TryController.php
 public function show_usertype()
 {
-    // Fetch roles from the database using your User_types model
-    $roles = \App\Models\User_types::all(); 
+    // $roles = \App\Models\User_types::all(); 
+    // ->whereNull('deleted_at')
+    $roles = User_types::whereNull('deleted_at')->get();
     
-    // Pass the $roles variable to the view
     return view('pages.usertype', compact('roles'));
 }
     public function show_user(Request $request)
     {
-        // return view('pages.users');
         $registeredUsers = RegisteredUser::all();
-        // 3. Pass the variable to the view
-        // return view('pages.users', compact('registeredUsers'));
-    
-    $roles = \App\Models\user_types::all();
-   
-
-    
-    // Check if there is a search query
-    $search = $request->input('search');
-    
-    $registeredUsers = \App\Models\RegisteredUser::with('userType')
-    ->whereNull('deleted_at') // <--- Add this line here
-    ->when($search, function ($query, $search) {
-        $query->where('user_name', 'like', "%{$search}%")
-              ->orWhere('first_name', 'like', "%{$search}%")
-              ->orWhere('last_name', 'like', "%{$search}%");
-    })
-    ->get();
-    // dd($registeredUsers);
+        $roles = \App\Models\user_types::all();
+        $search = $request->input('search');
+        
+        $registeredUsers = \App\Models\RegisteredUser::with('userType')
+        ->whereNull('deleted_at') // <--- Add this line here
+        ->when($search, function ($query, $search) {
+            $query->where('user_name', 'like', "%{$search}%")
+                ->orWhere('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%");
+        })
+        ->get();
 
     $allEmployeesFromSession = session('all_emp', []);
-    //  dd($allEmployeesFromSession);
-    // return view('home', compact('roles', 'registeredUsers', 'allEmployeesFromSession'));
     return view('pages.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession'));
-
     }
 
     public function show_visitortype()
@@ -78,10 +65,21 @@ public function show_usertype()
         $visitorTypes = VisitorType::orderBy('id', 'asc')->get();
         return view('pages.id', compact('registeredIds', 'visitorTypes'));
     }
-    public function show_report()
+    public function show_report(Request $request)
     {
-        return view('pages.report');
-    }
-
+        $visitorlogs = Visitor::all();
+        $search = $request->input('searchreport');
     
+        $visitorlogs = Visitor::with('visitor_type')
+        // ->whereNull('deleted_at') // <--- Add this line here
+        ->when($search, function ($query, $search) {
+            $query->where('user_name', 'like', "%{$search}%")
+                ->orWhere('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%");
+        })
+        ->get();
+
+        $allEmployeesFromSession = session('all_emp', []);
+        return view('pages.report', compact('visitorlogs', 'allEmployeesFromSession'));
+    }
 }

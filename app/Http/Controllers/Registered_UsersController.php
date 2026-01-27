@@ -43,12 +43,14 @@ class Registered_UsersController extends Controller
         // DATA PREPARATION: Use session data as default
         $firstName = $employeeData['first_name'] ?? 'N/A';
         $lastName  = $employeeData['last_name'] ?? 'N/A';
+        $location  = $employeeData['location_id'] ?? 'N/A';
 
         // If API is successful, update names from API
         if ($response->successful()) {
             $apiData = $response->json();
             $firstName = $apiData['FirstName'] ?? $firstName;
             $lastName  = $apiData['LastName'] ?? $lastName;
+            $location  = $apiData['Location'] ?? $location;
         } 
         // NOTE: Even if the API fails, we continue because we have the session data!
         
@@ -60,6 +62,7 @@ class Registered_UsersController extends Controller
             'location'   => $employeeData['location'] ?? 'N/A',
             'password'   => Hash::make($request->password),     
             'user_type'  => $request->user_type,
+            'location'    => $location,
             'created_by' => Auth::user()->first_name ?? 'System', 
             'updated_by' => Auth::user()->first_name ?? 'System',
         ]);
@@ -147,4 +150,27 @@ public function updateUser(Request $request, $id)
         return response()->json(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()], 500);
     }
 }
+
+
+    public function location()
+    {
+        $location = collect(session('all_location'));
+        $data = [];
+        $data[0] = [
+            'id' => '',
+            'text' => 'Choose Location/Site',
+        ];
+
+        
+        foreach ($location as $record) {
+            // Access array elements using array syntax
+            $data[] = [
+                'id' => $record['id'],
+                'text' => $record['name']
+            ];
+        }
+        
+
+        return response()->json($location);
+    }
 }

@@ -66,16 +66,23 @@
 
     </div>
 
-        
-            <div class="logout-button d-flex mt-auto pe-4 fw-bold">
+            <!-- Log out -->
+            <!-- <div class="logout-button d-flex mt-auto pe-4 fw-bold">
                 <i class="bi bi-box-arrow-left p-2"></i>
-                <!-- Log out -->
-                 <a  href="{{ route('logout') }}"                onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}>Logout</a>
-                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
+                <a  href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"> {{ __('Logout') }}</a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
+            </div> -->
+            <div class="logout-button d-flex mt-auto pe-4 fw-bold" 
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                
+                <i class="bi bi-box-arrow-left p-2"></i>
+                <span>{{ __('Logout') }}</span>
+
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
             </div>
 
         <br>

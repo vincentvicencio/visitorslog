@@ -43,6 +43,25 @@ Route::get('/usertype', [TryController::class, 'show_usertype'])->name('usertype
 Route::post('/add-user-type', [User_TypesController::class, 'addusertype'])->name('addusertype');
 
 
+// Route::get('/get-user-types', [Registered_UsersController::class, 'getUserTypes']);
+
+// Route::get('/get-locations', function() {
+//     // Retrieve session data
+//     $locations = session('all_location', []);
+//     // $locations = $location ?? [];
+    
+//     // If your API returns a nested 'data' key, extract it
+//     $data = isset($locations['data']) ? $locations['data'] : $locations;
+    
+//     return response()->json($data);
+// });
+
+Route::get('/getlocation', [Registered_UsersController::class, 'location'])->name('getlocations');
+    
+
+
+
+
 Route::post('/delete-user/{id}', [Registered_UsersController::class, 'deleteUser'])->name('deleteuser');    
 Route::post('/delete-usertype/{id}', [User_TypesController::class, 'deleteUsertype'])->name('deleteusertype');
 Route::post('/update-usertype', [User_TypesController::class, 'updateUsertype'])->name('updateusertype');

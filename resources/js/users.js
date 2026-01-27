@@ -5,6 +5,7 @@ $(document).ready(function() {
         'X-Requested-With': 'XMLHttpRequest'
     }
 });
+
     $(document).on('click', '.dropdown-toggle', function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -45,7 +46,16 @@ $(document).ready(function() {
         }
     });
 
-    $('#openPopup2').click(function() { $('#popupContainer2').fadeIn(); });
+    $('#openPopup2').click(function() { $('#popupContainer2').fadeIn(); 
+
+        // component.createDropdown('/get-locations', '#reg_location', null, null1);
+        // Check if component exists before calling
+    // if (typeof component !== 'undefined') {
+        component.createDropdown('/getlocation', '#reg_location', null, '#popupContainer2');
+    // } else {
+    //     console.error("The 'component' object is not defined. Check if its JS file is loaded.");
+    // }
+    });
 $('#closePopup2').click(function() { $('#popupContainer2').fadeOut(); });
 
 // Handle AJAX Submission

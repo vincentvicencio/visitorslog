@@ -168,7 +168,7 @@ class Component {
         }
     }
 
-    createDropdown(url, element_id, data = null, popContainer_id = "") {
+    createDropdown(url, element_id, data = null, popContainer_id) {
         var records = $.ajax({
             url: window.location.origin + url,
             type: "POST",
@@ -178,7 +178,7 @@ class Component {
             success: function (data) { return data; },
         }).responseJSON;
 
-        $(element_id).empty();
+        // $(element_id).empty();
 
         popContainer_id ? $(element_id).select2({ data: records, dropdownParent: $(popContainer_id), width: '100%' })
             : $(element_id).select2({ data: records });

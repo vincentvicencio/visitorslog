@@ -184,6 +184,10 @@
                 @endforeach
             </select>
 
+            <select name="locations" id="reg_location" class="form-control my-2" required>
+                <option value="">Select Location</option>
+            </select>
+
             <input type="text" id="reg_emp_code" name="emp_code" placeholder="Employee Code" class="form-control" required>
             <input type="password" id="reg_password" name="password" placeholder="Password" class="form-control" required>
 

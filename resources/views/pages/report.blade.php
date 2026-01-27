@@ -1,6 +1,20 @@
 @extends('layout')
 
 @section('content')
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    window.Laravel = {
+        baseUrl: "{{ url('/') }}",
+        csrfToken: "{{ csrf_token() }}" // This correctly gets the token from Laravel
+    };
+</script>
+
+@vite(['resources/js/report.js'])
+
+
 <div class="user-types-container mt-4">
     <div class="page-header">
         <div class="header-content">
@@ -15,7 +29,8 @@
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
         <div class="search-field d-flex align-items-center justify-content-between">
             search
-            <input type="text" placeholder="search" class="flex-grow-1 mx-2">
+            <form id="searchForm">
+            <input type="text" placeholder="search" class="flex-grow-1 mx-2" id="searchreport" name="searchreport"/>
             entries per page
             <select name="" id="" class="number-per-page">
                 <option value="">10</option>

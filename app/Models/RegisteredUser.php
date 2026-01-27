@@ -16,6 +16,7 @@ class RegisteredUser extends Model
     'updated_by',
     'deleted_by',
     'deleted_at',
+    'location',
     ];
 
     public function userType()

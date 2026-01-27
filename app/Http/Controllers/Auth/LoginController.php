@@ -74,6 +74,9 @@ class LoginController extends Controller
 
     // Fetch all employee data
     $this->fetch_emp_data('all_emp');
+    $this->fetch_api_data('all_location', 'location');
+    $location = collect(session('all_location'));
+    // dd($location);
     // dd($this->fetch_emp_data('all_emp'));
     // dd($allEmployeesFromSession);
     // Optionally fetch profile pic if needed
@@ -104,11 +107,25 @@ class LoginController extends Controller
                     'last_name',
                     'department_id',
                     'section_id',
-                    'location_id',
                 ]
             ];
             $api_data = \fetchdata_api('api_data', $payload);
             
+            Session::put($sessionKey, $api_data);
+        }
+        else{
+            $api_data = Session::get($sessionKey);
+        }
+
+        return $api_data;
+    }
+
+    private function fetch_api_data($sessionKey, $model){
+        if(!Session::has($sessionKey)){
+            $payload = [
+                'model' => $model,
+            ];
+            $api_data = fetchdata_api('api_data', $payload);
             Session::put($sessionKey, $api_data);
         }
         else{

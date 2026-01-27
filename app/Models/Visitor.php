@@ -23,4 +23,9 @@ class Visitor extends Model
         'updated_at',
         'deleted_at',
     ];
+
+    public function visitor_type()
+    {
+        return $this->belongsTo(\App\Models\VisitorType::class, 'visitor_type', 'id');
+    }
 }
