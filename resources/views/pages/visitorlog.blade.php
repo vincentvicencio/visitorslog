@@ -199,7 +199,7 @@
 </div>
 
 <!-- Add Request Item Modal -->
- <div class="addvisitor" style="display: none;">
+ <div class="addvisitor">
     <div class="addvisitormodal">
         <div class="panel">
             <div class="header fs-4">Add Visitor</div>

@@ -28,7 +28,7 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
-<body id="loginpage">
+<body class="overflow-hidden">
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm" style="display: none;">
             <div class="container">
