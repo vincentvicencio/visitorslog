@@ -15,6 +15,7 @@
 
 
 @vite (['resources/js/usertype.js'])
+@include('components.triggers.toast')
 
 <style>
     .visitor-log-sheet-table {
@@ -94,10 +95,16 @@
                                 <td>{{ $role->created_at->format('Y-m-d') }}</td>
                                 <td class="text-center">
                                     <div class="dropdown">
-                                        <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                        <!-- <button class="btn btn-sm btn-primary dropdown-toggle" 
                                                 type="button" 
                                                 data-bs-toggle="dropdown" 
                                                 data-bs-display="static"> Action
+                                        </button> -->
+                                        <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                                type="button" 
+                                                data-bs-toggle="dropdown" 
+                                                data-bs-boundary="viewport" aria-expanded="false">
+                                            Action
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item edit-type" href="javascript:void(0)" data-id="{{ $role->id }}"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
@@ -171,40 +178,6 @@
     </div>
 </div>
 
-
-<div class="toast-container position-fixed top-0 end-0 p-3">
-  <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastMessage">
-        Role updated successfully!
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-  </div>
-</div>
-
-<div class="toast-container position-fixed top-0 end-0 p-3">
-  <div id="deletesuccessToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastMessage">
-        Role Deleted successfully!
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-  </div>
-</div>
-
-
-<div class="toast-container position-fixed top-0 end-0 p-3">
-  <div id="addusersuccessToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastMessage">
-        Role Deleted successfully!
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-  </div>
-</div>
 @endsection
 
 

@@ -5,20 +5,42 @@ $(document).ready(function() {
         'X-Requested-With': 'XMLHttpRequest'
     }
 });
+    // Handle Dropdown placement without breaking the click event
+$(document).on('shown.bs.dropdown', '.dropdown', function () {
+    const $toggle = $(this).find('.dropdown-toggle');
+    const $menu = $(this).find('.dropdown-menu');
 
-    $(document).on('click', '.dropdown-toggle', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const menu = $(this).next('.dropdown-menu');
-        $('.dropdown-menu').not(menu).removeClass('show');
-        menu.toggleClass('show');
-    });
-    $(document).on('click', function (e) {
-        if (!$(e.target).closest('.dropdown').length) {
-            $('.dropdown-menu').removeClass('show');
-        }
-    });
+    // Store the original parent so we can put it back later
+    $menu.data('parent', $(this));
+    
+    $('body').append($menu);
+    
+    const offset = $toggle.offset();
+    $menu.css({
+        'display': 'block',
+        'position': 'absolute',
+        'visibility': 'visible',
+        'opacity': '1',
+        'top': offset.top + $toggle.outerHeight(),
+        'left': offset.left,
+        'z-index': '9999'
+    }).addClass('show');
+});
+
+$(document).on('hide.bs.dropdown', '.dropdown', function () {
+    const $menu = $('body > .dropdown-menu'); // Find the menu we moved to body
+    const $parent = $menu.data('parent');
+    
+    if ($parent) {
+        $parent.append($menu); // Put it back where it belongs
+        $menu.css({
+            'display': '',
+            'position': '',
+            'top': '',
+            'left': ''
+        }).removeClass('show');
+    }
+});
     function updateTableRows() {
         var limit = parseInt($('#entriesPerPage').val()); 
         var $rows = $('#employeeTableBody tr');
@@ -70,7 +92,8 @@ $('#registered_user_form').on('submit', function(e) {
                 _token: window.Laravel.csrfToken,
                 emp_code: $('#reg_emp_code').val(),
                 password: $('#reg_password').val(),
-                user_type: $('#reg_user_type').val() // This will now grab the ID from the select above
+                user_type: $('#reg_user_type').val(), // This will now grab the ID from the select above
+                locations: $('#reg_location').val(), // New location field
             },
         success: function(response) {
            $('#toastMessage').text(response.success || "User Added Successfully!");
@@ -162,7 +185,8 @@ $(document).on('click', '.edit-user', function() {
     });
 });
 
-$('#closeEditPopup').click(function() { $('#editPopupContainer').fadeOut(); });
+// $('#closeEditPopup').click(function() { $('#editPopupContainer').fadeOut(); });
+$('#closeEditPopup').click(function() { $('#editPopupContainer').hide(); });
 
 $('#edit_user_form').on('submit', function(e) {
     e.preventDefault();

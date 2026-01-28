@@ -56,10 +56,11 @@ Route::post('/add-user-type', [User_TypesController::class, 'addusertype'])->nam
 //     return response()->json($data);
 // });
 
-Route::get('/getlocation', [Registered_UsersController::class, 'location'])->name('getlocations');
+// Route::post('/getlocation', [Registered_UsersController::class, 'location'])->name('getlocations');
     
 
-
+Route::post('/getlocation', [Registered_UsersController::class, 'location'])->name('locations.lookup');
+Route::get('/getlocation', [Registered_UsersController::class, 'location'])->name('locations.lookup');
 
 
 Route::post('/delete-user/{id}', [Registered_UsersController::class, 'deleteUser'])->name('deleteuser');    

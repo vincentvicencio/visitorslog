@@ -25,9 +25,9 @@ class TryController extends Controller
     }
 public function show_usertype()
 {
-    // $roles = \App\Models\User_types::all(); 
+    $roles = \App\Models\User_types::all(); 
     // ->whereNull('deleted_at')
-    $roles = User_types::whereNull('deleted_at')->get();
+    // $roles = User_types::whereNull('deleted_at')->get();
     
     return view('pages.usertype', compact('roles'));
 }

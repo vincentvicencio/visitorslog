@@ -19,9 +19,11 @@ class Registered_UsersController extends Controller
         'user_type' => 'required',
         'emp_code'  => 'required|string|unique:registered_users,user_name',
         'password'  => 'required|string|min:6',
+        'locations' => 'required',
     ]);
 
     $empCode = $request->input('emp_code');
+    $selectedLocationId = $request->input('locations');
 
     // 2. SEARCH logic (Session)
     $employees = collect(session('all_emp'));
@@ -43,18 +45,15 @@ class Registered_UsersController extends Controller
         // DATA PREPARATION: Use session data as default
         $firstName = $employeeData['first_name'] ?? 'N/A';
         $lastName  = $employeeData['last_name'] ?? 'N/A';
-        $location  = $employeeData['location_id'] ?? 'N/A';
+        $location = $selectedLocationId ?? 'N/A';
 
-        // If API is successful, update names from API
         if ($response->successful()) {
             $apiData = $response->json();
             $firstName = $apiData['FirstName'] ?? $firstName;
             $lastName  = $apiData['LastName'] ?? $lastName;
-            $location  = $apiData['Location'] ?? $location;
+            $location = $selectedLocationId ?? 'N/A';
         } 
-        // NOTE: Even if the API fails, we continue because we have the session data!
         
-
         RegisteredUser::create([
             'user_name'  => $empCode,
             'first_name' => $firstName, 
@@ -62,7 +61,7 @@ class Registered_UsersController extends Controller
             'location'   => $employeeData['location'] ?? 'N/A',
             'password'   => Hash::make($request->password),     
             'user_type'  => $request->user_type,
-            'location'    => $location,
+            'location'   => $location,
             'created_by' => Auth::user()->first_name ?? 'System', 
             'updated_by' => Auth::user()->first_name ?? 'System',
         ]);
@@ -72,7 +71,6 @@ class Registered_UsersController extends Controller
             'message' => 'User registered successfully!'
             
         ]);
-        // dd(Auth::user() ? Auth::user()->toArray() : 'No user logged in');
 
     } catch (\Exception $e) {
         // This prevents the "undefined" error by returning a JSON message
@@ -105,6 +103,12 @@ class Registered_UsersController extends Controller
             'message' => 'Failed to remove user.'
         ], 500);
     }
+}
+
+public function getUserTypes()
+{
+    // Assuming your model is named User_types based on your use statements
+    return response()->json(\App\Models\User_types::all());
 }
 
     // --- NEW: GET USER DATA (For Edit Modal) ---
@@ -152,25 +156,44 @@ public function updateUser(Request $request, $id)
 }
 
 
+    // public function location()
+    // {
+    //     $location = collect(session('all_location'));
+    //     $data = [];
+    //     $data[0] = [
+    //         'id' => '',
+    //         'text' => 'Choose Location/Site',
+    //     ];
+
+        
+    //     foreach ($location as $record) {
+    //         // Access array elements using array syntax
+    //         $data[] = [
+    //             'id' => $record['id'],
+    //             'text' => $record['name']
+    //         ];
+    //     }
+        
+
+    //     // return response()->json($location);
+    //     return response()->json($record = $data);
+    // }
+
     public function location()
-    {
-        $location = collect(session('all_location'));
-        $data = [];
-        $data[0] = [
-            'id' => '',
-            'text' => 'Choose Location/Site',
+{
+    $location = collect(session('all_location'));
+    $data = [];
+    
+    // Placeholder
+    $data[] = ['id' => '', 'text' => 'Choose Location/Site'];
+
+    foreach ($location as $record) {
+        $data[] = [
+            'id'   => $record['id'], // Ensure 'id' exists in your session array
+            'text' => $record['name']
         ];
-
-        
-        foreach ($location as $record) {
-            // Access array elements using array syntax
-            $data[] = [
-                'id' => $record['id'],
-                'text' => $record['name']
-            ];
-        }
-        
-
-        return response()->json($location);
     }
+
+    return response()->json($data);
+}
 }

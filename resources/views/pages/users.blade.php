@@ -5,6 +5,9 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
     window.Laravel = {
         baseUrl: "{{ url('/') }}",
@@ -13,6 +16,7 @@
 </script>
 
 @vite(['resources/js/users.js'])
+@include('components.triggers.toast')
 
 <style>
     .visitor-log-sheet-table {
@@ -96,12 +100,19 @@
         <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
         <td class="text-center">
                         <div class="dropdown"> 
-                <button class="btn btn-sm btn-primary dropdown-toggle" 
+                <!-- <button class="btn btn-sm btn-primary dropdown-toggle" 
             type="button" 
             data-bs-toggle="dropdown" 
             aria-expanded="false">
         Action
-    </button>
+    </button> -->
+
+    <button class="btn btn-sm btn-primary dropdown-toggle" 
+        type="button" 
+        data-bs-toggle="dropdown" 
+        data-bs-boundary="viewport" aria-expanded="false">
+    Action
+</button>
         <ul class="dropdown-menu">
             <li>
                 <a class="dropdown-item edit-user" href="javascript:void(0)" 
@@ -186,6 +197,7 @@
 
             <select name="locations" id="reg_location" class="form-control my-2" required>
                 <option value="">Select Location</option>
+                 <!-- {{-- <option value="">Select User Type</option> --}} -->
             </select>
 
             <input type="text" id="reg_emp_code" name="emp_code" placeholder="Employee Code" class="form-control" required>
@@ -202,9 +214,8 @@
         <button id="closeEditPopup" type="button" style="float:right;">X</button>
         <h4>Edit User</h4>
         <form id="edit_user_form">
-            @csrf
+            @csrf  
             <input type="hidden" id="edit_user_id" name="id">
-            
             <label>Role</label>
             <select name="user_type" id="edit_user_type" class="form-control mb-2" required>
                 <option value="">Select Role</option>
@@ -212,14 +223,13 @@
                     <option value="{{ $role->id }}">{{ $role->name }}</option>
                 @endforeach
             </select>
-
             <label>Employee Code</label>
             <input type="text" id="edit_emp_code" name="emp_code" class="form-control mb-3" required>
-
             <button type="submit" class="btn btn-success w-100">Update User</button>
         </form>
     </div>
 </div>
+
 
 <div class="modal fade text-center" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -240,36 +250,5 @@
 </div>
 
 
-<div class="toast-container position-fixed top-0 end-0 p-3">
-  <div id="deletesuccessToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastMessage">
-        User Deleted Successfully!
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-  </div>
-</div>
 
-<div class="toast-container position-fixed top-0 end-0 p-3">
-  <div id="editsuccessToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastMessage">
-        User Updated Successfully!
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-  </div>
-</div>
-
-<div class="toast-container position-fixed top-0 end-0 p-3">
-  <div id="addsuccessToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body" id="toastMessage">
-        User Added Successfully!
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-  </div>
-</div>
 @endsection

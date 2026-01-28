@@ -1,5 +1,44 @@
 $(document).ready(function() {
-    // --- 1. GLOBAL VARIABLES ---
+
+
+
+$(document).on('shown.bs.dropdown', '.dropdown', function () {
+    const $toggle = $(this).find('.dropdown-toggle');
+    const $menu = $(this).find('.dropdown-menu');
+
+    // Store the original parent so we can put it back later
+    $menu.data('parent', $(this));
+    
+    $('body').append($menu);
+    
+    const offset = $toggle.offset();
+    $menu.css({
+        'display': 'block',
+        'position': 'absolute',
+        'visibility': 'visible',
+        'opacity': '1',
+        'top': offset.top + $toggle.outerHeight(),
+        'left': offset.left,
+        'z-index': '9999'
+    }).addClass('show');
+});
+
+$(document).on('hide.bs.dropdown', '.dropdown', function () {
+    const $menu = $('body > .dropdown-menu'); // Find the menu we moved to body
+    const $parent = $menu.data('parent');
+    
+    if ($parent) {
+        $parent.append($menu); // Put it back where it belongs
+        $menu.css({
+            'display': '',
+            'position': '',
+            'top': '',
+            'left': ''
+        }).removeClass('show');
+    }
+});
+
+    // --- 1. GLOBAL VARIABLES --
     let currentPage = 1;
 
     // --- 2. INITIALIZATION ---
@@ -99,7 +138,7 @@ $(document).ready(function() {
             $('#toastMessage').text(response.success || "User Type Added Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('addusersuccessToast');
+            const toastElement = document.getElementById('addusersuccessToast2');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -144,7 +183,7 @@ $(document).ready(function() {
             $('#toastMessage').text(response.success || "Role updated successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('successToast');
+            const toastElement = document.getElementById('successToast2');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -192,7 +231,7 @@ $('#closeEditType').click(function() {
                 $('#toastMessage').text(response.success || "Role Deleted Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('deletesuccessToast');
+            const toastElement = document.getElementById('deletesuccessToast2');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
