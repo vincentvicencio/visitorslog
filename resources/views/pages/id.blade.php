@@ -110,7 +110,7 @@
 </div>
 
 @vite('resources/js/registeredid.js')
-
+@include('components.triggers.registerIdModal')
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

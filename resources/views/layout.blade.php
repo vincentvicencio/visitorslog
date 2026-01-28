@@ -20,8 +20,6 @@
         @include('components.triggers.toast')
         @include('components.triggers.delete')
         @include('components.triggers.visitorTypeModal')
-        @include('components.triggers.registerIdModal')
-        {{-- @include('components.triggers.form') --}}
         @include('components.triggers.viewImage')
         <!-- Notification -->
 
