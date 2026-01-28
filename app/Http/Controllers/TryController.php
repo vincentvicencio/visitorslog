@@ -30,13 +30,15 @@ class TryController extends Controller
 public function show_usertype()
 {
     $roles = \App\Models\User_types::all(); 
+    $visitorTypes = VisitorType::all();
     
-    return view('pages.usertype', compact('roles'));
+    return view('pages.usertype', compact('roles', 'visitorTypes'));
 }
     public function show_user(Request $request)
     {
         $registeredUsers = RegisteredUser::all();
         $roles = \App\Models\user_types::all();
+        $visitorTypes = VisitorType::all();
 
         $visitorlogs = Visitor::with('visitor_type')->get();
         $search = $request->input('search');
@@ -51,7 +53,7 @@ public function show_usertype()
         ->get();
 
     $allEmployeesFromSession = session('all_emp', []);
-    return view('pages.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession', 'visitorlogs'));
+    return view('pages.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession', 'visitorlogs', 'visitorTypes'));
     }
 
     public function show_visitortype()
