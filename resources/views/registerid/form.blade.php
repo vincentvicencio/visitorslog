@@ -1,4 +1,6 @@
+@extends('layout')
 
+@section('content')
 
 <!DOCTYPE html>
 <html lang="en">
@@ -65,10 +67,13 @@
 <form action="/home" method="get">
     <button type="submit">Home</button>
 </form>
-<form action="/registeredIDs" method="get">
+{{-- <form action="/id" method="post">
     @csrf
     <button type="submit">Registered ID</button>
-</form>
+</form> --}}
+ <a class="dropdown-item" href="{{ route('id.index') }}" id="detailsBtn">
+        <i class="bi bi-eye me-2"></i> Back
+    </a>
 
 <div id="result" style="margin-top:20px;"></div>
 
@@ -108,3 +113,4 @@ $(document).ready(function() {
 
 </body>
 </html>
+@endsection

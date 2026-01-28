@@ -1,3 +1,6 @@
+@extends('layout')
+
+@section('content')
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,15 +32,24 @@
     <input type="text" name="visitor_id" value="{{ $visitor->visitor_id }}" required><br>
 
     <label>Location:</label>
-    <input type="text" name="location" value="{{ $visitor->location }}"><br>
+    <input type="text" name="location" 
+    value="
+        @if ($visitor->location == 1)
+            Facility Center
+        @elseif ($visitor->location == 2)
+            Summit One
+        @else
+            Mezzanine
+        @endif
+        "><br>
 
     <label>Image:</label>
-    <input type="text" name="image_path" value="{{ $visitor->image_path }}"><br><br>
+    <img src="{{ Storage::url($visitor->image_path) }}" alt="Image" ><br><br>
 
-    <form action="/visitors" method="get">
-        @csrf
-        <button type="submit">Back</button>
-    </form>
+    <a class="dropdown-item" href="{{ route('visitorlog.index') }}" id="detailsBtn">
+        <i class="bi bi-eye me-2"></i> Back
+    </a>
 
 </body>
 </html>
+@endsection

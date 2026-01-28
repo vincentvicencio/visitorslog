@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\VisitorType;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 
 class VisitorTypeController extends Controller
@@ -18,7 +19,9 @@ class VisitorTypeController extends Controller
     public function list()
     {
         // Get all registered IDs, latest first
-        $visitorTypes = VisitorType::orderBy('id', 'asc')->get();
+        $visitorTypes = VisitorType::where('deleted_at', null)
+                   ->orderBy('id', 'asc')
+                   ->get();
 
         // Pass to the view
         return view('visitor_types.list', compact('visitorTypes'));
@@ -32,69 +35,94 @@ class VisitorTypeController extends Controller
             'visitor_type' => [
                 'required',
                 'string',
-                Rule::unique('visitor_types', 'name')
-                    ->where(function ($query) use ($request) {
-                        return $query->whereRaw('LOWER(name) = ?', [
-                            strtolower($request->visitor_type)
-                        ]);
-                    }),
+                function ($attribute, $value, $fail) {
+                    // Check if a visitor type with the same name exists and is not soft-deleted
+                    $exists = VisitorType::whereRaw('LOWER(name) = ?', [strtolower($value)])
+                                ->whereNull('deleted_at') // only consider non-deleted rows
+                                ->exists();
+
+                    if ($exists) {
+                        $fail('Visitor Type already exists.');
+                    }
+                },
             ],
-        ], [
-            'visitor_type.unique' => 'Visitor Type already exists.',
         ]);
+
 
         try {
             $id = new VisitorType();
             $id->name = ucfirst(strtolower($request->visitor_type)); // normalize case
-            $id->created_by = null;
-            $id->updated_by = null;
-            $id->deleted_by = null;
+            $id->created_by = auth()->user()->name ?? 'Admin';
             $id->created_at = now();
-            $id->updated_at = now();
-            $id->deleted_at = null;
             $id->save();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Visitor Type added successfully!',
-            ]);
+                'message' => 'Visitor Type successfully added'
+            ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
                 'message' => 'Error saving Visitor Type: ' . $e->getMessage(),
             ]);
         }
     }
+    public function editAjax(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:visitor_types,id',
+            'visitor_type' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) use ($request) {
+                    $exists = VisitorType::whereRaw('LOWER(name) = ?', [strtolower($value)])
+                        ->where('id', '!=', $request->id)  // exclude current record
+                        ->whereNull('deleted_at')
+                        ->exists();
+                    if ($exists) {
+                        $fail('Visitor Type already exists.');
+                    }
+                },
+            ],
+        ]);
 
-    // public function save(Request $request)
-    // {
-    //     // Validate input
-    //     $request->validate([
-    //         'visitor_type' => 'required|string',
-    //     ]);
+        $visitor = VisitorType::find($request->id);
 
-    //     try {
-    //         $id = new VisitorType();
-    //         $id->name = $request->visitor_type;
-    //         $id->created_by = null;
-    //         $id->updated_by = null;
-    //         $id->deleted_by = null;
-    //         $id->created_at = now();
-    //         $id->updated_at = now();
-    //         $id->deleted_at = null;
-    //         $id->save();
+        $visitor->update([
+            'name' => ucfirst(strtolower($request->visitor_type)),
+            'updated_at' => now(),
+            'updated_by' => auth()->user()->name ?? 'Admin',
+        ]);
 
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Visitor Type added successfully!',
-    //         ]);
+        return response()->json([
+            'message' => 'Visitor type successfully updated'
+        ], 200);
+    }
 
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Error saving Visitor Type: ' . $e->getMessage(),
-    //         ]);
-    //     }
-    // }
+
+
+    public function deleteAjax(Request $request)
+    {
+        $visitor = VisitorType::where('id', $request->id)->first();
+
+        if (!$visitor) {
+            return response()->json([
+                'message' => 'Visitor Type not found'
+            ], 404);
+        }
+
+        if ($visitor->deleted_at !== null) {
+            return response()->json([
+                'message' => 'Visitor type already deleted'
+            ], 400);
+        }
+
+        $visitor->update([
+            'deleted_at' => Carbon::now(),
+            'deleted_by' => auth()->user()->name ?? 'Admin',
+        ]);
+
+        return response()->json([
+            'message' => 'Visitor type successfully deleted'
+        ]);
+    }
 }

@@ -7,7 +7,7 @@
             <div class="page-title fs-2">Visitor Type</div>
             <div class="page-subtitle mb-3">Manage and organize different visitor categories</div>
         </div>
-        <div class="top-button">
+        <div class="top-button" id="addBtn">
             Add Visitor Type
         </div>
     </div>
@@ -35,22 +35,15 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- <tr>
-                    <td><strong>Juan_DC</strong></td>
-                    <td>Receptionist</td>
-                    <td>-</td>
-                    <td>January 22, 2026 <br> Thursday, 8:30 AM</td>
-
-
-
-                </tr> --}}
-
                 @forelse($visitorTypes as $index => $visitor)
                     <tr>
                         <td><strong>{{ $visitor->name }}</strong></td>
                         <td>{{ $visitor->created_by }}</td>
                         <td>{{ $visitor->updated_by ?? '-' }}</td>
-                        <td>{{ $visitor->created_at->format('Y-m-d H:i') }}</td>
+                        <td>
+                            {{ $visitor->created_at->format('F d, Y') }}<br>
+                            {{ $visitor->created_at->format('l') }}
+                        </td>
                         <td class="text-center">
                             <div class="dropdown">
                                 <button 
@@ -60,17 +53,27 @@
                                     aria-expanded="false">
                                     Action
                                 </button>
-
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="#">
+                                        <button 
+                                            class="dropdown-item"
+                                            id="editBtn"
+                                            data-id="{{ $visitor->id }}"
+                                            data-name="{{ $visitor->name }}"
+                                            >
                                             <i class="bi bi-pencil-square me-2"></i> Edit
-                                        </a>
+                                        </button>
+
                                     </li>
                                     <li>
-                                        <button class="dropdown-item text-danger">
+                                        <button 
+                                            type="button"
+                                            class="dropdown-item text-danger"
+                                            id="deleteBtn"
+                                            data-id="{{ $visitor->id }}">
                                             <i class="bi bi-trash me-2"></i> Delete
                                         </button>
+
                                     </li>
                                 </ul>
                             </div>
@@ -87,5 +90,10 @@
         <x-table-pagination/>
     </div>
 </div>
+@vite('resources/js/visitortype.js')
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 @endsection

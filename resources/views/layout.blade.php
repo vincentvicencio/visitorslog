@@ -19,6 +19,10 @@
         <!-- Notification -->
         @include('components.triggers.toast')
         @include('components.triggers.delete')
+        @include('components.triggers.visitorTypeModal')
+        @include('components.triggers.registerIdModal')
+        {{-- @include('components.triggers.form') --}}
+        @include('components.triggers.viewImage')
         <!-- Notification -->
 
         @stack('scripts')
@@ -28,6 +32,11 @@
     @endif
 
     @include('layouts.footer')
+
+<!-- Bootstrap JS AFTER jQuery -->
+{{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> --}}
+
 </body>
 
 </html>
+

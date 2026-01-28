@@ -7,7 +7,7 @@
             <div class="page-title fs-2">Registered IDs</div>
             <div class="page-subtitle mb-3">Manage and monitor all registered ID entries</div>
         </div>
-        <div class="top-button">
+        <div class="top-button" id="addBtn">
             Register ID
         </div>
     </div>
@@ -37,42 +37,6 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- <tr>
-                    <td><strong>Juan Dela Cruz</strong></td>
-                    <td>1234</td>
-                    <td>Receptionist</td>
-                    <td>-</td>
-                    <td>January 22, 2026, Thursday</td>
-                    <td>January 23, 2026, Friday</td>
-                    <td class="text-center">
-                        <div class="dropdown">
-                            <button 
-                                class="btn btn-sm btn-primary dropdown-toggle"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                Action
-                            </button>
-
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="bi bi-pencil-square me-2"></i> Edit
-                                    </a>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item text-danger">
-                                        <i class="bi bi-trash me-2"></i> Delete
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-
-
-
-                </tr> --}}
-
                  @forelse($registeredIds as $index => $visitor)
                     <tr>
                         @foreach ($visitorTypes as $type)
@@ -84,8 +48,18 @@
                         <td>{{ $visitor->id_number }}</td>
                         <td>{{ $visitor->created_by }}</td>
                         <td>{{ $visitor->updated_by ?? '-' }}</td>
-                        <td>{{ $visitor->created_at->format('Y-m-d H:i') }}</td>    
-                        <td>{{ $visitor->updated_at->format('Y-m-d H:i') }}</td>
+                        <td>
+                            {{ $visitor->created_at->format('F d, Y') }}<br>
+                            {{ $visitor->created_at->format('l') }}
+                        </td> 
+                        <td>
+                            @if ($visitor->updated_at == $visitor->created_at)
+                               -
+                            @else
+                                {{ $visitor->updated_at->format('F d, Y') }}<br>
+                                {{ $visitor->updated_at->format('l') }}
+                            @endif
+                        </td>
                         <td class="text-center">
                             <div class="dropdown">
                                 <button 
@@ -98,14 +72,26 @@
 
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="#">
+                                        <button 
+                                            class="dropdown-item"
+                                            id="editBtn"
+                                            data-id="{{ $visitor->id }}"
+                                            data-type="{{ $visitor->visitor_type }}"
+                                            data-name="{{ $visitor->id_number }}"
+                                            >
                                             <i class="bi bi-pencil-square me-2"></i> Edit
-                                        </a>
+                                        </button>
+
                                     </li>
                                     <li>
-                                        <button class="dropdown-item text-danger">
+                                        <button 
+                                            type="button"
+                                            class="dropdown-item text-danger"
+                                            id="deleteBtn"
+                                            data-id="{{ $visitor->id }}">
                                             <i class="bi bi-trash me-2"></i> Delete
                                         </button>
+
                                     </li>
                                 </ul>
                             </div>
@@ -122,5 +108,10 @@
         <x-table-pagination/>
     </div>
 </div>
+
+@vite('resources/js/registeredid.js')
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @endsection

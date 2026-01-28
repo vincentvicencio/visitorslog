@@ -1,5 +1,4 @@
 @extends('layout')
-
 @section('content')
 <div class="user-types-container mt-4">
     <div class="page-header">
@@ -7,8 +6,8 @@
             <div class="page-title fs-2">Visitor Log Sheets</div>
             <div class="page-subtitle mb-3">Manage and track all visitor entries</div>
         </div>
-        <div class="top-button">
-            add visitor
+        <div class="top-button" id="addBtn">
+            Add Visitor
         </div>
     </div>
     <!-- table.scss -->
@@ -38,48 +37,6 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            {{-- <tbody>
-                <tr>
-                    <td>
-                        <small><strong>In:</strong> 08:30 AM</small><br>
-                        <small><strong>Out:</strong> 09:45 AM</small>
-                    </td>
-                    <td>
-                        <small><strong>Created:</strong> Admin</small><br>
-                        <small><strong>Updated:</strong> Admin</small>
-                    </td>
-                    <td class="status-cell">
-                        <div class="status">Active</div>
-                    </td>
-                    <td class="text-center">
-                        <div class="dropdown">
-                            <button 
-                                class="btn btn-sm btn-primary dropdown-toggle"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                Action
-                            </button>
-
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="bi bi-eye me-2"></i> View
-                                    </a>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item text-danger">
-                                        <i class="bi bi-clock-history me-2"></i> Timeout
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-
-
-
-                </tr>
-            </tbody> --}}
             <tbody>
                 @forelse($visitors as $index => $visitor)
                 <tr>
@@ -100,23 +57,35 @@
                             <td>{{ $type->name }}</td>
                         @endif
                     @endforeach
-                    {{-- <td>{{ $visitor->visitor_type }}</td> --}}
                     <td>{{ $visitor->visitor_id }}</td>
                     <td>
-                        <button class="btn-sm view-button">View</button>
+                        <button 
+                            class="btn-sm view-button"
+                            id="viewImageBtn"
+                            data-id="{{ $visitor->id }}"
+                            data-image="{{ Storage::url($visitor->image_path) }}">
+                            View
+                        </button>
+
                     </td>
-                    {{-- <img src="{{ asset('storage/' . $visitor->image_path) }}" alt="Visitor Image" width="100"> --}}
-                    <td>{{ $visitor->created_at->format('Y-m-d') }}</td>
                     <td>
-                        <small><strong>In:</strong> {{ $visitor->time_in}} </small><br>
-                        <small><strong>Out:</strong> {{ $visitor->time_out }}</small>
+                        {{ $visitor->created_at->format('F d, Y') }}<br>
+                        {{ $visitor->created_at->format('l') }}
+                    </td>
+
+                    <td>
+                        <small><strong>In:</strong> {{ \Carbon\Carbon::parse($visitor->time_in)->format('h:i A') }}</small><br>
+                        <small>
+                            <strong>Out:</strong>
+                            {{ $visitor->time_out ? \Carbon\Carbon::parse($visitor->time_out)->format('h:i A') : '-' }}
+                        </small>
                     </td>
                     <td>
                         <small><strong>Created: </strong>{{ $visitor->created_by }}</small><br>
                         <small><strong>Updated: </strong>{{ $visitor->updated_by ?? '-' }}</small>
                     </td>
                     <td class="status-cell">
-                        <div class="status">{{ $visitor->status == 1 ? 'Active' : 'Time Out' }}</div>
+                        <div class="status">{{ $visitor->status == 0 ? 'Active' : 'Time Out' }}</div>
                     </td>
                     <td class="text-center">
                         <div class="dropdown">
@@ -129,33 +98,28 @@
                             </button>
 
                             <ul class="dropdown-menu">
-                                <form id="editForm" method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    <input type="hidden" name="visitor_id" value="{{ $visitor->visitor_id }}">
-                                    <li>
-                                        <a class="dropdown-item" href="#" id="detailsBtn">
-                                            <i class="bi bi-eye me-2"></i> View
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item text-danger" id="timeoutBtn">
-                                            <i class="bi bi-clock-history me-2"></i> Timeout
-                                        </button>
-                                    </li>
-                                </form>
+                                <li>
+                                    <button 
+                                        class="dropdown-item"
+                                        id="viewBtn"
+                                        data-id="{{ $visitor->id }}">
+                                        <i class="bi bi-eye me-2"></i> View
+                                    </button>
+
+                                </li>
+                                <li>
+                                    <button 
+                                        type="button"
+                                        class="dropdown-item text-danger"
+                                        id="timeoutBtn"
+                                        data-id="{{ $visitor->id }}">
+                                        <i class="bi bi-clock-history me-2"></i> Timeout
+                                    </button>
+
+                                </li>
                             </ul>
                         </div>
                     </td>
-                    {{-- <td>
-                        <form id="editForm" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <input type="hidden" name="visitor_id" value="{{ $visitor->visitor_id }}">
-
-                            <button type="button" id="detailsBtn" class="home-button">View Details</button>
-                            <button type="button" id="timeoutBtn" class="timeout-button">Timeout</button>
-                        </form>
-                    </td> --}}
-                    {{-- <a href="/visitors/{{ $visitor->id }}/edit">Edit</a> --}}
                 </tr>
                 @empty
                 <tr>
@@ -168,5 +132,66 @@
         <x-table-pagination/>
     </div>
 </div>
+@vite('resources/js/visitors.js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+{{-- <script>
+    $(document).on('click', '.timeoutBtn', function () {
+        let visitorId = $(this).data('id');
+
+        if (!visitorId) return;
+
+        if (!confirm('Are you sure you want to time out this visitor?')) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('visitor.timeout.ajax') }}",
+            type: "POST",
+            data: {
+                visitor_id: visitorId,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                alert(response.message);
+
+                // Option 1: reload page
+                location.reload();
+
+                // Option 2 (later): update row status dynamically
+            },
+            error: function (xhr) {
+                alert('Something went wrong. Please try again.');
+            }
+        });
+    });
+    $(document).on('click', '.viewBtn', function () {
+        let visitorId = $(this).data('id');
+
+        if (!visitorId) return;
+
+        $.ajax({
+            url: "{{ route('visitor.view') }}",
+            type: "POST",
+            data: {
+                visitor_id: visitorId,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                // ✅ redirect after AJAX success
+                window.location.href = response.redirect;
+            },
+            error: function (xhr) {
+                let msg = 'Unable to load visitor details.';
+                if (xhr.responseJSON?.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                alert(msg);
+            }
+        });
+    });
+
+
+</script> --}}
 
 @endsection
