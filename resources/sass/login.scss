@@ -1,42 +1,10 @@
-#loginpage{
-    overflow: hidden;
-}
 .container {
   max-width: 100% !important;
   width: 100%;
-  padding: 0 !important;
-  margin: 0 !important;
-  height: 100vh;
   
-
-  .container-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
-    background-color: black;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      opacity: 0.7;
-    }
-  }
-
   .main-card {
-    border-radius: 16px;
-    background-color: white;
-    display: flex;
-    flex-direction: row;
-    padding: 5px;
-    gap: 10px;
-    width: 1000px;
-    margin: 20px;
-
+    width: 800px;
+    
     .main-card-panel{
         width: 50%;
         height: 600px;
@@ -44,14 +12,69 @@
 
         &#panel-01{
             background-image: linear-gradient(135deg,#0F4383 , #145AB0, #3492E9);
+            box-sizing: border-box;
+
+            .background-logo{
+              opacity: 0.05;
+              transform: translate(-50%, 0);
+            }
         }
         &#panel-02{
-            
+            form{
+              .form-header{
+                position: relative;
+                height: 60px;
+                
+                img{
+                  filter: invert(100%);
+                  opacity: 0.1;
+                }
+                .form-mainheader{
+                  color: #0F4383;
+                }
+                .form-subheader{
+                  margin-top: -10px;
+                  color: gray;
+                }
+              }
+              .input-holder{
+                margin-bottom: 10px;
+                
+                label{
+                  color: #0F4383;
+                  font-weight: bold;
+                }
+                input{
+                  border: none;
+                  border-radius: 10px;
+                  padding: 10px;
+                  background-color: #0f438318;
+                  width: 100%;
+                }
+              }
+              .login-button{
+                a{
+                  color: rgba(128, 128, 128, 0.5);
+                }
+                a:hover{
+                  color: gray;
+                }
+                button{
+                  background-color: #0F4383;
+                  width: 120px;
+                }
+                button:hover{
+                  background-color: #0f438381;
+                  transition: 0.2s;
+                }
+              }
+
+              
+            }
 
         }
     }
   }
-
   .center-card {
     position: fixed;
     width: 100%;
@@ -62,4 +85,27 @@
     top: 0;
     left: 0;
   }
+  @media (max-width: 700px) { 
+    .main-card {
+        flex-direction: column !important;
+    }
+    .main-card-panel{
+      height: auto !important;
+    }
+    #panel-01{
+      display: none;
+    }
+    #panel-02{
+      width: 100%;
+    }
+    .form-header{
+      img{
+        position: absolute;
+        display: flex !important;
+      }
+    }
+
+  }
 }
+
+
