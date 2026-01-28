@@ -28,4 +28,15 @@ class Visitor extends Model
     {
         return $this->belongsTo(\App\Models\VisitorType::class, 'visitor_type', 'id');
     }
+    public function userType()
+    {
+        return $this->belongsTo(\App\Models\User_types::class, 'user_type', 'id');
+    }
+    public function getLocationNameAttribute()
+    {
+        $locations = collect(session('all_location'));
+        $match = $locations->firstWhere('id', $this->location);
+        return $match ? $match['name'] : 'N/A';
+    }
+
 }

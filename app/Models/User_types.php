@@ -24,4 +24,6 @@ public $incrementing = true;
     'deleted_at'
     
     ]; 
+
+    
 }

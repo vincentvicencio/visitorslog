@@ -21,21 +21,21 @@
             <div class="page-title fs-2">Reports</div>
             <div class="page-subtitle mb-3">Monitor and track every logged visitor</div>
         </div>
-        <div class="top-button">
-            Filter Report
-        </div>
+            <!-- Filter Report -->
+            <button class="top-button btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+    <i class="bi bi-funnel me-1"></i> Filter Report
+</button>
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
         <div class="search-field d-flex align-items-center justify-content-between">
             search
-            <form id="searchForm">
-            <input type="text" placeholder="search" class="flex-grow-1 mx-2" id="searchreport" name="searchreport"/>
+             <input type="text" id="tableSearch" class="flex-grow-1 mx-2" placeholder="Search">
             entries per page
-            <select name="" id="" class="number-per-page">
-                <option value="">10</option>
-                <option value="">25</option>
-                <option value="">50</option>
+            <select name="" id="entriesPerPage" class="number-per-page form-select-sm">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
             </select>
         </div>
         <!-- Table -->
@@ -53,37 +53,59 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <strong>Juan Dela Cruz</strong><br>
-                        <small>0917-123-4567</small><br>
-                        <small>Quezon City</small>
-                    </td>
-                    <td>Summit One</td>
-                    <td>1023</td>
-                    <td>
-                        <button class="btn-sm view-button">View</button>
-                    </td>
-                    <td>January 22, 2026 <br>Thursday</td>
-                    <td>
-                        <small><strong>In:</strong> 08:30 AM</small><br>
-                        <small><strong>Out:</strong> 09:45 AM</small>
-                    </td>
-                    <td>
-                        <small><strong>Created:</strong> Admin</small><br>
-                        <small><strong>Updated:</strong> Admin</small>
-                    </td>
-                    <td class="status-cell">
-                        <div class="status">Active</div>
-                    </td>
-                    <td class="text-center">
-                        <div class="dropdown">
-                            <button 
-                                class="btn btn-sm btn-primary dropdown-toggle"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
+            <tbody id="reportTableBody">
+                @foreach ($visitorlogs as $reportlogs)
+                    <tr>
+                        <td>
+                            <strong>{{ "{$reportlogs->first_name} {$reportlogs->last_name}" }}</strong><br>
+                            <small>{{ $reportlogs->phone_number }}</small><br>
+                            <small>{{ $reportlogs->location_name }}</small>
+                        </td>
+                          @foreach ($visitorTypes as $type)
+                        @if ($type->id == $reportlogs->visitor_type)
+                            <td>{{ $type->name }}</td>
+                        @endif
+                    @endforeach
+                        <td>{{ $reportlogs->visitor_id }}</td>
+                        <td>
+                            @if ($reportlogs->image_path)
+                                <button type="button" class="btn-sm view-button btn btn-primary view-image-btn" 
+                                data-image="{{ asset('storage/' . $reportlogs->image_path) }}">
+                            View
+                        </button>
+                            @else
+                                <span class="text-muted">No Image</span>
+                            @endif
+                        </td>
+                        <td>{{ $reportlogs->created_at->format('F d, Y') }}</td>
+                        <td>
+                            <small><strong>In:</strong> {{ \Carbon\Carbon::parse($reportlogs->time_in)->format('h:i A') }}</small><br>
+                            <small><strong>Out:</strong> 
+                                @if ($reportlogs->time_out)
+                                    {{ \Carbon\Carbon::parse($reportlogs->time_out)->format('h:i A') }}
+                                @else
+                                    N/A
+                                @endif
+                            </small>
+                        </td>
+                        <td>
+                            <small><strong>Created:</strong> {{ $reportlogs->created_by }}</small><br>
+                            <small><strong>Updated:</strong> {{ $reportlogs->updated_by }}</small>
+                        </td>
+                        <td class="status-cell">
+                            @if ($reportlogs-> status == 0)
+                                <div class="status">Active</div>
+                            @else
+                                <div class="status">InActive</div>
+                            @endif
+                            <!-- <div class="status">{{ $reportlogs->status }}</div> -->
+                        </td>
+                        <td class="text-center">
+                            <div class="dropdown">
+                            <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                    type="button" 
+                                    data-bs-toggle="dropdown" 
+                                    data-bs-boundary="viewport" aria-expanded="false">
                                 Action
                             </button>
 
@@ -100,11 +122,9 @@
                                 </li>
                             </ul>
                         </div>
-                    </td>
-
-
-
-                </tr>
+                            </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
         <!-- Pagination -->
@@ -112,4 +132,267 @@
     </div>
 </div>
 
+
+
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Visitor Photo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid" alt="Visitor Image">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Reports</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url('/report') }}" method="GET">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date From</label>
+                            <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date To</label>
+                            <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Visitor Type</label>
+                        <select name="visitor_type" class="form-select">
+                            <option value="">All Types</option>
+                            @foreach ($visitorTypes as $type)
+                                <option value="{{ $type->id }}" {{ request('visitor_type') == $type->id ? 'selected' : '' }}>
+                                    {{ $type->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ url('/report') }}" class="btn btn-secondary">Reset</a>
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+
+$(document).ready(function() {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': window.Laravel.csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    });
+
+        // Handle Dropdown placement without breaking the click event
+    $(document).on('shown.bs.dropdown', '.dropdown', function () {
+        const $toggle = $(this).find('.dropdown-toggle');
+        const $menu = $(this).find('.dropdown-menu');
+
+        // Store the original parent so we can put it back later
+        $menu.data('parent', $(this));
+        
+        $('body').append($menu);
+        
+        const offset = $toggle.offset();
+        $menu.css({
+            'display': 'block',
+            'position': 'absolute',
+            'visibility': 'visible',
+            'opacity': '1',
+            'top': offset.top + $toggle.outerHeight(),
+            'left': offset.left,
+            'z-index': '9999'
+        }).addClass('show');
+    });
+
+    $(document).on('hide.bs.dropdown', '.dropdown', function () {
+        const $menu = $('body > .dropdown-menu'); // Find the menu we moved to body
+        const $parent = $menu.data('parent');
+        
+        if ($parent) {
+            $parent.append($menu); // Put it back where it belongs
+            $menu.css({
+                'display': '',
+                'position': '',
+                'top': '',
+                'left': ''
+            }).removeClass('show');
+        }
+    });
+    // Add 'e' as a parameter to the function
+    $('.view-image-btn').on('click', function(e) {
+        // 1. Prevent the page from reloading
+        e.preventDefault();
+        
+        // 2. Get the image URL from the data-image attribute
+        const imageUrl = $(this).data('image');
+        
+        // 3. Set the src of the image inside the modal
+        $('#modalImage').attr('src', imageUrl);
+        
+        // 4. Show the modal
+        $('#imageModal').modal('show');
+    });
+    $('#imageModal').on('hidden.bs.modal', function () {
+        $('#modalImage').attr('src', ''); 
+    });
+
+
+    function updateTableRows() {
+        var limit = parseInt($('#entriesPerPage').val()); 
+        var $rows = $('#reportTableBody tr');
+        $rows.hide();
+        $rows.slice(0, limit).show();
+
+        console.log("Showing " + limit + " rows");
+    }
+    updateTableRows();
+
+    $('#entriesPerPage').on('change', function() {
+        updateTableRows();
+    });
+
+    $("#tableSearch").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        var $rows = $("#reportTableBody tr");
+
+        if (value === "") {
+            updateTableRows(); 
+        } else {
+            $rows.filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        }
+    });
+
+ // --- 1. GLOBAL VARIABLES ---
+    let currentPage = 1;
+
+    // --- 2. INITIALIZATION ---
+    // Mark all rows as matches initially so pagination shows them all
+    $("#reportTableBody tr").addClass('search-match');
+    applyPagination();
+
+    // --- 3. SEARCH LOGIC ---
+    $("#tableSearch").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        var $rows = $("#reportTableBody tr");
+
+        $rows.each(function() {
+            var rowText = $(this).text().toLowerCase();
+            // Check if row is the "No results" row or if it matches search
+            var isMatch = rowText.indexOf(value) > -1;
+            
+            if (isMatch) {
+                $(this).addClass('search-match');
+            } else {
+                $(this).removeClass('search-match');
+            }
+        });
+
+        currentPage = 1; // Reset to first page on new search
+        applyPagination(); 
+    });
+
+    // --- 4. PAGINATION CORE FUNCTION ---
+    function applyPagination() {
+        const limit = parseInt($('#entriesPerPage').val()) || 10;
+        const $allRows = $("#reportTableBody tr");
+        const $rowsToPaginate = $allRows.filter('.search-match');
+
+        const totalRows = $rowsToPaginate.length;
+        const totalPages = Math.ceil(totalRows / limit) || 1;
+
+        // Boundary checks
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        // Hide all rows, then show only the current slice
+        $allRows.hide();
+        const start = (currentPage - 1) * limit;
+        const end = start + limit;
+        $rowsToPaginate.slice(start, end).show();
+
+        // Update the custom pagination UI text
+        $('.number-holder-pagination').text(`Page ${currentPage} of ${totalPages}`);
+
+        // Visual feedback for arrows (opacity and cursor)
+        updateArrowStyles(currentPage, totalPages);
+    }
+
+    function updateArrowStyles(curr, total) {
+        const isFirst = curr === 1;
+        const isLast = curr === total;
+
+        $('.pagination-first, .pagination-prev').css({
+            'opacity': isFirst ? '0.3' : '1',
+            'cursor': isFirst ? 'default' : 'pointer'
+        });
+        $('.pagination-next, .pagination-last').css({
+            'opacity': isLast ? '0.3' : '1',
+            'cursor': isLast ? 'default' : 'pointer'
+        });
+    }
+
+    // --- 5. EVENT LISTENERS ---
+
+    // Entries Per Page Change
+    $('#entriesPerPage').on('change', function() {
+        currentPage = 1;
+        applyPagination();
+    });
+
+    // Arrow Click Events
+    $(document).on('click', '.pagination-first', function() {
+        if (currentPage > 1) {
+            currentPage = 1;
+            applyPagination();
+        }
+    });
+
+    $(document).on('click', '.pagination-prev', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            applyPagination();
+        }
+    });
+
+    $(document).on('click', '.pagination-next', function() {
+        const limit = parseInt($('#entriesPerPage').val());
+        const totalPages = Math.ceil($("#reportTableBody tr.search-match").length / limit);
+        if (currentPage < totalPages) {
+            currentPage++;
+            applyPagination();
+        }
+    });
+
+    $(document).on('click', '.pagination-last', function() {
+        const limit = parseInt($('#entriesPerPage').val());
+        const totalPages = Math.ceil($("#reportTableBody tr.search-match").length / limit);
+        if (currentPage < totalPages) {
+            currentPage = totalPages;
+            applyPagination();
+        }
+    });
+
+
+});
+</script>
 @endsection
+

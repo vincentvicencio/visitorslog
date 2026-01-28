@@ -65,8 +65,6 @@ class LoginController extends Controller
         return redirect('/login');
     }
 
-
-
     protected function authenticated(Request $request, $user)
 {
     // Determine employee code
@@ -76,25 +74,8 @@ class LoginController extends Controller
     $this->fetch_emp_data('all_emp');
     $this->fetch_api_data('all_location', 'location');
     $location = collect(session('all_location'));
-    // dd($location);
-    // dd($this->fetch_emp_data('all_emp'));
-    // dd($allEmployeesFromSession);
-    // Optionally fetch profile pic if needed
-    // $this->fetch_profile_pic($emp_code);
-
-    // Check user type from RegisteredUser model
-    // $userType = RegisteredUser::where('emp_code', $emp_code)
-    //     ->value('user_type');
-
-    // // Redirect based on user type
-    // if ($userType == 1) {
-    //     return redirect()->route('reports'); // USER
-    // }
-
     return redirect()->route('home'); // ADMIN
 }
-
-
 
     private function fetch_emp_data($sessionKey){
         if(!Session::has($sessionKey)){
