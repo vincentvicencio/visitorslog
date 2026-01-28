@@ -1,5 +1,4 @@
 import { Modal } from 'bootstrap';
-import $ from 'jquery';
 
 class Container {
 

@@ -21,7 +21,8 @@
         @include('components.triggers.delete')
         @include('components.triggers.visitorTypeModal')
         @include('components.triggers.registerIdModal')
-        @include('components.triggers.visitorModal')
+        {{-- @include('components.triggers.form') --}}
+        @include('components.triggers.viewImage')
         <!-- Notification -->
 
         @stack('scripts')
@@ -38,3 +39,4 @@
 </body>
 
 </html>
+

@@ -5,7 +5,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="notification-title"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
             </div>
 
             <div class="modal-body">
@@ -17,8 +17,9 @@
                                     <div class="row">
                                         <div class="col-md-12 py-3">
                                             <h5 class="card-title text-center" id="notification-message"></h5>
-                                            <input type="hidden" name="record_id" id="record_id"
-                                                class="notification_record">
+                                            <form id="timeOutForm">
+                                                <input type="hidden" name="record_id" id="record_id" class="notification_record">
+                                            </form>
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-center">
@@ -35,3 +36,6 @@
         </div>
     </div>
 </div>
+
+@vite('resources/js/visitors.js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

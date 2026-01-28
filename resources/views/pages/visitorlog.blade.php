@@ -1,56 +1,4 @@
 @extends('layout')
-     <style>
-        /* Modal overlay */
-        .modal {
-            display: none; /* hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8); /* dark translucent background */
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Modal content box */
-        .modal-content {
-            position: relative;
-            background-color: none;
-            padding: 10px;
-            border-radius: 8px;
-            max-width: 50%;
-            max-height: 90%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        /* Image inside modal */
-        .modal-image {
-            max-width: 100%;
-            max-height: 80vh;
-            border-radius: 6px;
-        }
-
-        /* Close button */
-        .closeBtn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .closeBtn:hover {
-            color: #000;
-        }
-    </style>
 @section('content')
 <div class="user-types-container mt-4">
     <div class="page-header">
@@ -58,14 +6,9 @@
             <div class="page-title fs-2">Visitor Log Sheets</div>
             <div class="page-subtitle mb-3">Manage and track all visitor entries</div>
         </div>
-        
-        <form action="/visitor" method="post">
-            @csrf
-            <button class="top-button" type="submit">
-                Add Visitor
-            </button>
-            
-        </form>
+        <div class="top-button" id="addBtn">
+            Add Visitor
+        </div>
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
@@ -94,48 +37,6 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            {{-- <tbody>
-                <tr>
-                    <td>
-                        <small><strong>In:</strong> 08:30 AM</small><br>
-                        <small><strong>Out:</strong> 09:45 AM</small>
-                    </td>
-                    <td>
-                        <small><strong>Created:</strong> Admin</small><br>
-                        <small><strong>Updated:</strong> Admin</small>
-                    </td>
-                    <td class="status-cell">
-                        <div class="status">Active</div>
-                    </td>
-                    <td class="text-center">
-                        <div class="dropdown">
-                            <button 
-                                class="btn btn-sm btn-primary dropdown-toggle"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                Action
-                            </button>
-
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="bi bi-eye me-2"></i> View
-                                    </a>
-                                </li>
-                                <li>
-                                    <button class="dropdown-item text-danger">
-                                        <i class="bi bi-clock-history me-2"></i> Timeout
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-
-
-
-                </tr>
-            </tbody> --}}
             <tbody>
                 @forelse($visitors as $index => $visitor)
                 <tr>
@@ -158,7 +59,13 @@
                     @endforeach
                     <td>{{ $visitor->visitor_id }}</td>
                     <td>
-                        <button class="btn-sm view-button viewImageBtn" data-image="{{ Storage::url($visitor->image_path) }}">View</button>
+                        <button 
+                            class="btn-sm view-button"
+                            id="viewImageBtn"
+                            data-id="{{ $visitor->id }}"
+                            data-image="{{ Storage::url($visitor->image_path) }}">
+                            View
+                        </button>
 
                     </td>
                     <td>
@@ -192,24 +99,20 @@
 
                             <ul class="dropdown-menu">
                                 <li>
-                                    {{-- <a class="dropdown-item" href="{{ route('visitor.view', ['visitor_id' => $visitor->visitor_id]) }}">
-                                        <i class="bi bi-eye me-2"></i> View
-                                    </a> --}}
                                     <button 
-                                        class="dropdown-item viewBtn"
-                                        data-id="{{ $visitor->visitor_id }}">
+                                        class="dropdown-item"
+                                        id="viewBtn"
+                                        data-id="{{ $visitor->id }}">
                                         <i class="bi bi-eye me-2"></i> View
                                     </button>
 
                                 </li>
                                 <li>
-                                    {{-- <a class="dropdown-item text-danger" href="{{ route('visitor.timeout', ['visitor_id' => $visitor->visitor_id]) }}">
-                                        <i class="bi bi-clock-history me-2"></i> Timeout
-                                    </a> --}}
                                     <button 
                                         type="button"
-                                        class="dropdown-item text-danger timeoutBtn"
-                                        data-id="{{ $visitor->visitor_id }}">
+                                        class="dropdown-item text-danger"
+                                        id="timeoutBtn"
+                                        data-id="{{ $visitor->id }}">
                                         <i class="bi bi-clock-history me-2"></i> Timeout
                                     </button>
 
@@ -229,20 +132,13 @@
         <x-table-pagination/>
     </div>
 </div>
-
-<div id="simpleModal" class="modal">
-    <div class="modal-content">
-        <span class="closeBtn">&times;</span>
-        <img src="" alt="Modal Image" class="modal-image">   
-    </div>
-</div>
+@vite('resources/js/visitors.js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-{{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> --}}
 
 
 
 
-<script>
+{{-- <script>
     $(document).on('click', '.timeoutBtn', function () {
         let visitorId = $(this).data('id');
 
@@ -298,30 +194,7 @@
         });
     });
 
-    document.querySelectorAll('.viewImageBtn').forEach(button => {
-        button.addEventListener('click', function() {
-            const id = this.getAttribute('data-image');
-            if (id) {
-                // alert('Edit functionality is not implemented yet.');
-                document.getElementById('simpleModal').style.display = 'flex';
-                document.querySelector('.modal-image').src = id;
-                
-            }
-        });
-    });
 
-    document.querySelectorAll('.closeBtn', '.modal').forEach(button => {
-        button.addEventListener('click', function() {
-            document.getElementById('simpleModal').style.display = 'none';
-        });
-    });
-    document.querySelectorAll('.modal').forEach(button => {
-        button.addEventListener('click', function() {
-            document.getElementById('simpleModal').style.display = 'none';
-        });
-    });
-
-
-</script>
+</script> --}}
 
 @endsection

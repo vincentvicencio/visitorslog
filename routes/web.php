@@ -19,9 +19,9 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 // visitor routes
 Route::post('/visitor', [VisitorController::class, 'index'])->name('visitor.index');    //checked
-Route::post('/addVisitor/save', [VisitorController::class, 'save'])->name('visitor.save');  //checked
+Route::post('/visitor/save', [VisitorController::class, 'save'])->name('visitor.save');  //checked
 Route::post('/visitor/timeout', [VisitorController::class, 'timeoutAjax'])->name('visitor.timeout.ajax');
-Route::get('/visitor/view/{visitor_id}', function ($visitor_id) {$visitor = Visitor::where('visitor_id', $visitor_id)
+Route::get('/visitor/view/{id}', function ($id) {$visitor = Visitor::where('id', $id)
             ->latest('id')->firstOrFail();return view('homepage.view', compact('visitor'));})->name('visitor.view.page');
 Route::post('/visitor/view', [VisitorController::class, 'view'])->name('visitor.view'); 
 
@@ -31,7 +31,6 @@ Route::post('/IDNumber', [RegisterIDController::class, 'index'])->name('register
 Route::post('/registeredID/save', [RegisterIDController::class, 'save'])->name('registerID.save');  //checked
 Route::post('/registeredID/delete', [RegisterIDController::class, 'deleteAjax'])->name('registerID.delete.ajax'); //checked
 Route::post('/registeredID/edit', [RegisterIDController::class, 'editAjax'])->name('registerID.edit.ajax'); //checked
-// Route::get('/registeredIDs', [RegisterIDController::class, 'list'])->name('registerID.list'); //checked
 
 // visitor types routes
 Route::post('/visitor_type', [VisitorTypeController::class, 'index'])->name('visitorType.index');   //checked
@@ -39,7 +38,6 @@ Route::post('/visitorType/save', [VisitorTypeController::class, 'save'])->name('
 Route::post('/visitorType/delete', [VisitorTypeController::class, 'deleteAjax'])->name('visitorType.delete.ajax'); //checked
 Route::post('/visitorType/edit', [VisitorTypeController::class, 'editAjax'])->name('visitorType.edit.ajax'); //checked
 
-// Route::post('/name na tatawaging file try', [TryController::class, 'function na tatawagin or gagamitin show']);
 Route::post('/visitorlog', [TryController::class, 'show'])->name('visitorlog.index');
 Route::get('/visitorlog', [TryController::class, 'show'])->name('visitorlog.index');
 

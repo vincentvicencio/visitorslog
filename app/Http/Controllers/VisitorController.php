@@ -14,10 +14,10 @@ class VisitorController extends Controller
 {
     public function index()
     {
-        $visitors = VisitorType::where('deleted_at', null)
+        $visitorTypes = VisitorType::where('deleted_at', null)
                    ->orderBy('id', 'asc')
                    ->get();
-        return view('homepage.form', compact('visitors'));
+        return view('pages.form', compact('visitorTypes'));
     }
 
     public function list()
@@ -30,29 +30,9 @@ class VisitorController extends Controller
 
     }
 
-    // public function timeout(Request $request)
-    // {
-    //     $request->validate([
-    //         'visitor_id' => 'required|exists:visitors,visitor_id',
-    //     ]);
-
-    //     $visitor = Visitor::where('visitor_id', $request->visitor_id)->latest('id')->first();
-
-    //     if ($visitor) {
-    //         $visitor->time_out = now();
-    //         $visitor->status = 0; // timed out
-    //         $visitor->save();
-
-    //         // ✅ Set flash message
-    //         return redirect()->back()->with('success', 'Visitor timed out successfully!');
-    //     }
-
-    //     return redirect()->back()->with('error', 'Visitor not found.');
-    // }
-
     public function timeoutAjax(Request $request)
     {
-        $visitor = Visitor::where('visitor_id', $request->visitor_id)->first();
+        $visitor = Visitor::where('id', $request->id)->first();
 
         if (!$visitor) {
             return response()->json([
@@ -76,33 +56,13 @@ class VisitorController extends Controller
             'message' => 'Visitor successfully timed out'
         ]);
     }
-
-    // public function view(Request $request)
-    // {
-    //     $request->validate([
-    //         'visitor_id' => 'required|exists:visitors,visitor_id',
-    //     ]);
-
-    //     // Get only one visitor with visitor_id and status = 1
-    //     $visitor = Visitor::where('visitor_id', $request->visitor_id)
-    //                     ->where('status', 1)
-    //                     ->latest('id') // most recent if multiple
-    //                     ->first();     // only one record
-
-    //     if ($visitor) {
-    //         return view('homepage.view', compact('visitor'));
-    //     }
-
-    //     // Optional: handle case where visitor not found
-    //     return redirect()->back()->with('error', 'Visitor not found or inactive.');
-    // }
     public function view(Request $request)
     {
         $request->validate([
-            'visitor_id' => 'required|exists:visitors,visitor_id',
+            'id' => 'required|exists:visitors,id',
         ]);
 
-        $visitor = Visitor::where('visitor_id', $request->visitor_id)
+        $visitor = Visitor::where('id', $request->id)
             ->where('status', 0)
             ->latest('id')
             ->first();
@@ -114,7 +74,7 @@ class VisitorController extends Controller
         }
 
         return response()->json([
-            'redirect' => route('visitor.view.page', $visitor->visitor_id)
+            'redirect' => route('visitor.view.page', $visitor->id)
         ]);
     }
 

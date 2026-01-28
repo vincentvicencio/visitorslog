@@ -28,9 +28,9 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
-<body>
+<body id="loginpage">
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm" style="display: none;">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                     {{ config('app.name', 'Laravel') }}
@@ -58,7 +58,7 @@
                             @if (Route::has('register'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
+                                </li> 
                             @endif
                         @else
                             <li class="nav-item dropdown">
@@ -84,10 +84,11 @@
             </div>
         </nav>
 
-        <main class="py-4">
+        
+    </div>
+    <main class="">
             @yield('content')
         </main>
-    </div>
     <!-- ✅ jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -98,6 +99,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- ✅ Your compiled app scripts -->
-    @vite(['resources/js/app.js', 'resources/js/RegisteredId.js'])
+     @vite(['resources/js/app.js', 'resources/js/RegisteredId.js'])
+
 </body>
 </html>

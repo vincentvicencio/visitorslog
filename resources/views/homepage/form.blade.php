@@ -33,7 +33,7 @@
     <label>Visitor Type:</label>
     <select name="visitor_type" required>
         <option value="" disabled selected>Select Visitor Type</option>
-        @foreach ($visitors as $type)
+        @foreach ($visitorTypes as $type)
             <option value="{{ $type->id }}">{{ $type->name }}</option>
         @endforeach
     </select><br>
