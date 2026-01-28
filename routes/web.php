@@ -43,6 +43,10 @@ Route::get('/usertype', [TryController::class, 'show_usertype'])->name('usertype
 Route::post('/add-user-type', [User_TypesController::class, 'addusertype'])->name('addusertype');
 
 
+Route::delete('/delete-visitor/{id}', [TryController::class, 'destroy'])->name('visitors.destroy');
+Route::delete('/visitors/{id}', [TryController::class, 'destroy'])->name('visitors.destroy');
+
+
 // Route::get('/get-user-types', [Registered_UsersController::class, 'getUserTypes']);
 
 // Route::get('/get-locations', function() {

@@ -11,6 +11,7 @@ use App\Models\RegisteredID;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Auth;
 
 class TryController extends Controller
 {
@@ -96,6 +97,32 @@ public function show_usertype()
     $allEmployeesFromSession = session('all_emp', []);
 
     return view('pages.report', compact('visitorlogs', 'visitorTypes', 'allEmployeesFromSession'));
+}
+
+
+public function destroy($id)
+
+{
+try {
+        $visitor = Visitor::findOrFail($id);
+
+        // Instead of $user->delete(), we update the column
+        $visitor->update([
+            'deleted_at' => NOW(),
+            'deleted_by' => Auth::user()->first_name ?? 'System' // Optional: track who deleted it
+        ]);
+
+        // return response()->json([
+        //     'status' => 'success', 
+        //     'message' => 'Record Deleted successfully.'
+        // ]);
+    } catch (\Exception $e) {
+        // return response()->json([
+        //     'status' => 'error', 
+        //     'message' => 'Failed to remove user.'
+        // ], 500);
+    }
+
 }
 
 }
