@@ -1,12 +1,12 @@
 <!-- Side Menu -->
 <div id="side-bar-menu">
     <div class="side-menu" id="sideMenu">
-        <div class="side-menu-icon-1">
-            <img src="/images/Magellan_pure_white_logo.png" class="logo" alt="">
+        <div class="side-menu-icon-1 position-relative d-flex align-items-center justify-content-center w-100">
+            <img src="/images/Magellan_pure_white_logo.png" class="logo d-flex me-3" alt="">
         </div>   
-        <div class="side-menu-icon-2 text-white d-flex flex-column justify-content-between align-items-center">
-            <img src="/images/bgg.png" class="side-menu-icon-bg" alt="">
-            <div id="live-clock">
+        <div class="side-menu-icon-2 position-relative text-white d-flex flex-column justify-content-between align-items-center w-100">
+            <img src="/images/bgg.png" class="side-menu-icon-bg position-absolute top-0 start-0 w-100" alt="">
+            <div id="live-clock" class="d-flex flex-column">
                 <div class="d-flex justify-content-between fw-bold fs-6 align-items-start">
                     <div id="clock-day" class="mt-n2"></div>
                     <div id="clock-time"></div>
@@ -26,7 +26,7 @@
         </div>  
         <div class="menu fw-bold mt-3 py-1 ps-4">Menu</div>
 
-        <div class="sidebar-menu d-flex flex-column vh-100">
+        <div class="d-flex flex-column vh-100 mx-2">
 
         <a href="{{ url('visitorlog') }}"
         class="sidebar-menu-button {{ Request::is('visitorlog') ? 'selected' : '' }}">
@@ -74,7 +74,7 @@
                     @csrf
                 </form>
             </div> -->
-            <div class="logout-button d-flex mt-auto pe-4 fw-bold" 
+            <div class="logout-button d-flex mt-auto pe-4 fw-bold align-items-center justify-content-center" 
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 
                 <i class="bi bi-box-arrow-left p-2"></i>

@@ -22,16 +22,21 @@
             <div class="page-title fs-2">Reports</div>
             <div class="page-subtitle mb-3">Monitor and track every logged visitor</div>
         </div>
-            <!-- Filter Report -->
-            <button class="top-button btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
-    <i class="bi bi-funnel me-1"></i> Filter Report
-</button>
+        <div class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
+         text-white rounded-2 border-0 cursor-pointer px-3 py-2" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <i class="bi bi-funnel me-1"></i> Filter Report
+        </div>
+        <!-- Filter Report -->
+        <!-- <button class="top-button btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <i class="bi bi-funnel me-1"></i> Filter Report
+        </button> -->
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
-        <div class="search-field d-flex align-items-center justify-content-between">
+        <div class="search-field d-flex align-items-center justify-content-between w-100 rounded-3 mb-2 fw-bold fs-6 text-primary-custom ps-2 small-caps">
             search
-             <input type="text" id="tableSearch" class="flex-grow-1 mx-2" placeholder="Search">
+            <input type="text" id="tableSearch" placeholder="search" class="flex-grow-1 mx-2 border-0 rounded-2 ms-2 me-4 ps-3">
+       <!-- <input type="text" id="tableSearch" class="flex-grow-1 mx-2" placeholder="Search"> -->
             entries per page
             <select name="" id="entriesPerPage" class="number-per-page form-select-sm">
                 <option value="10">10</option>

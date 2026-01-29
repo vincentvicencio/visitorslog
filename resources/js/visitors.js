@@ -39,6 +39,11 @@ $(document).ready(function () {
         let Id = document.getElementById('record_id').value;
         timeoutVisitor(Id);
     });
+
+    $(document).on('click', '#addBtn', function () {
+
+        Container.showModal('#addVisitorModal');
+    });
 });
 
 function timeoutVisitor(Id) {

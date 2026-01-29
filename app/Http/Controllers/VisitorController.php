@@ -17,7 +17,7 @@ class VisitorController extends Controller
         $visitorTypes = VisitorType::where('deleted_at', null)
                    ->orderBy('id', 'asc')
                    ->get();
-        return view('pages.form', compact('visitorTypes'));
+        return view('homepage.form', compact('visitorTypes'));
     }
 
     public function list()

@@ -18,59 +18,23 @@
 @vite(['resources/js/users.js'])
 @include('components.triggers.toast')
 
-<style>
-    .visitor-log-sheet-table {
-        width: 100%;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        background-color: white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        display: flex;
-        flex-direction: column;
-        overflow: visible !important;
-    }
-
-    .search-field {
-        padding: 15px;
-        border-bottom: 1px solid #eee;
-    }
-    /* .table-scroll-container {
-        position: relative;
-        overflow: visible !important;
-    } */
-
-    #userTable {
-        width: 100% !important;
-        margin-bottom: 0;
-        table-layout: auto;
-    }
-
-    #userTable thead th {
-        background-color: #003366; 
-        color: white;
-        padding: 12px;
-    }
-    .dropdown {
-        position: relative;
-    }
-    
-    .dropdown-menu {
-        z-index: 9999;
-    }
-</style>
 <div class="user-types-container mt-4">
     <div class="page-header">
         <div class="header-content">
             <div class="page-title fs-2">Users</div>
             <div class="page-subtitle mb-3">Manage and organize user accounts and their details</div>
         </div>
-             <button type="button" id="openPopup2" class="top-button">Register User</button>
+        <div class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
+         text-white rounded-2 border-0 cursor-pointer px-3 py-2" id="openPopup2">
+            Register User
+        </div>
+        <!-- <button type="button" id="openPopup2" class="top-button">Register User</button> -->
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
-        <div class="search-field d-flex align-items-center justify-content-between">
+        <div class="search-field d-flex align-items-center justify-content-between w-100 rounded-3 mb-2 fw-bold fs-6 text-primary-custom ps-2 small-caps">
             search
-             <input type="text" id="tableSearch" class="flex-grow-1 mx-2" placeholder="Search">
+            <input type="text" id="tableSearch" placeholder="search" class="flex-grow-1 mx-2 border-0 rounded-2 ms-2 me-4 ps-3">
             entries per page
             <select name="" id="entriesPerPage" class="number-per-page form-select-sm">
                 <option value="10">10</option>
@@ -92,55 +56,54 @@
             </thead>
             <tbody id="employeeTableBody">
             @forelse($registeredUsers as $user)
-    <tr>
-        <td>{{ $user->first_name }}</td>
-         <td>{{ $user->userType->name ?? 'None' }}</td>
-        <td>{{ $user->created_by }}</td>
-        <td>{{ $user->updated_by}}</td>
-        <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
-        <td class="text-center">
-                        <div class="dropdown"> 
-                <!-- <button class="btn btn-sm btn-primary dropdown-toggle" 
-            type="button" 
-            data-bs-toggle="dropdown" 
-            aria-expanded="false">
-        Action
-    </button> -->
-
-    <button class="btn btn-sm btn-primary dropdown-toggle" 
-        type="button" 
-        data-bs-toggle="dropdown" 
-        data-bs-boundary="viewport" aria-expanded="false">
-    Action
-</button>
-        <ul class="dropdown-menu">
-            <li>
-                <a class="dropdown-item edit-user" href="javascript:void(0)" 
-                data-id="{{ $user->id }}">
-                    <i class="bi bi-pencil-square me-2"></i> Edit
-                </a>
-            </li>
-        <li>
-            <button type="button" class="dropdown-item text-danger delete-user" 
-                    data-id="{{ $user->id }}">
-                <i class="bi bi-trash me-2"></i> Delete
-            </button>
-        </li>
-        </ul>
-            </div>
-            </td>
-        </tr>
-    @empty
-        <tr>
-            <td colspan="5" class="text-center">No employees registered yet.</td>
-        </tr>
-    @endforelse
+            <tr>
+                <td>{{ $user->first_name }}</td>
+                <td>{{ $user->userType->name ?? 'None' }}</td>
+                <td>{{ $user->created_by }}</td>
+                <td>{{ $user->updated_by}}</td>
+                <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
+                <td class="text-center">
+                    <div class="dropdown"> 
+                        <!-- <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                type="button" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false">
+                            Action
+                        </button> -->
+                        <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                type="button" 
+                                data-bs-toggle="dropdown" 
+                                data-bs-boundary="viewport" aria-expanded="false">
+                            Action
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item edit-user" href="javascript:void(0)" 
+                                data-id="{{ $user->id }}">
+                                    <i class="bi bi-pencil-square me-2"></i> Edit
+                                </a>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item text-danger delete-user" 
+                                        data-id="{{ $user->id }}">
+                                    <i class="bi bi-trash me-2"></i> Delete
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="5" class="text-center">No employees registered yet.</td>
+            </tr>
+        @endforelse
             </tbody>
-            </table>
-            </div>
+        </table>
             <!-- Pagination -->
             <x-table-pagination/>
-        </div>
+    </div>
+</div>
 
 
 <div class="container mt-4">
