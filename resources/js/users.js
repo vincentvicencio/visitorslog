@@ -68,17 +68,10 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
         }
     });
 
-    $('#openPopup2').click(function() { $('#registeruserpopup').fadeIn(); 
-
-        // component.createDropdown('/get-locations', '#reg_location', null, null1);
-        // Check if component exists before calling
-    // if (typeof component !== 'undefined') {
+    $('#register_btn').click(function() { $('#registeruserpopup').fadeIn(); 
         component.createDropdown('/getlocation', '#reg_location', null, '#registeruserpopup');
-    // } else {
-    //     console.error("The 'component' object is not defined. Check if its JS file is loaded.");
-    // }
     });
-$('#closePopup2').click(function() { $('#registeruserpopup').fadeOut(); });
+$('#close_register_user_popup').click(function() { $('#registeruserpopup').fadeOut(); });
 
 // Handle AJAX Submission
 $('#registered_user_form').on('submit', function(e) {
@@ -99,7 +92,7 @@ $('#registered_user_form').on('submit', function(e) {
            $('#toastMessage').text(response.success || "User Added Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('add_user_successToast');
+            const toastElement = document.getElementById('SUCCESSTOAST');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -141,7 +134,6 @@ $('#confirmDeleteBtn').on('click', function() {
     btn.prop('disabled', true).text('Processing...');
 
     $.ajax({
-        // url: "/delete-user/" + userIdToDelete,
         url: window.Laravel.baseUrl + '/delete-user/' + userIdToDelete,
         type: "POST",
         data: {
@@ -149,10 +141,10 @@ $('#confirmDeleteBtn').on('click', function() {
         },
         success: function(response) {
             // Success: Reload the page to refresh the table
-            $('#toastMessage').text(response.success || "User Deleted Successfully!");
+            $('#DeletetoastMessage').text(response.success || "User Deleted Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('delete_user_successToast');
+            const toastElement = document.getElementById('DELETE');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -199,7 +191,7 @@ $('#edit_user_form').on('submit', function(e) {
             $('#editPopupContainer').fadeOut(200);
             $('#toastMessage').text(response.message || "User updated successfully!");
 
-            const toastElement = document.getElementById('edit_user_successToast');
+            const toastElement = document.getElementById('SUCCESSTOAST');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -328,8 +320,8 @@ $('#edit_user_form').on('submit', function(e) {
 
     // --- 6. EXISTING MODAL & AJAX LOGIC ---
     // (Keep your Register, Edit, and Delete AJAX code here...)
-    $('#openPopup2').click(function() { $('#registeruserpopup').fadeIn(); });
-    $('#closePopup2').click(function() { $('#registeruserpopup').fadeOut(); });
+    $('#register_btn').click(function() { $('#registeruserpopup').fadeIn(); });
+    $('#close_register_user_popup').click(function() { $('#registeruserpopup').fadeOut(); });
 
     // Handle Dropdown placement (if needed for table scrolling)
     $(document).on('shown.bs.dropdown', '.dropdown', function () {

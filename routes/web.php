@@ -18,14 +18,13 @@ Route::get('/', function () {
 });
 
 Auth::routes();
+Route::middleware(['auth'])->group(function () {
 
 Route::get('/visitorlog', [TryController::class, 'show'])->name('visitorlog.index');
 Route::get('/visitorlog-admin', [HomeController::class, 'index'])->name('visitorlog');
 
-Route::middleware(['auth'])->group(function () {
-    Route::post('/addusers', [Registered_UsersController::class, 'addusers']);
-    Route::post('/update-user/{id}', [Registered_UsersController::class, 'updateUser']);
-});
+Route::post('/addusers', [Registered_UsersController::class, 'addusers']);
+Route::post('/update-user/{id}', [Registered_UsersController::class, 'updateUser']);
 
 Route::post('/addusertype', [User_TypesController::class, 'addusertype'])->name('addusertype');
 Route::post('/addusers', [Registered_UsersController::class, 'addusers'])->name('addusers');
@@ -89,3 +88,8 @@ Route::get('/id', [TryController::class, 'show_id'])->name('id.index');
 
 Route::post('/report', [TryController::class, 'show_report'])->name('report.index');
 Route::get('/report', [TryController::class, 'show_report'])->name('report.index');
+
+Route::get('/home', [HomeController::class, 'index']);
+
+Route::get('/dashboard', [DashboardController::class, 'index']);
+});

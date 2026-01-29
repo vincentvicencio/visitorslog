@@ -138,7 +138,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
             $('#toastMessage').text(response.success || "User Type Added Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('add_user_type_successToast');
+            const toastElement = document.getElementById('SUCCESSTOAST');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -180,10 +180,10 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
         data: $(this).serialize(),
         success: function(response) {
             // 1. Update the message text
-            $('#toastMessage').text(response.success || "Role updated successfully!");
+            $('#toastMessage').text(response.success || "User Type Updated Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('edit_user_type_successToast');
+            const toastElement = document.getElementById('SUCCESSTOAST');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -228,10 +228,10 @@ $('#closeEditType').click(function() {
             },
             success: function(response) {
                 // Success: reload to refresh the table (hiding rows where deleted_at != null)
-                $('#toastMessage').text(response.success || "Role Deleted Successfully!");
+                $('#DeletetoastMessage').text(response.success || "User Type Deleted Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('delete_user_type_successToast');
+            const toastElement = document.getElementById('DELETE');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 

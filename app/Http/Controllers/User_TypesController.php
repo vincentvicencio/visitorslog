@@ -26,33 +26,24 @@ class User_TypesController extends Controller
     {
         try {
             $role = User_types::findOrFail($id);
-
-            // Perform a "Soft Update" instead of a hard delete
             $role->update([
-                'deleted_at' => now(), // Sets the current timestamp
-                'deleted_by' => auth()->user()->first_name ?? 'System' // Sets the name of the logged-in user
+                'deleted_at' => now(), 
+                'deleted_by' => auth()->user()->first_name ?? 'System' 
             ]);
-
-            return response()->json(['success' => 'Role deleted successfully!']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete role.'], 500);
         }
     }
 
-    // 1. Return the data to the AJAX 'get' request
-// 1. Fetch data for the modal
 public function edit($id)
 {
-    // Changed 'Role' to 'User_types'
     $role = User_types::findOrFail($id); 
     return response()->json($role);
 }
 
-// 2. Process the Update
 public function update(Request $request, $id)
 {
     $request->validate([
-        // Changed 'roles' table to 'user_types'
         'user_type' => 'required|string|max:255|unique:user_types,name,' . $id,
     ]);
 
@@ -61,7 +52,5 @@ public function update(Request $request, $id)
         'name' => $request->user_type,
         'updated_by' => Auth::user()->name ?? 'System'
     ]);
-
-    return response()->json(['success' => 'Role updated successfully!']);
 }
 }

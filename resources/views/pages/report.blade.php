@@ -13,7 +13,7 @@
 </script>
 
 @vite(['resources/js/report.js'])
-@include('components.triggers.toast')
+@include('components.triggers.users-userstype-toast')
 
 
 <div class="user-types-container mt-4">
