@@ -6,14 +6,16 @@
             <div class="page-title fs-2">Visitor Log Sheets</div>
             <div class="page-subtitle mb-3">Manage and track all visitor entries</div>
         </div>
-        <div class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
+
+        {{-- <div class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
          text-white rounded-2 border-0 cursor-pointer px-3 py-2" id="addBtn">
             Add Visitor
-        </div>
+        </div> --}}
 
-        <form action="/visitor" method="post">
+        <form action="/visitor" method="post" >
             @csrf
-            <button type="submit">Add</button>
+            <button type="submit" class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
+         text-white rounded-2 border-0 cursor-pointer px-3 py-2">Add Visitor</button>
         </form>
     </div>
     <!-- table.scss -->
@@ -67,28 +69,17 @@
                     @endforeach
                     <td>{{ $visitor->visitor_id }}</td>
                     <td>
-<<<<<<< HEAD
                         @if($visitor->image_path == null)
                             No Image Provided
                         @else
                             <button 
-                                class="btn-sm view-button"
+                            class="btn-sm view-button text-white border-0 rounded-2 px-3 py-1"
                                 id="viewImageBtn"
                                 data-id="{{ $visitor->id }}"
                                 data-image="{{ Storage::url($visitor->image_path) }}">
                                 View
                             </button>
                         @endif
-=======
-                        <button 
-                            class="btn-sm view-button text-white border-0 rounded-2 px-3 py-1"
-                            id="viewImageBtn"
-                            data-id="{{ $visitor->id }}"
-                            data-image="{{ Storage::url($visitor->image_path) }}">
-                            View
-                        </button>
-
->>>>>>> df08b65f5ba7ae37bb9b089e3f6dccbd8114fd40
                     </td>
                     <td>
                         {{ $visitor->created_at->format('F d, Y') }}<br>
@@ -154,49 +145,10 @@
         <x-table-pagination/>
     </div>
 </div>
-<<<<<<< HEAD
-=======
-@vite('resources/js/visitors.js')
- @include('components.triggers.form')
->>>>>>> df08b65f5ba7ae37bb9b089e3f6dccbd8114fd40
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @vite('resources/js/visitors.js')
 
-<<<<<<< HEAD
 {{-- <script>
-=======
-
-<!-- {{-- <script>
-    $(document).on('click', '.timeoutBtn', function () {
-        let visitorId = $(this).data('id');
-
-        if (!visitorId) return;
-
-        if (!confirm('Are you sure you want to time out this visitor?')) {
-            return;
-        }
-
-        $.ajax({
-            url: "{{ route('visitor.timeout.ajax') }}",
-            type: "POST",
-            data: {
-                visitor_id: visitorId,
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (response) {
-                alert(response.message);
-
-                // Option 1: reload page
-                location.reload();
-
-                // Option 2 (later): update row status dynamically
-            },
-            error: function (xhr) {
-                alert('Something went wrong. Please try again.');
-            }
-        });
-    });
->>>>>>> df08b65f5ba7ae37bb9b089e3f6dccbd8114fd40
     $(document).on('click', '.viewBtn', function () {
         let visitorId = $(this).data('id');
 
@@ -224,6 +176,6 @@
     });
 
 
-</script> --}} -->
+</script> --}} 
 
 @endsection
