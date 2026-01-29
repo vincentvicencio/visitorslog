@@ -14,13 +14,13 @@ use App\Models\RegisteredUser;
 use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('visitorlog.index');
 });
 
 Auth::routes();
 
 // home route
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/addusers', [Registered_UsersController::class, 'addusers']);

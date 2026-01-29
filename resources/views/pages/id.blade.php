@@ -15,12 +15,12 @@
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
         <div class="search-field d-flex align-items-center justify-content-between">
             search
-            <input type="text" placeholder="search" class="flex-grow-1 mx-2">
+            <input type="text" id="typeSearch" placeholder="search" class="flex-grow-1 mx-2">
             entries per page
-            <select name="" id="" class="number-per-page">
-                <option value="">10</option>
-                <option value="">25</option>
-                <option value="">50</option>
+            <select name="" id="entriesPerPage" class="number-per-page">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
             </select>
         </div>
         <!-- Table -->
@@ -36,7 +36,7 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="visitorLogTableBody">
                  @forelse($registeredIds as $index => $visitor)
                     <tr>
                         @foreach ($visitorTypes as $type)
@@ -61,40 +61,50 @@
                             @endif
                         </td>
                         <td class="text-center">
-                            <div class="dropdown">
+                            @if (!$visitorsLogs->contains('visitor_id', $visitor->id_number))
+                                <div class="dropdown">
+                                    <button 
+                                        class="btn btn-sm btn-primary dropdown-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        Action
+                                    </button>
+
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button 
+                                                class="dropdown-item"
+                                                id="editBtn"
+                                                data-id="{{ $visitor->id }}"
+                                                data-type="{{ $visitor->visitor_type }}"
+                                                data-name="{{ $visitor->id_number }}"
+                                                >
+                                                <i class="bi bi-pencil-square me-2"></i> Edit
+                                            </button>
+
+                                        </li>
+                                        <li>
+                                            <button 
+                                                type="button"
+                                                class="dropdown-item text-danger"
+                                                id="deleteBtn"
+                                                data-id="{{ $visitor->id }}">
+                                                <i class="bi bi-trash me-2"></i> Delete
+                                            </button>
+
+                                        </li>
+                                    </ul>
+                                </div>
+                            @else
+                               
                                 <button 
-                                    class="btn btn-sm btn-primary dropdown-toggle"
                                     type="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    Action
+                                    class="dropdown-item text-success">
+                                    Currently Used
                                 </button>
-
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <button 
-                                            class="dropdown-item"
-                                            id="editBtn"
-                                            data-id="{{ $visitor->id }}"
-                                            data-type="{{ $visitor->visitor_type }}"
-                                            data-name="{{ $visitor->id_number }}"
-                                            >
-                                            <i class="bi bi-pencil-square me-2"></i> Edit
-                                        </button>
-
-                                    </li>
-                                    <li>
-                                        <button 
-                                            type="button"
-                                            class="dropdown-item text-danger"
-                                            id="deleteBtn"
-                                            data-id="{{ $visitor->id }}">
-                                            <i class="bi bi-trash me-2"></i> Delete
-                                        </button>
-
-                                    </li>
-                                </ul>
-                            </div>
+                            @endif
+                            
                         </td>
                     </tr>
                     @empty
@@ -108,10 +118,9 @@
         <x-table-pagination/>
     </div>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @vite('resources/js/registeredid.js')
 @include('components.triggers.registerIdModal')
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 @endsection

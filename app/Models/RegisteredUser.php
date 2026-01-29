@@ -3,7 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\User_types;
+ 
 class RegisteredUser extends Model
 {
     protected $table = 'registered_users';
@@ -21,6 +22,6 @@ class RegisteredUser extends Model
 
     public function userType()
     {
-        return $this->belongsTo(\App\Models\User_types::class, 'user_type', 'id');
+        return $this->belongsTo(User_types::class, 'user_type', 'id');
     }
 }

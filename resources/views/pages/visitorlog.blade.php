@@ -14,12 +14,13 @@
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
         <div class="search-field d-flex align-items-center justify-content-between">
             search
-            <input type="text" placeholder="search" class="flex-grow-1 mx-2">
+            <input type="text" id="typeSearch" placeholder="search" class="flex-grow-1 mx-2">
+            {{-- <input type="text"class="flex-grow-1 mx-2" placeholder="search"> --}}
             entries per page
-            <select name="" id="" class="number-per-page">
-                <option value="">10</option>
-                <option value="">25</option>
-                <option value="">50</option>
+            <select name="" id="entriesPerPage" class="number-per-page">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
             </select>
         </div>
         <!-- Table -->
@@ -37,7 +38,7 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="visitorLogTableBody">
                 @forelse($visitors as $index => $visitor)
                 <tr>
                     <td>
@@ -59,14 +60,17 @@
                     @endforeach
                     <td>{{ $visitor->visitor_id }}</td>
                     <td>
-                        <button 
-                            class="btn-sm view-button"
-                            id="viewImageBtn"
-                            data-id="{{ $visitor->id }}"
-                            data-image="{{ Storage::url($visitor->image_path) }}">
-                            View
-                        </button>
-
+                        @if($visitor->image_path == null)
+                            No Image Provided
+                        @else
+                            <button 
+                                class="btn-sm view-button"
+                                id="viewImageBtn"
+                                data-id="{{ $visitor->id }}"
+                                data-image="{{ Storage::url($visitor->image_path) }}">
+                                View
+                            </button>
+                        @endif
                     </td>
                     <td>
                         {{ $visitor->created_at->format('F d, Y') }}<br>
@@ -132,39 +136,10 @@
         <x-table-pagination/>
     </div>
 </div>
-@vite('resources/js/visitors.js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@vite('resources/js/visitors.js')
 
 {{-- <script>
-    $(document).on('click', '.timeoutBtn', function () {
-        let visitorId = $(this).data('id');
-
-        if (!visitorId) return;
-
-        if (!confirm('Are you sure you want to time out this visitor?')) {
-            return;
-        }
-
-        $.ajax({
-            url: "{{ route('visitor.timeout.ajax') }}",
-            type: "POST",
-            data: {
-                visitor_id: visitorId,
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (response) {
-                alert(response.message);
-
-                // Option 1: reload page
-                location.reload();
-
-                // Option 2 (later): update row status dynamically
-            },
-            error: function (xhr) {
-                alert('Something went wrong. Please try again.');
-            }
-        });
-    });
     $(document).on('click', '.viewBtn', function () {
         let visitorId = $(this).data('id');
 

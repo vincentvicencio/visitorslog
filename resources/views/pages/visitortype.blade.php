@@ -15,12 +15,12 @@
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
         <div class="search-field d-flex align-items-center justify-content-between">
             search
-            <input type="text" placeholder="search" class="flex-grow-1 mx-2">
+            <input type="text" id="typeSearch" placeholder="search" class="flex-grow-1 mx-2">
             entries per page
-            <select name="" id="" class="number-per-page">
-                <option value="">10</option>
-                <option value="">25</option>
-                <option value="">50</option>
+            <select name="" id="entriesPerPage" class="number-per-page">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
             </select>
         </div>
         <!-- Table -->
@@ -34,7 +34,7 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="visitorLogTableBody">
                 @forelse($visitorTypes as $index => $visitor)
                     <tr>
                         <td><strong>{{ $visitor->name }}</strong></td>
@@ -90,10 +90,10 @@
         <x-table-pagination/>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @vite('resources/js/visitortype.js')
 
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
 @endsection

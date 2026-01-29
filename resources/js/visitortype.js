@@ -27,7 +27,7 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
     const id_number = input.dataset.id;
     const visitor_type = input.value.trim();
     if (!visitor_type) {
-        Triggers.showToast('Visitor type cannot be empty.');
+        Triggers.showToast('Visitor type cannot be empty.', 1);
         return;
     }
 
@@ -41,7 +41,7 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
-                Triggers.showToast(response.message);
+                Triggers.showToast(response.message, 0);
                 setTimeout(() => {
                     $(textInputModal.hide()).fadeOut('slow');
                 }, 2000);
@@ -50,7 +50,7 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
                 }, 2000);
             },
             error: function (xhr) {
-                Triggers.showToast(xhr.responseJSON?.message ?? 'Save failed.');
+                Triggers.showToast(xhr.responseJSON?.message ?? 'Save failed.', 1);
                 const input = document.getElementById('userInput');
                 input.value = '';
             }
@@ -66,27 +66,27 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
-                Triggers.showToast(response.message);
-                // location.reload();
+                Triggers.showToast(response.message, 0);
+                // Close modal
+                setTimeout(() => {
+                    $(textInputModal.hide()).fadeOut('slow');
+                }, 2000);
+                setTimeout(() => {
+                    $(location.reload()).fadeOut('slow');
+                }, 2000);
+
             },
             error: function (xhr) {
-                Triggers.showToast(xhr.responseJSON?.message ?? 'Edit failed.');
+                Triggers.showToast(xhr.responseJSON?.message ?? 'Edit failed.', 1);
                 const input = document.getElementById('userInput');
                 input.value = '';
             }
         });
-
-        // Close modal
-        setTimeout(() => {
-            $(textInputModal.hide()).fadeOut('slow');
-        }, 2000);
-        setTimeout(() => {
-            $(location.reload()).fadeOut('slow');
-        }, 2000);
     }
     
 });
 
+$(document).ready(function () {
 $(document).on('click', '#addBtn', function () {
     openTextInputModalBlank();
 });
@@ -118,7 +118,7 @@ $(document).on('click', '#deleteBtn', function () {
             _token: $('meta[name="csrf-token"]').attr('content')
         },
         success: function (response) {
-            Triggers.showToast(response.message);
+            Triggers.showToast(response.message, 0);
             setTimeout(() => {
                 $('.toast').fadeOut('slow');
             }, 2000);
@@ -127,10 +127,93 @@ $(document).on('click', '#deleteBtn', function () {
             }, 2000);
         },
         error: function (xhr) {
-            Triggers.showToast(xhr.responseJSON?.message ?? 'Delete failed.');
+            Triggers.showToast(xhr.responseJSON?.message ?? 'Delete failed.', 1);
         }
     });
 });
 
 
 
+
+// /////////////////////////////////////////////////
+
+
+    // ================= PAGINATION =================
+    let currentPage = 1;
+
+    function initTable() {
+        $("#visitorLogTableBody tr").addClass('search-match');
+        applyPagination();
+    }
+
+    function applyPagination() {
+        const limit = parseInt($('#entriesPerPage').val()) || 10;
+        const $rows = $("#visitorLogTableBody tr.search-match");
+        const totalRows = $rows.length;
+        const totalPages = Math.ceil(totalRows / limit) || 1;
+
+        currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+
+        $("#visitorLogTableBody tr").hide();
+
+        const start = (currentPage - 1) * limit;
+        $rows.slice(start, start + limit).show();
+
+        $('.number-holder-pagination')
+            .text(`Page ${currentPage} of ${totalPages}`);
+
+        updateArrowStyles(currentPage, totalPages);
+    }
+
+    function updateArrowStyles(curr, total) {
+        $('.pagination-first, .pagination-prev')
+            .css({ opacity: curr === 1 ? 0.3 : 1 });
+
+        $('.pagination-next, .pagination-last')
+            .css({ opacity: curr === total ? 0.3 : 1 });
+    }
+
+    // ================= SEARCH =================
+    $("#typeSearch").on("keyup", function () {
+        const value = $(this).val().toLowerCase();
+
+        $("#visitorLogTableBody tr").each(function () {
+            $(this).toggleClass(
+                'search-match',
+                $(this).text().toLowerCase().includes(value)
+            );
+        });
+
+        currentPage = 1;
+        applyPagination();
+    });
+
+    // ================= CONTROLS =================
+    $('#entriesPerPage').on('change', () => {
+        currentPage = 1;
+        applyPagination();
+    });
+
+    $(document).on('click', '.pagination-first', () => {
+        currentPage = 1; applyPagination();
+    });
+
+    $(document).on('click', '.pagination-prev', () => {
+        if (currentPage > 1) currentPage--;
+        applyPagination();
+    });
+
+    $(document).on('click', '.pagination-next', () => {
+        currentPage++; applyPagination();
+    });
+
+    $(document).on('click', '.pagination-last', () => {
+        const limit = parseInt($('#entriesPerPage').val()) || 10;
+        currentPage = Math.ceil(
+            $("#visitorLogTableBody tr.search-match").length / limit
+        );
+        applyPagination();
+    });
+
+    initTable();
+});

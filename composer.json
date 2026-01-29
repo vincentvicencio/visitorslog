@@ -35,7 +35,7 @@
         },
         "files": [
             "app/Helpers/commonHelper.php",
-            "app/Helpers/FunctionsHeplers.php"
+            "app/Helpers/FunctionsHelpers.php"
         ]
     },
     "autoload-dev": {
@@ -44,7 +44,7 @@
         },
         "files": [
             "app/Helpers/commonHelper.php",
-            "app/Helpers/FunctionsHeplers.php"
+            "app/Helpers/FunctionsHelpers.php"
         ]
     },
     "scripts": {
