@@ -10,13 +10,16 @@
         {{-- <div class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
          text-white rounded-2 border-0 cursor-pointer px-3 py-2" id="addBtn">
             Add Visitor
-        </div> --}}
+        </div>
 
-        <form action="/visitor" method="post" >
+         <form action="/visitor" method="post" >
             @csrf
-            <button type="submit" class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
-         text-white rounded-2 border-0 cursor-pointer px-3 py-2">Add Visitor</button>
-        </form>
+            <button type="submit" >Add Visitor</button>
+        </form> --}}
+        <a class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
+            text-white rounded-2 border-0 cursor-pointer px-3 py-2 text-decoration-none" href="{{ route('visitor.index') }}" id="addBtn">
+            Add Visitor
+        </a>
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
@@ -148,34 +151,5 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @vite('resources/js/visitors.js')
 
-{{-- <script>
-    $(document).on('click', '.viewBtn', function () {
-        let visitorId = $(this).data('id');
-
-        if (!visitorId) return;
-
-        $.ajax({
-            url: "{{ route('visitor.view') }}",
-            type: "POST",
-            data: {
-                visitor_id: visitorId,
-                _token: $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (response) {
-                // ✅ redirect after AJAX success
-                window.location.href = response.redirect;
-            },
-            error: function (xhr) {
-                let msg = 'Unable to load visitor details.';
-                if (xhr.responseJSON?.message) {
-                    msg = xhr.responseJSON.message;
-                }
-                alert(msg);
-            }
-        });
-    });
-
-
-</script> --}} 
 
 @endsection

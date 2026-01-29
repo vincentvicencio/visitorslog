@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\VisitorType;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 
 class VisitorTypeController extends Controller
@@ -52,7 +53,7 @@ class VisitorTypeController extends Controller
         try {
             $id = new VisitorType();
             $id->name = ucfirst(strtolower($request->visitor_type)); // normalize case
-            $id->created_by = auth()->user()->name ?? 'Admin';
+            $id->created_by = Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System';
             $id->created_at = now();
             $id->save();
 
@@ -90,7 +91,7 @@ class VisitorTypeController extends Controller
         $visitor->update([
             'name' => ucfirst(strtolower($request->visitor_type)),
             'updated_at' => now(),
-            'updated_by' => auth()->user()->name ?? 'Admin',
+            'updated_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System',
         ]);
 
         return response()->json([
@@ -118,7 +119,7 @@ class VisitorTypeController extends Controller
 
         $visitor->update([
             'deleted_at' => Carbon::now(),
-            'deleted_by' => auth()->user()->name ?? 'Admin',
+            'deleted_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'Admin',
         ]);
 
         return response()->json([

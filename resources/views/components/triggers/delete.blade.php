@@ -37,5 +37,5 @@
     </div>
 </div>
 
-@vite('resources/js/visitors.js')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{{-- @vite(['resources/js/registered.js', 'resources/js/visitors.js', 'resources/js/visitortype.js']) --}}

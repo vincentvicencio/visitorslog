@@ -3,6 +3,35 @@ import Triggers from './common/triggers.js';
 import Container from './common/container.js';
 
 $(document).ready(function () {
+    $('#captureBtn').on('click', function () {
+        $('#imageInput').click();
+    });
+
+    $(document).on('click', '#viewBtn', function () {
+        let visitorId = $(this).data('id');
+
+        if (!visitorId) return;
+
+        $.ajax({
+            url: "/visitor/view",
+            type: "POST",
+            data: {
+                id: visitorId,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                // ✅ redirect after AJAX success
+                window.location.href = response.redirect;
+            },
+            error: function (xhr) {
+                let msg = 'Unable to load visitor details.';
+                if (xhr.responseJSON?.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                Triggers.showToast(msg, 1);
+            }
+        });
+    });
 
     $(document).on('click', '#timeoutBtn', function () {
         let Id = $(this).data('id');
@@ -40,7 +69,7 @@ $(document).ready(function () {
             }
         });
     });
-// /////////////////////////////////////////////////
+    // /////////////////////////////////////////////////
 
 
     // ================= PAGINATION =================
@@ -127,18 +156,25 @@ $(document).ready(function () {
 
         Container.showModal('#addVisitorModal');
     });
+
+    const imageModal = new Modal(document.getElementById('imageModal'));
+
+    $(document).on('click', '#viewImageBtn', function () {
+        const imageUrl = $(this).data('image');
+
+        $('#modalImage').attr('src', imageUrl);
+        imageModal.show();
+    });
+
+
+
+
+    
 });
 
 
 
-const imageModal = new Modal(document.getElementById('imageModal'));
 
-$(document).on('click', '#viewImageBtn', function () {
-    const imageUrl = $(this).data('image');
-
-    $('#modalImage').attr('src', imageUrl);
-    imageModal.show();
-});
 
 
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\VisitorTypeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
 use App\Models\Visitor;
+use App\Models\VisitorType;
 use App\Http\Controllers\TryController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\User_TypesController;
@@ -56,11 +57,26 @@ Route::get('/get-usertype/{id}', [User_TypesController::class, 'getUsertype']);
 Route::post('/fetch-users-by-type', [Registered_UsersController::class, 'fetchUsersByType'])->name('fetchUsersByType');
 Route::post('/fetch-users-by-name', [Registered_UsersController::class, 'fetchUsersByName'])->name('fetchUsersByName'); 
 
+Route::get('/visitor', [VisitorController::class, 'index'])->name('visitor.index');    //checked
 Route::post('/visitor', [VisitorController::class, 'index'])->name('visitor.index');    //checked
 Route::post('/visitor/save', [VisitorController::class, 'save'])->name('visitor.save');  //checked
 Route::post('/visitor/timeout', [VisitorController::class, 'timeoutAjax'])->name('visitor.timeout.ajax');
-Route::get('/visitor/view/{id}', function ($id) {$visitor = Visitor::where('id', $id)
-            ->latest('id')->firstOrFail();return view('homepage.view', compact('visitor'));})->name('visitor.view.page');
+// Route::get('/visitor/view/{id}', function ($id) {$visitor = Visitor::where('id', $id)
+//             ->latest('id')->firstOrFail();return view('homepage.view', compact('visitor'));})->name('visitor.view.page');
+Route::get('/visitor/view/{id}', function ($id) {
+
+    $visitor = Visitor::where('id', $id)
+        ->latest('id')
+        ->firstOrFail();
+
+    $visitorTypes = VisitorType::whereNull('deleted_at')
+        ->orderBy('id', 'asc')
+        ->get();
+
+    return view('homepage.view', compact('visitor', 'visitorTypes'));
+
+})->name('visitor.view.page');
+
 Route::post('/visitor/view', [VisitorController::class, 'view'])->name('visitor.view'); 
 
 Route::post('/IDNumber', [RegisterIDController::class, 'index'])->name('registerID.index');  //checked
