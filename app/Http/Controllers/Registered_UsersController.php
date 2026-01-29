@@ -127,9 +127,7 @@ public function updateUser(Request $request, $id)
     try {
         // Find the user we are currently editing
         $user = RegisteredUser::findOrFail($id);
-
-        // Validation: Check if the selected Role (user_type) 
-        // matches the Employee Code (user_name) in the database
+        
         if ($request->emp_code !== $user->user_name) {
             return response()->json([
                 'status' => 'error', 
@@ -154,30 +152,6 @@ public function updateUser(Request $request, $id)
         return response()->json(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()], 500);
     }
 }
-
-
-    // public function location()
-    // {
-    //     $location = collect(session('all_location'));
-    //     $data = [];
-    //     $data[0] = [
-    //         'id' => '',
-    //         'text' => 'Choose Location/Site',
-    //     ];
-
-        
-    //     foreach ($location as $record) {
-    //         // Access array elements using array syntax
-    //         $data[] = [
-    //             'id' => $record['id'],
-    //             'text' => $record['name']
-    //         ];
-    //     }
-        
-
-    //     // return response()->json($location);
-    //     return response()->json($record = $data);
-    // }
 
     public function location()
 {

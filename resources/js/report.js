@@ -55,9 +55,9 @@ $(document).ready(function(){
         $('#modalImage').attr('src', imageUrl);
         
         // 4. Show the modal
-        $('#imageModal').modal('show');
+        $('#View_imageModal').modal('show');
     });
-    $('#imageModal').on('hidden.bs.modal', function () {
+    $('#View_imageModal').on('hidden.bs.modal', function () {
         $('#modalImage').attr('src', ''); 
     });
 
@@ -224,10 +224,10 @@ $(document).ready(function(){
             },
             success: function(response) {
             //   Success: Reload the page to refresh the table
-            $('#toastMessage').text(response.success || "User Deleted Successfully!");
+            $('#DeletetoastMessage').text(response.success || "Report Log Deleted Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('deletesuccessToast');
+            const toastElement = document.getElementById('DELETE');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 

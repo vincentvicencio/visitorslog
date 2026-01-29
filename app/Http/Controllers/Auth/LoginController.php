@@ -12,8 +12,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Helpers\fetchdata_api;
 use function fetchdata_api;
+<<<<<<< HEAD
 
 // use function fetchdata_api;
+=======
+use function PHPUnit\Framework\isNull;
+
+>>>>>>> 055741908302b342b9f36e0f2272701dbeba42bf
 class LoginController extends Controller
 
 {

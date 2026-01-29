@@ -23,50 +23,31 @@ Auth::routes();
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/addusers', [Registered_UsersController::class, 'addusers']);
-    Route::post('/update-user/{id}', [Registered_UsersController::class, 'updateUser']);
-});
+
+Route::get('/visitorlog', [TryController::class, 'show'])->name('visitorlog.index');
+Route::get('/visitorlog-admin', [HomeController::class, 'index'])->name('visitorlog');
+
+Route::post('/addusers', [Registered_UsersController::class, 'addusers']);
+Route::post('/update-user/{id}', [Registered_UsersController::class, 'updateUser']);
 
 Route::post('/addusertype', [User_TypesController::class, 'addusertype'])->name('addusertype');
 Route::post('/addusers', [Registered_UsersController::class, 'addusers'])->name('addusers');
 
 Route::get('/get-user/{id}', [Registered_UsersController::class, 'getUser']);
-// Route::post('/update-user/{id}', [Registered_UsersController::class, 'updateUser'])->name('updateuser');
 
 Route::get('/usertype/{id}/edit', [User_TypesController::class, 'edit']);
 Route::put('/usertype/{id}', [User_TypesController::class, 'update']);
 Route::delete('/usertype/{id}', [User_TypesController::class, 'destroy']);
 
-// View route
 Route::get('/usertype', [TryController::class, 'show_usertype'])->name('usertype');
 
-// Action route
 Route::post('/add-user-type', [User_TypesController::class, 'addusertype'])->name('addusertype');
-
 
 Route::delete('/delete-visitor/{id}', [TryController::class, 'destroy'])->name('visitors.destroy');
 Route::delete('/visitors/{id}', [TryController::class, 'destroy'])->name('visitors.destroy');
 
-
-// Route::get('/get-user-types', [Registered_UsersController::class, 'getUserTypes']);
-
-// Route::get('/get-locations', function() {
-//     // Retrieve session data
-//     $locations = session('all_location', []);
-//     // $locations = $location ?? [];
-    
-//     // If your API returns a nested 'data' key, extract it
-//     $data = isset($locations['data']) ? $locations['data'] : $locations;
-    
-//     return response()->json($data);
-// });
-
-// Route::post('/getlocation', [Registered_UsersController::class, 'location'])->name('getlocations');
-    
-
 Route::post('/getlocation', [Registered_UsersController::class, 'location'])->name('locations.lookup');
 Route::get('/getlocation', [Registered_UsersController::class, 'location'])->name('locations.lookup');
-
 
 Route::post('/delete-user/{id}', [Registered_UsersController::class, 'deleteUser'])->name('deleteuser');    
 Route::post('/delete-usertype/{id}', [User_TypesController::class, 'deleteUsertype'])->name('deleteusertype');
@@ -75,7 +56,6 @@ Route::get('/get-usertype/{id}', [User_TypesController::class, 'getUsertype']);
 Route::post('/fetch-users-by-type', [Registered_UsersController::class, 'fetchUsersByType'])->name('fetchUsersByType');
 Route::post('/fetch-users-by-name', [Registered_UsersController::class, 'fetchUsersByName'])->name('fetchUsersByName'); 
 
-// visitor routes
 Route::post('/visitor', [VisitorController::class, 'index'])->name('visitor.index');    //checked
 Route::post('/visitor/save', [VisitorController::class, 'save'])->name('visitor.save');  //checked
 Route::post('/visitor/timeout', [VisitorController::class, 'timeoutAjax'])->name('visitor.timeout.ajax');
@@ -83,14 +63,11 @@ Route::get('/visitor/view/{id}', function ($id) {$visitor = Visitor::where('id',
             ->latest('id')->firstOrFail();return view('homepage.view', compact('visitor'));})->name('visitor.view.page');
 Route::post('/visitor/view', [VisitorController::class, 'view'])->name('visitor.view'); 
 
-
-// registered ID routes
 Route::post('/IDNumber', [RegisterIDController::class, 'index'])->name('registerID.index');  //checked
 Route::post('/registeredID/save', [RegisterIDController::class, 'save'])->name('registerID.save');  //checked
 Route::post('/registeredID/delete', [RegisterIDController::class, 'deleteAjax'])->name('registerID.delete.ajax'); //checked
 Route::post('/registeredID/edit', [RegisterIDController::class, 'editAjax'])->name('registerID.edit.ajax'); //checked
 
-// visitor types routes
 Route::post('/visitor_type', [VisitorTypeController::class, 'index'])->name('visitorType.index');   //checked
 Route::post('/visitorType/save', [VisitorTypeController::class, 'save'])->name('visitorType.save'); //checked
 Route::post('/visitorType/delete', [VisitorTypeController::class, 'deleteAjax'])->name('visitorType.delete.ajax'); //checked
@@ -115,3 +92,7 @@ Route::get('/id', [TryController::class, 'show_id'])->name('id.index');
 
 Route::post('/report', [TryController::class, 'show_report'])->name('report.index');
 Route::get('/report', [TryController::class, 'show_report'])->name('report.index');
+
+Route::get('/home', [HomeController::class, 'index']);
+
+});
