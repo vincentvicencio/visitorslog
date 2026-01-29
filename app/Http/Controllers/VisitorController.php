@@ -84,7 +84,7 @@ class VisitorController extends Controller
 
 
 
-    public function save(Request $request)
+    public function saveAjax(Request $request)
     {
         $request->validate([
             'first_name'   => 'required|string',
@@ -92,7 +92,7 @@ class VisitorController extends Controller
             'last_name'    => 'required|string',
             'visitor_type' => 'required|exists:visitor_types,id',
 
-            'visitor_id' => [
+            'id_number' => [
                 'required',
                 'string',
                 function ($attribute, $value, $fail) use ($request) {

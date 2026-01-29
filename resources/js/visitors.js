@@ -3,6 +3,39 @@ import Triggers from './common/triggers.js';
 import Container from './common/container.js';
 
 $(document).ready(function () {
+
+    $('#addVisitorForm').on('submit', function (e) {
+        e.preventDefault();
+
+        let formData = new FormData(this);
+
+        $.ajax({
+            url: "/visitor/save",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                Triggers.showToast(response.message, 0);
+                
+                setTimeout(() => {
+                    window.location.href = "/visitorlog";
+                }, 2000);
+            },
+            error: function (xhr) {
+                let msg = xhr.responseJSON?.message ?? 'Save failed.';
+                Triggers.showToast(msg, 1);
+            }
+        });
+    });
+
+    $(document).on('click', '#clrBtn', function () {
+        $('#addVisitorForm')[0].reset();
+    });
+
     $('#captureBtn').on('click', function () {
         $('#imageInput').click();
     });
@@ -56,7 +89,6 @@ $(document).ready(function () {
             },
             success: function (response) {
                 Triggers.showToast(response.message, 0);
-
                 setTimeout(() => {
                     location.reload(); // ✅ correct reload
                 }, 2000);
@@ -151,12 +183,6 @@ $(document).ready(function () {
 
     initTable();
 
-
-    $(document).on('click', '#addBtn', function () {
-
-        Container.showModal('#addVisitorModal');
-    });
-
     const imageModal = new Modal(document.getElementById('imageModal'));
 
     $(document).on('click', '#viewImageBtn', function () {
@@ -169,7 +195,7 @@ $(document).ready(function () {
 
 
 
-    
+
 });
 
 
