@@ -16,8 +16,8 @@ class User_TypesController extends Controller
 
         User_types::create([
             'name'       => $request->user_type,
-            'created_by' => Auth::user()->name ?? 'System',
-            'updated_by' => Auth::user()->name ?? 'System',
+            'created_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System',
+            'updated_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System',
         ]);
 
         return response()->json(['status' => 'success']);
