@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-@include('layouts.sidebar')
+@if (!View::hasSection('hideSidebar'))
+    @include('layouts.sidebar')
+@endif
 @include('layouts.head')
 
 <body>
@@ -12,7 +14,10 @@
 
     <div id="content" class="ps-0 d-flex flex-column">
 
-        @include('layouts.header')
+        @if (!View::hasSection('hideSidebar'))
+            @include('layouts.header')
+        @endif  
+        
 
         @yield('content')
 

@@ -6,16 +6,23 @@
             <div class="page-title fs-2">Visitor Log Sheets</div>
             <div class="page-subtitle mb-3">Manage and track all visitor entries</div>
         </div>
-        <div class="top-button" id="addBtn">
+        <div class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
+         text-white rounded-2 border-0 cursor-pointer px-3 py-2" id="addBtn">
             Add Visitor
         </div>
+
+        <form action="/visitor" method="post">
+            @csrf
+            <button type="submit">Add</button>
+        </form>
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
-        <div class="search-field d-flex align-items-center justify-content-between">
+        <div class="search-field d-flex align-items-center justify-content-between w-100 rounded-3 mb-2 fw-bold fs-6 text-primary-custom ps-2 small-caps">
             search
-            <input type="text" id="typeSearch" placeholder="search" class="flex-grow-1 mx-2">
+            {{-- <input type="text"  placeholder="search" class="flex-grow-1 mx-2"> --}}
             {{-- <input type="text"class="flex-grow-1 mx-2" placeholder="search"> --}}
+            <input type="text"id="typeSearch" placeholder="search" class="flex-grow-1 mx-2 border-0 rounded-2 ms-2 me-4 ps-3">
             entries per page
             <select name="" id="entriesPerPage" class="number-per-page">
                 <option value="10">10</option>
@@ -60,6 +67,7 @@
                     @endforeach
                     <td>{{ $visitor->visitor_id }}</td>
                     <td>
+<<<<<<< HEAD
                         @if($visitor->image_path == null)
                             No Image Provided
                         @else
@@ -71,6 +79,16 @@
                                 View
                             </button>
                         @endif
+=======
+                        <button 
+                            class="btn-sm view-button text-white border-0 rounded-2 px-3 py-1"
+                            id="viewImageBtn"
+                            data-id="{{ $visitor->id }}"
+                            data-image="{{ Storage::url($visitor->image_path) }}">
+                            View
+                        </button>
+
+>>>>>>> df08b65f5ba7ae37bb9b089e3f6dccbd8114fd40
                     </td>
                     <td>
                         {{ $visitor->created_at->format('F d, Y') }}<br>
@@ -89,7 +107,7 @@
                         <small><strong>Updated: </strong>{{ $visitor->updated_by ?? '-' }}</small>
                     </td>
                     <td class="status-cell">
-                        <div class="status">{{ $visitor->status == 0 ? 'Active' : 'Time Out' }}</div>
+                        <div class="status rounded-2">{{ $visitor->status == 0 ? 'Active' : 'Time Out' }}</div>
                     </td>
                     <td class="text-center">
                         <div class="dropdown">
@@ -136,10 +154,49 @@
         <x-table-pagination/>
     </div>
 </div>
+<<<<<<< HEAD
+=======
+@vite('resources/js/visitors.js')
+ @include('components.triggers.form')
+>>>>>>> df08b65f5ba7ae37bb9b089e3f6dccbd8114fd40
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @vite('resources/js/visitors.js')
 
+<<<<<<< HEAD
 {{-- <script>
+=======
+
+<!-- {{-- <script>
+    $(document).on('click', '.timeoutBtn', function () {
+        let visitorId = $(this).data('id');
+
+        if (!visitorId) return;
+
+        if (!confirm('Are you sure you want to time out this visitor?')) {
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('visitor.timeout.ajax') }}",
+            type: "POST",
+            data: {
+                visitor_id: visitorId,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                alert(response.message);
+
+                // Option 1: reload page
+                location.reload();
+
+                // Option 2 (later): update row status dynamically
+            },
+            error: function (xhr) {
+                alert('Something went wrong. Please try again.');
+            }
+        });
+    });
+>>>>>>> df08b65f5ba7ae37bb9b089e3f6dccbd8114fd40
     $(document).on('click', '.viewBtn', function () {
         let visitorId = $(this).data('id');
 
@@ -167,6 +224,6 @@
     });
 
 
-</script> --}}
+</script> --}} -->
 
 @endsection

@@ -1,64 +1,100 @@
-
 @extends('layout')
 
+@section('hideSidebar')
+@endsection
+
 @section('content')
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Add Visitor</title>
-</head>
-<body>
 
-<form id="addVisitorForm" enctype="multipart/form-data">
-    @csrf
+    <div class="container-background position-fixed top-0 start-0 vw-100 vh-100 bg-black"><img src="images/bgg.png" alt="" class="w-100 h-100 d-block opacity-75 object-fit-cover"></div>
 
-    <h3>Add Visitor Log</h3>
+<div class="addvisitor" id="addVisitorModal">
+    <div class="addvisitormodal">
+        <div class="panel">
+             <a class="btn-close" href="{{ route('visitorlog.index') }}" id="detailsBtn">
+                <!-- <i class="bi bi-x-lg"></i> -->
+            </a>
+            <div class="header fs-4">Add Visitor</div>
+            <div class="subheader mb-3">Register and record a new visitor entry</div>
+            <!-- <button type="button" class="btn-close" aria-label="Close" data-bs-dismiss="modal"></button> -->
+            <form class="form" id="addVisitorForm" enctype="multipart/form-data">
+                @csrf
+                <div class="details">
+                    <div class="input-holder floating">
+                        <input type="hidden" name="id" id="id" class="form-control" placeholder=" " >
+                        <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " value="">
+                        <label for="id_number">ID Number</label>
+                    </div>
+                    <!-- <label>Visitor ID:</label>
+                    <input type="text" name="visitor_id" required><br> -->
+                    <div class="input-holder floating">
+                        <select name="visitor_type" id="visitor_type" class="form-control" required >
+                            <option value="" disabled selected>Select Visitor Type</option> <!-- Empty option for floating effect -->
+                            @foreach ($visitorTypes as $type)
+                                <option value="{{ $type->id }}">{{ $type->name }}</option>
+                            @endforeach
+                        </select>
+                        <label for="visitor_type">Visitor Type</label>
+                    </div>
+                    <!-- <select name="visitor_type" required>
+                        <option value="" disabled selected>Select Visitor Type</option>
+                        @foreach ($visitorTypes as $type)
+                            <option value="{{ $type->id }}">{{ $type->name }}</option>
+                        @endforeach
+                    </select><br> -->
+                    <div class="input-holder floating">
+                        <input type="text" name="first_name" id="first_name" class="form-control" placeholder=" ">
+                        <label for="first_name">first name</label>
+                    </div>
+                    <div class="input-holder floating">
+                        <input type="text" name="middle_name" id="middle_name" class="form-control" placeholder=" ">
+                        <label for="middle_name">middle name</label>
+                    </div>
+                    <div class="input-holder floating">
+                        <input type="text" name="last_name" id="last_name" class="form-control" placeholder=" ">
+                        <label for="last_name">last name</label>
+                    </div>
+                    <div class="input-holder floating">
+                        <input type="text" name="contact_number" id="contact_number" class="form-control" placeholder=" " >
+                        <label for="contact_number">contact number</label>
+                    </div>
+                    <div class="input-holder floating w-100">
+                        <textarea name="address" id="address" class="form-control" placeholder=" " rows="3" ></textarea>
+                        <label for="address">Address</label>
+                    </div>
+                </div>
+                <div class="capture">
+                    <div class="header">Capture Image</div>
+                    <div class="imgholder" >No Image</div>
+                    <button type="file" name="image_path" accept="image/*" class="capture-button">capture</button>
+                </div>
 
-    <label>First Name:</label>
-    <input type="text" name="first_name" required><br>
 
-    <label>Middle Name:</label>
-    <input type="text" name="middle_name"><br>
 
-    <label>Last Name:</label>
-    <input type="text" name="last_name" required><br>
+<!-- 
+                <label>Image:</label>
+                <input type="file" name="image_path" accept="image/*"><br><br> -->
 
-    <label>Phone Number:</label>
-    <input type="text" name="phone_number"><br>
+                <!-- <button type="submit">Add Visitor</button> -->
+            </form>
+            <div class="panel-buttons">
+                    <button type="submit" class="save">save</button>
+                    <button type="button" class="clear">clear</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <label>Visitor Type:</label>
-    <select name="visitor_type" required>
-        <option value="" disabled selected>Select Visitor Type</option>
-        @foreach ($visitorTypes as $type)
-            <option value="{{ $type->id }}">{{ $type->name }}</option>
-        @endforeach
-    </select><br>
 
-    <label>Visitor ID:</label>
-    <input type="text" name="visitor_id" required><br>
 
-    <label>Location:</label>
-    <input type="text" name="location"><br>
+@vite('resources/js/visitors.js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
 
-    <label>Image:</label>
-    <input type="file" name="image_path" accept="image/*"><br><br>
 
-    <button type="submit">Add Visitor</button>
-</form>
+
+
 
 <br>
 
-{{-- <form action="/visitorlog" method="post">
-    @csrf
-    <button type="submit">Visitor List</button>
-</form> --}}
- <a class="dropdown-item" href="{{ route('visitorlog.index') }}" id="detailsBtn">
-    <i class="bi bi-eye me-2"></i> Back
-</a>
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -145,6 +181,4 @@
 </script> --}}
 
 
-</body>
-</html>
 @endsection

@@ -122,6 +122,11 @@ $(document).ready(function () {
 
     initTable();
 
+
+    $(document).on('click', '#addBtn', function () {
+
+        Container.showModal('#addVisitorModal');
+    });
 });
 
 
