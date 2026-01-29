@@ -7,11 +7,12 @@
             <div class="form">
                 <div class="details">
                     <div class="input-holder floating">
-                        <input type="text" name="id_number" id="" class="form-control" placeholder=" " >
+                        <input type="hidden" name="id" id="id" class="form-control" placeholder=" " >
+                        <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " value="">
                         <label for="id_number">ID Number</label>
                     </div>
                     <div class="input-holder floating">
-                        <select name="visitor_type" id="visitor_type" class="form-control" required>
+                        <select name="visitor_type" id="visitor_type" class="form-control" required >
                             <option value="" disabled selected>Select Visitor Type</option> <!-- Empty option for floating effect -->
                             <option value="summit_one">Summit One</option>
                             <option value="facility_center">Facility Center</option>
@@ -20,24 +21,24 @@
                         <label for="visitor_type">Visitor Type</label>
                     </div>
                     <div class="input-holder floating">
-                        <input type="text" name="id_number" id="" class="form-control" placeholder=" " >
-                        <label for="id_number">first name</label>
+                        <input type="text" name="first_name" id="first_name" class="form-control" placeholder=" ">
+                        <label for="first_name">first name</label>
                     </div>
                     <div class="input-holder floating">
-                        <input type="text" name="id_number" id="" class="form-control" placeholder=" " >
-                        <label for="id_number">middle name</label>
+                        <input type="text" name="middle_name" id="middle_name" class="form-control" placeholder=" ">
+                        <label for="middle_name">middle name</label>
                     </div>
                     <div class="input-holder floating">
-                        <input type="text" name="id_number" id="" class="form-control" placeholder=" " >
-                        <label for="id_number">last name</label>
+                        <input type="text" name="last_name" id="last_name" class="form-control" placeholder=" ">
+                        <label for="last_name">last name</label>
                     </div>
                     <div class="input-holder floating">
-                        <input type="text" name="id_number" id="" class="form-control" placeholder=" " >
-                        <label for="id_number">contact number</label>
+                        <input type="text" name="contact_number" id="contact_number" class="form-control" placeholder=" " >
+                        <label for="contact_number">contact number</label>
                     </div>
                     <div class="input-holder floating w-100">
-                        <textarea name="address" id="address" class="form-control" placeholder=" " rows="3"></textarea>
-                        <label for="id_number">Address</label>
+                        <textarea name="address" id="address" class="form-control" placeholder=" " rows="3" ></textarea>
+                        <label for="address">Address</label>
                     </div>
                 </div>
                 <div class="capture">

@@ -127,6 +127,11 @@ $(document).ready(function () {
 
         Container.showModal('#addVisitorModal');
     });
+
+    $(document).on('click', '#addBtn', function () {
+
+        Container.showModal('#addVisitorModal');
+    });
 });
 
 
