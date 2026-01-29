@@ -126,7 +126,7 @@
         </div>
     </div>
 </div>
-
+<!-- //////////////////////////////////////////////     MODALS       ////////////////////////////////////////////////////// -->
 <div id="addTypeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000;">
     <div style="background:white; width:400px; margin:100px auto; padding:25px; border-radius:12px; position:relative;">
         <button id="closeAddType" type="button" class="btn-close" style="float:right; border:none; background:none;">X</button>

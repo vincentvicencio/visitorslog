@@ -134,8 +134,8 @@
         <x-table-pagination/>
     </div>
 </div>
-
-<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+<!-- ////////////////////////////////////////   MODALS     ///////////////////////////////////////////// -->
+<div class="modal fade" id="View_imageModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">

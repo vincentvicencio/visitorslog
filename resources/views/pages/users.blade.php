@@ -99,42 +99,35 @@
         <td>{{ $user->updated_by}}</td>
         <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
         <td class="text-center">
-                        <div class="dropdown"> 
-                <!-- <button class="btn btn-sm btn-primary dropdown-toggle" 
-            type="button" 
-            data-bs-toggle="dropdown" 
-            aria-expanded="false">
-        Action
-    </button> -->
-
-    <button class="btn btn-sm btn-primary dropdown-toggle" 
-        type="button" 
-        data-bs-toggle="dropdown" 
-        data-bs-boundary="viewport" aria-expanded="false">
-    Action
-</button>
-        <ul class="dropdown-menu">
-            <li>
-                <a class="dropdown-item edit-user" href="javascript:void(0)" 
-                data-id="{{ $user->id }}">
-                    <i class="bi bi-pencil-square me-2"></i> Edit
-                </a>
-            </li>
-        <li>
-            <button type="button" class="dropdown-item text-danger delete-user" 
-                    data-id="{{ $user->id }}">
-                <i class="bi bi-trash me-2"></i> Delete
-            </button>
-        </li>
-        </ul>
+            <div class="dropdown">
+                    <button class="btn btn-sm btn-primary dropdown-toggle" 
+                        type="button" 
+                        data-bs-toggle="dropdown" 
+                        data-bs-boundary="viewport" aria-expanded="false">
+                    Action
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item edit-user" href="javascript:void(0)" 
+                        data-id="{{ $user->id }}">
+                            <i class="bi bi-pencil-square me-2"></i> Edit
+                        </a>
+                    </li>
+                <li>
+                    <button type="button" class="dropdown-item text-danger delete-user" 
+                            data-id="{{ $user->id }}">
+                        <i class="bi bi-trash me-2"></i> Delete
+                    </button>
+                </li>
+                </ul>
             </div>
             </td>
         </tr>
-    @empty
+        @empty
         <tr>
             <td colspan="5" class="text-center">No employees registered yet.</td>
         </tr>
-    @endforelse
+        @endforelse
             </tbody>
             </table>
             </div>
@@ -181,13 +174,14 @@
     </div>
 </div>
 
-<div id="popupContainer2" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
+
+<!-- //////////////////////////////////////////////     MODALS       ////////////////////////////////////////////////////// -->
+<div id="registeruserpopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
     <div style="background:white; width:350px; margin:100px auto; padding:20px; border-radius:8px; position:relative;">
         <button id="closePopup2" type="button" style="float:right;">X</button>
         
             <form id="registered_user_form">
             @csrf
-            <p>Total Roles Found: {{ count($roles)}}</p>
             <select name="user_type" id="reg_user_type" class="form-control" required>
                 <option value="">Select Role</option>
                 @foreach($roles as $role)
@@ -197,7 +191,6 @@
 
             <select name="locations" id="reg_location" class="form-control my-2" required>
                 <option value="">Select Location</option>
-                 <!-- {{-- <option value="">Select User Type</option> --}} -->
             </select>
 
             <input type="text" id="reg_emp_code" name="emp_code" placeholder="Employee Code" class="form-control" required>
@@ -248,7 +241,4 @@
         </div>
     </div>
 </div>
-
-
-
 @endsection

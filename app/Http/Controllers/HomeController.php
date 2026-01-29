@@ -22,18 +22,6 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    // public function index()
-// {
-//     $roles = \App\Models\User_types::all();
-//     $registeredUsers = \App\Models\RegisteredUser::all(); 
-
-
-//     // Fetch the employee data stored in the session during login
-//     $allEmployeesFromSession = session('all_emp', []); 
-        
-    // dd($allEmployeesFromSession);
-//     return view('home', compact('roles', 'registeredUsers', 'allEmployeesFromSession'));
-// }
 public function index(Request $request)
 {
     $roles = \App\Models\User_types::all();
@@ -49,7 +37,7 @@ public function index(Request $request)
 
     $allEmployeesFromSession = session('all_emp', []); 
 
-    return view('home', compact('roles', 'registeredUsers', 'allEmployeesFromSession'));
+    return view('visitorlog', compact('roles', 'registeredUsers', 'allEmployeesFromSession'));
 }
 
 public function search_emp_code(Request $request){
@@ -57,7 +45,7 @@ public function search_emp_code(Request $request){
     $details    = $employees->firstWhere('emp_code', $request->id);
     if(!$details){
         return response()->json(['msg' => 'No User Found']);
-    }
+    } 
 
     $code       = $details['emp_code'] ?? '';
 

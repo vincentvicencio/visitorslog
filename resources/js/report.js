@@ -55,9 +55,9 @@ $(document).ready(function(){
         $('#modalImage').attr('src', imageUrl);
         
         // 4. Show the modal
-        $('#imageModal').modal('show');
+        $('#View_imageModal').modal('show');
     });
-    $('#imageModal').on('hidden.bs.modal', function () {
+    $('#View_imageModal').on('hidden.bs.modal', function () {
         $('#modalImage').attr('src', ''); 
     });
 
@@ -227,7 +227,7 @@ $(document).ready(function(){
             $('#toastMessage').text(response.success || "User Deleted Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('deletesuccessToast');
+            const toastElement = document.getElementById('delete_report_successToast');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 

@@ -18,7 +18,12 @@
                 <div class="user-name ps-2">
                     <div class="fs-6 " style="margin-top:2px;">Welcome</div>
                     <div class="d-block text-truncate fw-bold" style="width:120px; margin-top:-2px;">
-                        Clint Antonio antonio antonioantonioantonio
+                          @auth
+                            {{ Auth::user()->first_name }} <!--{{ Auth::user()->last_name }}-->
+                          @endauth
+                          @guest
+                            Guest User
+                          @endguest
                     </div>
                 </div>
 

@@ -11,6 +11,8 @@ use App\Helpers\fetchdata_api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use function fetchdata_api;
+use function PHPUnit\Framework\isNull;
+
 class LoginController extends Controller
 {
     /*
@@ -31,7 +33,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/visitorlog';
 
     /**
      * Create a new controller instance.
@@ -74,7 +76,7 @@ class LoginController extends Controller
     $this->fetch_emp_data('all_emp');
     $this->fetch_api_data('all_location', 'location');
     $location = collect(session('all_location'));
-    return redirect()->route('home'); // ADMIN
+    return redirect()->route('visitorlog.index'); // ADMIN
 }
 
     private function fetch_emp_data($sessionKey){

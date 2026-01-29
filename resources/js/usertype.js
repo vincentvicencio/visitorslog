@@ -138,7 +138,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
             $('#toastMessage').text(response.success || "User Type Added Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('addusersuccessToast2');
+            const toastElement = document.getElementById('add_user_type_successToast');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -183,7 +183,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
             $('#toastMessage').text(response.success || "Role updated successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('successToast2');
+            const toastElement = document.getElementById('edit_user_type_successToast');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -231,7 +231,7 @@ $('#closeEditType').click(function() {
                 $('#toastMessage').text(response.success || "Role Deleted Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('deletesuccessToast2');
+            const toastElement = document.getElementById('delete_user_type_successToast');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 

@@ -68,17 +68,17 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
         }
     });
 
-    $('#openPopup2').click(function() { $('#popupContainer2').fadeIn(); 
+    $('#openPopup2').click(function() { $('#registeruserpopup').fadeIn(); 
 
         // component.createDropdown('/get-locations', '#reg_location', null, null1);
         // Check if component exists before calling
     // if (typeof component !== 'undefined') {
-        component.createDropdown('/getlocation', '#reg_location', null, '#popupContainer2');
+        component.createDropdown('/getlocation', '#reg_location', null, '#registeruserpopup');
     // } else {
     //     console.error("The 'component' object is not defined. Check if its JS file is loaded.");
     // }
     });
-$('#closePopup2').click(function() { $('#popupContainer2').fadeOut(); });
+$('#closePopup2').click(function() { $('#registeruserpopup').fadeOut(); });
 
 // Handle AJAX Submission
 $('#registered_user_form').on('submit', function(e) {
@@ -99,7 +99,7 @@ $('#registered_user_form').on('submit', function(e) {
            $('#toastMessage').text(response.success || "User Added Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('addsuccessToast');
+            const toastElement = document.getElementById('add_user_successToast');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -120,8 +120,8 @@ function copyToRegister(code) {
     // Fill the employee code input in your existing registration form
     $('#reg_emp_code').val(code);
     
-    // Open the registration popup (popupContainer2)
-    $('#popupContainer2').fadeIn();
+    // Open the registration popup (registeruserpopup)
+    $('#registeruserpopup').fadeIn();
 }
 // --- DELETE USER LOGIC ---
 let userIdToDelete = null;
@@ -152,7 +152,7 @@ $('#confirmDeleteBtn').on('click', function() {
             $('#toastMessage').text(response.success || "User Deleted Successfully!");
 
             // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('deletesuccessToast');
+            const toastElement = document.getElementById('delete_user_successToast');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
@@ -185,7 +185,6 @@ $(document).on('click', '.edit-user', function() {
     });
 });
 
-// $('#closeEditPopup').click(function() { $('#editPopupContainer').fadeOut(); });
 $('#closeEditPopup').click(function() { $('#editPopupContainer').hide(); });
 
 $('#edit_user_form').on('submit', function(e) {
@@ -197,16 +196,13 @@ $('#edit_user_form').on('submit', function(e) {
         type: "POST",
         data: $(this).serialize(), 
         success: function(response) {
-            // 1. Hide the modal immediately
             $('#editPopupContainer').fadeOut(200);
-
-            // 2. Set the text and show the toast
             $('#toastMessage').text(response.message || "User updated successfully!");
-            const toastElement = document.getElementById('editsuccessToast'); // Use your success toast ID
+
+            const toastElement = document.getElementById('edit_user_successToast');
             const toast = new bootstrap.Toast(toastElement);
             toast.show();
 
-            // 3. Reload
             setTimeout(function() {
                 location.reload();
             }, 1500);
@@ -332,8 +328,8 @@ $('#edit_user_form').on('submit', function(e) {
 
     // --- 6. EXISTING MODAL & AJAX LOGIC ---
     // (Keep your Register, Edit, and Delete AJAX code here...)
-    $('#openPopup2').click(function() { $('#popupContainer2').fadeIn(); });
-    $('#closePopup2').click(function() { $('#popupContainer2').fadeOut(); });
+    $('#openPopup2').click(function() { $('#registeruserpopup').fadeIn(); });
+    $('#closePopup2').click(function() { $('#registeruserpopup').fadeOut(); });
 
     // Handle Dropdown placement (if needed for table scrolling)
     $(document).on('shown.bs.dropdown', '.dropdown', function () {
