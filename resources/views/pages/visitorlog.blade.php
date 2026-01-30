@@ -97,8 +97,8 @@
                         </small>
                     </td>
                     <td>
-                        <small><strong>Created: </strong>{{ $visitor->created_by }}</small><br>
-                        <small><strong>Updated: </strong>{{ $visitor->updated_by ?? '-' }}</small>
+                        <small><strong>Created: </strong>{{ $visitor->getEmpName($visitor->created_by) }}</small><br>
+                        <small><strong>Updated: </strong>{{ $visitor->getEmpName($visitor->updated_by) ?? '-' }}</small>
                     </td>
                     <td class="status-cell">
                         <div class="status rounded-2">{{ $visitor->status == 0 ? 'Active' : 'Time Out' }}</div>
@@ -118,7 +118,8 @@
                                     <button 
                                         class="dropdown-item"
                                         id="viewBtn"
-                                        data-id="{{ $visitor->id }}">
+                                        data-id="{{ $visitor->id }}"
+                                        data-type="visitorlog">
                                         <i class="bi bi-eye me-2"></i> View
                                     </button>
 
