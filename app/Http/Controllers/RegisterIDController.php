@@ -62,7 +62,8 @@ class RegisterIDController extends Controller
         $registeredID->id_number = $request->id_number;
         // visitor_type IS ALREADY the ID from visitor_types table
         $registeredID->visitor_type = $request->visitor_type;
-        $registeredID->created_by = Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System';
+        $registeredID->created_by = Auth::id();
+        // Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System';
         $registeredID->created_at = now();
         $registeredID->save();
 
@@ -103,7 +104,7 @@ class RegisterIDController extends Controller
             'id_number' => $request->id_number,
             'visitor_type' => $request->visitor_type,
             'updated_at' => now(),
-            'updated_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System',
+            'updated_by' => Auth::id(),
         ]);
 
         return response()->json([
@@ -131,7 +132,7 @@ class RegisterIDController extends Controller
 
         $visitor->update([
             'deleted_at' => Carbon::now(),
-            'deleted_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'Admin',
+            'deleted_by' => Auth::id(),
         ]);
 
         return response()->json([

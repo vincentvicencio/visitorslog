@@ -9,9 +9,11 @@
     <div class="addvisitor" id="addVisitorModal">
         <div class="addvisitormodal">
             <div class="panel">
-                <a class="btn-close" href="{{ route('visitorlog.index') }}" id="detailsBtn">
-                    {{-- <i class="bi bi-x-lg"></i> --}}
-                </a>
+
+                <a class="btn-close" href="{{ route($type.'.index') }}"></a>
+
+
+
                 <div class="header fs-4">Visitor Details</div>
                 <div class="subheader mb-3">Register and record a new visitor entry</div>
                 <div class="form" id="addVisitorForm">

@@ -119,14 +119,18 @@
 
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a class="dropdown-item" href="#">
+                                    <button 
+                                        class="dropdown-item"
+                                        id="viewBtn"
+                                        data-id="{{ $reportlogs->id }}"
+                                        data-type="report">
                                         <i class="bi bi-eye me-2"></i> View
-                                    </a>
+                                    </button>
                                 </li>
                                 <li>
                                     <button type="button" class="dropdown-item text-danger delete-btn" 
                                             data-id="{{ $reportlogs->id }}" 
-                                            data-url="{{ route('visitors.destroy', $reportlogs->id) }}">
+                                            {{-- data-url="{{ route(name: 'visitors.destroy', $reportlogs->id) }}"--}}> 
                                         <i class="bi bi-trash me-2"></i> Delete
                                     </button>
                                 </li>

@@ -19,13 +19,13 @@ class TryController extends Controller
     {
         $visitors = Visitor::where('status', 0)
                    ->whereNull('time_out')
-                   ->orderBy('id', 'asc')
+                   ->orderBy('id', 'desc')
                    ->get();
         $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'asc')
+                   ->orderBy('id', 'desc')
                    ->get();
-
-        return view('pages.visitorlog', compact('visitors', 'visitorTypes'));
+        $empMap = collect(session('all_emp'))->keyBy('emp_code');
+        return view('pages.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
     }
 public function show_usertype()
 {
@@ -63,7 +63,7 @@ public function show_usertype()
     {
         // Get all registered IDs, latest first
         $visitorTypes = VisitorType::where('deleted_at', null)
-        ->orderBy('id', 'asc')
+        ->orderBy('id', 'desc')
         ->get();
         // Pass to the view
         return view('pages.visitortype', compact('visitorTypes'));
@@ -71,14 +71,14 @@ public function show_usertype()
     public function show_id()
     {
         $registeredIds = RegisteredID::where('deleted_at', null)
-                   ->orderBy('id', 'asc')
+                   ->orderBy('id', 'desc')
                    ->get();
         $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'asc')
+                   ->orderBy('id', 'desc')
                    ->get();
         $visitorsLogs = Visitor::where('status', 0)
                    ->whereNull('time_out')
-                   ->orderBy('id', 'asc')
+                   ->orderBy('id', 'desc')
                    ->get();
         return view('pages.id', compact('registeredIds', 'visitorTypes', 'visitorsLogs'));
     }
@@ -128,15 +128,7 @@ try {
             'deleted_by' => Auth::user()->first_name ?? 'System' // Optional: track who deleted it
         ]);
 
-        // return response()->json([
-        //     'status' => 'success', 
-        //     'message' => 'Record Deleted successfully.'
-        // ]);
     } catch (\Exception $e) {
-        // return response()->json([
-        //     'status' => 'error', 
-        //     'message' => 'Failed to remove user.'
-        // ], 500);
     }
 
 }

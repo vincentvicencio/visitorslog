@@ -1,14 +1,49 @@
 import { Modal } from 'bootstrap';
 import Triggers from './common/triggers.js';
+import Datatable from './common/settable.js';
 import Container from './common/container.js';
 
 $(document).ready(function () {
+
+    $('#addVisitorForm').on('submit', function (e) {
+        e.preventDefault();
+
+        let formData = new FormData(this);
+
+        $.ajax({
+            url: "/visitor/save",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                Triggers.showToast(response.message, 0);
+                
+                setTimeout(() => {
+                    window.location.href = "/visitorlog";
+                }, 2000);
+            },
+            error: function (xhr) {
+                let msg = xhr.responseJSON?.message ?? 'Save failed.';
+                Triggers.showToast(msg, 1);
+            }
+        });
+    });
+
+    $(document).on('click', '#clrBtn', function () {
+        $('#addVisitorForm')[0].reset();
+    });
+
     $('#captureBtn').on('click', function () {
         $('#imageInput').click();
     });
 
     $(document).on('click', '#viewBtn', function () {
         let visitorId = $(this).data('id');
+            let type = $(this).data('type');
 
         if (!visitorId) return;
 
@@ -17,6 +52,7 @@ $(document).ready(function () {
             type: "POST",
             data: {
                 id: visitorId,
+                type: type,
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
@@ -56,7 +92,6 @@ $(document).ready(function () {
             },
             success: function (response) {
                 Triggers.showToast(response.message, 0);
-
                 setTimeout(() => {
                     location.reload(); // ✅ correct reload
                 }, 2000);
@@ -151,12 +186,6 @@ $(document).ready(function () {
 
     initTable();
 
-
-    $(document).on('click', '#addBtn', function () {
-
-        Container.showModal('#addVisitorModal');
-    });
-
     const imageModal = new Modal(document.getElementById('imageModal'));
 
     $(document).on('click', '#viewImageBtn', function () {
@@ -219,11 +248,72 @@ $(document).ready(function () {
     
 });
 
+// // table
+//     async list() {
+//         const self = this;
 
+//         const tableHeader = [
+//             { id: "emp_code",       label: "Emp Code" },
+//             { id: "emp_name",       label: "Name" },
+//             { id: "user_type",      label: "User Type" },
+//             { id: "updated_date",   label: "Updated Date" },
+//             { id: "action",         label: "Action" },
+//         ];
 
+//         const columns = tableHeader.map(col => ({
+//             data: col.id, 
+//             title: col.label,
+//             width: 'auto'
+//         }));
 
+//         const columnDefs = [
+//             { targets: [0, 1, 2, 3], orderable: false }
+//         ]; 
 
+//         settable.createTableAjax(
+//             self.table,
+//             columns,
+//             ${self.url}list,
+//             columnDefs,
+//             this.module
+//         ); 
 
+//         const tableApi = $(self.table).DataTable();
+//         $('input[type="search"]').off('keyup').on('keyup', function() {
+//             tableApi.search(this.value).draw();
+//         });
 
+//          setTimeout(() => {
+//             const searchInput = document.getElementById('dt-search-0');             
+//                 if (searchInput) {
+//                     searchInput.setAttribute('placeholder', 'Search here...');
+//                 }
+//             }, 100);
 
+//     }
 
+//     // Edit
+//     async onLoadForm(record_id) {
+
+//         const self = this;
+
+//         const url = ${self.url}search;
+//         const users = await datahandling.processData(url, 'POST',  { id: record_id })
+
+//         $("#user_id").val(record_id);
+//         $("#empCode").val(users.records.emp_code)
+//         $("#empName").val(users.employee_details.emp_name)
+//         $("#userType").val(users.records.user_type).trigger('change');
+        
+//         component.createDropdown(
+//                 '/registered_user/get_user_types', 
+//                 '#userType', 
+//                 null, 
+//                 self.modal 
+//             );
+
+//         $('#searchUser').closest('.mb-3').hide();
+//         $('#addUserModalLabel').text('Edit User');
+
+//         Container.showModal(self.modal)
+//     }

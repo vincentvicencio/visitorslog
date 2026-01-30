@@ -1,5 +1,33 @@
 $(document).ready(function(){
 
+    $(document).on('click', '#viewBtn', function () {
+            let visitorId = $(this).data('id');
+            let type = $(this).data('type');
+    
+            if (!visitorId) return;
+    
+            $.ajax({
+                url: "/visitor/view",
+                type: "POST",
+                data: {
+                    id: visitorId,
+                    type: type,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    // ✅ redirect after AJAX success
+                    window.location.href = response.redirect;
+                },
+                error: function (xhr) {
+                    let msg = 'Unable to load visitor details.';
+                    if (xhr.responseJSON?.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    Triggers.showToast(msg, 1);
+                }
+            });
+        });
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': window.Laravel.csrfToken,

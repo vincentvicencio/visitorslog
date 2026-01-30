@@ -56,14 +56,26 @@ Route::post('/update-usertype', [User_TypesController::class, 'updateUsertype'])
 Route::get('/get-usertype/{id}', [User_TypesController::class, 'getUsertype']); 
 Route::post('/fetch-users-by-type', [Registered_UsersController::class, 'fetchUsersByType'])->name('fetchUsersByType');
 Route::post('/fetch-users-by-name', [Registered_UsersController::class, 'fetchUsersByName'])->name('fetchUsersByName'); 
+// URL registered user
+        // Route::group(['prefix' => 'registered_user'], function () {
+        //     Route::get('/', [RegisteredUserController::class, 'index'])->name('registered_users');
+        //     Route::post('/search_empno', [RegisteredUserController::class,'search_emp_code'])->name('registered_user.search_empno');
+        //     Route::post('/search',  [RegisteredUserController::class, 'search'])->name('registered_user.search');
+        //     Route::post('/list', [RegisteredUserController::class, 'list'])->name('registered_user.list');
+        //     Route::post('/add_user', [RegisteredUserController::class, 'add_user'])->name('registered_user.add_user');
+        //     Route::get('/clear_form', [RegisteredUserController::class, 'clear_form'])->name('registered_user.clear_form');
+        //     Route::post('/list/delete', [RegisteredUserController::class, 'delete_user'])->name('registered_user.delete_user');
+        //     Route::post('/get_user_types', [RegisteredUserController::class, 'getUserTypes'])->name('registered_user.get_types');
+        // });
 
 Route::get('/visitor', [VisitorController::class, 'index'])->name('visitor.index');    //checked
 Route::post('/visitor', [VisitorController::class, 'index'])->name('visitor.index');    //checked
-Route::post('/visitor/save', [VisitorController::class, 'save'])->name('visitor.save');  //checked
+Route::post('/visitor/list', [VisitorController::class, 'list'])->name('visitor.list');    //checked
+Route::post('/visitor/save', [VisitorController::class, 'saveAjax'])->name('visitor.save');  //checked
 Route::post('/visitor/timeout', [VisitorController::class, 'timeoutAjax'])->name('visitor.timeout.ajax');
 // Route::get('/visitor/view/{id}', function ($id) {$visitor = Visitor::where('id', $id)
 //             ->latest('id')->firstOrFail();return view('homepage.view', compact('visitor'));})->name('visitor.view.page');
-Route::get('/visitor/view/{id}', function ($id) {
+Route::get('/visitor/view/{id}/{type}', function ($id, $type) {
 
     $visitor = Visitor::where('id', $id)
         ->latest('id')
@@ -73,7 +85,7 @@ Route::get('/visitor/view/{id}', function ($id) {
         ->orderBy('id', 'asc')
         ->get();
 
-    return view('homepage.view', compact('visitor', 'visitorTypes'));
+    return view('homepage.view', compact('visitor', 'visitorTypes', 'type'));
 
 })->name('visitor.view.page');
 
