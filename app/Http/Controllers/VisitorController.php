@@ -8,6 +8,7 @@ use App\Models\VisitorType;
 use App\Models\RegisteredID;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 
 class VisitorController extends Controller
@@ -17,7 +18,10 @@ class VisitorController extends Controller
         $visitorTypes = VisitorType::where('deleted_at', null)
                    ->orderBy('id', 'asc')
                    ->get();
-        return view('homepage.form', compact('visitorTypes'));
+        $visitors = Visitor::where('status', 0)
+                   ->orderBy('id', 'asc')
+                   ->get();
+        return view('homepage.form', compact('visitorTypes', "visitors"));
     }
 
     public function list()
@@ -49,7 +53,7 @@ class VisitorController extends Controller
         $visitor->update([
             'time_out' => Carbon::now(),
             'status'   => 1,
-            'updated_by' => auth()->user()->name ?? 'Admin',
+            'updated_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System',
         ]);
 
         return response()->json([
@@ -80,7 +84,7 @@ class VisitorController extends Controller
 
 
 
-    public function save(Request $request)
+    public function saveAjax(Request $request)
     {
         $request->validate([
             'first_name'   => 'required|string',
@@ -88,7 +92,7 @@ class VisitorController extends Controller
             'last_name'    => 'required|string',
             'visitor_type' => 'required|exists:visitor_types,id',
 
-            'visitor_id' => [
+            'id_number' => [
                 'required',
                 'string',
                 function ($attribute, $value, $fail) use ($request) {
@@ -132,7 +136,7 @@ class VisitorController extends Controller
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->visitor_id;
             $visitor->location     = $request->location;
-            $visitor->created_by   = auth()->user()->name ?? 'Admin';
+            $visitor->created_by   = Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System';
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
             $visitor->save();

@@ -1,7 +1,6 @@
-import Container from './common/container.js';
-import Triggers from './common/triggers.js';
-import Datahandling from './common/datahandling.js';
 import { Modal } from 'bootstrap';
+import Triggers from './common/triggers.js';
+import Container from './common/container.js';
 
 // Get modal element
 const textInputModalEl = document.getElementById('registerIDModal');
@@ -92,52 +91,55 @@ document.getElementById('registerIDSubmit').addEventListener('click', () => {
     
 });
 $(document).ready(function () {
-$(document).on('click', '#addBtn', function () {
-    openTextInputModalBlank();
-});
-
-// Open modal when clicking edit
-$(document).on('click', '#editBtn', function () {
-    const id = $(this).data('id');
-    const visitor_type = $(this).data('type'); 
-    const id_number = $(this).data('name');
-    if (!id) return;
-    openTextInputModal(id, visitor_type, id_number);
-});
-
-
-
-$(document).on('click', '#deleteBtn', function () {
-    let id = $(this).data('id');
-
-    if (!id) return;
-
-    if (!confirm('Are you sure you want to delete this Visitor ID?')) {
-        return;
-    }
-
-    $.ajax({
-        url: "registeredID/delete",
-        type: "POST",
-        data: {
-            id: id,
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function (response) {
-            Triggers.showToast(response.message, 0);
-            setTimeout(() => {
-                $('.toast').fadeOut('slow');
-            }, 2000);
-            setTimeout(() => {
-                $(location.reload()).fadeOut('slow');
-            }, 2000);
-        },
-        error: function (xhr) {
-            Triggers.showToast(xhr.responseJSON?.message ?? 'Delete failed.', 1);
-        }
+    $(document).on('click', '#addBtn', function () {
+        openTextInputModalBlank();
     });
-});
 
+    // Open modal when clicking edit
+    $(document).on('click', '#editBtn', function () {
+        const id = $(this).data('id');
+        const visitor_type = $(this).data('type'); 
+        const id_number = $(this).data('name');
+        if (!id) return;
+        openTextInputModal(id, visitor_type, id_number);
+    });
+
+
+
+    $(document).on('click', '#deleteBtn', function () {
+        let id = $(this).data('id');
+
+        Triggers.showNotification(
+            '#notificationContainer',
+            'Delete Register ID',
+            'Are you sure you want to delete this Visitor ID?',
+            id
+        );
+    });
+        
+    $(document).on('click', '#btn_ok', function () {
+        let id = $('#record_id').val();
+        $.ajax({
+            url: "registeredID/delete",
+            type: "POST",
+            data: {
+                id: id,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                Triggers.showToast(response.message, 0);
+                setTimeout(() => {
+                    $('.toast').fadeOut('slow');
+                }, 2000);
+                setTimeout(() => {
+                    $(location.reload()).fadeOut('slow');
+                }, 2000);
+            },
+            error: function (xhr) {
+                Triggers.showToast(xhr.responseJSON?.message ?? 'Delete failed.', 1);
+            }
+        });;
+    });
 // /////////////////////////////////////////////////
 
 

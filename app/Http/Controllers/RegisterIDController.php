@@ -7,6 +7,7 @@ use App\Models\RegisteredID;
 use App\Models\VisitorType;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class RegisterIDController extends Controller
 {
@@ -61,7 +62,7 @@ class RegisterIDController extends Controller
         $registeredID->id_number = $request->id_number;
         // visitor_type IS ALREADY the ID from visitor_types table
         $registeredID->visitor_type = $request->visitor_type;
-        $registeredID->created_by = auth()->user()->name ?? 'Admin';
+        $registeredID->created_by = Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System';
         $registeredID->created_at = now();
         $registeredID->save();
 
@@ -102,7 +103,7 @@ class RegisterIDController extends Controller
             'id_number' => $request->id_number,
             'visitor_type' => $request->visitor_type,
             'updated_at' => now(),
-            'updated_by' => auth()->user()->name ?? 'Admin',
+            'updated_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System',
         ]);
 
         return response()->json([
@@ -130,7 +131,7 @@ class RegisterIDController extends Controller
 
         $visitor->update([
             'deleted_at' => Carbon::now(),
-            'deleted_by' => auth()->user()->name ?? 'Admin',
+            'deleted_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'Admin',
         ]);
 
         return response()->json([
