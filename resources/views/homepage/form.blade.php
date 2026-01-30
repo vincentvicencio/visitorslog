@@ -68,7 +68,7 @@
                                     id="imageInput"
                                     name="image_path"
                                     accept="image/*"
-                                    capture="environment"
+                                    capture="user"
                                     hidden
                                 >
                         </div>
