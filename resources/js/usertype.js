@@ -119,7 +119,10 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
     // --- 5. MODAL & AJAX OPERATIONS ---
 
     // Open Add Modal
-    $('#openAddTypePopup').click(function() { $('#addTypeModal').fadeIn(200); });
+    $('#openAddTypePopup').click(function() { 
+        $('#save_type').text('Save New User Type');
+        $('#addTypeModal').fadeIn(200); }
+    );
     $('#closeAddType').click(function() { $('#addTypeModal').fadeOut(200); });
 
     // Handle Add Form
@@ -130,7 +133,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
 
         $.ajax({
             // url: "{{ route('addusertype') }}",
-            url: window.Laravel.baseUrl + '/addusertype', 
+            url:'/addusertype', 
             type: "POST",
             data: $(this).serialize(),
             success: function(response) { 
@@ -156,14 +159,15 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
     // Open Edit Modal
     $(document).on('click', '.edit-type', function() {
         let id = $(this).data('id');
+        $('#save_type').text('Update');
         $.get('/usertype/' + id + '/edit', function(data) {
             $('#edit_type_id').val(data.id);
             $('#edit_type_name').val(data.name);
-            $('#editTypeModal').fadeIn(200);
+            $('#addTypeModal').fadeIn(200);
         });
     });
 
-    $('#closeEditType').click(function() { $('#editTypeModal').fadeOut(200); });
+    $('#closeEditType').click(function() { $('#addTypeModal').fadeOut(200); });
     $('#edit_type_form').on('submit', function(e) {
     e.preventDefault();
     
@@ -173,9 +177,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
     $submitBtn.prop('disabled', true).text('Updating...');
 
     $.ajax({
-        // This matches Route::put('/usertype/{id}', [Controller::class, 'update']);
-        // url: '/usertype/' + id,
-        url: window.Laravel.baseUrl + '/usertype/' + id,
+        url: '/usertype/' + id,
         type: 'POST', // Use POST because we are using @method('PUT') in the form
         data: $(this).serialize(),
         success: function(response) {
@@ -201,7 +203,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
 
 // Step C: Close Modal
 $('#closeEditType').click(function() { 
-    $('#editTypeModal').fadeOut(200); 
+    $('#addTypeModal').fadeOut(200); 
 });
 
     let roleIdToDelete = null;

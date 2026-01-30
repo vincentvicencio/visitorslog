@@ -60,8 +60,10 @@
                         @if(is_null($role->deleted_at))
                             <tr>
                                 <td class="role-name"><strong>{{ $role->name }}</strong></td>
-                                <td>{{ $role->created_by ?? 'System' }}</td>
-                                <td>{{ $role->updated_by ?? 'N/A' }}</td>
+                                <!-- <td>{{ $role->created_by ?? 'System' }}</td>
+                                <td>{{ $role->updated_by ?? 'N/A' }}</td> -->
+                                <td>{{ $role->getEmpName($role->created_by) }}</td>
+                                <td>{{ $role->getEmpName($role->updated_by) }}</td>
                                 <td>{{ $role->created_at->format('Y-m-d') }}</td>
                                 <td class="text-center">
                                     <div class="dropdown">

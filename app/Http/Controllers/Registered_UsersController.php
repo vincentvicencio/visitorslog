@@ -62,8 +62,10 @@ class Registered_UsersController extends Controller
             'password'   => Hash::make($request->password),     
             'user_type'  => $request->user_type,
             'location'   => $location,
-            'created_by' => Auth::user()->first_name ?? 'System', 
-            'updated_by' => Auth::user()->first_name ?? 'System',
+            'created_by' => Auth::id(), 
+            'updated_by' => Auth::id(),
+            // 'created_by' => Auth::user()->first_name ?? 'System', 
+            // 'updated_by' => Auth::user()->first_name ?? 'System',
         ]);
 
         return response()->json([
@@ -90,7 +92,7 @@ class Registered_UsersController extends Controller
         // Instead of $user->delete(), we update the column
         $user->update([
             'deleted_at' => NOW(),
-            'deleted_by' => Auth::user()->first_name ?? 'System' // Optional: track who deleted it
+            'deleted_by' => Auth::id() // Optional: track who deleted it
         ]);
 
         return response()->json([
@@ -138,7 +140,8 @@ public function updateUser(Request $request, $id)
         $updateData = [
             'user_type'  => $request->user_type,
             'user_name'  => $request->emp_code, // Update the code if it changed
-            'updated_by' => Auth::user()->first_name ?? 'System',
+            // 'updated_by' => Auth::user()->first_name ?? 'System',
+            'updated_by' => Auth::id(),
         ];
 
         if ($request->filled('password')) {
@@ -170,4 +173,5 @@ public function updateUser(Request $request, $id)
 
     return response()->json($data);
 }
+
 }

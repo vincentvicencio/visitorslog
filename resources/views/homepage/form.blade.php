@@ -68,10 +68,22 @@
                                 id="imageInput"
                                 name="image_path"
                                 accept="image/*"
-                                capture="environment"
+                                capture="user"
                                 hidden
                             >
                     </div>
+                    <!-- <div class="capture">
+    <div class="header">Capture Image</div>
+    <div class="imgholder">
+        <video id="webcam" autoplay playsinline style="width: 100%; height: auto;"></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <img id="photoPreview" src="" style="display:none; width: 100%;">
+    </div> 
+
+    <button type="button" class="capture-button" id="captureBtn">Capture</button>
+    
+    <input type="hidden" id="image_data" name="image_path">
+</div>-->
                 </form>
                     <div class="panel-buttons">
                         <button type="submit" class="save">save</button>

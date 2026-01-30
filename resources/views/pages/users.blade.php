@@ -61,8 +61,10 @@
     <tr>
         <td>{{ $user->first_name }}</td>
          <td>{{ $user->userType->name ?? 'None' }}</td>
-        <td>{{ $user->created_by }}</td>
-        <td>{{ $user->updated_by}}</td>
+        <!-- <td>{{ $user->created_by }}</td>
+        <td>{{ $user->updated_by}}</td> -->
+        <td>{{ $user->getEmpName($user->created_by) }}</td>
+        <td>{{ $user->getEmpName($user->updated_by) }}</td>
         <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
         <td class="text-center">
             <div class="dropdown">

@@ -31,8 +31,9 @@ public function show_usertype()
 {
     $roles = \App\Models\User_types::all(); 
     $visitorTypes = VisitorType::all();
+    $empMap = collect(session('all_emp'))->keyBy('emp_code');
     
-    return view('pages.usertype', compact('roles', 'visitorTypes'));
+    return view('pages.usertype', compact('roles', 'visitorTypes','empMap'));
 }
     public function show_user(Request $request)
     {
@@ -42,6 +43,8 @@ public function show_usertype()
 
         $visitorlogs = Visitor::with('visitor_type')->get();
         $search = $request->input('search');
+
+        $empMap = collect(session('all_emp'))->keyBy('emp_code');
         
         $registeredUsers = \App\Models\RegisteredUser::with('userType')
         ->whereNull('deleted_at')
@@ -53,7 +56,7 @@ public function show_usertype()
         ->get();
 
     $allEmployeesFromSession = session('all_emp', []);
-    return view('pages.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession', 'visitorlogs', 'visitorTypes'));
+    return view('pages.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession', 'visitorlogs', 'visitorTypes','empMap'));
     }
 
     public function show_visitortype()
