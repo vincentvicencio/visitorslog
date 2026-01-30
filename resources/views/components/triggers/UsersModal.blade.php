@@ -2,7 +2,9 @@
 <!-- //////////////////////////////////////////////     USERS MODALS       ////////////////////////////////////////////////////// -->
 <div id="registeruserpopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
     <div style="background:white; width:350px; margin:100px auto; padding:20px; border-radius:8px; position:relative;">
-        <button id="close_register_user_popup" type="button" style="float:right;">X</button>
+        <button id="close_register_user_popup" type="button" class="btn-close" style="float:right; border:none;" aria-label="Close"></button>
+        <div class="header fs-4 fw-bold mb-0">Add New User Type</div>
+        <div class="subheader mb-3">Create and register a new user type</div>
         
             <form id="registered_user_form">
             @csrf

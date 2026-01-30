@@ -249,6 +249,9 @@ $('#closeEditType').click(function() {
         });
     });
 
+
+
+
     // Dropdown Overflow Fix
     $(document).on('shown.bs.dropdown', '.dropdown', function () {
         const $btn = $(this).find('.dropdown-toggle');
@@ -268,3 +271,8 @@ $('#closeEditType').click(function() {
         $('body > .dropdown-menu').remove();
     });
 });
+
+
+
+
+

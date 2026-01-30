@@ -216,6 +216,31 @@
 }
 
 
+#deleteRoleModal{
+    .modal-backdrop.show {
+        background: rgba(0,0,0,0.7) !important; /* lighter overlay */
+    }
+    .modal-content{
+        margin: 0;
+    }
+    .header{
+        font-weight: bold;
+        color: #d70000;
+        
+    }
+    .subheader{
+        color: gray;
+    }
+
+    .delete-button{
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .cancel-button{
+        margin-left: auto;
+    }
+}
 
 
 

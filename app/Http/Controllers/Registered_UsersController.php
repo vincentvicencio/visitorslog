@@ -160,8 +160,8 @@ public function updateUser(Request $request, $id)
     
     // Placeholder
     $data[] = ['id' => '', 'text' => 'Choose Location/Site'];
-
-    foreach ($location as $record) {
+    dd($data);
+        foreach ($location as $record) {
         $data[] = [
             'id'   => $record['id'], // Ensure 'id' exists in your session array
             'text' => $record['name']

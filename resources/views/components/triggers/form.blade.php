@@ -43,13 +43,22 @@
                 </div>
                 <div class="capture">
                     <div class="header">Capture Image</div>
+<<<<<<< Updated upstream
                     <div class="imgholder">No Image</div>
+=======
+                    <div class="imgholder" >No Image</div>
+>>>>>>> Stashed changes
                     <button type="button" class="capture-button">capture</button>
                 </div>
             </div>
             <div class="panel-buttons">
+<<<<<<< Updated upstream
                 <button type="button" class="save">save</button>
                 <button type="button" class="clear">clear</button>
+=======
+                    <button type="button" class="save">save</button>
+                    <button type="button" class="clear">clear</button>
+>>>>>>> Stashed changes
             </div>
         </div>
     </div>
