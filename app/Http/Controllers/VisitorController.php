@@ -23,15 +23,76 @@ class VisitorController extends Controller
                    ->get();
         return view('homepage.form', compact('visitorTypes', "visitors"));
     }
+     public function list(Request $request){
+     
+        $keywords = strtolower($request->search);
+        $limit    = $request->input('length');
 
-    public function list()
-    {
-        $visitors = Visitor::where('status', 1)
-                   ->orderBy('id', 'asc')
-                   ->get();
+        $rawquery = Visitor::withoutTrashed()->where(function($query) use ($keywords) {
+                        $query->where('emp_code',         'LIKE', "%$keywords%");
+                    });
 
-        return view('homepage.list', compact('visitors'));
+        $totalRecords = $rawquery->get()->count();
+        
+        if ($request->input('draw') > 1) { 
+            $start         = $request->input('start'); 
+            $column        = $request->input('order.0.column');
+            $direction     = $request->input('order.0.dir');
+            $order         = $request->input('columns')[$column]['data']; 
+            $temp          = $rawquery->get(); 
+            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
+            $data          = $rawquery->orderBy("updated_at", "desc")->take($limit)->get();
+            $totalFiltered = count($temp);
+        } else { 
+            $data          = $rawquery->orderBy("updated_at", "desc")->take($limit)->get();
+            $totalFiltered = $totalRecords;
+        }
 
+        $newData = [];
+        $i       = 0;
+ 
+        foreach ($data as $d) { 
+            
+            $newData[$i] = [
+                'emp_code'          => $d->emp_code, // show emp_code in first column
+                'emp_name'          => function_exists('user_name') ? user_name($d->emp_code) : $d->emp_code,
+                // 'user_type' => $d->user_type == 1 ? 'User' : 'Admin',
+                'user_type' => optional($d->type)->name ?? 'N/A',
+                'updated_date' => $d->created_at->format('F j, Y'),
+                'action'            => '<button class="btn-edit" title="Edit"  data-id="'.$d->id.'" >  
+                                        <svg xmlns="http://www.w3.org/2000/svg" 
+                                            width="20" 
+                                            height="20" 
+                                            fill="none" 
+                                            viewBox="0 0 24 24" 
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" 
+                                                stroke-linejoin="round" 
+                                                stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                    </button>
+                            
+                                        <button class="btn-delete" 
+                                                title="Delete"  
+                                                data-id="'.$d->emp_code.'" 
+                                                data-details="'.(function_exists('user_name') ? user_name($d->emp_code) : $d->emp_code).'" 
+                                                id="delete_btn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7m2-3h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/>
+                                            </svg>
+                                        </button>' 
+            ];
+
+            $i++;
+        } 
+ 
+        return response()->json([
+            'draw'              => intval($request->input('draw')),
+            'recordsTotal'      => $totalRecords,
+            'recordsFiltered'   => $totalFiltered,
+            'data'              => $newData            
+        ]);
     }
 
     public function timeoutAjax(Request $request)

@@ -69,7 +69,7 @@
                                     id="imageInput"
                                     name="image_path"
                                     accept="image/*"
-                                    capture="environment"
+                                    capture="user"
                                     hidden
                                 >
                         </div>
@@ -88,12 +88,4 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
-
-
-
-
-
-
-
-
 @endsection
