@@ -1,3 +1,6 @@
+import { Modal } from 'bootstrap';
+import Triggers from './common/triggers.js';
+
 $(document).ready(function() {
     $.ajaxSetup({
     headers: {
@@ -67,147 +70,6 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
             });
         }
     });
-
-    $('#register_btn').click(function() { $('#registeruserpopup').fadeIn(); 
-        component.createDropdown('/getlocation', '#reg_location', null, '#registeruserpopup');
-    });
-$('#close_register_user_popup').click(function() { $('#registeruserpopup').fadeOut(); });
-
-// Handle AJAX Submission
-$('#registered_user_form').on('submit', function(e) {
-    e.preventDefault(); 
-
-    $.ajax({
-        // url: "{{ route('addusers') }}", 
-        url: window.Laravel.baseUrl + '/addusers', 
-        type: "POST",
-        data: {
-                _token: window.Laravel.csrfToken,
-                emp_code: $('#reg_emp_code').val(),
-                password: $('#reg_password').val(),
-                user_type: $('#reg_user_type').val(), // This will now grab the ID from the select above
-                locations: $('#reg_location').val(), // New location field
-            },
-        success: function(response) {
-           $('#toastMessage').text(response.success || "User Added Successfully!");
-
-            // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('SUCCESSTOAST');
-            const toast = new bootstrap.Toast(toastElement);
-            toast.show();
-
-            // 3. Optional: Delay the reload so the user can actually see the toast
-            setTimeout(function() {
-                location.reload();
-            }, 1000); 
-        },
-        error: function(xhr) {
-            // This will now show you the specific validation error from Laravel
-            console.log(xhr.responseText);
-            alert("Validation Error: " + xhr.responseJSON.message);
-        }
-    });
-});
-
-function copyToRegister(code) {
-    // Fill the employee code input in your existing registration form
-    $('#reg_emp_code').val(code);
-    
-    // Open the registration popup (registeruserpopup)
-    $('#registeruserpopup').fadeIn();
-}
-// --- DELETE USER LOGIC ---
-let userIdToDelete = null;
-
-// 1. When the delete button in the table is clicked
-$(document).on('click', '.delete-user', function() {
-    userIdToDelete = $(this).data('id'); // Store the ID
-    $('#deleteConfirmModal').modal('show'); // Show the modal
-});
-
-// 2. When the "Delete" button inside the modal is clicked
-$('#confirmDeleteBtn').on('click', function() {
-    if (!userIdToDelete) return;
-
-    // Change button state to show processing
-    const btn = $(this);
-    btn.prop('disabled', true).text('Processing...');
-
-    $.ajax({
-        url: window.Laravel.baseUrl + '/delete-user/' + userIdToDelete,
-        type: "POST",
-        data: {
-            _token: window.Laravel.csrfToken
-        },
-        success: function(response) {
-            // Success: Reload the page to refresh the table
-            $('#DeletetoastMessage').text(response.success || "User Deleted Successfully!");
-
-            // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('DELETE');
-            const toast = new bootstrap.Toast(toastElement);
-            toast.show();
-
-            // 3. Optional: Delay the reload so the user can actually see the toast
-            setTimeout(function() {
-                location.reload();
-            }, 1500); 
-        },
-        error: function(xhr) {
-            alert("Error deleting user.");
-            btn.prop('disabled', false).text('Delete');
-            $('#deleteConfirmModal').modal('hide');
-        }
-    });
-});
-
-
-$(document).on('click', '.edit-user', function() {
-    var userId = $(this).data('id');
-    
-    // CHANGE THIS: Add the baseUrl variable to the GET request
-    $.get(window.Laravel.baseUrl + "/get-user/" + userId, function(data) {
-        $('#edit_user_id').val(data.id);
-        $('#edit_user_type').val(data.role_id); 
-        $('#edit_emp_code').val(data.emp_code);
-        $('#editPopupContainer').fadeIn();
-    }).fail(function(xhr) {
-        // If this triggers, it means the fetch itself is getting the 401 error
-        console.error("Fetch failed: ", xhr.status);
-    });
-});
-
-$('#closeEditPopup').click(function() { $('#editPopupContainer').hide(); });
-
-$('#edit_user_form').on('submit', function(e) {
-    e.preventDefault();
-    var userId = $('#edit_user_id').val(); 
-
-    $.ajax({
-        url: window.Laravel.baseUrl + '/update-user/' + userId,
-        type: "POST",
-        data: $(this).serialize(), 
-        success: function(response) {
-            $('#editPopupContainer').fadeOut(200);
-            $('#toastMessage').text(response.message || "User updated successfully!");
-
-            const toastElement = document.getElementById('SUCCESSTOAST');
-            const toast = new bootstrap.Toast(toastElement);
-            toast.show();
-
-            setTimeout(function() {
-                location.reload();
-            }, 1500);
-        },
-        error: function(xhr) {
-            if (xhr.status === 401) {
-                alert("Your session has expired. Please refresh and log in again.");
-            } else {
-                alert("Error: " + (xhr.responseJSON ? xhr.responseJSON.message : "Update failed"));
-            }
-        }
-    });
-});
     // --- 1. GLOBAL VARIABLES ---
     let currentPage = 1;
 
@@ -318,24 +180,194 @@ $('#edit_user_form').on('submit', function(e) {
         }
     });
 
-    // --- 6. EXISTING MODAL & AJAX LOGIC ---
-    // (Keep your Register, Edit, and Delete AJAX code here...)
-    $('#register_btn').click(function() { $('#registeruserpopup').fadeIn(); });
-    $('#close_register_user_popup').click(function() { $('#registeruserpopup').fadeOut(); });
+// Initialize the notification modal instance
+const notificationModalEl = document.getElementById('notificationContainer');
+const notificationModal = new Modal(notificationModalEl);
 
-    // Handle Dropdown placement (if needed for table scrolling)
-    $(document).on('shown.bs.dropdown', '.dropdown', function () {
-        const $menu = $(this).find('.dropdown-menu');
-        $('body').append($menu);
-        const offset = $(this).offset();
-        $menu.css({
-            'display': 'block',
-            'top': offset.top + $(this).outerHeight(),
-            'left': offset.left
+let userIdToDelete = null;
+
+// 1. When the delete button in the table is clicked
+$(document).on('click', '.delete-user', function() {
+    userIdToDelete = $(this).data('id'); // Store the ID
+    
+    // Set the modal content dynamically
+    $('#notification-title').text('Confirm User Deletion');
+    $('#notification-message').text('Are you sure you want to delete this user? This action cannot be undone.');
+    
+    // Ensure the "Yes" button is reset
+    $('#btn_ok').prop('disabled', false).text('Yes');
+
+    // Show the modal using the bootstrap instance
+    notificationModal.show();
+});
+
+// 2. When the "Yes" button inside the notification modal is clicked
+$('#btn_ok').on('click', function() {
+    if (!userIdToDelete) return;
+
+    const btn = $(this);
+    btn.prop('disabled', true).text('Processing...');
+
+    $.ajax({
+        url:'/delete-user/' + userIdToDelete,
+        type: "POST",
+        data: {
+            _token: window.Laravel.csrfToken
+        },
+        success: function(response) {
+            // Hide the confirmation modal
+            notificationModal.hide();
+
+            // Handle the Toast
+            $('#DeletetoastMessage').text(response.success || "User Deleted Successfully!");
+            const toastElement = document.getElementById('DELETE');
+            if (toastElement) {
+                const toast = new bootstrap.Toast(toastElement);
+                toast.show();
+            }
+
+            // Reload the page
+            setTimeout(function() {
+                location.reload();
+            }, 1500); 
+        },
+        error: function(xhr) {
+            alert("Error deleting user: " + (xhr.responseJSON?.message || "Internal Server Error"));
+            btn.prop('disabled', false).text('Yes');
+            notificationModal.hide();
+        }
+    });
+});
+$(document).on('click', '#register_btn', function () {
+        openUserModalBlank();
+    });
+
+    // Click Edit Button
+    $(document).on('click', '.edit-user', function () {
+        const userId = $(this).data('id');
+        if (!userId) return;
+
+        // Fetch user details before opening modal
+        $.get("/get-user/" + userId, function(data) {
+            openUserModal(data);
         });
     });
 
-    $(document).on('hide.bs.dropdown', '.dropdown', function () {
-        $('body > .dropdown-menu').remove();
-    });
 });
+
+// Initialize Modal
+const userModalEl = document.getElementById('registerUserModal');
+const userModal = new bootstrap.Modal(userModalEl);
+
+export function openUserModal(data) {
+    const idInput = document.getElementById('reg_user_db_id');
+    
+    // Set Data
+    idInput.dataset.id = data.id; 
+    $('#reg_emp_code').val(data.emp_code); 
+    $('#reg_user_type').val(data.role_id); 
+    $('#reg_password').val(''); // Clear password for security/edit
+    
+    // UI Updates
+    $('#userModalTitle').text('Edit User');
+    $('#submit_user_btn').text('Update User');
+    $('.edit-only-text').show();
+
+    // Load locations via component helper
+    if (typeof component !== 'undefined' && component.createDropdown) {
+        component.createDropdown('/getlocation', '#reg_location', data.location_id, '#registerUserModal');
+    } else {
+        $('#reg_location').val(data.location_id);
+    }
+
+    userModal.show();
+}
+
+export function openUserModalBlank() {
+    const idInput = document.getElementById('reg_user_db_id');
+    delete idInput.dataset.id; // Clear ID to signify "Add"
+    
+    // Reset Fields
+    $('#reg_emp_code, #reg_password, #reg_user_type, #reg_location').val('');
+    
+    // UI Updates
+    $('#userModalTitle').text('Register User');
+    $('#submit_user_btn').text('Register User');
+    $('.edit-only-text').hide();
+
+    // Load locations
+    component.createDropdown('/getlocation', '#reg_location', null, '#registerUserModal');
+    
+    userModal.show();
+}
+
+document.getElementById('submit_user_btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    const idInput = document.getElementById('reg_user_db_id');
+    const id = idInput.dataset.id;
+    const $btn = $(this);
+
+    // Prepare Data
+    const formData = {
+        _token: $('meta[name="csrf-token"]').attr('content'),
+        emp_code: $('#reg_emp_code').val(),
+        user_type: $('#reg_user_type').val(),
+        locations: $('#reg_location').val(),
+        password: $('#reg_password').val()
+    };
+
+    // Validation
+    if (!formData.emp_code || !formData.user_type) {
+        Triggers.showToast('Please fill in required fields.', 1);
+        return;
+    }
+
+    $btn.prop('disabled', true).text('Processing...');
+
+    if (id === undefined) {
+        // --- ADD USER LOGIC ---
+        $.ajax({
+            url: "/addusers",
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                Triggers.showToast(response.message || "User registered!", 0);
+                setTimeout(() => { userModal.hide(); }, 1500);
+                setTimeout(() => { location.reload(); }, 2000);
+            },
+            error: function(xhr) {
+                $btn.prop('disabled', false).text('Register User');
+                Triggers.showToast(xhr.responseJSON?.message ?? 'Registration failed.', 1);
+            }
+        });
+    } else {
+        // --- UPDATE USER LOGIC ---
+        formData._method = 'PUT'; // Laravel Method Spoofing
+        $.ajax({
+            url: "/update-user/" + id,
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                Triggers.showToast(response.message || "User updated!", 0);
+                setTimeout(() => { userModal.hide(); }, 1500);
+                setTimeout(() => { location.reload(); }, 2000);
+            },
+            error: function(xhr) {
+                $btn.prop('disabled', false).text('Update User');
+                Triggers.showToast(xhr.responseJSON?.message ?? 'Update failed.', 1);
+            }
+        });
+    }
+});
+
+function showSuccessFlow(message) {
+    $('#toastMessage').text(message);
+    const toastElement = document.getElementById('SUCCESSTOAST');
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+
+    setTimeout(() => {
+        location.reload();
+    }, 1500);
+}

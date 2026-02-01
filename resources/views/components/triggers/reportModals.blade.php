@@ -54,7 +54,7 @@
     </div>
 </div>
 
-<div class="modal fade text-center" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+<!-- <div class="modal fade text-center" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -70,4 +70,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->

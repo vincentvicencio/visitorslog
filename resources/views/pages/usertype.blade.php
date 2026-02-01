@@ -15,6 +15,7 @@
 
 
 @vite (['resources/js/usertype.js'])
+<!-- @vite (['resources/js/try.js']) -->
 @include('components.triggers.users-userstype-toast')
 @include('components.triggers.UserTypeModal')
 

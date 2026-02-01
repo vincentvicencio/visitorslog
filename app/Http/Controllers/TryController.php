@@ -133,4 +133,16 @@ try {
 
 }
 
+
+// In your UserController.php
+public function getUser($id) {
+    $user = User::find($id);
+    return response()->json([
+        'id'        => $user->id,
+        'emp_code'  => $user->emp_code,
+        'role_id'   => $user->user_type, // Ensure this matches your column name
+        'location_id' => $user->location_id 
+    ]);
+}
+
 }

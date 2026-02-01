@@ -1,5 +1,6 @@
 <!-- //////////////////////////////////////////////     MODALS       ////////////////////////////////////////////////////// -->
-<div id="addTypeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000;">
+<!-- <div id="addTypeModal" class="modal fade" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000;" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="textInputModalLabel" aria-hidden="true">
     <div style="background:white; width:400px; margin:100px auto; padding:25px; border-radius:12px; position:relative;">
         <button id="closeAddType" type="button" class="btn-close" style="float:right; border:none; background:none;">X</button>
         <h4 class="mb-4">User Type</h4>
@@ -13,7 +14,30 @@
             <button type="submit" class="btn btn-primary w-100" id="save_type"></button>
         </form>
     </div>
-</div>  
+</div>   -->
+
+<div class="modal fade" id="addTypeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">User Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeAddType"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add_type_form">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Role Name</label>
+                        <input type="text" name="user_type" class="form-control" placeholder="e.g. Administrator" required id='edit_type_name'>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="add_type_form" class="btn btn-primary w-100" id="save_type">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- <div id="editTypeModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000;">
     <div style="background:white; width:400px; margin:100px auto; padding:25px; border-radius:12px; position:relative;">
@@ -30,10 +54,10 @@
             <button type="submit" class="btn btn-primary w-100">Update Role</button>
         </form>
     </div>
-</div>
+</div>-->
 
 
-<div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -49,4 +73,4 @@
             </div>
         </div>
     </div>
-</div> -->
+</div>  -->

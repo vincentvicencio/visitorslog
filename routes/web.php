@@ -122,5 +122,6 @@ Route::post('/report', [TryController::class, 'show_report'])->name('report.inde
 Route::get('/report', [TryController::class, 'show_report'])->name('report.index');
 
 Route::get('/home', [HomeController::class, 'index']);
-
+// Change 'post' to 'put'
+Route::put('/update-user/{id}', [Registered_UsersController::class, 'updateUser']);
 });

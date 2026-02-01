@@ -1,6 +1,6 @@
 
 <!-- //////////////////////////////////////////////     USERS MODALS       ////////////////////////////////////////////////////// -->
-<div id="registeruserpopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
+<!-- <div id="registeruserpopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
     <div style="background:white; width:350px; margin:100px auto; padding:20px; border-radius:8px; position:relative;">
         <button id="close_register_user_popup" type="button" style="float:right;">X</button>
         
@@ -22,6 +22,52 @@
 
             <button type="submit" class="btn btn-primary">Register User</button>
         </form>
+    </div>
+</div> -->
+
+
+<div class="modal fade" id="registerUserModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalTitle">Register User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="reg_user_db_id"> 
+                
+                <div class="mb-3">
+                    <label class="form-label">Select Role</label>
+                    <select id="reg_user_type" class="form-control" required>
+                        <option value="">Select Role</option>
+                        @foreach($roles as $role)
+                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Select Location</label>
+                    <select id="reg_location" class="form-control" required>
+                        <option value="">Select Location</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Employee Code</label>
+                    <input type="text" id="reg_emp_code" class="form-control" placeholder="Employee Code" required>
+                </div>
+
+                <div class="mb-3" id="password_container">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="reg_password" class="form-control" placeholder="Password">
+                    <small class="text-muted edit-only-text" style="display:none;">Leave blank to keep current password</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary w-100" id="submit_user_btn">Register User</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -48,7 +94,7 @@
 </div>
 
 
-<div class="modal fade text-center" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+<!-- <div class="modal fade text-center" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -64,4 +110,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->

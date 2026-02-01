@@ -16,6 +16,7 @@
 </script>
 
 @vite(['resources/js/users.js'])
+@vite(['resources/js/try.js'])
 @include('components.triggers.users-userstype-toast')
 @include('components.triggers.UsersModal')
 
@@ -104,7 +105,7 @@
 </div>
 
 
-<div class="container mt-4">
+<!-- <div class="container mt-4">
     <button class="btn btn-outline-info btn-sm mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#sessionEmployeeTable" aria-expanded="false" aria-controls="sessionEmployeeTable">
         ...
     </button>
@@ -140,6 +141,6 @@
             </table>
         </div>
     </div>
-</div>
+</div> -->
 
 @endsection
