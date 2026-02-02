@@ -72,39 +72,12 @@
                                     hidden
                                 >
                         </div>
-                
-                    </div>
-                    <div class="capture">
-                        <div class="header">Capture Image</div>
-                        <div class="imgholder">
-                            Image
-                        </div>
-                        {{-- <button type="button" class="capture-button">capture</button>
-                        <input type="file" name="image_path" accept="image/*"> --}}
-                            <button type="button" class="capture-button" id="captureBtn">
-                                Capture
-                            </button>
-                            <input 
-                                type="file"
-                                id="imageInput"
-                                name="image_path"
-                                accept="image/*"
-                                capture="user"
-                                hidden
-                            >
-                    </div>
-                    <!-- <div class="capture">
-    <div class="header">Capture Image</div>
-    <div class="imgholder">
-        <video id="webcam" autoplay playsinline style="width: 100%; height: auto;"></video>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <img id="photoPreview" src="" style="display:none; width: 100%;">
-    </div> 
 
-    <button type="button" class="capture-button" id="captureBtn">Capture</button>
-    
-    <input type="hidden" id="image_data" name="image_path">
-</div>-->
+                    </div>
+                    <div class="panel-buttons">
+                        <button type="submit" class="save" id="saveBtn">save</button>
+                        <button type="button" class="clear" id="clrBtn">clear</button>
+                    </div>
                 </form>
             </div>
         </div>
