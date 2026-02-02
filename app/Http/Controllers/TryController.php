@@ -41,7 +41,10 @@ public function show_usertype()
         $roles = \App\Models\user_types::all();
         $visitorTypes = VisitorType::all();
 
-        $visitorlogs = Visitor::with('visitor_type')->get();
+        // $visitorlogs = Visitor::with('visitor_type')->get();
+        $visitorlogs = Visitor::where('status', 0)
+                   ->orderBy('id', 'asc')
+                   ->get();
         $search = $request->input('search');
 
         $empMap = collect(session('all_emp'))->keyBy('emp_code');
@@ -84,31 +87,34 @@ public function show_usertype()
     }
     public function show_report(Request $request)
 {
-    $query = Visitor::with('visitor_type');
+    // $query = Visitor::with('visitor_type');
 
-    // Filter by Date Range
-    if ($request->filled('date_from')) {
-        $query->whereDate('created_at', '>=', $request->date_from);
-    }
-    if ($request->filled('date_to')) {
-        $query->whereDate('created_at', '<=', $request->date_to);
-    }
+    // // Filter by Date Range
+    // if ($request->filled('date_from')) {
+    //     $query->whereDate('created_at', '>=', $request->date_from);
+    // }
+    // if ($request->filled('date_to')) {
+    //     $query->whereDate('created_at', '<=', $request->date_to);
+    // }
 
-    // Filter by Visitor Type
-    if ($request->filled('visitor_type')) {
-        $query->where('visitor_type', $request->visitor_type);
-    }
+    // // Filter by Visitor Type
+    // if ($request->filled('visitor_type')) {
+    //     $query->where('visitor_type', $request->visitor_type);
+    // }
 
-    // Existing Search Logic
-    if ($request->filled('searchreport')) {
-        $search = $request->searchreport;
-        $query->where(function($q) use ($search) {
-            $q->where('first_name', 'like', "%$search%")
-              ->orWhere('last_name', 'like', "%$search%");
-        });
-    }
+    // // Existing Search Logic
+    // if ($request->filled('searchreport')) {
+    //     $search = $request->searchreport;
+    //     $query->where(function($q) use ($search) {
+    //         $q->where('first_name', 'like', "%$search%")
+    //           ->orWhere('last_name', 'like', "%$search%");
+    //     });
+    // }$query->
 
-    $visitorlogs = $query->orderBy('created_at', 'desc')->get();
+    // $visitorlogs = orderBy('created_at', 'desc')->get();
+    $visitorlogs = Visitor::where('status', 0)
+                   ->orderBy('id', 'asc')
+                   ->get();
     $visitorTypes = VisitorType::all();
     $allEmployeesFromSession = session('all_emp', []);
 
