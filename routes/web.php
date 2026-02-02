@@ -114,7 +114,18 @@ Route::get('/users', [TryController::class, 'show_user'])->name('users.index');
 
 Route::post('/visitortype', [TryController::class, 'show_visitortype'])->name('visitortype.index');
 Route::get('/visitortype', [TryController::class, 'show_visitortype'])->name('visitortype.index');
+Route::post('/visitortype/list', [VisitorTypeController::class, 'list'])->name('visitortype.list');
 
+
+Route::group(['prefix' => 'visitortype'], function () {
+    Route::post('/list', [VisitorTypeController::class, 'list'])->name('list');
+});
+Route::group(['prefix' => 'registerId'], function () {
+    Route::post('/list', [RegisterIDController::class, 'list'])->name('list');
+});
+Route::group(['prefix' => 'visitorslog'], function () {
+    Route::post('/list', [VisitorController::class, 'list'])->name('list');
+});
 Route::post('/id', [TryController::class, 'show_id'])->name('id.index');
 Route::get('/id', [TryController::class, 'show_id'])->name('id.index');
 

@@ -9,6 +9,9 @@ use App\Models\RegisteredID;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+
 
 
 class VisitorController extends Controller
@@ -23,77 +26,204 @@ class VisitorController extends Controller
                    ->get();
         return view('homepage.form', compact('visitorTypes', "visitors"));
     }
-    //  public function list(Request $request){
+
+    public function list(Request $request){
      
-    //     $keywords = strtolower($request->search);
-    //     $limit    = $request->input('length');
+        $keywords = strtolower($request->search);
+        // $keywords = strtolower($request->input('search.value'));
 
-    //     $rawquery = Visitor::withoutTrashed()->where(function($query) use ($keywords) {
-    //                     $query->where('emp_code',         'LIKE', "%$keywords%");
-    //                 });
+        $limit    = $request->input('length');
 
-    //     $totalRecords = $rawquery->get()->count();
+        // $rawquery = Visitor::with('visitorType')
+        //             ->withoutTrashed()
+        //             ->where('status', 0)
+        //             ->when($keywords, callback: function ($query) use ($keywords) {
+        //                 $query->where('visitor_id', 'LIKE', "%{$keywords}%")
+        //                     ->orWhereHas(relation: 'visitorType', function ($q) use ($keywords) {
+        //                         $q->where('name', 'LIKE', "%{$keywords}%");
+        //                     });
+        //             });
+
+        // $rawquery = Visitor::with('visitorType')
+        //             ->withoutTrashed()
+        //             ->where('status', 0)
+        //             ->where('deleted_at', null)
+        //             ->when($keywords, function ($query) use ($keywords) {
+        //                 $query->where(function ($q) use ($keywords) {
+        //                     $q->where('visitor_id', 'LIKE', "%{$keywords}%")
+        //                     ->where('first_name', 'LIKE', "%{$keywords}%")
+        //                     ->where('middle_name', 'LIKE', "%{$keywords}%")
+        //                     ->where('last_name', 'LIKE', "%{$keywords}%")
+        //                     ->orWhereHas('visitorType', function ($qt) use ($keywords) {
+        //                         $qt->where('name', 'LIKE', "%{$keywords}%");
+        //                     });
+        //                 });
+        //             });
+
+        $rawquery = Visitor::with('visitorType')
+                ->withoutTrashed()
+                ->where('status', 0)
+                ->when($keywords, function ($query) use ($keywords) {
+                    $query->where(function ($q) use ($keywords) {
+                        $q->where('visitor_id', 'LIKE', "%{$keywords}%")
+                        ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+                        ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
+                        ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+                        ->orWhereHas('visitorType', function ($qt) use ($keywords) {
+                            $qt->where('name', 'LIKE', "%{$keywords}%");
+                        });
+                    });
+                });
+
+
+
+
         
-    //     if ($request->input('draw') > 1) { 
-    //         $start         = $request->input('start'); 
-    //         $column        = $request->input('order.0.column');
-    //         $direction     = $request->input('order.0.dir');
-    //         $order         = $request->input('columns')[$column]['data']; 
-    //         $temp          = $rawquery->get(); 
-    //         $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-    //         $data          = $rawquery->orderBy("updated_at", "desc")->take($limit)->get();
-    //         $totalFiltered = count($temp);
-    //     } else { 
-    //         $data          = $rawquery->orderBy("updated_at", "desc")->take($limit)->get();
-    //         $totalFiltered = $totalRecords;
-    //     }
-
-    //     $newData = [];
-    //     $i       = 0;
+        $totalRecords = $rawquery->get()->count();
+        
+        if ($request->input('draw') > 1) { 
+            $start         = $request->input('start'); 
+            $column        = $request->input('order.0.column');
+            $direction     = $request->input('order.0.dir');
+            $order         = $request->input('columns')[$column]['data']; 
+            $temp          = $rawquery->get(); 
+            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
+            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $totalFiltered = count($temp);
+       
+        } else { 
+       
+            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+     
+            $totalFiltered = $totalRecords;
+        }
  
-    //     foreach ($data as $d) { 
-            
-    //         $newData[$i] = [
-    //             'emp_code'          => $d->emp_code, // show emp_code in first column
-    //             'emp_name'          => function_exists('user_name') ? user_name($d->emp_code) : $d->emp_code,
-    //             // 'user_type' => $d->user_type == 1 ? 'User' : 'Admin',
-    //             'user_type' => optional($d->type)->name ?? 'N/A',
-    //             'updated_date' => $d->created_at->format('F j, Y'),
-    //             'action'            => '<button class="btn-edit" title="Edit"  data-id="'.$d->id.'" >  
-    //                                     <svg xmlns="http://www.w3.org/2000/svg" 
-    //                                         width="20" 
-    //                                         height="20" 
-    //                                         fill="none" 
-    //                                         viewBox="0 0 24 24" 
-    //                                         stroke="currentColor">
-    //                                         <path stroke-linecap="round" 
-    //                                             stroke-linejoin="round" 
-    //                                             stroke-width="2"
-    //                                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-    //                                     </svg>
-    //                                 </button>
-                            
-    //                                     <button class="btn-delete" 
-    //                                             title="Delete"  
-    //                                             data-id="'.$d->emp_code.'" 
-    //                                             data-details="'.(function_exists('user_name') ? user_name($d->emp_code) : $d->emp_code).'" 
-    //                                             id="delete_btn">
-    //                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    //                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7m2-3h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/>
-    //                                         </svg>
-    //                                     </button>' 
-    //         ];
-
-    //         $i++;
-    //     } 
+        $newData = [];
+        $i       = 0;
  
-    //     return response()->json([
-    //         'draw'              => intval($request->input('draw')),
-    //         'recordsTotal'      => $totalRecords,
-    //         'recordsFiltered'   => $totalFiltered,
-    //         'data'              => $newData            
-    //     ]);
-    // }
+        // foreach ($data as $d) { 
+ 
+        //     $newData[$i] = [
+        //         'id'          => $d->id,
+        //         'name'        => $d->name,
+        //         'description' => $d->description,
+        //         // 'updated_by'  => user_name($d->updated_by),
+        //         // 'updated_date'=> date('Y-m-d H:i:s', strtotime($d->updated_at)),
+        //         // 'action'      => create_action($d->id, $d->name, 'Edit')
+        //     ];
+        //     $i++;
+        // }
+      
+        foreach ($data as $d) { 
+            $locationLabel = '';
+
+            if ($d->location == 1) {
+                $locationLabel = 'Facility Center';
+            } elseif ($d->location == 2) {
+                $locationLabel = 'Summit One';
+            } else {
+                $locationLabel = 'Mezzanine';
+            }
+
+            $image = '';
+
+            if ($d->image_path == null) {
+                $image = 'No Image Provided';
+            }else{
+                $image ='<button 
+                    class="btn-sm view-button text-white border-0 rounded-2 px-3 py-1"
+                        id="viewImageBtn"
+                        data-id="'. $d->id .'"
+                        data-image="'. Storage::url($d->image_path) .'">
+                        View
+                    </button>';
+            }
+
+            $status = '';
+
+            if($d->status == 0){
+                $status = 'Active';
+            }else{
+                $status = 'Timed Out';
+            }
+
+            $time_in = Carbon::parse($d->time_in)->format('h:i A');
+
+            $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            $newData[$i] = [
+                'personal_detail' => '
+                    <strong>' . $d->first_name . ' ' . $d->middle_name . ' ' . $d->last_name . '</strong>
+                    <br><small>' . $locationLabel . '</small>
+                    <br><small>' . $d->phone_number . '</small>
+                ',
+
+                'visitor_type' => $d->visitorType->name,
+
+                'visitor_id' => $d->visitor_id,
+
+                'image' => $image,
+
+                'visit' =>  $d->created_at->format("F d, Y") .'<br>
+                        '. $d->created_at->format('l'),
+
+                'time' => '<small><strong>In:</strong> '. $time_in .'</small><br>
+                            <small>
+                                <strong>Out:</strong>
+                                '. $time_out .'
+                            </small>',
+                'creator' => '<small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'<small><br>
+                            <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>',
+                
+                'status' => '<div class="status rounded-2"> '. $status .'</div>',
+
+                'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
+
+                'updated_at' => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+
+                'action' => '<div class="dropdown">
+                                <button 
+                                    class="btn btn-sm btn-primary dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Action
+                                </button>
+
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <button 
+                                            class="dropdown-item"
+                                            id="viewBtn"
+                                            data-id="'. $d->id .'"
+                                            data-type="visitorlog">
+                                            <i class="bi bi-eye me-2"></i> View
+                                        </button>
+
+                                    </li>
+                                    <li>
+                                        <button 
+                                            type="button"
+                                            class="dropdown-item text-danger"
+                                            id="timeoutBtn"
+                                            data-id="'. $d->id .'">
+                                            <i class="bi bi-clock-history me-2"></i> Timeout
+                                        </button>
+
+                                    </li>
+                                </ul>
+                            </div>',
+            ];
+            $i++;
+        }
+ 
+        return response()->json([
+            'draw'              => intval($request->input('draw')),
+            'recordsTotal'      => $totalRecords,
+            'recordsFiltered'   => $totalFiltered,
+            'data'              => $newData            
+        ]);
+    }
 
     public function timeoutAjax(Request $request)
     {

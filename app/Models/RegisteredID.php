@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RegisteredID extends Model
 {
+    use SoftDeletes;
     protected $table = 'registered_visitor_ids';
 
     protected $fillable = [
@@ -39,5 +41,11 @@ class RegisteredID extends Model
 
         return $empCode; // Return code if no match found
     }
+
+    public function visitorType()
+    {
+        return $this->belongsTo(VisitorType::class, 'visitor_type');
+    }
+
 
 }

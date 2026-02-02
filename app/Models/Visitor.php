@@ -29,6 +29,11 @@ class Visitor extends Model
         'deleted_at',
     ];
 
+    public function visitorType()
+    {
+        return $this->belongsTo(VisitorType::class, 'visitor_type');
+    }
+
     public function getEmpName($empCode)
     {
         // Retrieve the list you stored in session during login
@@ -51,10 +56,9 @@ class Visitor extends Model
 
         return $empCode; // Return code if no match found
     }
-    public function visitor_type()
-    {
-        return $this->belongsTo(\App\Models\VisitorType::class, 'visitor_type', 'id');
-    }
+
+
+
     public function userType()
     {
         return $this->belongsTo(\App\Models\User_types::class, 'user_type', 'id');
@@ -65,7 +69,4 @@ class Visitor extends Model
         $match = $locations->firstWhere('id', $this->location);
         return $match ? $match['name'] : 'N/A';
     }
-
-
-    
 }

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class VisitorType extends Model
 {
+
+    use SoftDeletes;
     protected $table = 'visitor_types';
 
     protected $fillable = [

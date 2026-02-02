@@ -248,49 +248,7 @@ $(document).ready(function () {
     
 });
 
-// // table
-//     async list() {
-//         const self = this;
 
-//         const tableHeader = [
-//             { id: "emp_code",       label: "Emp Code" },
-//             { id: "emp_name",       label: "Name" },
-//             { id: "user_type",      label: "User Type" },
-//             { id: "updated_date",   label: "Updated Date" },
-//             { id: "action",         label: "Action" },
-//         ];
-
-//         const columns = tableHeader.map(col => ({
-//             data: col.id, 
-//             title: col.label,
-//             width: 'auto'
-//         }));
-
-//         const columnDefs = [
-//             { targets: [0, 1, 2, 3], orderable: false }
-//         ]; 
-
-//         settable.createTableAjax(
-//             self.table,
-//             columns,
-//             ${self.url}list,
-//             columnDefs,
-//             this.module
-//         ); 
-
-//         const tableApi = $(self.table).DataTable();
-//         $('input[type="search"]').off('keyup').on('keyup', function() {
-//             tableApi.search(this.value).draw();
-//         });
-
-//          setTimeout(() => {
-//             const searchInput = document.getElementById('dt-search-0');             
-//                 if (searchInput) {
-//                     searchInput.setAttribute('placeholder', 'Search here...');
-//                 }
-//             }, 100);
-
-//     }
 
 //     // Edit
 //     async onLoadForm(record_id) {
