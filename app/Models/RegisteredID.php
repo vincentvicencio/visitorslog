@@ -48,5 +48,17 @@ class RegisteredID extends Model
         return $this->belongsTo(VisitorType::class, 'visitor_type');
     }
 
+   // RegisteredID model
+    public function visitorsLogs()
+    {
+        return $this->hasMany(
+            Visitor::class,
+            'visitor_id',
+            'id_number'
+        );
+    }
+
+
+
 
 }

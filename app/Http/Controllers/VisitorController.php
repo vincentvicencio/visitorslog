@@ -175,7 +175,7 @@ class VisitorController extends Controller
                 'creator' => '<small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'<small><br>
                             <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>',
                 
-                'status' => '<div class="status rounded-2"> '. $status .'</div>',
+                'status' => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
 
                 'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
 

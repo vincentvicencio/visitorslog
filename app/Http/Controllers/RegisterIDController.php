@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\RegisteredID\visitorsLogs;
 use App\Models\RegisteredID;
 use App\Models\VisitorType;
 use Carbon\Carbon;
@@ -134,6 +135,44 @@ class RegisterIDController extends Controller
         // } 
 
         foreach ($data as $d) { 
+            $exists = $d->visitorsLogs()->exists();
+
+    if (!$exists) {
+        // NOT USED → allow edit/delete
+        $action = '<button 
+                        class="btn btn-sm btn-primary dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        Action
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <button 
+                                class="dropdown-item"
+                                id="editBtn"
+                                data-id="'.$d->id.'"
+                                data-name="'.$d->id_number.'"
+                                data-type="'.$d->visitor_type.'">
+                                <i class="bi bi-pencil-square me-2"></i> Edit
+                            </button>
+                        </li>
+                        <li>
+                            <button 
+                                type="button"
+                                class="dropdown-item text-danger"
+                                id="deleteBtn"
+                                data-id="'.$d->id.'">
+                                <i class="bi bi-trash me-2"></i> Delete
+                            </button>
+                        </li>
+                    </ul>';
+    } else {
+        // USED → disable actions
+        $action = '<span class="badge bg-success">Currently Used</span>';
+    }
+
+
             $newData[$i] = [
                 'visitor_type' => $d->visitorType->name,
 
@@ -147,37 +186,7 @@ class RegisterIDController extends Controller
 
                 'updated_at' => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
-                'action' => '<button 
-                                class="btn btn-sm btn-primary dropdown-toggle"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                Action
-                            </button>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <button 
-                                            class="dropdown-item"
-                                            id="editBtn"
-                                            data-id="'.$d->id.'"
-                                            data-name="'.$d->id_number.'"
-                                            data-type="'.$d->visitor_type.'"
-                                            >
-                                            <i class="bi bi-pencil-square me-2"></i> Edit
-                                        </button>
-
-                                    </li>
-                                    <li>
-                                        <button 
-                                            type="button"
-                                            class="dropdown-item text-danger"
-                                            id="deleteBtn"
-                                            data-id="'.$d->id.'"
-                                            <i class="bi bi-trash me-2"></i> Delete
-                                        </button>
-
-                                    </li>
-                                </ul>' 
+                'action' => $action
             ];
             $i++;
         }
