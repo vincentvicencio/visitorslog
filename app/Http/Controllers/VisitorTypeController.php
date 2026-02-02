@@ -17,15 +17,110 @@ class VisitorTypeController extends Controller
         return view('visitor_types.form');
     }
 
-    public function list()
-    {
-        // Get all registered IDs, latest first
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'asc')
-                   ->get();
+    public function list(Request $request){
+     
+        $keywords = strtolower($request->search);
+        $limit    = $request->input('length');
+        
 
-        // Pass to the view
-        return view('visitor_types.list', compact('visitorTypes'));
+
+        // $rawquery = VisitorType::withoutTrashed();
+        // ->where(function($query) use ($keywords) {
+        //                 $query->where('name', 'LIKE', "%$keywords%");
+        //             });
+
+
+        $rawquery = VisitorType::withoutTrashed()->where(function($query) use ($keywords) {
+                        $query->where('name', 'LIKE', "%$keywords%")
+                            ->where('deleted_at', null);
+                    });
+        
+
+
+        
+        $totalRecords = $rawquery->get()->count();
+        
+        if ($request->input('draw') > 1) { 
+            $start         = $request->input('start'); 
+            $column        = $request->input('order.0.column');
+            $direction     = $request->input('order.0.dir');
+            $order         = $request->input('columns')[$column]['data']; 
+            $temp          = $rawquery->get(); 
+            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
+            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $totalFiltered = count($temp);
+       
+        } else { 
+       
+            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+     
+            $totalFiltered = $totalRecords;
+        }
+ 
+        $newData = [];
+        $i       = 0;
+ 
+        // foreach ($data as $d) { 
+ 
+        //     $newData[$i] = [
+        //         'id'          => $d->id,
+        //         'name'        => $d->name,
+        //         'description' => $d->description,
+        //         // 'updated_by'  => user_name($d->updated_by),
+        //         // 'updated_date'=> date('Y-m-d H:i:s', strtotime($d->updated_at)),
+        //         // 'action'      => create_action($d->id, $d->name, 'Edit')
+        //     ];
+        //     $i++;
+        // }
+      
+        foreach ($data as $d) { 
+       
+            $newData[$i] = [
+                'name'          => $d->name, // show emp_code in first column
+                'created_by' => $d->getEmpName($d->created_by),
+                'updated_by' => ($d->getEmpName($d->updated_by) ?? '-'),
+                'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
+                'action'            => '<button 
+                                            class="btn btn-sm btn-primary dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            Action
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button 
+                                                    class="dropdown-item"
+                                                    id="editBtn"
+                                                    data-id="'.$d->id.'"
+                                                    data-name="'.$d->name.'"
+                                                    >
+                                                    <i class="bi bi-pencil-square me-2"></i> Edit
+                                                </button>
+
+                                            </li>
+                                            <li>
+                                                <button 
+                                                    type="button"
+                                                    class="dropdown-item text-danger"
+                                                    id="deleteBtn"
+                                                    data-id="'.$d->id.'"
+                                                    <i class="bi bi-trash me-2"></i> Delete
+                                                </button>
+
+                                            </li>
+                                        </ul>' 
+            ];
+
+            $i++;
+        } 
+ 
+        return response()->json([
+            'draw'              => intval($request->input('draw')),
+            'recordsTotal'      => $totalRecords,
+            'recordsFiltered'   => $totalFiltered,
+            'data'              => $newData            
+        ]);
     }
 
 
@@ -53,7 +148,7 @@ class VisitorTypeController extends Controller
         try {
             $id = new VisitorType();
             $id->name = ucfirst(strtolower($request->visitor_type)); // normalize case
-            $id->created_by = Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System';
+            $id->created_by = Auth::id();
             $id->created_at = now();
             $id->save();
 
@@ -91,7 +186,7 @@ class VisitorTypeController extends Controller
         $visitor->update([
             'name' => ucfirst(strtolower($request->visitor_type)),
             'updated_at' => now(),
-            'updated_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System',
+            'updated_by' => Auth::id(),
         ]);
 
         return response()->json([
@@ -119,7 +214,7 @@ class VisitorTypeController extends Controller
 
         $visitor->update([
             'deleted_at' => Carbon::now(),
-            'deleted_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'Admin',
+            'deleted_by' => Auth::id(),
         ]);
 
         return response()->json([

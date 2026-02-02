@@ -16,8 +16,8 @@ class User_TypesController extends Controller
 
         User_types::create([
             'name'       => $request->user_type,
-            'created_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System',
-            'updated_by' => Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System',
+            'created_by' => Auth::id(),
+            'updated_by' => Auth::id(),
         ]);
 
         return response()->json(['status' => 'success']);
@@ -28,7 +28,7 @@ class User_TypesController extends Controller
             $role = User_types::findOrFail($id);
             $role->update([
                 'deleted_at' => now(), 
-                'deleted_by' => auth()->user()->first_name ?? 'System' 
+                'deleted_by' => Auth::id(), 
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete role.'], 500);
@@ -50,7 +50,7 @@ public function update(Request $request, $id)
     $role = User_types::findOrFail($id);
     $role->update([
         'name' => $request->user_type,
-        'updated_by' => Auth::user()->name ?? 'System'
+        'updated_by' => Auth::id(),
     ]);
 }
 }

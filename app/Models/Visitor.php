@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\VisitorType;
 
 class Visitor extends Model
 {
@@ -29,10 +30,36 @@ class Visitor extends Model
         'deleted_at',
     ];
 
-    public function visitor_type()
+    public function visitorType()
     {
-        return $this->belongsTo(\App\Models\VisitorType::class, 'visitor_type', 'id');
+        return $this->belongsTo(VisitorType::class, 'visitor_type');
     }
+
+    public function getEmpName($empCode)
+    {
+        // Retrieve the list you stored in session during login
+        $employees = session('all_emp');
+
+        if (!$employees) {
+            return $empCode; // Return the code if session is empty
+        }
+
+        // Search the collection for the matching emp_code
+        $employee = collect($employees)->firstWhere('emp_code', $empCode);
+
+        if ($employee) {
+            // Handle both object and array formats depending on your API helper
+            $firstName = data_get($employee, 'first_name');
+            $lastName = data_get($employee, 'last_name');
+            
+            return "{$firstName} {$lastName}";
+        }
+
+        return $empCode; // Return code if no match found
+    }
+
+
+
     public function userType()
     {
         return $this->belongsTo(\App\Models\User_types::class, 'user_type', 'id');
@@ -43,5 +70,4 @@ class Visitor extends Model
         $match = $locations->firstWhere('id', $this->location);
         return $match ? $match['name'] : 'N/A';
     }
-
 }

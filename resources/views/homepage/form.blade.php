@@ -73,9 +73,8 @@
                                     hidden
                                 >
                         </div>
-                
+
                     </div>
-                
                     <div class="panel-buttons">
                         <button type="submit" class="save" id="saveBtn">save</button>
                         <button type="button" class="clear" id="clrBtn">clear</button>

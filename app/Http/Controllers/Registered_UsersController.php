@@ -62,8 +62,10 @@ class Registered_UsersController extends Controller
             'password'   => Hash::make($request->password),     
             'user_type'  => $request->user_type,
             'location'   => $location,
-            'created_by' => Auth::user()->first_name ?? 'System', 
-            'updated_by' => Auth::user()->first_name ?? 'System',
+            'created_by' => Auth::id(), 
+            'updated_by' => Auth::id(),
+            // 'created_by' => Auth::user()->first_name ?? 'System', 
+            // 'updated_by' => Auth::user()->first_name ?? 'System',
         ]);
 
         return response()->json([
@@ -90,7 +92,7 @@ class Registered_UsersController extends Controller
         // Instead of $user->delete(), we update the column
         $user->update([
             'deleted_at' => NOW(),
-            'deleted_by' => Auth::user()->first_name ?? 'System' // Optional: track who deleted it
+            'deleted_by' => Auth::id() // Optional: track who deleted it
         ]);
 
         return response()->json([
@@ -112,11 +114,59 @@ public function getUserTypes()
 }
 
     // --- NEW: GET USER DATA (For Edit Modal) ---
+    // public function getUser($id)
+    // {
+    //     // $user = RegisteredUser::findOrFail($id);
+    //     // return response()->json($user);
+    //     $user = RegisteredUser::findorFail($id);
+
+    //     $location = collect(session('all_location'));
+    // $data = [];
+    
+    // // Placeholder
+    // $data[] = ['id' => '', 'text' => 'Choose Location/Site'];
+
+    // foreach ($location as $record) {
+    //     $data[] = [
+    //         'id'   => $record['id'], // Ensure 'id' exists in your session array
+    //         'text' => $record['name']
+    //     ];
+    // }
+
+    // return response()->json([
+    //     'id'        => $user->id,
+    //     'emp_code'  => $user->user_name,
+    //     'role_id'   => $user->user_type,
+    //     'location_id' => $user->location 
+    // ]);
+    // }
+
+
     public function getUser($id)
-    {
-        $user = RegisteredUser::findOrFail($id);
-        return response()->json($user);
-    }
+{
+    // 1. Find the registered user in the database
+    $user = RegisteredUser::findOrFail($id);
+
+    // 2. Fetch all employees and locations from session
+    $allEmployees = collect(session('all_emp'));
+    $allLocations = collect(session('all_location'));
+
+    // 3. Find this specific employee in the session data by their code
+    $sessionEmployee = $allEmployees->firstWhere('emp_code', $user->user_name);
+
+    // 4. Get the Location Name (If the user model stores an ID, find the name in session)
+    // If your $user->location is an ID, find the text name for it:
+    $locationData = $allLocations->firstWhere('id', $user->location);
+    $locationName = $locationData['name'] ?? 'N/A';
+
+    return response()->json([
+        'id'            => $user->id,
+        'emp_code'      => $user->user_name,
+        'role_id'       => $user->user_type,
+        'location_id'   => $user->location, // The ID for the dropdown
+        'location_name' => $locationName    // The display text
+    ]);
+}
 public function updateUser(Request $request, $id) 
 {
     $request->validate([
@@ -138,7 +188,8 @@ public function updateUser(Request $request, $id)
         $updateData = [
             'user_type'  => $request->user_type,
             'user_name'  => $request->emp_code, // Update the code if it changed
-            'updated_by' => Auth::user()->first_name ?? 'System',
+            // 'updated_by' => Auth::user()->first_name ?? 'System',
+            'updated_by' => Auth::id(),
         ];
 
         if ($request->filled('password')) {
@@ -170,4 +221,19 @@ public function updateUser(Request $request, $id)
 
     return response()->json($data);
 }
+
+
+
+
+// In your UserController.php
+// public function getUser($id) {
+//     $user = RegisteredUser::find($id);
+//     return response()->json([
+//         'id'        => $user->id,
+//         'emp_code'  => $user->emp_code,
+//         'role_id'   => $user->user_type, // Ensure this matches your column name
+//         'location_id' => $user->location_id 
+//     ]);
+// }
+
 }

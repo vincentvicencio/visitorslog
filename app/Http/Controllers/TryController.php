@@ -19,20 +19,21 @@ class TryController extends Controller
     {
         $visitors = Visitor::where('status', 0)
                    ->whereNull('time_out')
-                   ->orderBy('id', 'asc')
+                   ->orderBy('id', 'desc')
                    ->get();
         $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'asc')
+                   ->orderBy('id', 'desc')
                    ->get();
-
-        return view('pages.visitorlog', compact('visitors', 'visitorTypes'));
+        $empMap = collect(session('all_emp'))->keyBy('emp_code');
+        return view('pages.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
     }
 public function show_usertype()
 {
     $roles = \App\Models\User_types::all(); 
     $visitorTypes = VisitorType::all();
+    $empMap = collect(session('all_emp'))->keyBy('emp_code');
     
-    return view('pages.usertype', compact('roles', 'visitorTypes'));
+    return view('pages.usertype', compact('roles', 'visitorTypes','empMap'));
 }
     public function show_user(Request $request)
     {
@@ -40,8 +41,13 @@ public function show_usertype()
         $roles = \App\Models\user_types::all();
         $visitorTypes = VisitorType::all();
 
-        $visitorlogs = Visitor::with('visitor_type')->get();
+        // $visitorlogs = Visitor::with('visitor_type')->get();
+        $visitorlogs = Visitor::where('status', 0)
+                   ->orderBy('id', 'asc')
+                   ->get();
         $search = $request->input('search');
+
+        $empMap = collect(session('all_emp'))->keyBy('emp_code');
         
         $registeredUsers = \App\Models\RegisteredUser::with('userType')
         ->whereNull('deleted_at')
@@ -53,14 +59,14 @@ public function show_usertype()
         ->get();
 
     $allEmployeesFromSession = session('all_emp', []);
-    return view('pages.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession', 'visitorlogs', 'visitorTypes'));
+    return view('pages.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession', 'visitorlogs', 'visitorTypes','empMap'));
     }
 
     public function show_visitortype()
     {
         // Get all registered IDs, latest first
         $visitorTypes = VisitorType::where('deleted_at', null)
-        ->orderBy('id', 'asc')
+        ->orderBy('id', 'desc')
         ->get();
         // Pass to the view
         return view('pages.visitortype', compact('visitorTypes'));
@@ -68,44 +74,47 @@ public function show_usertype()
     public function show_id()
     {
         $registeredIds = RegisteredID::where('deleted_at', null)
-                   ->orderBy('id', 'asc')
+                   ->orderBy('id', 'desc')
                    ->get();
         $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'asc')
+                   ->orderBy('id', 'desc')
                    ->get();
         $visitorsLogs = Visitor::where('status', 0)
                    ->whereNull('time_out')
-                   ->orderBy('id', 'asc')
+                   ->orderBy('id', 'desc')
                    ->get();
         return view('pages.id', compact('registeredIds', 'visitorTypes', 'visitorsLogs'));
     }
     public function show_report(Request $request)
 {
-    $query = Visitor::with('visitor_type');
+    // $query = Visitor::with('visitor_type');
 
-    // Filter by Date Range
-    if ($request->filled('date_from')) {
-        $query->whereDate('created_at', '>=', $request->date_from);
-    }
-    if ($request->filled('date_to')) {
-        $query->whereDate('created_at', '<=', $request->date_to);
-    }
+    // // Filter by Date Range
+    // if ($request->filled('date_from')) {
+    //     $query->whereDate('created_at', '>=', $request->date_from);
+    // }
+    // if ($request->filled('date_to')) {
+    //     $query->whereDate('created_at', '<=', $request->date_to);
+    // }
 
-    // Filter by Visitor Type
-    if ($request->filled('visitor_type')) {
-        $query->where('visitor_type', $request->visitor_type);
-    }
+    // // Filter by Visitor Type
+    // if ($request->filled('visitor_type')) {
+    //     $query->where('visitor_type', $request->visitor_type);
+    // }
 
-    // Existing Search Logic
-    if ($request->filled('searchreport')) {
-        $search = $request->searchreport;
-        $query->where(function($q) use ($search) {
-            $q->where('first_name', 'like', "%$search%")
-              ->orWhere('last_name', 'like', "%$search%");
-        });
-    }
+    // // Existing Search Logic
+    // if ($request->filled('searchreport')) {
+    //     $search = $request->searchreport;
+    //     $query->where(function($q) use ($search) {
+    //         $q->where('first_name', 'like', "%$search%")
+    //           ->orWhere('last_name', 'like', "%$search%");
+    //     });
+    // }$query->
 
-    $visitorlogs = $query->orderBy('created_at', 'desc')->get();
+    // $visitorlogs = orderBy('created_at', 'desc')->get();
+    $visitorlogs = Visitor::where('status', 0)
+                   ->orderBy('id', 'asc')
+                   ->get();
     $visitorTypes = VisitorType::all();
     $allEmployeesFromSession = session('all_emp', []);
 
@@ -125,17 +134,21 @@ try {
             'deleted_by' => Auth::user()->first_name ?? 'System' // Optional: track who deleted it
         ]);
 
-        // return response()->json([
-        //     'status' => 'success', 
-        //     'message' => 'Record Deleted successfully.'
-        // ]);
     } catch (\Exception $e) {
-        // return response()->json([
-        //     'status' => 'error', 
-        //     'message' => 'Failed to remove user.'
-        // ], 500);
     }
 
+}
+
+
+// In your UserController.php
+public function getUser($id) {
+    $user = User::find($id);
+    return response()->json([
+        'id'        => $user->id,
+        'emp_code'  => $user->emp_code,
+        'role_id'   => $user->user_type, // Ensure this matches your column name
+        'location_id' => $user->location_id 
+    ]);
 }
 
 }

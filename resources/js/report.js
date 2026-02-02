@@ -1,12 +1,4 @@
 $(document).ready(function(){
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': window.Laravel.csrfToken,
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    });
-
         // Handle Dropdown placement without breaking the click event
     $(document).on('shown.bs.dropdown', '.dropdown', function () {
         const $toggle = $(this).find('.dropdown-toggle');
@@ -43,7 +35,6 @@ $(document).ready(function(){
             }).removeClass('show');
         }
     });
-    // Add 'e' as a parameter to the function
     $('.view-image-btn').on('click', function(e) {
         // 1. Prevent the page from reloading
         e.preventDefault();
@@ -199,49 +190,124 @@ $(document).ready(function(){
         }
     });
 
-
-    let visitorIdToDelete = null; 
-
-    // 1. When the "delete" button in the table is clicked
-    $(document).on('click', '.delete-btn', function() {
-        // This grabs the ID from the specific button you clicked
-        visitorIdToDelete = $(this).data('id'); 
-        $('#deleteConfirmModal').modal('show');
+     $(document).on('click', '.delete-btn', function () {
+        const id = $(this).data('id');
+        const name = $(this).data('name') || "this visitor"; // Assuming you have data-name in your button
+        
+        if (!id) return;
+        
+        openDeleteModal(id, name);
     });
 
-    // 2. The AJAX call
-    $('#confirmDeleteBtn').on('click', function() {
-        if (!visitorIdToDelete) return;
 
-        const btn = $(this);
-        btn.prop('disabled', true).text('Processing...');
-
-        $.ajax({
-            url: window.Laravel.baseUrl + '/delete-visitor/' + visitorIdToDelete,
-            type: "DELETE",
-            data: {
-                _token: window.Laravel.csrfToken
-            },
-            success: function(response) {
-            //   Success: Reload the page to refresh the table
-            $('#DeletetoastMessage').text(response.success || "Report Log Deleted Successfully!");
-
-            // 2. Initialize and show the Bootstrap Toast
-            const toastElement = document.getElementById('DELETE');
-            const toast = new bootstrap.Toast(toastElement);
-            toast.show();
-
-            // 3. Optional: Delay the reload so the user can actually see the toast
-            setTimeout(function() {
-                location.reload();
-            }, 1500); 
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
-                btn.prop('disabled', false).text('Delete');
-            }   
+    $(document).on('click', '#viewBtn', function () {
+            let visitorId = $(this).data('id');
+            let type = $(this).data('type');
+    
+            if (!visitorId) return;
+    
+            $.ajax({
+                url: "/visitor/view",
+                type: "POST",
+                data: {
+                    id: visitorId,
+                    type: type,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    window.location.href = response.redirect;
+                },
+                error: function (xhr) {
+                    let msg = 'Unable to load visitor details.';
+                    if (xhr.responseJSON?.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    Triggers.showToast(msg, 1);
+                }
+            });
         });
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': window.Laravel.csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
     });
 
 });
 
+// Initialize Modal
+const notificationModalEl = document.getElementById('notificationContainer');
+const notificationModal = new bootstrap.Modal(notificationModalEl);
+
+// --- OPEN DELETE MODAL FUNCTION ---
+
+/**
+ * Open the custom notification modal for deletion
+ * @param {number|string} id - The ID of the record to delete
+ * @param {string} name - Optional name to display in the message
+ */
+export function openDeleteModal(id, name = "this record") {
+    const recordInput = document.getElementById('record_id');
+    const messageTitle = document.getElementById('notification-title');
+    const messageBody = document.getElementById('notification-message');
+
+    // Set Data
+    recordInput.value = id; 
+    
+    // UI Updates
+    messageTitle.innerText = "Confirm Deletion";
+    messageBody.innerText = `Are you sure you want to delete ${name}?`;
+    
+    // Reset button state in case it was disabled previously
+    $('#btn_ok').prop('disabled', false).text('Yes');
+
+    notificationModal.show();
+}
+
+// --- HANDLE DELETE SUBMIT ---
+
+document.getElementById('btn_ok').addEventListener('click', function() {
+    const id = document.getElementById('record_id').value;
+    const $btn = $(this);
+
+    if (!id) {
+        Triggers.showToast('Invalid record ID.', 1);
+        return;
+    }
+
+    $btn.prop('disabled', true).text('Processing...');
+
+    // AJAX request to delete the record
+    $.ajax({
+        url:'/delete-visitor/' + id,
+        type: 'DELETE',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (response) {
+
+            // 1. Hide the confirmation modal
+            notificationModal.hide();
+
+            // 2. Set the text and show the manual Bootstrap Toast (#DELETE)
+            $('#DeletetoastMessage').text(response.success || "Report Log Deleted Successfully!");
+            
+            const toastElement = document.getElementById('DELETE');
+            if (toastElement) {
+                const toast = new bootstrap.Toast(toastElement);
+                toast.show();
+            }
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        },
+        error: function (xhr) {
+            // Re-enable button on error
+            $btn.prop('disabled', false).text('Yes');
+            
+            const errorMsg = xhr.responseJSON?.message ?? 'Delete failed.';
+            Triggers.showToast(errorMsg, 1);
+        }
+    });
+});
