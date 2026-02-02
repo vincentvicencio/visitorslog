@@ -2,17 +2,42 @@
 import { Modal } from 'bootstrap';
 import Triggers from './common/triggers.js';
 
+    
 
-    $(document).on('shown.bs.dropdown', '.dropdown', function () {
+//     $(document).on('shown.bs.dropdown', '.dropdown', function () {
+//     const $toggle = $(this).find('.dropdown-toggle');
+//     const $menu = $(this).find('.dropdown-menu');
+
+//     // Store the original parent so we can put it back later
+//     $menu.data('parent', $(this));
+    
+//     $('body').append($menu);
+    
+//     const offset = $toggle.offset();
+//     $menu.css({
+//         'display': 'block',
+//         'position': 'absolute',
+//         'visibility': 'visible',
+//         'opacity': '1',
+//         'top': offset.top + $toggle.outerHeight(),
+//         'left': offset.left,
+//         'z-index': '9999'
+//     }).addClass('show');
+// });
+
+$(document).on('shown.bs.dropdown', '.dropdown', function () {
     const $toggle = $(this).find('.dropdown-toggle');
     const $menu = $(this).find('.dropdown-menu');
 
-    // Store the original parent so we can put it back later
+    // Store the original parent
     $menu.data('parent', $(this));
     
+    // Move to body
     $('body').append($menu);
     
     const offset = $toggle.offset();
+    
+    // Force visibility and correct placement
     $menu.css({
         'display': 'block',
         'position': 'absolute',
@@ -20,8 +45,9 @@ import Triggers from './common/triggers.js';
         'opacity': '1',
         'top': offset.top + $toggle.outerHeight(),
         'left': offset.left,
-        'z-index': '9999'
-    }).addClass('show');
+        'z-index': '9999', // Ensure this is higher than the modal or table
+        'min-width': $toggle.outerWidth() // Matches the button width
+    }).addClass('show'); 
 });
 
 $(document).on('hide.bs.dropdown', '.dropdown', function () {

@@ -22,6 +22,95 @@ class User_TypesController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+
+    public function list(Request $request){
+     
+        $keywords = strtolower($request->search);
+        $limit    = $request->input('length');
+        
+
+
+        // $rawquery = VisitorType::withoutTrashed();
+        // ->where(function($query) use ($keywords) {
+        //                 $query->where('name', 'LIKE', "%$keywords%");
+        //             });
+
+
+        $rawquery = User_types::withoutTrashed()->where(function($query) use ($keywords) {
+                        $query->where('name', 'LIKE', "%$keywords%")
+                            ->where('deleted_at', null);
+                    });
+        
+
+
+        
+        $totalRecords = $rawquery->get()->count();
+        
+        if ($request->input('draw') > 1) { 
+            $start         = $request->input('start'); 
+            $column        = $request->input('order.0.column');
+            $direction     = $request->input('order.0.dir');
+            $order         = $request->input('columns')[$column]['data']; 
+            $temp          = $rawquery->get(); 
+            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
+            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $totalFiltered = count($temp);
+       
+        } else { 
+       
+            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+     
+            $totalFiltered = $totalRecords;
+        }
+ 
+        $newData = [];
+        $i       = 0;
+ 
+        // foreach ($data as $d) { 
+ 
+        //     $newData[$i] = [
+        //         'id'          => $d->id,
+        //         'name'        => $d->name,
+        //         'description' => $d->description,
+        //         // 'updated_by'  => user_name($d->updated_by),
+        //         // 'updated_date'=> date('Y-m-d H:i:s', strtotime($d->updated_at)),
+        //         // 'action'      => create_action($d->id, $d->name, 'Edit')
+        //     ];
+        //     $i++;
+        // }
+      
+        foreach ($data as $d) { 
+       
+            $newData[$i] = [
+                'name'          => $d->name, // show emp_code in first column
+                'created_by' => $d->getEmpName($d->created_by),
+                'updated_by' => ($d->getEmpName($d->updated_by) ?? '-'),
+                'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
+                'action'            => '<div class="dropdown">
+                                        <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                                type="button" 
+                                                data-bs-toggle="dropdown" 
+                                                data-bs-boundary="viewport" aria-expanded="false">
+                                            Action
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item edit-type" href="javascript:void(0)" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
+                                            <li><button class="dropdown-item text-danger delete-type" data-id="'. $d->id .'"><i class="bi bi-trash me-2"></i> Delete</button></li>
+                                        </ul>
+                                    </div>' 
+            ];
+
+            $i++;
+        } 
+ 
+        return response()->json([
+            'draw'              => intval($request->input('draw')),
+            'recordsTotal'      => $totalRecords,
+            'recordsFiltered'   => $totalFiltered,
+            'data'              => $newData            
+        ]);
+    }
+
     public function destroy($id) 
     {
         try {

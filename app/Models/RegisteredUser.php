@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User_types;
- 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class RegisteredUser extends Model
 {
+    use SoftDeletes;
     protected $table = 'registered_users';
     protected $fillable = ['user_name',
     'first_name',

@@ -1,5 +1,8 @@
 <?php
 
+namespace App\Http\Controllers\TryController;
+
+
 use App\Http\Controllers\RegisterIDController;
 use App\Http\Controllers\VisitorTypeController;
 use Illuminate\Support\Facades\Route;
@@ -126,6 +129,18 @@ Route::group(['prefix' => 'registerId'], function () {
 Route::group(['prefix' => 'visitorslog'], function () {
     Route::post('/list', [VisitorController::class, 'list'])->name('list');
 });
+Route::group(['prefix' => 'userTypes'], function () {
+    Route::post('/list', [User_TypesController::class, 'list'])->name('list');
+});
+
+Route::group(['prefix' => 'userstable'], function () {
+    Route::post('/list', [Registered_UsersController::class, 'list'])->name('list');
+});
+
+Route::group(['prefix' => 'reporttable'], function () {
+    Route::post('/list', [TryController::class, 'list'])->name('list');
+});
+
 Route::post('/id', [TryController::class, 'show_id'])->name('id.index');
 Route::get('/id', [TryController::class, 'show_id'])->name('id.index');
 

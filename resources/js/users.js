@@ -4,8 +4,7 @@ import Triggers from './common/triggers.js';
 $(document).ready(function() {
     $.ajaxSetup({
     headers: {
-        'X-CSRF-TOKEN': window.Laravel.csrfToken,
-        'X-Requested-With': 'XMLHttpRequest'
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
 });
     // Handle Dropdown placement without breaking the click event

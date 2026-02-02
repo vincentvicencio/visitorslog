@@ -139,16 +139,12 @@
             <thead></thead>
         </table>
     </div>
-<<<<<<< HEAD
- </div>
-=======
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @push('scripts')
 @vite(['resources/js/visitors.js', 'resources/js/visitorsClass.js'])
 @endpush
->>>>>>> a0df297dbc2705d35db4d24966609a662218c677
 
 
 @endsection

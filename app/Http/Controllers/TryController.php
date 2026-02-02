@@ -11,7 +11,10 @@ use App\Models\RegisteredID;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
-use Auth;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use App\Models\User;
 
 class TryController extends Controller
 {
@@ -150,5 +153,198 @@ public function getUser($id) {
         'location_id' => $user->location_id 
     ]);
 }
+
+public function list(Request $request){
+     
+        $keywords = strtolower($request->search);
+        // $keywords = strtolower($request->input('search.value'));
+
+        $limit    = $request->input('length');
+
+        // $rawquery = Visitor::with('visitorType')
+        //             ->withoutTrashed()
+        //             ->where('status', 0)
+        //             ->when($keywords, callback: function ($query) use ($keywords) {
+        //                 $query->where('visitor_id', 'LIKE', "%{$keywords}%")
+        //                     ->orWhereHas(relation: 'visitorType', function ($q) use ($keywords) {
+        //                         $q->where('name', 'LIKE', "%{$keywords}%");
+        //                     });
+        //             });
+
+        // $rawquery = Visitor::with('visitorType')
+        //             ->withoutTrashed()
+        //             ->where('status', 0)
+        //             ->where('deleted_at', null)
+        //             ->when($keywords, function ($query) use ($keywords) {
+        //                 $query->where(function ($q) use ($keywords) {
+        //                     $q->where('visitor_id', 'LIKE', "%{$keywords}%")
+        //                     ->where('first_name', 'LIKE', "%{$keywords}%")
+        //                     ->where('middle_name', 'LIKE', "%{$keywords}%")
+        //                     ->where('last_name', 'LIKE', "%{$keywords}%")
+        //                     ->orWhereHas('visitorType', function ($qt) use ($keywords) {
+        //                         $qt->where('name', 'LIKE', "%{$keywords}%");
+        //                     });
+        //                 });
+        //             });
+
+        $rawquery = Visitor::with('visitorType')
+                ->withoutTrashed()
+                ->where('status', 0)
+                ->when($keywords, function ($query) use ($keywords) {
+                    $query->where(function ($q) use ($keywords) {
+                        $q->where('visitor_id', 'LIKE', "%{$keywords}%")
+                        ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+                        ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
+                        ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+                        ->orWhereHas('visitorType', function ($qt) use ($keywords) {
+                            $qt->where('name', 'LIKE', "%{$keywords}%");
+                        });
+                    });
+                });
+
+
+
+
+        
+        $totalRecords = $rawquery->get()->count();
+        
+        if ($request->input('draw') > 1) { 
+            $start         = $request->input('start'); 
+            $column        = $request->input('order.0.column');
+            $direction     = $request->input('order.0.dir');
+            $order         = $request->input('columns')[$column]['data']; 
+            $temp          = $rawquery->get(); 
+            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
+            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $totalFiltered = count($temp);
+       
+        } else { 
+       
+            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+     
+            $totalFiltered = $totalRecords;
+        }
+ 
+        $newData = [];
+        $i       = 0;
+ 
+        // foreach ($data as $d) { 
+ 
+        //     $newData[$i] = [
+        //         'id'          => $d->id,
+        //         'name'        => $d->name,
+        //         'description' => $d->description,
+        //         // 'updated_by'  => user_name($d->updated_by),
+        //         // 'updated_date'=> date('Y-m-d H:i:s', strtotime($d->updated_at)),
+        //         // 'action'      => create_action($d->id, $d->name, 'Edit')
+        //     ];
+        //     $i++;
+        // }
+      
+        foreach ($data as $d) { 
+            $locationLabel = '';
+
+            if ($d->location == 1) {
+                $locationLabel = 'Facility Center';
+            } elseif ($d->location == 2) {
+                $locationLabel = 'Summit One';
+            } else {
+                $locationLabel = 'Mezzanine';
+            }
+
+            $image = '';
+
+            if ($d->image_path == null) {
+                $image = 'No Image Provided';
+            }else{
+                $image ='<button 
+                    class="btn-sm view-button text-white border-0 rounded-2 px-3 py-1"
+                        id="viewImageBtn"
+                        data-id="'. $d->id .'"
+                        data-image="'. Storage::url($d->image_path) .'">
+                        View
+                    </button>';
+            }
+
+            $status = '';
+
+            if($d->status == 0){
+                $status = 'Active';
+            }else{
+                $status = 'Timed Out';
+            }
+
+            $time_in = Carbon::parse($d->time_in)->format('h:i A');
+
+            $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            $newData[$i] = [
+                'personal_detail' => '
+                    <strong>' . $d->first_name . ' ' . $d->middle_name . ' ' . $d->last_name . '</strong>
+                    <br><small>' . $locationLabel . '</small>
+                    <br><small>' . $d->phone_number . '</small>
+                ',
+
+                'visitor_type' => $d->visitorType->name,
+
+                'visitor_id' => $d->visitor_id,
+
+                'image' => $image,
+
+                'visit' =>  $d->created_at->format("F d, Y") .'<br>
+                        '. $d->created_at->format('l'),
+
+                'time' => '<small><strong>In:</strong> '. $time_in .'</small><br>
+                            <small>
+                                <strong>Out:</strong>
+                                '. $time_out .'
+                            </small>',
+                'creator' => '<small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'<small><br>
+                            <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>',
+                
+                'status' => '<div class="status rounded-2"> '. $status .'</div>',
+
+                'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
+
+                'updated_at' => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+
+                'action' => '<div class="dropdown">
+                            <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                    type="button" 
+                                    data-bs-toggle="dropdown" 
+                                    data-bs-boundary="viewport" aria-expanded="false">
+                                Action
+                            </button>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <button 
+                                        class="dropdown-item"
+                                        id="viewBtn"
+                                        data-id="'. $d->id .'"
+                                        data-type="report">
+                                        <i class="bi bi-eye me-2"></i> View
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger delete-btn" 
+                                            data-id="'. $d->id .'" 
+                                        <i class="bi bi-trash me-2"></i> Delete
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>',
+            ];
+            $i++;
+        }
+ 
+        return response()->json([
+            'draw'              => intval($request->input('draw')),
+            'recordsTotal'      => $totalRecords,
+            'recordsFiltered'   => $totalFiltered,
+            'data'              => $newData            
+        ]);
+    }
+
 
 }

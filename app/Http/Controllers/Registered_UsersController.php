@@ -211,7 +211,7 @@ public function updateUser(Request $request, $id)
     
     // Placeholder
     $data[] = ['id' => '', 'text' => 'Choose Location/Site'];
-    dd($data);
+    // dd($data);
         foreach ($location as $record) {
         $data[] = [
             'id'   => $record['id'], // Ensure 'id' exists in your session array
@@ -224,16 +224,99 @@ public function updateUser(Request $request, $id)
 
 
 
+public function list(Request $request){
+     
+        $keywords = strtolower($request->search);
+        $limit    = $request->input('length');
+        
 
-// In your UserController.php
-// public function getUser($id) {
-//     $user = RegisteredUser::find($id);
-//     return response()->json([
-//         'id'        => $user->id,
-//         'emp_code'  => $user->emp_code,
-//         'role_id'   => $user->user_type, // Ensure this matches your column name
-//         'location_id' => $user->location_id 
-//     ]);
-// }
+
+        // $rawquery = VisitorType::withoutTrashed();
+        // ->where(function($query) use ($keywords) {
+        //                 $query->where('name', 'LIKE', "%$keywords%");
+        //             });
+
+
+        $rawquery = RegisteredUser::with('userType')
+                    ->withoutTrashed()
+                    ->where('deleted_at', null)
+                    ->when($keywords, function ($query) use ($keywords) {
+                        $query->where('user_name', 'LIKE', "%{$keywords}%")
+                            ->orWhereHas('userType', function ($q) use ($keywords) {
+                                $q->where('name', 'LIKE', "%{$keywords}%");
+                            });
+                            
+                            
+                    });
+
+        
+
+
+        
+        $totalRecords = $rawquery->get()->count();
+        
+        if ($request->input('draw') > 1) { 
+            $start         = $request->input('start'); 
+            $column        = $request->input('order.0.column');
+            $direction     = $request->input('order.0.dir');
+            $order         = $request->input('columns')[$column]['data']; 
+            $temp          = $rawquery->get(); 
+            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
+            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $totalFiltered = count($temp);
+       
+        } else { 
+       
+            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+     
+            $totalFiltered = $totalRecords;
+        }
+ 
+        $newData = [];
+        $i       = 0;
+      
+        foreach ($data as $d) { 
+       
+            $newData[$i] = [
+                'user_name'  => $d->user_name, // show emp_code in first column
+                'user_type'  => $d->userType->name,
+                'created_by' => $d->getEmpName($d->created_by),
+                'updated_by' => ($d->getEmpName($d->updated_by) ?? '-'),
+                'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
+                'updated_at' => $d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l'),
+                'action'            => ' <div class="dropdown">
+                                                    <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                                        type="button" 
+                                                        data-bs-toggle="dropdown" 
+                                                        data-bs-boundary="viewport" aria-expanded="false">
+                                                    Action
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a class="dropdown-item edit-user" href="javascript:void(0)" 
+                                                        data-id="'.$d->id .'">
+                                                            <i class="bi bi-pencil-square me-2"></i> Edit
+                                                        </a>
+                                                    </li>
+                                                <li>
+                                                    <button type="button" class="dropdown-item text-danger delete-user" 
+                                                            data-id="'.$d->id .'">
+                                                        <i class="bi bi-trash me-2"></i> Delete
+                                                    </button>
+                                                </li>
+                                                </ul>
+                                            </div>' 
+            ];
+
+            $i++;
+        } 
+ 
+        return response()->json([
+            'draw'              => intval($request->input('draw')),
+            'recordsTotal'      => $totalRecords,
+            'recordsFiltered'   => $totalFiltered,
+            'data'              => $newData            
+        ]);
+    }
 
 }

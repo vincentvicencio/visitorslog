@@ -5,7 +5,6 @@
 
 @section('content')
 
-<<<<<<< Updated upstream
     <div class="container-background position-fixed top-0 start-0 vw-100 vh-100 bg-black"><img src="images/bgg.png" alt="" class="w-100 h-100 d-block opacity-75 object-fit-cover"></div>
     <div class="addvisitor" id="addVisitorModal">
         <div class="addvisitormodal">
@@ -87,4 +86,5 @@
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+@vite('resources/js/visitors.js')
 @endsection

@@ -16,7 +16,7 @@
 </script>
 
 @vite(['resources/js/users.js'])
-@vite(['resources/js/try.js'])
+@vite(['resources/js/UsersClass.js'])
 @include('components.triggers.users-userstype-toast')
 @include('components.triggers.UsersModal')
 
@@ -35,72 +35,9 @@
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
-        <div class="search-field d-flex align-items-center justify-content-between w-100 rounded-3 mb-2 fw-bold fs-6 text-primary-custom ps-2 small-caps">
-            search
-            <input type="text" id="tableSearch" placeholder="search" class="flex-grow-1 mx-2 border-0 rounded-2 ms-2 me-4 ps-3">
-            entries per page
-            <select name="" id="entriesPerPage" class="number-per-page form-select-sm">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-            </select>
-        </div>
-        <!-- Table -->
-        <table class="table table-bordered align-middle" id="userTable">
-            <thead>
-                <tr class="table-header">
-                    <th>Username</th>
-                    <th>Role</th>
-                    <th>Created by</th>
-                    <th>Updated by</th>
-                    <th>Created date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="employeeTableBody">
-            @forelse($registeredUsers as $user)
-    <tr>
-        <td>{{ $user->first_name }}</td>
-         <td>{{ $user->userType->name ?? 'None' }}</td>
-        <!-- <td>{{ $user->created_by }}</td>
-        <td>{{ $user->updated_by}}</td> -->
-        <td>{{ $user->getEmpName($user->created_by) }}</td>
-        <td>{{ $user->getEmpName($user->updated_by) }}</td>
-        <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
-        <td class="text-center">
-            <div class="dropdown">
-                    <button class="btn btn-sm btn-primary dropdown-toggle" 
-                        type="button" 
-                        data-bs-toggle="dropdown" 
-                        data-bs-boundary="viewport" aria-expanded="false">
-                    Action
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a class="dropdown-item edit-user" href="javascript:void(0)" 
-                        data-id="{{ $user->id }}">
-                            <i class="bi bi-pencil-square me-2"></i> Edit
-                        </a>
-                    </li>
-                <li>
-                    <button type="button" class="dropdown-item text-danger delete-user" 
-                            data-id="{{ $user->id }}">
-                        <i class="bi bi-trash me-2"></i> Delete
-                    </button>
-                </li>
-                </ul>
-            </div>
-            </td>
-        </tr>
-        @empty
-        <tr>
-            <td colspan="5" class="text-center">No employees registered yet.</td>
-        </tr>
-        @endforelse
-            </tbody>
+        <table class="table table-bordered align-middle" id="usersTable">
+            <thead></thead>
         </table>
-            <!-- Pagination -->
-            <x-table-pagination/>
     </div>
 </div>
 
