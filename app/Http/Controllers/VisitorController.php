@@ -30,6 +30,7 @@ class VisitorController extends Controller
     public function list(Request $request){
      
         $keywords = strtolower($request->search);
+        // dd($request->search);
         // $keywords = strtolower($request->input('search.value'));
 
         $limit    = $request->input('length');
@@ -70,7 +71,7 @@ class VisitorController extends Controller
                         ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
                         ->orWhere('last_name', 'LIKE', "%{$keywords}%")
                         ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-                            $qt->where('name', 'LIKE', "%{$keywords}%");
+                            $qt->where('first_name', 'LIKE', "%{$keywords}%");
                         });
                     });
                 });
@@ -152,11 +153,11 @@ class VisitorController extends Controller
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
 
             $newData[$i] = [
-                'personal_detail' => '
-                    <strong>' . $d->first_name . ' ' . $d->middle_name . ' ' . $d->last_name . '</strong>
-                    <br><small>' . $locationLabel . '</small>
-                    <br><small>' . $d->phone_number . '</small>
-                ',
+                // 'personal_detail' => '
+                //     <strong>' . $d->first_name . ' ' . $d->middle_name . ' ' . $d->last_name . '</strong>
+                //     <br><small>' . $locationLabel . '</small>
+                //     <br><small>' . $d->phone_number . '</small>
+                // ',
 
                 'visitor_type' => $d->visitorType->name,
 

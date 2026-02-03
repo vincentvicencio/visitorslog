@@ -30,7 +30,7 @@ class VisitorsLogTable {
         const self = this;
 
         const tableHeader = [
-            { id: "personal_detail",       label: "Personal Details" },
+            // { id: "personal_detail",       label: "Personal Details" },
             { id: "visitor_type",       label: "Visitor Type" },
             { id: "visitor_id",       label: "ID No." },
             { id: "image",      label: "Image" },
@@ -62,6 +62,7 @@ class VisitorsLogTable {
 
         const tableApi = $(self.table).DataTable();
         $('input[type="search"]').off('keyup').on('keyup', function() {
+            // console.log('tangina mo charle')
             tableApi.search(this.value).draw();
         });
 
