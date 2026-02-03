@@ -57,7 +57,7 @@ class UserTypeTable {
         );
 
         const tableApi = $(self.table).DataTable();
-        $('input[type="search"]').off('keyup').on('keyup', function() {
+        $('#usertypesearch').off('keyup').on('keyup', function() {
             tableApi.search(this.value).draw();
         });
 

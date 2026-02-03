@@ -62,6 +62,7 @@ class VisitorsLogTable {
 
         const tableApi = $(self.table).DataTable();
         $('input[type="search"]').off('keyup').on('keyup', function() {
+            // console.log('tangina mo charle')
             tableApi.search(this.value).draw();
         });
 

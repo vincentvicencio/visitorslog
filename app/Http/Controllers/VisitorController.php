@@ -31,6 +31,7 @@ class VisitorController extends Controller
     public function list(Request $request){
 
         $keywords = strtolower($request->search);
+        // dd($request->search);
         // $keywords = strtolower($request->input('search.value'));
 
         $limit    = $request->input('length');
@@ -71,7 +72,7 @@ class VisitorController extends Controller
                         ->orWhere('visitor_id', 'LIKE', "%{$keywords}%")
                         ->orWhere('phone_number', 'LIKE', "%{$keywords}%")
                         ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-                            $qt->where('name', 'LIKE', "%{$keywords}%");
+                            $qt->where('first_name', 'LIKE', "%{$keywords}%");
                         });
                     });
                 });
