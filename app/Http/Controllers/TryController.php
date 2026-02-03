@@ -114,12 +114,16 @@ public function show_usertype()
     //     });
     // }$query->
 
+    
     // $visitorlogs = orderBy('created_at', 'desc')->get();
     $visitorlogs = Visitor::where('status', 0)
                    ->orderBy('id', 'asc')
                    ->get();
     $visitorTypes = VisitorType::all();
     $allEmployeesFromSession = session('all_emp', []);
+
+
+    
 
     return view('pages.report', compact('visitorlogs', 'visitorTypes', 'allEmployeesFromSession'));
 }
@@ -187,20 +191,48 @@ public function list(Request $request){
         //                 });
         //             });
 
+        // $rawquery = Visitor::with('visitorType')
+        //         ->withoutTrashed()
+        //         ->where('status', 0)
+        //         ->when($keywords, function ($query) use ($keywords) {
+        //             $query->where(function ($q) use ($keywords) {
+        //                 $q->where('visitor_id', 'LIKE', "%{$keywords}%")
+        //                 ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+        //                 ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
+        //                 ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+        //                 ->orWhereHas('visitorType', function ($qt) use ($keywords) {
+        //                     $qt->where('name', 'LIKE', "%{$keywords}%");
+        //                 });
+        //             });
+        //         });
+
         $rawquery = Visitor::with('visitorType')
-                ->withoutTrashed()
-                ->where('status', 0)
-                ->when($keywords, function ($query) use ($keywords) {
-                    $query->where(function ($q) use ($keywords) {
-                        $q->where('visitor_id', 'LIKE', "%{$keywords}%")
-                        ->orWhere('first_name', 'LIKE', "%{$keywords}%")
-                        ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
-                        ->orWhere('last_name', 'LIKE', "%{$keywords}%")
-                        ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-                            $qt->where('name', 'LIKE', "%{$keywords}%");
-                        });
+            ->withoutTrashed()
+            ->where('status', 0)
+            // 1. Existing Keyword Search
+            ->when($keywords, function ($query) use ($keywords) {
+                $query->where(function ($q) use ($keywords) {
+                    $q->where('visitor_id', 'LIKE', "%{$keywords}%")
+                    ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+                    ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
+                    ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+                    ->orWhereHas('visitorType', function ($qt) use ($keywords) {
+                        $qt->where('name', 'LIKE', "%{$keywords}%");
                     });
                 });
+            })
+            // 2. NEW: Filter by Date From
+            ->when($request->date_from, function ($query) use ($request) {
+                $query->whereDate('created_at', '>=', $request->date_from);
+            })
+            // 3. NEW: Filter by Date To
+            ->when($request->date_to, function ($query) use ($request) {
+                $query->whereDate('created_at', '<=', $request->date_to);
+            })
+            // 4. NEW: Filter by Visitor Type Dropdown
+            ->when($request->visitor_type, function ($query) use ($request) {
+                $query->where('visitor_type_id', $request->visitor_type);
+            });
 
 
 

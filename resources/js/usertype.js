@@ -1,6 +1,7 @@
-// $(document).ready(function() {
 import { Modal } from 'bootstrap';
 import Triggers from './common/triggers.js';
+
+$(document).ready(function() {
 
     
 
@@ -309,11 +310,46 @@ document.getElementById('save_type').addEventListener('click', () => {
             type: 'POST',
             data: {
                 user_type: user_type,
-                _token: $('meta[name="csrf-token"]').attr('content')
+                // _token: $('meta[name="csrf-token"]').attr('content')
+                _token: window.Laravel.csrfToken
             },
+            // success: function (response) {
+
+            // $('#toastMessage').text(response.success || "User Type Added Successfully!");
+            // const toastElement = document.getElementById('SUCCESSTOAST');
+            
+            // if (toastElement) {
+            //     const toast = new bootstrap.Toast(toastElement);
+            //     toast.show();
+            // }
+
+            // setTimeout(() => {
+            //     location.reload();
+            // }, 1500);
+
+            // },
+
             success: function (response) {
-                showSuccessFlow(response.success || "Added Successfully!");
-            },
+                const message = response.success || "User Type Added Successfully!";
+                
+                // 1. Set the Title (Optional but looks better)
+                $('.toast-title').text("Success");
+                
+                // 2. Set the Body Text
+                $('#toastMessageforadd').text(message);
+
+                // 3. Show the Toast
+                const toastElement = document.getElementById('SUCCESSTOAST');
+                if (toastElement) {
+                    const toast = new bootstrap.Toast(toastElement);
+                    toast.show();
+                }
+
+                // 4. Reload
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+},
             error: function (xhr) {
                 $btn.prop('disabled', false).text('Save New User Type');
                 alert(xhr.responseJSON?.message ?? 'Save failed.');
@@ -330,7 +366,23 @@ document.getElementById('save_type').addEventListener('click', () => {
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
-                showSuccessFlow(response.success || "Updated Successfully!");
+                const message = response.success || "User Type Updated Successfully!";
+                
+                // 1. Set the Title (Optional but looks better)
+                $('.toast-title').text("Success");
+                
+                // 2. Set the Body Text
+                $('#toastMessageforadd').text(message);
+
+                // 3. Show the Toast
+                const toastElement = document.getElementById('SUCCESSTOAST');
+                if (toastElement) {
+                    const toast = new bootstrap.Toast(toastElement);
+                    toast.show();
+                }
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
             },
             error: function (xhr) {
                 $btn.prop('disabled', false).text('Update');
@@ -339,18 +391,6 @@ document.getElementById('save_type').addEventListener('click', () => {
         });
     }
 });
-
-function showSuccessFlow(message) {
-    $('#toastMessage').text(message);
-    const toastElement = document.getElementById('SUCCESSTOAST');
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-
-    setTimeout(() => {
-        $('#addTypeModal').fadeOut('slow');
-        location.reload();
-    }, 1500);
-}
 
 $('#closeAddType').click(function() { $('#addTypeModal').fadeOut(200); });
 
@@ -482,4 +522,4 @@ $('#btn_ok').on('click', function() {
 
 
 
-// });
+});
