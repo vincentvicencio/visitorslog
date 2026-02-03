@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Auth\SessionGuar;
 
 
 
@@ -28,7 +29,7 @@ class VisitorController extends Controller
     }
 
     public function list(Request $request){
-     
+
         $keywords = strtolower($request->search);
         // $keywords = strtolower($request->input('search.value'));
 
@@ -37,6 +38,7 @@ class VisitorController extends Controller
         // $rawquery = Visitor::with('visitorType')
         //             ->withoutTrashed()
         //             ->where('status', 0)
+        //             ->where('deleted_at', null)
         //             ->when($keywords, callback: function ($query) use ($keywords) {
         //                 $query->where('visitor_id', 'LIKE', "%{$keywords}%")
         //                     ->orWhereHas(relation: 'visitorType', function ($q) use ($keywords) {
@@ -47,28 +49,27 @@ class VisitorController extends Controller
         // $rawquery = Visitor::with('visitorType')
         //             ->withoutTrashed()
         //             ->where('status', 0)
-        //             ->where('deleted_at', null)
         //             ->when($keywords, function ($query) use ($keywords) {
-        //                 $query->where(function ($q) use ($keywords) {
-        //                     $q->where('visitor_id', 'LIKE', "%{$keywords}%")
-        //                     ->where('first_name', 'LIKE', "%{$keywords}%")
-        //                     ->where('middle_name', 'LIKE', "%{$keywords}%")
-        //                     ->where('last_name', 'LIKE', "%{$keywords}%")
+        //                 $query->where('visitor_id', 'LIKE', "%{$keywords}%")
         //                     ->orWhereHas('visitorType', function ($qt) use ($keywords) {
         //                         $qt->where('name', 'LIKE', "%{$keywords}%");
         //                     });
-        //                 });
+
+                    
         //             });
+        // $rawquery = Visitor::withoutTrashed()->where(function($query) use ($keywords) {
+        //         $query->where('first_name', 'LIKE', "%$keywords%")
+        //                 ->where('status', 0);
+        //     });
 
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
                 ->where('status', 0)
                 ->when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
-                        $q->where('visitor_id', 'LIKE', "%{$keywords}%")
-                        ->orWhere('first_name', 'LIKE', "%{$keywords}%")
-                        ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
-                        ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+                        $q->where('full_name', 'LIKE', "%{$keywords}%")
+                        ->orWhere('visitor_id', 'LIKE', "%{$keywords}%")
+                        ->orWhere('phone_number', 'LIKE', "%{$keywords}%")
                         ->orWhereHas('visitorType', function ($qt) use ($keywords) {
                             $qt->where('name', 'LIKE', "%{$keywords}%");
                         });
@@ -117,13 +118,14 @@ class VisitorController extends Controller
         foreach ($data as $d) { 
             $locationLabel = '';
 
-            if ($d->location == 1) {
-                $locationLabel = 'Facility Center';
-            } elseif ($d->location == 2) {
-                $locationLabel = 'Summit One';
-            } else {
-                $locationLabel = 'Mezzanine';
+            $location = collect(session('all_location'));
+            foreach ($location as $record) {
+                if($d->location == $record['id']){
+                    $locationLabel = $record['name'];
+                }
+
             }
+
 
             $image = '';
 
@@ -150,10 +152,10 @@ class VisitorController extends Controller
             $time_in = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
-
+                    
             $newData[$i] = [
-                'personal_detail' => '
-                    <strong>' . $d->first_name . ' ' . $d->middle_name . ' ' . $d->last_name . '</strong>
+                'full_name' => '
+                    <strong>' . $d->full_name . '</strong>
                     <br><small>' . $locationLabel . '</small>
                     <br><small>' . $d->phone_number . '</small>
                 ',
@@ -324,16 +326,25 @@ class VisitorController extends Controller
             if ($request->hasFile('image_path')) {
                 $imagePath = $request->file('image_path')->store('visitors', 'public');
             }
-
+            $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
+            // $location = collect(session('all_location'));
+            // foreach ($location as $record) {
+            //     $data[] = [
+            //         'id'   => $record['id'], // Ensure 'id' exists in your session array
+            //         'text' => $record['name']
+            //     ];
+            // }
             // Save visitor
             $visitor = new Visitor();
+            $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
             $visitor->first_name   = $request->first_name;
             $visitor->middle_name  = $request->middle_name;
             $visitor->last_name    = $request->last_name;
             $visitor->phone_number = $request->contact_number;
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $request->location;
+            $visitor->location     = Auth::user()->location_id;
+            $visitor->address     = $request->address;
             $visitor->created_by   = Auth::id();
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();

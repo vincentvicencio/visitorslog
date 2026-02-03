@@ -30,7 +30,7 @@ class ReportClassTable {
         const self = this;
 
         const tableHeader = [
-            { id: "personal_detail",       label: "Personal Details" },
+            { id: "full_name",       label: "Personal Details" },
             { id: "visitor_type",       label: "Visitor Type" },
             { id: "visitor_id",       label: "ID No." },
             { id: "image",      label: "Image" },

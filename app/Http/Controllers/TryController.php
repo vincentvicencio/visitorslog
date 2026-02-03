@@ -52,7 +52,7 @@ public function show_usertype()
 
         $empMap = collect(session('all_emp'))->keyBy('emp_code');
         
-        $registeredUsers = \App\Models\RegisteredUser::with('userType')
+        $registeredUsers = RegisteredUser::with('userType')
         ->whereNull('deleted_at')
         ->when($search, function ($query, $search) {
             $query->where('user_name', 'like', "%{$search}%")
@@ -159,68 +159,24 @@ public function getUser($id) {
 }
 
 public function list(Request $request){
-     
+
         $keywords = strtolower($request->search);
         // $keywords = strtolower($request->input('search.value'));
 
         $limit    = $request->input('length');
 
-        // $rawquery = Visitor::with('visitorType')
-        //             ->withoutTrashed()
-        //             ->where('status', 0)
-        //             ->when($keywords, callback: function ($query) use ($keywords) {
-        //                 $query->where('visitor_id', 'LIKE', "%{$keywords}%")
-        //                     ->orWhereHas(relation: 'visitorType', function ($q) use ($keywords) {
-        //                         $q->where('name', 'LIKE', "%{$keywords}%");
-        //                     });
-        //             });
-
-        // $rawquery = Visitor::with('visitorType')
-        //             ->withoutTrashed()
-        //             ->where('status', 0)
-        //             ->where('deleted_at', null)
-        //             ->when($keywords, function ($query) use ($keywords) {
-        //                 $query->where(function ($q) use ($keywords) {
-        //                     $q->where('visitor_id', 'LIKE', "%{$keywords}%")
-        //                     ->where('first_name', 'LIKE', "%{$keywords}%")
-        //                     ->where('middle_name', 'LIKE', "%{$keywords}%")
-        //                     ->where('last_name', 'LIKE', "%{$keywords}%")
-        //                     ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-        //                         $qt->where('name', 'LIKE', "%{$keywords}%");
-        //                     });
-        //                 });
-        //             });
-
-        // $rawquery = Visitor::with('visitorType')
-        //         ->withoutTrashed()
-        //         ->where('status', 0)
-        //         ->when($keywords, function ($query) use ($keywords) {
-        //             $query->where(function ($q) use ($keywords) {
-        //                 $q->where('visitor_id', 'LIKE', "%{$keywords}%")
-        //                 ->orWhere('first_name', 'LIKE', "%{$keywords}%")
-        //                 ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
-        //                 ->orWhere('last_name', 'LIKE', "%{$keywords}%")
-        //                 ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-        //                     $qt->where('name', 'LIKE', "%{$keywords}%");
-        //                 });
-        //             });
-        //         });
-
         $rawquery = Visitor::with('visitorType')
-            ->withoutTrashed()
-            ->where('status', 0)
-            // 1. Existing Keyword Search
-            ->when($keywords, function ($query) use ($keywords) {
-                $query->where(function ($q) use ($keywords) {
-                    $q->where('visitor_id', 'LIKE', "%{$keywords}%")
-                    ->orWhere('first_name', 'LIKE', "%{$keywords}%")
-                    ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
-                    ->orWhere('last_name', 'LIKE', "%{$keywords}%")
-                    ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-                        $qt->where('name', 'LIKE', "%{$keywords}%");
+                ->withoutTrashed()
+                ->when($keywords, function ($query) use ($keywords) {
+                    $query->where(function ($q) use ($keywords) {
+                        $q->where('full_name', 'LIKE', "%{$keywords}%")
+                        ->orWhere('visitor_id', 'LIKE', "%{$keywords}%")
+                        ->orWhere('phone_number', 'LIKE', "%{$keywords}%")
+                        ->orWhereHas('visitorType', function ($qt) use ($keywords) {
+                            $qt->where('name', 'LIKE', "%{$keywords}%");
+                        });
                     });
-                });
-            })
+                })
             // 2. NEW: Filter by Date From
             ->when($request->date_from, function ($query) use ($request) {
                 $query->whereDate('created_at', '>=', $request->date_from);
@@ -276,12 +232,12 @@ public function list(Request $request){
         foreach ($data as $d) { 
             $locationLabel = '';
 
-            if ($d->location == 1) {
-                $locationLabel = 'Facility Center';
-            } elseif ($d->location == 2) {
-                $locationLabel = 'Summit One';
-            } else {
-                $locationLabel = 'Mezzanine';
+            $location = collect(session('all_location'));
+            foreach ($location as $record) {
+                if($d->location == $record['id']){
+                    $locationLabel = $record['name'];
+                }
+
             }
 
             $image = '';
@@ -309,10 +265,10 @@ public function list(Request $request){
             $time_in = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
-
+                    
             $newData[$i] = [
-                'personal_detail' => '
-                    <strong>' . $d->first_name . ' ' . $d->middle_name . ' ' . $d->last_name . '</strong>
+                'full_name' => '
+                    <strong>' . $d->full_name . '</strong>
                     <br><small>' . $locationLabel . '</small>
                     <br><small>' . $d->phone_number . '</small>
                 ',
@@ -334,38 +290,44 @@ public function list(Request $request){
                 'creator' => '<small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'<small><br>
                             <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>',
                 
-                'status' => '<div class="status rounded-2"> '. $status .'</div>',
+                'status' => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
 
                 'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
 
                 'updated_at' => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
                 'action' => '<div class="dropdown">
-                            <button class="btn btn-sm btn-primary dropdown-toggle" 
-                                    type="button" 
-                                    data-bs-toggle="dropdown" 
-                                    data-bs-boundary="viewport" aria-expanded="false">
-                                Action
-                            </button>
+                                <button 
+                                    class="btn btn-sm btn-primary dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Action
+                                </button>
 
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <button 
-                                        class="dropdown-item"
-                                        id="viewBtn"
-                                        data-id="'. $d->id .'"
-                                        data-type="report">
-                                        <i class="bi bi-eye me-2"></i> View
-                                    </button>
-                                </li>
-                                <li>
-                                    <button type="button" class="dropdown-item text-danger delete-btn" 
-                                            data-id="'. $d->id .'" 
-                                        <i class="bi bi-trash me-2"></i> Delete
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>',
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <button 
+                                            class="dropdown-item"
+                                            id="viewBtn"
+                                            data-id="'. $d->id .'"
+                                            data-type="visitorlog">
+                                            <i class="bi bi-eye me-2"></i> View
+                                        </button>
+
+                                    </li>
+                                    <li>
+                                        <button 
+                                            type="button"
+                                            class="dropdown-item text-danger"
+                                            id="timeoutBtn"
+                                            data-id="'. $d->id .'">
+                                            <i class="bi bi-clock-history me-2"></i> Timeout
+                                        </button>
+
+                                    </li>
+                                </ul>
+                            </div>',
             ];
             $i++;
         }

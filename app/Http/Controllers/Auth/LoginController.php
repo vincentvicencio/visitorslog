@@ -92,6 +92,7 @@ class LoginController extends Controller
                     'last_name',
                     'department_id',
                     'section_id',
+                    'location_id'
                 ]
             ];
             $api_data = fetchdata_api('api_data', $payload);

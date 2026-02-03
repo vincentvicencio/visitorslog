@@ -73,7 +73,6 @@ Route::post('/fetch-users-by-name', [Registered_UsersController::class, 'fetchUs
 
 Route::get('/visitor', [VisitorController::class, 'index'])->name('visitor.index');    //checked
 Route::post('/visitor', [VisitorController::class, 'index'])->name('visitor.index');    //checked
-Route::post('/visitor/list', [VisitorController::class, 'list'])->name('visitor.list');    //checked
 Route::post('/visitor/save', [VisitorController::class, 'saveAjax'])->name('visitor.save');  //checked
 Route::post('/visitor/timeout', [VisitorController::class, 'timeoutAjax'])->name('visitor.timeout.ajax');
 // Route::get('/visitor/view/{id}', function ($id) {$visitor = Visitor::where('id', $id)
