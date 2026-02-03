@@ -1,5 +1,5 @@
 $(document).ready(function(){
-        // Handle Dropdown placement without breaking the click event
+        // =================================Dropdown==================================
     $(document).on('shown.bs.dropdown', '.dropdown', function () {
         const $toggle = $(this).find('.dropdown-toggle');
         const $menu = $(this).find('.dropdown-menu');
@@ -35,7 +35,23 @@ $(document).ready(function(){
             }).removeClass('show');
         }
     });
-    $('.view-image-btn').on('click', function(e) {
+
+    // =================================Dropdown==================================
+    // =================================Buttons==================================
+    
+
+    $(document).on('click', '.delete-btn', function () {
+        const id = $(this).data('id');
+        const name = $(this).data('name') || "this visitor"; // Assuming you have data-name in your button
+        
+        if (!id) return;
+        
+        openDeleteModal(id, name);
+    });
+
+}); // End of document.ready
+
+$(document).on('click', '.view-button', function(e) {
         // 1. Prevent the page from reloading
         e.preventDefault();
         
@@ -52,152 +68,6 @@ $(document).ready(function(){
         $('#modalImage').attr('src', ''); 
     });
 
-
-    function updateTableRows() {
-        var limit = parseInt($('#entriesPerPage').val()); 
-        var $rows = $('#reportTableBody tr');
-        $rows.hide();
-        $rows.slice(0, limit).show();
-
-        console.log("Showing " + limit + " rows");
-    }
-    updateTableRows();
-
-    $('#entriesPerPage').on('change', function() {
-        updateTableRows();
-    });
-
-    $("#tableSearch").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        var $rows = $("#reportTableBody tr");
-
-        if (value === "") {
-            updateTableRows(); 
-        } else {
-            $rows.filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-            });
-        }
-    });
-
- // --- 1. GLOBAL VARIABLES ---
-    let currentPage = 1;
-
-    // --- 2. INITIALIZATION ---
-    // Mark all rows as matches initially so pagination shows them all
-    $("#reportTableBody tr").addClass('search-match');
-    applyPagination();
-
-    // --- 3. SEARCH LOGIC ---
-    $("#tableSearch").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        var $rows = $("#reportTableBody tr");
-
-        $rows.each(function() {
-            var rowText = $(this).text().toLowerCase();
-            // Check if row is the "No results" row or if it matches search
-            var isMatch = rowText.indexOf(value) > -1;
-            
-            if (isMatch) {
-                $(this).addClass('search-match');
-            } else {
-                $(this).removeClass('search-match');
-            }
-        });
-
-        currentPage = 1; // Reset to first page on new search
-        applyPagination(); 
-    });
-
-    // --- 4. PAGINATION CORE FUNCTION ---
-    function applyPagination() {
-        const limit = parseInt($('#entriesPerPage').val()) || 10;
-        const $allRows = $("#reportTableBody tr");
-        const $rowsToPaginate = $allRows.filter('.search-match');
-
-        const totalRows = $rowsToPaginate.length;
-        const totalPages = Math.ceil(totalRows / limit) || 1;
-
-        // Boundary checks
-        if (currentPage > totalPages) currentPage = totalPages;
-        if (currentPage < 1) currentPage = 1;
-
-        // Hide all rows, then show only the current slice
-        $allRows.hide();
-        const start = (currentPage - 1) * limit;
-        const end = start + limit;
-        $rowsToPaginate.slice(start, end).show();
-
-        // Update the custom pagination UI text
-        $('.number-holder-pagination').text(`Page ${currentPage} of ${totalPages}`);
-
-        // Visual feedback for arrows (opacity and cursor)
-        updateArrowStyles(currentPage, totalPages);
-    }
-
-    function updateArrowStyles(curr, total) {
-        const isFirst = curr === 1;
-        const isLast = curr === total;
-
-        $('.pagination-first, .pagination-prev').css({
-            'opacity': isFirst ? '0.3' : '1',
-            'cursor': isFirst ? 'default' : 'pointer'
-        });
-        $('.pagination-next, .pagination-last').css({
-            'opacity': isLast ? '0.3' : '1',
-            'cursor': isLast ? 'default' : 'pointer'
-        });
-    }
-
-    // --- 5. EVENT LISTENERS ---
-
-    // Entries Per Page Change
-    $('#entriesPerPage').on('change', function() {
-        currentPage = 1;
-        applyPagination();
-    });
-
-    // Arrow Click Events
-    $(document).on('click', '.pagination-first', function() {
-        if (currentPage > 1) {
-            currentPage = 1;
-            applyPagination();
-        }
-    });
-
-    $(document).on('click', '.pagination-prev', function() {
-        if (currentPage > 1) {
-            currentPage--;
-            applyPagination();
-        }
-    });
-
-    $(document).on('click', '.pagination-next', function() {
-        const limit = parseInt($('#entriesPerPage').val());
-        const totalPages = Math.ceil($("#reportTableBody tr.search-match").length / limit);
-        if (currentPage < totalPages) {
-            currentPage++;
-            applyPagination();
-        }
-    });
-
-    $(document).on('click', '.pagination-last', function() {
-        const limit = parseInt($('#entriesPerPage').val());
-        const totalPages = Math.ceil($("#reportTableBody tr.search-match").length / limit);
-        if (currentPage < totalPages) {
-            currentPage = totalPages;
-            applyPagination();
-        }
-    });
-
-     $(document).on('click', '.delete-btn', function () {
-        const id = $(this).data('id');
-        const name = $(this).data('name') || "this visitor"; // Assuming you have data-name in your button
-        
-        if (!id) return;
-        
-        openDeleteModal(id, name);
-    });
 
 
     $(document).on('click', '#viewBtn', function () {
@@ -233,8 +103,6 @@ $(document).ready(function(){
             'X-Requested-With': 'XMLHttpRequest'
         }
     });
-
-});
 
 // Initialize Modal
 const notificationModalEl = document.getElementById('notificationContainer');
@@ -311,3 +179,149 @@ document.getElementById('btn_ok').addEventListener('click', function() {
         }
     });
 });
+    
+
+// =================================Buttons==================================
+    
+
+//     function updateTableRows() {
+//         var limit = parseInt($('#entriesPerPage').val()); 
+//         var $rows = $('#reportTableBody tr');
+//         $rows.hide();
+//         $rows.slice(0, limit).show();
+
+//         console.log("Showing " + limit + " rows");
+//     }
+//     updateTableRows();
+
+//     $('#entriesPerPage').on('change', function() {
+//         updateTableRows();
+//     });
+
+//     $("#tableSearch").on("keyup", function() {
+//         var value = $(this).val().toLowerCase();
+//         var $rows = $("#reportTableBody tr");
+
+//         if (value === "") {
+//             updateTableRows(); 
+//         } else {
+//             $rows.filter(function() {
+//                 $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+//             });
+//         }
+//     });
+
+//  // --- 1. GLOBAL VARIABLES ---
+//     let currentPage = 1;
+
+//     // --- 2. INITIALIZATION ---
+//     // Mark all rows as matches initially so pagination shows them all
+//     $("#reportTableBody tr").addClass('search-match');
+//     applyPagination();
+
+//     // --- 3. SEARCH LOGIC ---
+//     $("#tableSearch").on("keyup", function() {
+//         var value = $(this).val().toLowerCase();
+//         var $rows = $("#reportTableBody tr");
+
+//         $rows.each(function() {
+//             var rowText = $(this).text().toLowerCase();
+//             // Check if row is the "No results" row or if it matches search
+//             var isMatch = rowText.indexOf(value) > -1;
+            
+//             if (isMatch) {
+//                 $(this).addClass('search-match');
+//             } else {
+//                 $(this).removeClass('search-match');
+//             }
+//         });
+
+//         currentPage = 1; // Reset to first page on new search
+//         applyPagination(); 
+//     });
+
+//     // --- 4. PAGINATION CORE FUNCTION ---
+//     function applyPagination() {
+//         const limit = parseInt($('#entriesPerPage').val()) || 10;
+//         const $allRows = $("#reportTableBody tr");
+//         const $rowsToPaginate = $allRows.filter('.search-match');
+
+//         const totalRows = $rowsToPaginate.length;
+//         const totalPages = Math.ceil(totalRows / limit) || 1;
+
+//         // Boundary checks
+//         if (currentPage > totalPages) currentPage = totalPages;
+//         if (currentPage < 1) currentPage = 1;
+
+//         // Hide all rows, then show only the current slice
+//         $allRows.hide();
+//         const start = (currentPage - 1) * limit;
+//         const end = start + limit;
+//         $rowsToPaginate.slice(start, end).show();
+
+//         // Update the custom pagination UI text
+//         $('.number-holder-pagination').text(`Page ${currentPage} of ${totalPages}`);
+
+//         // Visual feedback for arrows (opacity and cursor)
+//         updateArrowStyles(currentPage, totalPages);
+//     }
+
+//     function updateArrowStyles(curr, total) {
+//         const isFirst = curr === 1;
+//         const isLast = curr === total;
+
+//         $('.pagination-first, .pagination-prev').css({
+//             'opacity': isFirst ? '0.3' : '1',
+//             'cursor': isFirst ? 'default' : 'pointer'
+//         });
+//         $('.pagination-next, .pagination-last').css({
+//             'opacity': isLast ? '0.3' : '1',
+//             'cursor': isLast ? 'default' : 'pointer'
+//         });
+//     }
+
+//     // --- 5. EVENT LISTENERS ---
+
+//     // Entries Per Page Change
+//     $('#entriesPerPage').on('change', function() {
+//         currentPage = 1;
+//         applyPagination();
+//     });
+
+//     // Arrow Click Events
+//     $(document).on('click', '.pagination-first', function() {
+//         if (currentPage > 1) {
+//             currentPage = 1;
+//             applyPagination();
+//         }
+//     });
+
+//     $(document).on('click', '.pagination-prev', function() {
+//         if (currentPage > 1) {
+//             currentPage--;
+//             applyPagination();
+//         }
+//     });
+
+//     $(document).on('click', '.pagination-next', function() {
+//         const limit = parseInt($('#entriesPerPage').val());
+//         const totalPages = Math.ceil($("#reportTableBody tr.search-match").length / limit);
+//         if (currentPage < totalPages) {
+//             currentPage++;
+//             applyPagination();
+//         }
+//     });
+
+//     $(document).on('click', '.pagination-last', function() {
+//         const limit = parseInt($('#entriesPerPage').val());
+//         const totalPages = Math.ceil($("#reportTableBody tr.search-match").length / limit);
+//         if (currentPage < totalPages) {
+//             currentPage = totalPages;
+//             applyPagination();
+//         }
+//     });
+
+     
+
+    
+

@@ -1,6 +1,14 @@
 @extends('layout')
 
+
+
+@include('components.triggers.users-userstype-toast')
+@include('components.triggers.UsersModal')
+
 @section('content')
+
+@vite(['resources/js/users.js'])
+@vite(['resources/js/UsersClass.js'])   
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -11,14 +19,11 @@
 <script>
     window.Laravel = {
         baseUrl: "{{ url('/') }}",
-        csrfToken: "{{ csrf_token() }}" // This correctly gets the token from Laravel
+        csrfToken: "{{ csrf_token() }}"
     };
 </script>
 
-@vite(['resources/js/users.js'])
-@vite(['resources/js/UsersClass.js'])
-@include('components.triggers.users-userstype-toast')
-@include('components.triggers.UsersModal')
+
 
 <div class="user-types-container mt-4">
     <div class="page-header">
@@ -30,8 +35,6 @@
          text-white rounded-2 border-0 cursor-pointer px-3 py-2" id="register_btn">
             Register User
         </div>
-        <!-- <button type="button" id="openPopup2" class="top-button">Register User</button> -->
-             {{-- <button type="button" id="register_btn" class="top-button">Register User</button> --}}
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">

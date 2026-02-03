@@ -6,7 +6,7 @@ import component from './common/component';
 import $ from 'jquery';
 
 
-class VisitorTypeTable {
+class UserTypeTable {
     constructor() {
         this.defaultFields  = []
         // first parameter of your route
@@ -72,7 +72,7 @@ class VisitorTypeTable {
 
 
 }
-const visitorsType = new VisitorTypeTable();
-visitorsType.onLoadPage();
+const userType = new UserTypeTable();
+userType.onLoadPage();
 
-export default visitorsType;
+export default userType;

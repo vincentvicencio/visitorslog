@@ -6,7 +6,7 @@ import component from './common/component';
 import $ from 'jquery';
 
 
-class RegisterIdTable {
+class UsersTable {
     constructor() {
         this.defaultFields  = []
         // first parameter of your route
@@ -74,7 +74,7 @@ class RegisterIdTable {
 
 
 }
-const registerIDs = new RegisterIdTable();
-registerIDs.onLoadPage();
+const users = new UsersTable();
+users.onLoadPage();
 
-export default registerIDs;
+export default users;

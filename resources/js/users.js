@@ -331,9 +331,28 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
             type: 'POST',
             data: formData,
             success: function(response) {
-                Triggers.showToast(response.message || "User registered!", 0);
-                setTimeout(() => { userModal.hide(); }, 1500);
-                setTimeout(() => { location.reload(); }, 2000);
+                // Triggers.showToast(response.message || "User registered!", 0);
+
+                // setTimeout(() => { userModal.hide(); }, 1500);
+                // setTimeout(() => { location.reload(); }, 2000);
+                const message = response.success || "User registered Successfully!";
+                
+                // 1. Set the Title (Optional but looks better)
+                $('.toast-title').text("Success");
+                
+                // 2. Set the Body Text
+                $('#toastMessageforadd').text(message);
+
+                // 3. Show the Toast
+                const toastElement = document.getElementById('SUCCESSTOAST');
+                if (toastElement) {
+                    const toast = new bootstrap.Toast(toastElement);
+                    toast.show();
+                }
+
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
             },
             error: function(xhr) {
                 $btn.prop('disabled', false).text('Register User');
@@ -348,9 +367,28 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
             type: 'POST',
             data: formData,
             success: function(response) {
-                Triggers.showToast(response.message || "User updated!", 0);
-                setTimeout(() => { userModal.hide(); }, 1500);
-                setTimeout(() => { location.reload(); }, 2000);
+                // Triggers.showToast(response.message || "User updated!", 0);
+                // setTimeout(() => { userModal.hide(); }, 1500);
+                // setTimeout(() => { location.reload(); }, 2000);
+
+                const message = response.success || "User Updated Successfully!";
+                
+                // 1. Set the Title (Optional but looks better)
+                $('.toast-title').text("Success");
+                
+                // 2. Set the Body Text
+                $('#toastMessageforadd').text(message);
+
+                // 3. Show the Toast
+                const toastElement = document.getElementById('SUCCESSTOAST');
+                if (toastElement) {
+                    const toast = new bootstrap.Toast(toastElement);
+                    toast.show();
+                }
+
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
             },
             error: function(xhr) {
                 $btn.prop('disabled', false).text('Update User');
@@ -359,14 +397,3 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
         });
     }
 });
-
-function showSuccessFlow(message) {
-    $('#toastMessage').text(message);
-    const toastElement = document.getElementById('SUCCESSTOAST');
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-
-    setTimeout(() => {
-        location.reload();
-    }, 1500);
-}
