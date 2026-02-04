@@ -155,36 +155,43 @@ class VisitorController extends Controller
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
                     
             $newData[$i] = [
-                'full_name' => '
-                    <strong>' . $d->full_name . '</strong>
-                    <br><small>' . $locationLabel . '</small>
-                    <br><small>' . $d->phone_number . '</small>
+                'full_name' => '<div class="text-center">   
+                                    <strong>' . $d->full_name . '</strong>
+                                    <br><small>' . $locationLabel . '</small>
+                                    <br><small>' . $d->phone_number . '</small>
+                                <div>
                 ',
 
-                'visitor_type' => $d->visitorType->name,
+                'visitor_type' => '<div class="text-center">' . $d->visitorType->name . '</div>',
 
-                'visitor_id' => $d->visitor_id,
+                'visitor_id' => '<div class="text-center">' . $d->visitor_id . '</div>',
 
-                'image' => $image,
+                'image' => '<div class="text-center">' . $image . '</div>',
 
-                'visit' =>  $d->created_at->format("F d, Y") .'<br>
-                        '. $d->created_at->format('l'),
+                'visit' =>  '<div class="text-center">' . 
+                                    $d->created_at->format("F d, Y") .'<br>
+                                    '. $d->created_at->format('l')
+                        . '</div>',
 
-                'time' => '<small><strong>In:</strong> '. $time_in .'</small><br>
-                            <small>
-                                <strong>Out:</strong>
-                                '. $time_out .'
-                            </small>',
-                'creator' => '<small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'<small><br>
-                            <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>',
+                'time' => '<div class="text-center">
+                                <small><strong>In:</strong> '. $time_in .'</small><br>
+                                <small>
+                                    <strong>Out:</strong>
+                                    '. $time_out .'
+                                </small>
+                            </div>',
+                'creator' => '<div class="text-center">
+                                <small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'<small><br>
+                                <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>
+                            </div>',
                 
                 'status' => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
 
-                'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
+                'created_at' => '<div class="text-center">' . $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l') . '</div>',
 
                 'updated_at' => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
-                'action' => '<div class="dropdown">
+                'action' => '<div class="dropdown text-center">
                                 <button 
                                     class="btn btn-sm btn-primary dropdown-toggle"
                                     type="button"

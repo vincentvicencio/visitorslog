@@ -134,7 +134,7 @@
             </tbody>
         </table> -->
         <!-- Pagination -->
-        <!-- <x-table-pagination/> -->
+        {{-- <!-- <x-table-pagination/> --> --}}
         <table class="table table-bordered align-middle" id="visitorsLogTable">
             <thead></thead>
         </table>
