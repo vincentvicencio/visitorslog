@@ -165,46 +165,13 @@ public function list(Request $request){
 
         $limit    = $request->input('length');
 
-        // $rawquery = Visitor::with('visitorType')
-        //             ->withoutTrashed()
-        //             ->where('status', 0)
-        //             ->when($keywords, callback: function ($query) use ($keywords) {
-        //                 $query->where('visitor_id', 'LIKE', "%{$keywords}%")
-        //                     ->orWhereHas(relation: 'visitorType', function ($q) use ($keywords) {
-        //                         $q->where('name', 'LIKE', "%{$keywords}%");
-        //                     });
-        //             });
-
-        // $rawquery = Visitor::with('visitorType')
-        //             ->withoutTrashed()
-        //             ->where('status', 0)
-        //             ->where('deleted_at', null)
-        //             ->when($keywords, function ($query) use ($keywords) {
-        //                 $query->where(function ($q) use ($keywords) {
-        //                     $q->where('visitor_id', 'LIKE', "%{$keywords}%")
-        //                     ->where('first_name', 'LIKE', "%{$keywords}%")
-        //                     ->where('middle_name', 'LIKE', "%{$keywords}%")
-        //                     ->where('last_name', 'LIKE', "%{$keywords}%")
-        //                     ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-        //                         $qt->where('name', 'LIKE', "%{$keywords}%");
-        //                     });
-        //                 });
-        //             });
-
-        // $rawquery = Visitor::with('visitorType')
-        //         ->withoutTrashed()
-        //         ->where('status', 0)
-        //         ->when($keywords, function ($query) use ($keywords) {
-        //             $query->where(function ($q) use ($keywords) {
-        //                 $q->where('visitor_id', 'LIKE', "%{$keywords}%")
-        //                 ->orWhere('first_name', 'LIKE', "%{$keywords}%")
-        //                 ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
-        //                 ->orWhere('last_name', 'LIKE', "%{$keywords}%")
-        //                 ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-        //                     $qt->where('name', 'LIKE', "%{$keywords}%");
-        //                 });
-        //             });
-        //         });
+        // Debug: Log what we're receiving
+        \Log::info('Filter Request:', [
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+            'visitor_type' => $request->visitor_type,
+            'search' => $keywords
+        ]);
 
         $rawquery = Visitor::with('visitorType')
             ->withoutTrashed()
@@ -234,25 +201,44 @@ public function list(Request $request){
                 $query->where('visitor_type_id', $request->visitor_type);
             });
 
-
-
-
-        
-        $totalRecords = $rawquery->get()->count();
+        // Log the count after filters
+        $totalRecords = $rawquery->count();
+        \Log::info('Total Filtered Records:', ['count' => $totalRecords]);
         
         if ($request->input('draw') > 1) { 
             $start         = $request->input('start'); 
             $column        = $request->input('order.0.column');
             $direction     = $request->input('order.0.dir');
             $order         = $request->input('columns')[$column]['data']; 
-            $temp          = $rawquery->get(); 
-            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawQuery->orderby($order, $direction)->get(); 
-            $totalFiltered = count($temp);
+            
+            // Map virtual columns to actual database columns
+            $columnMap = [
+                'personal_detail' => 'first_name',
+                'visitor_type' => 'visitor_type_id',
+                'visitor_id' => 'visitor_id',
+                'image' => 'image_path',
+                'visit' => 'created_at',
+                'time' => 'created_at',
+                'creator' => 'created_by',
+                'status' => 'status',
+                'action' => 'id'
+            ];
+            
+            $order = $columnMap[$order] ?? 'id';
+            
+            // Apply ordering and pagination to the filtered query
+            $data = $rawquery->orderBy($order, $direction)
+                             ->skip($start)
+                             ->take($limit)
+                             ->get();
+            
+            $totalFiltered = $totalRecords;
        
         } else { 
-       
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            // First load - no sorting from DataTable yet
+            $data = $rawquery->orderBy("id", "desc")
+                             ->take($limit)
+                             ->get();
      
             $totalFiltered = $totalRecords;
         }
@@ -360,7 +346,7 @@ public function list(Request $request){
                                 </li>
                                 <li>
                                     <button type="button" class="dropdown-item text-danger delete-btn" 
-                                            data-id="'. $d->id .'" 
+                                            data-id="'. $d->id .'">
                                         <i class="bi bi-trash me-2"></i> Delete
                                     </button>
                                 </li>
