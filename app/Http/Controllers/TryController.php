@@ -190,25 +190,44 @@ public function list(Request $request){
                 $query->where('visitor_type_id', $request->visitor_type);
             });
 
-
-
-
-        
-        $totalRecords = $rawquery->get()->count();
+        // Log the count after filters
+        $totalRecords = $rawquery->count();
+        \Log::info('Total Filtered Records:', ['count' => $totalRecords]);
         
         if ($request->input('draw') > 1) { 
             $start         = $request->input('start'); 
             $column        = $request->input('order.0.column');
             $direction     = $request->input('order.0.dir');
             $order         = $request->input('columns')[$column]['data']; 
-            $temp          = $rawquery->get(); 
-            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawQuery->orderby($order, $direction)->get(); 
-            $totalFiltered = count($temp);
+            
+            // Map virtual columns to actual database columns
+            $columnMap = [
+                'personal_detail' => 'first_name',
+                'visitor_type' => 'visitor_type_id',
+                'visitor_id' => 'visitor_id',
+                'image' => 'image_path',
+                'visit' => 'created_at',
+                'time' => 'created_at',
+                'creator' => 'created_by',
+                'status' => 'status',
+                'action' => 'id'
+            ];
+            
+            $order = $columnMap[$order] ?? 'id';
+            
+            // Apply ordering and pagination to the filtered query
+            $data = $rawquery->orderBy($order, $direction)
+                             ->skip($start)
+                             ->take($limit)
+                             ->get();
+            
+            $totalFiltered = $totalRecords;
        
         } else { 
-       
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            // First load - no sorting from DataTable yet
+            $data = $rawquery->orderBy("id", "desc")
+                             ->take($limit)
+                             ->get();
      
             $totalFiltered = $totalRecords;
         }

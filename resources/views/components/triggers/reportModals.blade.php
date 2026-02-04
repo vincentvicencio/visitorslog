@@ -20,7 +20,7 @@
                 <h5 class="modal-title" id="filterModalLabel">Filter Reports</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ url('/report') }}" method="GET">
+            <form action="{{ url('/report') }}" method="GET" id = "filterForm">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -48,6 +48,7 @@
                 <div class="modal-footer">
                     <a href="{{ url('/report') }}" class="btn btn-secondary">Reset</a>
                     <button type="submit" class="btn btn-primary">Apply Filters</button>
+                     <!-- <button type="button" id="btnApplyFilters" class="btn btn-primary">Apply Filters</button> -->
                 </div>
             </form>
         </div>
