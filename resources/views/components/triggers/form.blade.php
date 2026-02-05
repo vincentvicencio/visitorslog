@@ -21,7 +21,7 @@
                         <label for="visitor_type">Visitor Type</label>
                     </div>
                     <div class="input-holder floating">
-                        <input type="text" name="first_name" id="first_name" class="form-control" placeholder=" ">
+                        <input type="text" name="first_name" id="first_name" class="form-control" placeholder=" " required>
                         <label for="first_name">first name</label>
                     </div>
                     <div class="input-holder floating">
@@ -29,36 +29,27 @@
                         <label for="middle_name">middle name</label>
                     </div>
                     <div class="input-holder floating">
-                        <input type="text" name="last_name" id="last_name" class="form-control" placeholder=" ">
+                        <input type="text" name="last_name" id="last_name" class="form-control" placeholder=" " required>
                         <label for="last_name">last name</label>
                     </div>
                     <div class="input-holder floating">
-                        <input type="text" name="contact_number" id="contact_number" class="form-control" placeholder=" " >
+                        <input type="text" name="contact_number" id="contact_number" class="form-control" placeholder=" " required>
                         <label for="contact_number">contact number</label>
                     </div>
                     <div class="input-holder floating w-100">
-                        <textarea name="address" id="address" class="form-control" placeholder=" " rows="3" ></textarea>
+                        <textarea name="address" id="address" class="form-control" placeholder=" " rows="3" required></textarea>
                         <label for="address">Address</label>
                     </div>
                 </div>
                 <div class="capture">
                     <div class="header">Capture Image</div>
-<<<<<<< Updated upstream
                     <div class="imgholder">No Image</div>
-=======
-                    <div class="imgholder" >No Image</div>
->>>>>>> Stashed changes
                     <button type="button" class="capture-button">capture</button>
                 </div>
             </div>
             <div class="panel-buttons">
-<<<<<<< Updated upstream
                 <button type="button" class="save">save</button>
                 <button type="button" class="clear">clear</button>
-=======
-                    <button type="button" class="save">save</button>
-                    <button type="button" class="clear">clear</button>
->>>>>>> Stashed changes
             </div>
         </div>
     </div>

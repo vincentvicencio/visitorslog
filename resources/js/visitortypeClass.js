@@ -16,16 +16,62 @@ class VisitorTypeTable {
         // module
         this.module         = "visitortype"
         // form id
-        this.form           = "#"
+        this.form           = "#textInputForm"
         // offCanvas
-        this.modal          = "#"
+        this.modal          = "#textInputModal"
         // add user form id
         this.formid         = "#"  
+
     }
 
+
     async onLoadPage(){
+        // this.initializePage();
         this.list();
     }
+
+    // async initializePage(){
+    //     const self = this
+
+    //     //Open Modal
+    //     $("#addBtn").on('click', function(){ 
+    //         // console.log('clicked')   
+    //         // Clear Form  
+    //         datahandling.clearForm(self.form) 
+    //         // $('#textInputModalLabel').text('Register Visitor Type');
+    //         // show Canvas Form
+    //         container.showModal(self.modal)
+
+    //         // openTextInputModal('0', 'name')
+    //     })
+
+    //     $(this.form).on('submit', async function(e){
+    //         e.preventDefault()
+    //         await datahandling.saveForm('/visitortype/save', self.table, self.form, new FormData(this))
+    //     })
+        
+    // }
+
+
+    // async onLoadForm(record_id) {
+    //     const self = this;
+
+    //     const url = self.url+'search';
+    //     const response = await datahandling.processData(
+    //         url,
+    //         'POST',
+    //         { id: record_id }
+    //     );
+
+    //     $("#item_id").val(record_id);
+    //     $("#requestItemName").val(response.record.name);
+
+    //     $('#textInputModalLabel').text('Edit Visitor Type');
+
+    //     container.showModal(self.modal);
+    // }
+
+
     async list() {
         const self = this;
 
@@ -52,8 +98,8 @@ class VisitorTypeTable {
             columns,
             self.url,
             columnDefs,
-            10,          // ✅ pagination
-            {}           // ✅ data
+            // 10,          // ✅ pagination
+            // {}           // ✅ data
         );
 
         const tableApi = $(self.table).DataTable();

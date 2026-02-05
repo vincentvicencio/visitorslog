@@ -55,9 +55,8 @@ class RegisteredID extends Model
             Visitor::class,
             'visitor_id',
             'id_number'
-        );
+        )->whereNull('time_out');
     }
-
 
 
 

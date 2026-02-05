@@ -5,6 +5,10 @@ import Container from './common/container.js';
 // Get modal element
 const textInputModalEl = document.getElementById('textInputModal');
 const textInputModal = new Modal(textInputModalEl);
+const deleteModalEl = document.getElementById('notificationContainer');
+const deleteModal = new Modal(deleteModalEl);
+
+let URL = '/visitortype/';
 
 // Open modal function
 export function openTextInputModal(id, name) {
@@ -23,7 +27,6 @@ export function openTextInputModalBlank() {
 document.getElementById('textInputSubmit').addEventListener('click', () => {
     const input = document.getElementById('userInput');
     const id = input.dataset.id;
-    const id_number = input.dataset.id;
     const visitor_type = input.value.trim();
     if (!visitor_type) {
         Triggers.showToast('Visitor type cannot be empty.', 1);
@@ -33,7 +36,7 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
     if(id === undefined) {
         // Send AJAX request to update visitor type
         $.ajax({
-            url: "/visitorType/save",
+            url: URL+"save",
             type: 'POST',
             data: {
                 visitor_type: visitor_type,
@@ -43,10 +46,10 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
                 Triggers.showToast(response.message, 0);
                 setTimeout(() => {
                     $(textInputModal.hide()).fadeOut('slow');
-                }, 2000);
-                setTimeout(() => {
-                    $(location.reload()).fadeOut('slow');
-                }, 2000);
+                }, 1000);
+                if ($.fn.DataTable.isDataTable('#visitorsTable')) {
+                    $('#visitorsTable').DataTable().draw(false);
+                }
             },
             error: function (xhr) {
                 Triggers.showToast(xhr.responseJSON?.message ?? 'Save failed.', 1);
@@ -57,7 +60,7 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
     }else{
         // Send AJAX request to update visitor type
         $.ajax({
-            url: "/visitorType/edit",
+            url: URL+"edit",
             type: 'POST',
             data: {
                 id: id,
@@ -69,10 +72,10 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
                 // Close modal
                 setTimeout(() => {
                     $(textInputModal.hide()).fadeOut('slow');
-                }, 2000);
-                setTimeout(() => {
-                    $(location.reload()).fadeOut('slow');
-                }, 2000);
+                }, 1000);
+                if ($.fn.DataTable.isDataTable('#visitorsTable')) {
+                    $('#visitorsTable').DataTable().draw(false);
+                }
 
             },
             error: function (xhr) {
@@ -113,7 +116,7 @@ $(document).ready(function () {
     $(document).on('click', '#btn_ok', function () {
         let id = $('#record_id').val();
         $.ajax({
-            url: "visitorType/delete",
+            url: URL+"delete",
             type: "POST",
             data: {
                 id: id,
@@ -123,10 +126,11 @@ $(document).ready(function () {
                 Triggers.showToast(response.message, 0);
                 setTimeout(() => {
                     $('.toast').fadeOut('slow');
-                }, 2000);
-                setTimeout(() => {
-                    $(location.reload()).fadeOut('slow');
-                }, 2000);
+                    $(deleteModal.hide()).fadeOut('slow');
+                }, 1000);
+                if ($.fn.DataTable.isDataTable('#visitorsTable')) {
+                    $('#visitorsTable').DataTable().draw(false);
+                }
             },
             error: function (xhr) {
                 Triggers.showToast(xhr.responseJSON?.message ?? 'Delete failed.', 1);
@@ -140,83 +144,4 @@ $(document).ready(function () {
 
 // /////////////////////////////////////////////////
 
-
-    // ================= PAGINATION =================
-    let currentPage = 1;
-
-    function initTable() {
-        $("#visitorLogTableBody tr").addClass('search-match');
-        applyPagination();
-    }
-
-    function applyPagination() {
-        const limit = parseInt($('#entriesPerPage').val()) || 10;
-        const $rows = $("#visitorLogTableBody tr.search-match");
-        const totalRows = $rows.length;
-        const totalPages = Math.ceil(totalRows / limit) || 1;
-
-        currentPage = Math.min(Math.max(currentPage, 1), totalPages);
-
-        $("#visitorLogTableBody tr").hide();
-
-        const start = (currentPage - 1) * limit;
-        $rows.slice(start, start + limit).show();
-
-        $('.number-holder-pagination')
-            .text(`Page ${currentPage} of ${totalPages}`);
-
-        updateArrowStyles(currentPage, totalPages);
-    }
-
-    function updateArrowStyles(curr, total) {
-        $('.pagination-first, .pagination-prev')
-            .css({ opacity: curr === 1 ? 0.3 : 1 });
-
-        $('.pagination-next, .pagination-last')
-            .css({ opacity: curr === total ? 0.3 : 1 });
-    }
-
-    // ================= SEARCH =================
-    $("#typeSearch").on("keyup", function () {
-        const value = $(this).val().toLowerCase();
-
-        $("#visitorLogTableBody tr").each(function () {
-            $(this).toggleClass(
-                'search-match',
-                $(this).text().toLowerCase().includes(value)
-            );
-        });
-
-        currentPage = 1;
-        applyPagination();
-    });
-
-    // ================= CONTROLS =================
-    $('#entriesPerPage').on('change', () => {
-        currentPage = 1;
-        applyPagination();
-    });
-
-    $(document).on('click', '.pagination-first', () => {
-        currentPage = 1; applyPagination();
-    });
-
-    $(document).on('click', '.pagination-prev', () => {
-        if (currentPage > 1) currentPage--;
-        applyPagination();
-    });
-
-    $(document).on('click', '.pagination-next', () => {
-        currentPage++; applyPagination();
-    });
-
-    $(document).on('click', '.pagination-last', () => {
-        const limit = parseInt($('#entriesPerPage').val()) || 10;
-        currentPage = Math.ceil(
-            $("#visitorLogTableBody tr.search-match").length / limit
-        );
-        applyPagination();
-    });
-
-    initTable();
 });

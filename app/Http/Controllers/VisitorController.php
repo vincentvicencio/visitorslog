@@ -10,7 +10,6 @@ use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Auth\SessionGuar;
 
 
 
@@ -90,12 +89,12 @@ class VisitorController extends Controller
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
             $totalFiltered = count($temp);
        
         } else { 
        
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
      
             $totalFiltered = $totalRecords;
         }
@@ -282,7 +281,7 @@ class VisitorController extends Controller
         //     'redirect' => route('visitor.view.page', $visitor->id, $visitor->type)
         // ]);
         return response()->json([
-            'redirect' => route('visitor.view.page', [
+            'redirect' => route('view.page', [
                 'id'   => $visitor->id,
                 'type' => $request->type,
             ])
