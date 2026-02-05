@@ -7,16 +7,20 @@ class Container {
      * @param modal_id = modal id
      */
     async showModal(modal_id) {
-        const modalElement = document.querySelector(modal_id)
+        const modalElement = document.querySelector(modal_id);
         
-        let modalInstance = Modal.getInstance(modalElement)
+        // Get or create Bootstrap modal instance
+        let modalInstance = Modal.getInstance(modalElement);
         if (!modalInstance) {
-            modalInstance = new Modal(modalElement)
+            modalInstance = new Modal(modalElement);
         }
 
-        modalInstance.show()
+        
+        // Show modal
+        modalInstance.show();
     }
 
+ 
     /**
      * Hide Modal
      * @param modal_id = modal id
@@ -93,4 +97,4 @@ class Container {
     }
 }
 
-export default new Container;
+export default new Container();

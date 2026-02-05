@@ -15,7 +15,32 @@
                     @endif
 
                     {{ __('You are logged in!') }}
+                    <br>
+
+                    <form action="/visitor" method="post">
+                        @csrf
+                        <button type="submit">Add Visitor</button>
+                    </form>
+
+                    <form action="/IDNumber" method="post">
+                        @csrf
+                        <button type="submit">Register ID</button>
+                    </form>
+
+                    <form action="/visitor_type" method="post">
+                        @csrf
+                        <button type="submit">Add Visitor Type</button>
+                    </form>
+                    <form action="/addusers" method="post">
+                        @csrf
+                        <button type="submit">User</button>
+                    </form>
                 </div>
+
+                <form action="/visitorlog" method="POST">
+                    @csrf
+                    <input type="submit" value="btn">
+                </form>
             </div>
         </div>
     </div>

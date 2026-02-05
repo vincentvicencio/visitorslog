@@ -13,7 +13,8 @@ class Triggers {
 
         setTimeout(() => {
             $('.toast').fadeOut('slow');
-        }, 3000);
+        }, 2000);
+
     }
 
     /**
@@ -87,4 +88,4 @@ class Triggers {
     }
 }
 
-export default new Triggers;
+export default new Triggers();

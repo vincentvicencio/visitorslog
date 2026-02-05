@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
+@if (!View::hasSection('hideSidebar'))
+    @include('layouts.sidebar')
+@endif
 @include('layouts.head')
 
 <body>
@@ -12,13 +14,18 @@
 
     <div id="content" class="ps-0 d-flex flex-column">
 
-        @include('layouts.header')
+        @if (!View::hasSection('hideSidebar'))
+            @include('layouts.header')
+        @endif  
+        
 
         @yield('content')
 
         <!-- Notification -->
         @include('components.triggers.toast')
         @include('components.triggers.delete')
+        @include('components.triggers.visitorTypeModal')
+        @include('components.triggers.viewImage')
         <!-- Notification -->
 
         @stack('scripts')
@@ -28,6 +35,11 @@
     @endif
 
     @include('layouts.footer')
+
+<!-- Bootstrap JS AFTER jQuery -->
+{{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> --}}
+
 </body>
 
 </html>
+

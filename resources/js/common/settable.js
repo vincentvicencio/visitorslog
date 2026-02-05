@@ -61,7 +61,7 @@ class Datatable {
      * @param module = method name (e.g window.forecasting  )
      * @param pagination= how many rows will display
      */
-    async createTableAjax(table, theads, url, tbodies = "", pagination = 10, data = {}) {
+    async createTableAjax(table, theads, url, tbodies = "", pagination = 10, data = {}, enableSearch = true) {
         const self = this
 
         $(table).DataTable().clear().destroy()
@@ -73,8 +73,9 @@ class Datatable {
             processing: true,
             serverSide: true,
             stateSave: true,
-            searching: true,
+            searching: enableSearch,
             pagingType: 'simple',
+            dom: '<"top">rt<"bottom"pi><"clear">',
             search: { return: true },
             stateLoadParams: function (settings, data) {
                 data.length = pagination
@@ -84,7 +85,7 @@ class Datatable {
                 url: window.location.origin + url + 'list',
                 type: "POST",
                 data: function (d) {
-                    d.search = $("input[type='search']").val()
+                    d.search = $("#typeSearch").val()
                     $.extend(d, data);
                     if (!d.start) d.start = 0;
                 },
