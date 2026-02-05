@@ -22,27 +22,38 @@ class Component {
         const $table = $(table_name);
         const tableApi = $table.DataTable();
 
+        const modules = import.meta.glob('../*.js', { eager: false });
 
-        const modules = import.meta.glob('../administrator/*.js');
+        const loadModule = async () => {
+            const key = Object.keys(modules).find(
+                path => path.endsWith(moduleName+".js")
+            );
+            
+            if (!key) {
+                console.error('Module not found:', moduleName);
+                console.table(Object.keys(modules));
+                return null;
+            }
+        
+            const mod = modules[key];
+            const imported = typeof mod === 'function' ? await mod() : mod;
+        
+            return imported?.default ?? null;
+        };
 
         // -------------------------
         // EDIT
         // -------------------------
         $table.off('click', '.btn-edit').on('click', '.btn-edit', async function () {
+            const Module = await loadModule();
+            if (!Module) return;
+        
+            const instance = typeof Module === 'function'
+                ? new Module()
+                : Module;
+        
+            instance.onLoadForm?.($(this).data('id'));
 
-            const regex = new RegExp(`/${moduleName}\\.js$`)
-
-            const importKey = Object.keys(modules).find(key => regex.test(key))
-
-            const imported = await modules[importKey]()
-
-            const instance = typeof imported.default === 'function'
-                ? new imported.default()
-                : imported.default
-
-
-            let record_id = $(this).attr('data-id');
-            instance.onLoadForm?.(record_id)
         });
 
         // -------------------------

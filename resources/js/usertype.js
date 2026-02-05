@@ -102,12 +102,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
         updateArrowStyles(currentPage, totalPages);
     }
 
-    function updateArrowStyles(curr, total) {
-        const isFirst = curr === 1;
-        const isLast = curr === total;
-        $('.pagination-first, .pagination-prev').css({'opacity': isFirst ? '0.3' : '1', 'cursor': isFirst ? 'default' : 'pointer'});
-        $('.pagination-next, .pagination-last').css({'opacity': isLast ? '0.3' : '1', 'cursor': isLast ? 'default' : 'pointer'});
-    }
+
 
     // --- 4. EVENT LISTENERS ---
 
@@ -127,21 +122,6 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
     $('#entriesPerPage').on('change', function() {
         currentPage = 1;
         applyPagination();
-    });
-
-    // Navigation Arrow Clicks
-    $(document).on('click', '.pagination-first', function() { currentPage = 1; applyPagination(); });
-    $(document).on('click', '.pagination-prev', function() { if(currentPage > 1) { currentPage--; applyPagination(); } });
-    $(document).on('click', '.pagination-next', function() { 
-        const limit = parseInt($('#entriesPerPage').val());
-        const totalPages = Math.ceil($("#userTypeTableBody tr.search-match").length / limit);
-        if(currentPage < totalPages) { currentPage++; applyPagination(); }
-    });
-    $(document).on('click', '.pagination-last', function() { 
-        const limit = parseInt($('#entriesPerPage').val());
-        const totalPages = Math.ceil($("#userTypeTableBody tr.search-match").length / limit);
-        currentPage = totalPages; 
-        applyPagination(); 
     });
 
     // --- 5. MODAL & AJAX OPERATIONS ---
@@ -313,21 +293,6 @@ document.getElementById('save_type').addEventListener('click', () => {
                 // _token: $('meta[name="csrf-token"]').attr('content')
                 _token: window.Laravel.csrfToken
             },
-            // success: function (response) {
-
-            // $('#toastMessage').text(response.success || "User Type Added Successfully!");
-            // const toastElement = document.getElementById('SUCCESSTOAST');
-            
-            // if (toastElement) {
-            //     const toast = new bootstrap.Toast(toastElement);
-            //     toast.show();
-            // }
-
-            // setTimeout(() => {
-            //     location.reload();
-            // }, 1500);
-
-            // },
 
             success: function (response) {
                 const message = response.success || "User Type Added Successfully!";
@@ -346,9 +311,16 @@ document.getElementById('save_type').addEventListener('click', () => {
                 }
 
                 // 4. Reload
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
+                // setTimeout(() => {
+                //     location.reload();
+                // }, 1500);
+
+                if ($.fn.DataTable.isDataTable('#userTypeTable')) {
+                $('#userTypeTable').DataTable().draw(false);
+
+                }
+                $btn.prop('disabled', false).text('Save New User Type');
+                userTypeModal.hide(); 
 },
             error: function (xhr) {
                 $btn.prop('disabled', false).text('Save New User Type');
@@ -380,9 +352,16 @@ document.getElementById('save_type').addEventListener('click', () => {
                     const toast = new bootstrap.Toast(toastElement);
                     toast.show();
                 }
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
+                // setTimeout(() => {
+                //     location.reload();
+                // }, 1500);
+
+                if ($.fn.DataTable.isDataTable('#userTypeTable')) {
+                $('#userTypeTable').DataTable().draw(false);
+
+                }
+                $btn.prop('disabled', false).text('Update');
+                userTypeModal.hide(); 
             },
             error: function (xhr) {
                 $btn.prop('disabled', false).text('Update');
@@ -502,9 +481,16 @@ $('#btn_ok').on('click', function() {
             }
 
             // Reload after toast
-            setTimeout(function() {
-                location.reload();
-            }, 1500); 
+            // setTimeout(function() {
+            //     location.reload();
+            // }, 1500); 
+
+            if ($.fn.DataTable.isDataTable('#userTypeTable')) {
+                $('#userTypeTable').DataTable().draw(false);
+
+                }
+                $btn.prop('disabled', false).text('Yes');
+                userTypeModal.hide(); 
         },
         error: function(xhr) {
             alert("Error deleting role: " + (xhr.responseJSON?.message || "Internal Server Error"));

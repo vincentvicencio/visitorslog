@@ -41,18 +41,18 @@ class VisitorTypeController extends Controller
         $totalRecords = $rawquery->get()->count();
         
         if ($request->input('draw') > 1) { 
-            $start         = $request->input('start'); 
+             $start         = $request->input('start'); 
             $column        = $request->input('order.0.column');
             $direction     = $request->input('order.0.dir');
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $data          = $rawquery->orderBy("updated_at", "desc")->take($limit)->get();
             $totalFiltered = count($temp);
        
         } else { 
        
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
      
             $totalFiltered = $totalRecords;
         }

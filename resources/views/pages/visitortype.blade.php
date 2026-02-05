@@ -15,10 +15,16 @@
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
+        <!-- search and filter -->
+        <x-table-filter/>
 
+        <!-- table -->
         <table class="table table-bordered align-middle" id="visitorsTable">
             <thead></thead>
         </table>
+
+        <!-- Pagination -->
+        <x-table-pagination/>
     </div>
 
     

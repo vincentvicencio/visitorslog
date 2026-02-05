@@ -16,7 +16,7 @@
                 <form id="textInputForm">
                     <div class="mb-3">
                         <label for="visitorType" class="form-label">Visitor Type</label>
-                        <select name="visitorType" required class="form-control" id="visitortype">
+                        <select name="visitorType" required class="form-control" id="visitortype" required>
                             <option value="" disabled selected>Select Visitor Type</option>
                             @foreach ($visitorTypes as $type)
                                 <option value="{{ $type->id }}">

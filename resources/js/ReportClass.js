@@ -60,12 +60,46 @@ class ReportClassTable {
             { targets: [0, 1, 2, 3], orderable: false }
         ];
 
-        
+        settable.createTableAjax(
+            self.table,
+            columns,
+            self.url,
+            columnDefs,
+            10,          // ✅ pagination
+            {},          // ✅ data
+            false
+        );
 
-        // Use custom ajax to include filters
+        $(self.table).on('init.dt', function () {
+
+            console.log('✅ DATATABLE INITIALIZED');
+
+            // const tableApi = $(self.table).DataTable();
+
+            // 🔥 FORCE DRAW
+            // tableApi.draw();
+
+            // =========================================
+            // CUSTOM SEARCH
+            // =========================================
+            $('#typeSearch')
+                .off('keyup')
+                .on('keyup', function () {
+                    tableApi.search(this.value).draw();
+                });
+
+            // =========================================
+            // ENTRIES PER PAGE
+            // =================================
+            $('#entriesPerPage')
+                .off('change')
+                .on('change', function () {
+                    tableApi.page.len(this.value).draw();
+                });
+        });
+        
         const tableElement = $(self.table);
         tableElement.DataTable().clear().destroy();
-        // tableElement.DataTable().clear().destroy();
         
         const table = tableElement.DataTable({
 
@@ -74,27 +108,12 @@ class ReportClassTable {
             stateLoadParams: function (settings, data) {
                 data.length = 10;
             },
-            // ajax: {
-            //     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            //     url: window.location.origin + self.url + 'list',
-            //     type: "POST",
-            //     data: function (d) {
-            //         d.search = $("input[type='search']").val();
-            //         // Add filter values from global object
-            //         d.date_from = window.reportFilters?.date_from || '';
-            //         d.date_to = window.reportFilters?.date_to || '';
-            //         d.visitor_type = window.reportFilters?.visitor_type || '';
-            //         console.log('Sending to server:', d);
-            //         if (!d.start) d.start = 0;
-            //     }
-            // },
             ajax: {
                   headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 url: window.location.origin + self.url + 'list',
                 type: "POST",
-                data: function (d) {
+                data: function (d) { 
                     d.search = $("input[type='search']").val();
-                    // Always pull the LATEST values from the synced global object
                     d.date_from = window.reportFilters.date_from;
                     d.date_to = window.reportFilters.date_to;
                     d.visitor_type = window.reportFilters.visitor_type;

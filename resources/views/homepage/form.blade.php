@@ -19,7 +19,7 @@
                     <div class="form">
                         <div class="details">
                             <div class="input-holder floating">
-                                <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" ">
+                                <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " required>
                                 <label for="id_number">ID Number</label>
                             </div>
                             <div class="input-holder floating">
@@ -33,23 +33,23 @@
                             </div>
                             </select><br>
                             <div class="input-holder floating">
-                                <input type="text" name="first_name" id="first_name" class="form-control" placeholder=" ">
+                                <input type="text" name="first_name" id="first_name" class="form-control" placeholder=" " required>
                                 <label for="first_name">first name</label>
                             </div>
                             <div class="input-holder floating">
-                                <input type="text" name="middle_name" id="middle_name" class="form-control" placeholder=" ">
+                                <input type="text" name="middle_name" id="middle_name" class="form-control" placeholder=" " >
                                 <label for="middle_name">middle name</label>
                             </div>
                             <div class="input-holder floating">
-                                <input type="text" name="last_name" id="last_name" class="form-control" placeholder=" ">
+                                <input type="text" name="last_name" id="last_name" class="form-control" placeholder=" " required>
                                 <label for="last_name">last name</label>
                             </div>
                             <div class="input-holder floating">
-                                <input type="text" name="contact_number" id="contact_number" class="form-control" placeholder=" ">
+                                <input type="text" name="contact_number" id="contact_number" class="form-control" placeholder=" " required> 
                                 <label for="contact_number">contact number</label>
                             </div>
                             <div class="input-holder floating w-100">
-                                <textarea name="address" id="address" class="form-control" placeholder=" " rows="3"></textarea>
+                                <textarea name="address" id="address" class="form-control" placeholder=" " rows="3" required></textarea>
                                 <label for="address">Address</label>
                             </div>
                         </div>

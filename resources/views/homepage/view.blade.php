@@ -50,14 +50,7 @@
                             <label for="contact_number">Contact Number</label>
                         </div>
                         <div class="input-holder floating w-100">
-                                @if ($visitor->location == 1)
-                                    <textarea name="address" id="address" class="form-control" readonly placeholder=" " rows="3">Facility Center</textarea>
-                                @elseif ($visitor->location == 2)
-                                    <textarea name="address" id="address" class="form-control" readonly placeholder=" " rows="3">Summit One</textarea>
-                                @else
-                                    <textarea name="address" id="address" class="form-control" readonly placeholder=" " rows="3">Mezzanine</textarea>
-                                @endif
-                            
+                                    <textarea name="address" id="address" class="form-control" readonly placeholder=" " rows="3">{{ $visitor->address }}</textarea>
                             <label for="address">Address</label>
                         </div>
                     </div>

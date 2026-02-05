@@ -63,12 +63,12 @@ class RegisterIDController extends Controller
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
             $totalFiltered = count($temp);
        
         } else { 
        
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
      
             $totalFiltered = $totalRecords;
         }
@@ -220,6 +220,10 @@ class RegisterIDController extends Controller
                         $fail('Visitor ID already exists.');
                     }
                 },
+            ],
+            'visitor_type' => [
+                'required',
+                'exists:visitor_types,id',
             ],
         ]);
 

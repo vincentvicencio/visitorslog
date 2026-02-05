@@ -10,7 +10,6 @@ use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Auth\SessionGuar;
 
 
 
@@ -90,12 +89,12 @@ class VisitorController extends Controller
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
             $totalFiltered = count($temp);
        
         } else { 
        
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
      
             $totalFiltered = $totalRecords;
         }
@@ -282,7 +281,7 @@ class VisitorController extends Controller
         //     'redirect' => route('visitor.view.page', $visitor->id, $visitor->type)
         // ]);
         return response()->json([
-            'redirect' => route('visitor.view.page', [
+            'redirect' => route('view.page', [
                 'id'   => $visitor->id,
                 'type' => $request->type,
             ])
@@ -348,7 +347,7 @@ class VisitorController extends Controller
             $visitor->first_name   = $request->first_name;
             $visitor->middle_name  = $request->middle_name;
             $visitor->last_name    = $request->last_name;
-            $visitor->phone_number = $request->contact_number;
+            $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
             $visitor->location     = Auth::user()->location_id;
