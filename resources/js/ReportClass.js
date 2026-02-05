@@ -92,9 +92,8 @@ class ReportClassTable {
                   headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 url: window.location.origin + self.url + 'list',
                 type: "POST",
-                data: function (d) {
+                data: function (d) { 
                     d.search = $("input[type='search']").val();
-                    // Always pull the LATEST values from the synced global object
                     d.date_from = window.reportFilters.date_from;
                     d.date_to = window.reportFilters.date_to;
                     d.visitor_type = window.reportFilters.visitor_type;

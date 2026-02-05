@@ -53,7 +53,7 @@ class User_TypesController extends Controller
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
             $totalFiltered = count($temp);
        
         } else { 

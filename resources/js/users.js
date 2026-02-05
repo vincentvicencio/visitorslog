@@ -226,9 +226,16 @@ $('#btn_ok').on('click', function() {
             }
 
             // Reload the page
-            setTimeout(function() {
-                location.reload();
-            }, 1500); 
+            // setTimeout(function() {
+            //     location.reload();
+            // }, 1500); 
+
+            if ($.fn.DataTable.isDataTable('#usersTable')) {
+                $('#usersTable').DataTable().draw(false);
+
+                }
+                $btn.prop('disabled', false).text('Yes');
+                userModal.hide();
         },
         error: function(xhr) {
             alert("Error deleting user: " + (xhr.responseJSON?.message || "Internal Server Error"));
@@ -331,10 +338,6 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
             type: 'POST',
             data: formData,
             success: function(response) {
-                // Triggers.showToast(response.message || "User registered!", 0);
-
-                // setTimeout(() => { userModal.hide(); }, 1500);
-                // setTimeout(() => { location.reload(); }, 2000);
                 const message = response.success || "User registered Successfully!";
                 
                 // 1. Set the Title (Optional but looks better)
@@ -350,9 +353,16 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
                     toast.show();
                 }
 
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
+                // setTimeout(() => {
+                //     location.reload();
+                // }, 1500);
+
+                if ($.fn.DataTable.isDataTable('#usersTable')) {
+                $('#usersTable').DataTable().draw(false);
+
+                }
+                $btn.prop('disabled', false).text('Register User');
+                userModal.hide(); 
             },
             error: function(xhr) {
                 $btn.prop('disabled', false).text('Register User');
@@ -367,9 +377,6 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
             type: 'POST',
             data: formData,
             success: function(response) {
-                // Triggers.showToast(response.message || "User updated!", 0);
-                // setTimeout(() => { userModal.hide(); }, 1500);
-                // setTimeout(() => { location.reload(); }, 2000);
 
                 const message = response.success || "User Updated Successfully!";
                 
@@ -386,9 +393,12 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
                     toast.show();
                 }
 
-                setTimeout(() => {
-                    location.reload();
-                }, 1500);
+                if ($.fn.DataTable.isDataTable('#usersTable')) {
+                $('#usersTable').DataTable().draw(false);
+
+                }
+                $btn.prop('disabled', false).text('Update User');
+                userModal.hide();
             },
             error: function(xhr) {
                 $btn.prop('disabled', false).text('Update User');

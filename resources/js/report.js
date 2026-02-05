@@ -113,7 +113,7 @@ $(document).on('click', '#openFilterBtn', function () {
     if (modalInstance) {
         modalInstance.hide();
     }
-    
+
     // Reload table with no filters
     $('#reportTable').DataTable().draw();
     
@@ -237,9 +237,24 @@ document.getElementById('btn_ok').addEventListener('click', function() {
                 const toast = new bootstrap.Toast(toastElement);
                 toast.show();
             }
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
+            // setTimeout(() => {
+            //     location.reload();
+            // }, 1500);
+
+            // refresh the datatable only
+            if ($.fn.DataTable.isDataTable('#reportTable')) {
+                $('#reportTable').DataTable().draw(false);
+            }
+
+            // 3. Re-enable the button
+            $btn.prop('disabled', false).text('Yes');
+            const modalEl = document.getElementById('filterModal');
+    const modalInstance =
+        bootstrap.Modal.getInstance(modalEl) ||
+        new bootstrap.Modal(modalEl);
+
+    modalInstance.hide();
+
         },
         error: function (xhr) {
             // Re-enable button on error

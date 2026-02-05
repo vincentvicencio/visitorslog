@@ -227,7 +227,7 @@ public function list(Request $request){
             $order = $columnMap[$order] ?? 'id';
             
             // Apply ordering and pagination to the filtered query
-            $data = $rawquery->orderBy($order, $direction)
+            $data = $rawquery->orderBy('id', 'desc')
                              ->skip($start)
                              ->take($limit)
                              ->get();
