@@ -165,8 +165,6 @@ public function list(Request $request){
 
         $limit    = $request->input('length');
 
-<<<<<<< HEAD
-=======
         // Debug: Log what we're receiving
         \Log::info('Filter Request:', [
             'date_from' => $request->date_from,
@@ -175,7 +173,6 @@ public function list(Request $request){
             'search' => $keywords
         ]);
 
->>>>>>> 2a7df276c60bbda649ef6810462b1244ad5a887d
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
                 ->when($keywords, function ($query) use ($keywords) {
@@ -335,31 +332,6 @@ public function list(Request $request){
                                     Action
                                 </button>
 
-<<<<<<< HEAD
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <button 
-                                            class="dropdown-item"
-                                            id="viewBtn"
-                                            data-id="'. $d->id .'"
-                                            data-type="visitorlog">
-                                            <i class="bi bi-eye me-2"></i> View
-                                        </button>
-
-                                    </li>
-                                    <li>
-                                        <button 
-                                            type="button"
-                                            class="dropdown-item text-danger"
-                                            id="timeoutBtn"
-                                            data-id="'. $d->id .'">
-                                            <i class="bi bi-clock-history me-2"></i> Timeout
-                                        </button>
-
-                                    </li>
-                                </ul>
-                            </div>',
-=======
                             <ul class="dropdown-menu">
                                 <li>
                                     <button 
@@ -378,7 +350,6 @@ public function list(Request $request){
                                 </li>
                             </ul>
                         </div>',
->>>>>>> 2a7df276c60bbda649ef6810462b1244ad5a887d
             ];
             $i++;
         }

@@ -35,7 +35,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/visitorlog';
+    protected $redirectTo = '/visitorslog';
 
     /**
      * Create a new controller instance.
@@ -78,7 +78,7 @@ class LoginController extends Controller
     $this->fetch_emp_data('all_emp');
     $this->fetch_api_data('all_location', 'location');
     $location = collect(session('all_location'));
-    return redirect()->route('visitorlog.index'); // ADMIN
+    return redirect()->route('visitorslog'); // ADMIN
 }
 
     private function fetch_emp_data($sessionKey){

@@ -66,66 +66,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
     }
 });
 
-    // --- 1. GLOBAL VARIABLES --
-    let currentPage = 1;
-
-    // --- 2. INITIALIZATION ---
-    function initTable() {
-        $("#userTypeTableBody tr").addClass('search-match');
-        applyPagination();
-    }
-    initTable();
-
-    // --- 3. THE CORE PAGINATION FUNCTION ---
-    function applyPagination() {
-        const limit = parseInt($('#entriesPerPage').val()) || 10;
-        const $allRows = $("#userTypeTableBody tr");
-        
-        // Filter rows that match the search criteria
-        const $rowsToPaginate = $allRows.filter('.search-match');
-        const totalRows = $rowsToPaginate.length;
-        const totalPages = Math.ceil(totalRows / limit) || 1;
-
-        // Boundary checks
-        if (currentPage > totalPages) currentPage = totalPages;
-        if (currentPage < 1) currentPage = 1;
-
-        // Hide all, then show only the current page slice
-        $allRows.hide();
-        const start = (currentPage - 1) * limit;
-        const end = start + limit;
-        $rowsToPaginate.slice(start, end).show();
-
-        // Update pagination text
-        $('.number-holder-pagination').text(`Page ${currentPage} of ${totalPages}`);
-
-        updateArrowStyles(currentPage, totalPages);
-    }
-
-
-
-    // --- 4. EVENT LISTENERS ---
-
-    // Search Logic
-    $("#typeSearch").on("keyup", function() {
-        const value = $(this).val().toLowerCase();
-        $("#userTypeTableBody tr").each(function() {
-            const rowText = $(this).text().toLowerCase();
-            const isMatch = rowText.indexOf(value) > -1;
-            $(this).toggleClass('search-match', isMatch);
-        });
-        currentPage = 1; 
-        applyPagination(); 
-    });
-
-    // Entries Per Page Change
-    $('#entriesPerPage').on('change', function() {
-        currentPage = 1;
-        applyPagination();
-    });
-
-    // --- 5. MODAL & AJAX OPERATIONS ---
-  
+    
   
   
 //     $('#openAddTypePopup').click(function() { 

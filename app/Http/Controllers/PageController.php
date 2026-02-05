@@ -28,7 +28,7 @@ class PageController extends Controller
                    ->orderBy('id', 'desc')
                    ->get();
         $empMap = collect(session('all_emp'))->keyBy('emp_code');
-        return view('pages.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+        return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
     }
     public function show_usertype()
     {
@@ -140,6 +140,14 @@ class PageController extends Controller
         // $keywords = strtolower($request->input('search.value'));
 
         $limit    = $request->input('length');
+
+        // Debug: Log what we're receiving
+        \Log::info('Filter Request:', [
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+            'visitor_type' => $request->visitor_type,
+            'search' => $keywords
+        ]);
 
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
@@ -264,29 +272,24 @@ class PageController extends Controller
                                     Action
                                 </button>
 
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <button 
-                                            class="dropdown-item"
-                                            id="viewBtn"
-                                            data-id="'. $d->id .'"
-                                            data-type="visitorlog">
-                                            <i class="bi bi-eye me-2"></i> View
-                                        </button>
-
-                                    </li>
-                                    <li>
-                                        <button 
-                                            type="button"
-                                            class="dropdown-item text-danger"
-                                            id="timeoutBtn"
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <button 
+                                        class="dropdown-item"
+                                        id="viewBtn"
+                                        data-id="'. $d->id .'"
+                                        data-type="report">
+                                        <i class="bi bi-eye me-2"></i> View
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger delete-btn" 
                                             data-id="'. $d->id .'">
-                                            <i class="bi bi-clock-history me-2"></i> Timeout
-                                        </button>
-
-                                    </li>
-                                </ul>
-                            </div>',
+                                        <i class="bi bi-trash me-2"></i> Delete
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>',
             ];
             $i++;
         }

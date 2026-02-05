@@ -7,7 +7,7 @@
             <div class="page-subtitle mb-3">Manage and track all visitor entries</div>
         </div>
         <a class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
-            text-white rounded-2 border-0 cursor-pointer px-3 py-2 text-decoration-none" href="{{ route('visitor.index') }}" id="addBtn">
+            text-white rounded-2 border-0 cursor-pointer px-3 py-2 text-decoration-none" href="{{ route('visitorslog.form') }}" id="addBtn">
             Add Visitor
         </a>
     </div>

@@ -148,7 +148,7 @@ $(document).on('click', '.view-button', function(e) {
             if (!visitorId) return;
     
             $.ajax({
-                url: "/visitor/view",
+                url: "/visitorslog/view",
                 type: "POST",
                 data: {
                     id: visitorId,

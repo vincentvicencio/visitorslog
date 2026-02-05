@@ -33,8 +33,8 @@
 
         <div class="d-flex flex-column vh-100 mx-2">
 
-        <a href="{{ url('visitorlog') }}"
-        class="sidebar-menu-button {{ Request::is('visitorlog') ? 'selected' : '' }}">
+        <a href="{{ url('visitorslog') }}"
+        class="sidebar-menu-button {{ Request::is('visitorslog') ? 'selected' : '' }}">
             <i class="bi bi-person-lines-fill fs-6 p-2"></i>
             Visitor Log Sheets
         </a>
@@ -57,8 +57,8 @@
             Visitor Type
         </a>
 
-        <a href="{{ url('id') }}"
-        class="sidebar-menu-button {{ Request::is('id') ? 'selected' : '' }}">
+        <a href="{{ url('registerId') }}"
+        class="sidebar-menu-button {{ Request::is('registerId') ? 'selected' : '' }}">
             <i class="bi bi-person-vcard fs-6 p-2"></i>
             ID Numbers
         </a>
