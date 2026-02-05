@@ -134,6 +134,7 @@ Route::group(['prefix' => 'userTypes'], function () {
 
 Route::group(['prefix' => 'userstable'], function () {
     Route::post('/list', [Registered_UsersController::class, 'list'])->name('list');
+    Route::get('/list', [Registered_UsersController::class, 'list'])->name('list');
 });
 
 Route::group(['prefix' => 'reporttable'], function () {

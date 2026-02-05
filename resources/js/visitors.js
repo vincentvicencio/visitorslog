@@ -130,17 +130,8 @@ $(document).ready(function () {
 
         $('.number-holder-pagination')
             .text(`Page ${currentPage} of ${totalPages}`);
-
-        updateArrowStyles(currentPage, totalPages);
     }
 
-    function updateArrowStyles(curr, total) {
-        $('.pagination-first, .pagination-prev')
-            .css({ opacity: curr === 1 ? 0.3 : 1 });
-
-        $('.pagination-next, .pagination-last')
-            .css({ opacity: curr === total ? 0.3 : 1 });
-    }
 
     // ================= SEARCH =================
     $("#typeSearch").on("keyup", function () {
@@ -163,9 +154,6 @@ $(document).ready(function () {
         applyPagination();
     });
 
-    $(document).on('click', '.pagination-first', () => {
-        currentPage = 1; applyPagination();
-    });
 
     $(document).on('click', '.pagination-prev', () => {
         if (currentPage > 1) currentPage--;

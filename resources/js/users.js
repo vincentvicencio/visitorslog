@@ -124,19 +124,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
         updateArrowStyles(currentPage, totalPages);
     }
 
-    function updateArrowStyles(curr, total) {
-        const isFirst = curr === 1;
-        const isLast = curr === total;
 
-        $('.pagination-first, .pagination-prev').css({
-            'opacity': isFirst ? '0.3' : '1',
-            'cursor': isFirst ? 'default' : 'pointer'
-        });
-        $('.pagination-next, .pagination-last').css({
-            'opacity': isLast ? '0.3' : '1',
-            'cursor': isLast ? 'default' : 'pointer'
-        });
-    }
 
     // --- 5. EVENT LISTENERS ---
 
@@ -146,13 +134,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
         applyPagination();
     });
 
-    // Arrow Click Events
-    $(document).on('click', '.pagination-first', function() {
-        if (currentPage > 1) {
-            currentPage = 1;
-            applyPagination();
-        }
-    });
+
 
     $(document).on('click', '.pagination-prev', function() {
         if (currentPage > 1) {

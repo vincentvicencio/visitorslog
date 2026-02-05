@@ -3,9 +3,15 @@
         padding: 10px;
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-sizing: border-box;
     }
-    #visitorsLogTable, #userTypeTable{
-        border-radius: 10px ;
+    #visitorsLogTable, 
+    #userTypeTable, 
+    #usersTable, 
+    #visitorsTable, 
+    #registerIdTable,
+    #reportTable {
+        box-sizing: border-box;
         width: 100%;
         
         #visitorsTable{
@@ -160,18 +166,3 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-.d-md-flex{
-    display: block !important;
-}
-.form-control{
-    // display: none !important;
-}

@@ -102,12 +102,7 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
         updateArrowStyles(currentPage, totalPages);
     }
 
-    function updateArrowStyles(curr, total) {
-        const isFirst = curr === 1;
-        const isLast = curr === total;
-        $('.pagination-first, .pagination-prev').css({'opacity': isFirst ? '0.3' : '1', 'cursor': isFirst ? 'default' : 'pointer'});
-        $('.pagination-next, .pagination-last').css({'opacity': isLast ? '0.3' : '1', 'cursor': isLast ? 'default' : 'pointer'});
-    }
+
 
     // --- 4. EVENT LISTENERS ---
 
@@ -127,21 +122,6 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
     $('#entriesPerPage').on('change', function() {
         currentPage = 1;
         applyPagination();
-    });
-
-    // Navigation Arrow Clicks
-    $(document).on('click', '.pagination-first', function() { currentPage = 1; applyPagination(); });
-    $(document).on('click', '.pagination-prev', function() { if(currentPage > 1) { currentPage--; applyPagination(); } });
-    $(document).on('click', '.pagination-next', function() { 
-        const limit = parseInt($('#entriesPerPage').val());
-        const totalPages = Math.ceil($("#userTypeTableBody tr.search-match").length / limit);
-        if(currentPage < totalPages) { currentPage++; applyPagination(); }
-    });
-    $(document).on('click', '.pagination-last', function() { 
-        const limit = parseInt($('#entriesPerPage').val());
-        const totalPages = Math.ceil($("#userTypeTableBody tr.search-match").length / limit);
-        currentPage = totalPages; 
-        applyPagination(); 
     });
 
     // --- 5. MODAL & AJAX OPERATIONS ---

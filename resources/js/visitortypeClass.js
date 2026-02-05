@@ -30,17 +30,16 @@ class VisitorTypeTable {
         const self = this;
 
         const tableHeader = [
-            { id: "name",       label: "Name" },
-            { id: "created_by",       label: "Created By" },
-            { id: "updated_by",      label: "Updated By" },
-            { id: "created_at",   label: "Created Date" },
-            { id: "action",         label: "Action" },
+            { id: "name",        label: "Name" },
+            { id: "created_by",  label: "Created By" },
+            { id: "updated_by",  label: "Updated By" },
+            { id: "created_at",  label: "Created Date" },
+            { id: "action",      label: "Action" },
         ];
 
         const columns = tableHeader.map(col => ({
             data: col.id, 
-            title: col.label,
-            width: 'auto'
+            title: col.label
         }));
 
         const columnDefs = [
@@ -53,21 +52,37 @@ class VisitorTypeTable {
             self.url,
             columnDefs,
             10,          // ✅ pagination
-            {}           // ✅ data
+            {},          // ✅ data
+            false
         );
 
-        const tableApi = $(self.table).DataTable();
-        $('input[type="search"]').off('keyup').on('keyup', function() {
-            tableApi.search(this.value).draw();
+        $(self.table).on('init.dt', function () {
+
+            console.log('✅ DATATABLE INITIALIZED');
+
+            const tableApi = $(self.table).DataTable();
+
+            // 🔥 FORCE DRAW
+            tableApi.draw();
+
+            // =========================================
+            // CUSTOM SEARCH
+            // =========================================
+            $('#typeSearch')
+                .off('keyup')
+                .on('keyup', function () {
+                    tableApi.search(this.value).draw();
+                });
+
+            // =========================================
+            // ENTRIES PER PAGE
+            // =================================
+            $('#entriesPerPage')
+                .off('change')
+                .on('change', function () {
+                    tableApi.page.len(this.value).draw();
+                });
         });
-
-         setTimeout(() => {
-            const searchInput = document.getElementById('dt-search-0');             
-                if (searchInput) {
-                    searchInput.setAttribute('placeholder', 'Search here...');
-                }
-            }, 100);
-
     }
 
 
@@ -75,4 +90,3 @@ class VisitorTypeTable {
 const visitorsType = new VisitorTypeTable();
 visitorsType.onLoadPage();
 
-export default visitorsType;
