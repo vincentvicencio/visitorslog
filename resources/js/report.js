@@ -1,3 +1,13 @@
+import container from './common/container';
+import datahandling from './common/datahandling';
+import triggers from './common/triggers';
+import settable from './common/settable';
+import component from './common/component';
+import $ from 'jquery';
+import * as bootstrap from 'bootstrap';
+
+
+
 $(document).ready(function(){
         // =================================Dropdown==================================
     $(document).on('shown.bs.dropdown', '.dropdown', function () {
@@ -48,6 +58,67 @@ $(document).ready(function(){
         
         openDeleteModal(id, name);
     });
+
+$(document).on('click', '#openFilterBtn', function () {
+
+    const modalEl = document.getElementById('filterModal');
+    const modalInstance =
+        bootstrap.Modal.getInstance(modalEl) ||
+        new bootstrap.Modal(modalEl);
+
+    modalInstance.show();
+});
+
+
+    $(document).on('submit', '#filterForm', function(e) {
+    e.preventDefault();
+
+    window.reportFilters = {
+        date_from: $('input[name="date_from"]').val(),
+        date_to: $('input[name="date_to"]').val(),
+        visitor_type: $('select[name="visitor_type"]').val()
+    };
+
+    if ($.fn.DataTable.isDataTable('#reportTable')) {
+        $('#reportTable').DataTable().draw(); 
+    }
+
+    const filterModal = document.getElementById('filterModal');
+    const modalInstance = bootstrap.Modal.getInstance(filterModal);
+
+    if (modalInstance) {
+        modalInstance.hide();
+    }
+});
+
+
+    // Handle Reset Button
+    $(document).on('click', '.btn-secondary[href*="/report"]', function(e) {
+    e.preventDefault();
+
+    // Reset form UI
+    $('#filterForm')[0].reset();
+
+    // IMPORTANT: clear the global filters
+    window.reportFilters = {
+        date_from: '',
+        date_to: '',
+        visitor_type: ''
+    };
+
+
+    const filterModal = document.getElementById('filterModal');
+    const modalInstance = bootstrap.Modal.getInstance(filterModal);
+
+    if (modalInstance) {
+        modalInstance.hide();
+    }
+
+    // Reload table with no filters
+    $('#reportTable').DataTable().draw();
+    
+});
+
 
 }); // End of document.ready
 
@@ -166,9 +237,24 @@ document.getElementById('btn_ok').addEventListener('click', function() {
                 const toast = new bootstrap.Toast(toastElement);
                 toast.show();
             }
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
+            // setTimeout(() => {
+            //     location.reload();
+            // }, 1500);
+
+            // refresh the datatable only
+            if ($.fn.DataTable.isDataTable('#reportTable')) {
+                $('#reportTable').DataTable().draw(false);
+            }
+
+            // 3. Re-enable the button
+            $btn.prop('disabled', false).text('Yes');
+            const modalEl = document.getElementById('filterModal');
+    const modalInstance =
+        bootstrap.Modal.getInstance(modalEl) ||
+        new bootstrap.Modal(modalEl);
+
+    modalInstance.hide();
+
         },
         error: function (xhr) {
             // Re-enable button on error

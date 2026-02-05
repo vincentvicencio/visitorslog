@@ -165,6 +165,17 @@ public function list(Request $request){
 
         $limit    = $request->input('length');
 
+<<<<<<< HEAD
+=======
+        // Debug: Log what we're receiving
+        \Log::info('Filter Request:', [
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+            'visitor_type' => $request->visitor_type,
+            'search' => $keywords
+        ]);
+
+>>>>>>> 2a7df276c60bbda649ef6810462b1244ad5a887d
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
                 ->when($keywords, function ($query) use ($keywords) {
@@ -190,25 +201,44 @@ public function list(Request $request){
                 $query->where('visitor_type_id', $request->visitor_type);
             });
 
-
-
-
-        
-        $totalRecords = $rawquery->get()->count();
+        // Log the count after filters
+        $totalRecords = $rawquery->count();
+        \Log::info('Total Filtered Records:', ['count' => $totalRecords]);
         
         if ($request->input('draw') > 1) { 
             $start         = $request->input('start'); 
             $column        = $request->input('order.0.column');
             $direction     = $request->input('order.0.dir');
             $order         = $request->input('columns')[$column]['data']; 
-            $temp          = $rawquery->get(); 
-            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawQuery->orderby($order, $direction)->get(); 
-            $totalFiltered = count($temp);
+            
+            // Map virtual columns to actual database columns
+            $columnMap = [
+                'personal_detail' => 'first_name',
+                'visitor_type' => 'visitor_type_id',
+                'visitor_id' => 'visitor_id',
+                'image' => 'image_path',
+                'visit' => 'created_at',
+                'time' => 'created_at',
+                'creator' => 'created_by',
+                'status' => 'status',
+                'action' => 'id'
+            ];
+            
+            $order = $columnMap[$order] ?? 'id';
+            
+            // Apply ordering and pagination to the filtered query
+            $data = $rawquery->orderBy('id', 'desc')
+                             ->skip($start)
+                             ->take($limit)
+                             ->get();
+            
+            $totalFiltered = $totalRecords;
        
         } else { 
-       
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            // First load - no sorting from DataTable yet
+            $data = $rawquery->orderBy("id", "desc")
+                             ->take($limit)
+                             ->get();
      
             $totalFiltered = $totalRecords;
         }
@@ -305,6 +335,7 @@ public function list(Request $request){
                                     Action
                                 </button>
 
+<<<<<<< HEAD
                                 <ul class="dropdown-menu">
                                     <li>
                                         <button 
@@ -328,6 +359,26 @@ public function list(Request $request){
                                     </li>
                                 </ul>
                             </div>',
+=======
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <button 
+                                        class="dropdown-item"
+                                        id="viewBtn"
+                                        data-id="'. $d->id .'"
+                                        data-type="report">
+                                        <i class="bi bi-eye me-2"></i> View
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger delete-btn" 
+                                            data-id="'. $d->id .'">
+                                        <i class="bi bi-trash me-2"></i> Delete
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>',
+>>>>>>> 2a7df276c60bbda649ef6810462b1244ad5a887d
             ];
             $i++;
         }

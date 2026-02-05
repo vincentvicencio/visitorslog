@@ -347,7 +347,7 @@ class VisitorController extends Controller
             $visitor->first_name   = $request->first_name;
             $visitor->middle_name  = $request->middle_name;
             $visitor->last_name    = $request->last_name;
-            $visitor->phone_number = $request->contact_number;
+            $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
             $visitor->location     = Auth::user()->location_id;

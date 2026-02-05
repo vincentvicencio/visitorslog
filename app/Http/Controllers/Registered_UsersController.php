@@ -262,7 +262,7 @@ public function list(Request $request){
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
             $totalFiltered = count($temp);
        
         } else { 
@@ -279,7 +279,7 @@ public function list(Request $request){
        
             $newData[$i] = [
                 'user_name'  => $d->user_name, // show emp_code in first column
-                'user_type'  => $d->userType->name,
+                'user_type'  => $d->userType->name ?? '-',
                 'created_by' => $d->getEmpName($d->created_by),
                 'updated_by' => ($d->getEmpName($d->updated_by) ?? '-'),
                 'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
