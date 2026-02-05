@@ -106,6 +106,8 @@ class ReportClassTable {
             },
             initComplete: function() {
                 this.api().columns.adjust();
+                // Remove duplicate header created by scrollX
+                $('.dt-scroll-head').remove();
             }
         });
 
