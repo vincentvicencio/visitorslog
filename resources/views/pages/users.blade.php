@@ -49,5 +49,42 @@
         <x-table-pagination/>
     </div>
 </div>
+ <div class="container mt-4">
+    <button class="btn btn-outline-info btn-sm mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#sessionEmployeeTable" aria-expanded="false" aria-controls="sessionEmployeeTable">
+        ...
+    </button>
+
+    <div class="collapse" id="sessionEmployeeTable">
+        <div class="card card-body">
+            <h3>Available Employees (From Central Hub Session)</h3>
+            <table class="table table-bordered table-sm">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Emp Code</th>
+                        <th>Full Name</th>
+                        <th>Dept ID</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($allEmployeesFromSession as $emp)
+                        <tr>
+                            <td>{{ $emp['emp_code'] ?? 'N/A' }}</td>
+                            <td>{{ ($emp['first_name'] ?? '') . ' ' . ($emp['last_name'] ?? '') }}</td>
+                            <td>{{ $emp['department_id'] ?? 'N/A' }}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="copyToRegister('{{ $emp['emp_code'] }}')">Select</button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center">No session data found. Please re-login.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> 
 
 @endsection

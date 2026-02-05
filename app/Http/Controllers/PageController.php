@@ -232,7 +232,7 @@ class PageController extends Controller
                     <br><small>' . $d->phone_number . '</small>
                 ',
 
-                'visitor_type' => $d->visitorType->name,
+                'visitor_type' => $d->visitorType?->name ?? '-',
 
                 'visitor_id' => $d->visitor_id,
 

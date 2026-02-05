@@ -29,7 +29,7 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
     const id = input.dataset.id;
     const visitor_type = input.value.trim();
     if (!visitor_type) {
-        Triggers.showToast('Visitor type cannot be empty.', 1);
+        Triggers.showToast('Please enter a visitor type name.', 1);
         return;
     }
 
@@ -52,7 +52,7 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
                 }
             },
             error: function (xhr) {
-                Triggers.showToast(xhr.responseJSON?.message ?? 'Save failed.', 1);
+                Triggers.showToast(xhr.responseJSON?.message ?? 'Failed to save visitor type.', 1);
                 const input = document.getElementById('userInput');
                 input.value = '';
             }
@@ -79,7 +79,7 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
 
             },
             error: function (xhr) {
-                Triggers.showToast(xhr.responseJSON?.message ?? 'Edit failed.', 1);
+                Triggers.showToast(xhr.responseJSON?.message ?? 'Failed to update visitor type.', 1);
                 const input = document.getElementById('userInput');
                 input.value = '';
             }
@@ -133,7 +133,7 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr) {
-                Triggers.showToast(xhr.responseJSON?.message ?? 'Delete failed.', 1);
+                Triggers.showToast(xhr.responseJSON?.message ?? 'Failed to delete visitor type.', 1);
             }
         });
     });
