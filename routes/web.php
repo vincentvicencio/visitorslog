@@ -87,6 +87,8 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/update-user/{id}',   'updateUser')->name('registerUser.updateUser');
             Route::post('/delete-user/{id}',  'deleteUser')->name('registerUser.deleteuser');  
             Route::post('/getlocation',       'location')->name('locations.lookup');
+            Route::post('/get-user-type',     'getUserTypes')->name('getUserTypes');
+            Route::get('/search-employees',   'searchEmployees')->name('registerUser.searchEmployees');
         });
 
     // REPORT
@@ -96,5 +98,6 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/',                   'index')->name('reports');
             Route::post('/list',              'list')->name('reports.list');
             Route::delete('/delete-visitor/{id}', 'destroy')->name('reports.destroy');
+            Route::get('/export',             'exportReport')->name('reports.export');
         });
 });

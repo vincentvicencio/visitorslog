@@ -48,22 +48,42 @@
                     </select>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Select Location</label>
-                    <select id="reg_location" class="form-control" required>
-                        <option value="">Select Location</option>
-                    </select>
-                </div>
+                <div id="reg_fields_container" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label">Select Location</label>
+                        <select id="reg_location" class="form-control" required>
+                            <option value="">Select Location</option>
+                        </select>
+                    </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Employee Code</label>
-                    <input type="text" id="reg_emp_code" class="form-control" placeholder="Employee Code" required>
-                </div>
+                    <div class="mb-3" id="emp_code_container">
+                        <label class="form-label">Employee Code</label>
+                        <div class="input-group">
+                            <input type="text" id="reg_emp_code" class="form-control" placeholder="Enter Employee Code" autocomplete="off">
+                            <button class="btn btn-outline-primary" type="button" id="search_emp_btn">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
 
-                <div class="mb-3" id="password_container">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="reg_password" class="form-control" placeholder="Password">
-                    <small class="text-muted edit-only-text" style="display:none;">Leave blank to keep current password</small>
+                    <div class="mb-3" id="employee_name_container" style="display: none;">
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label">First Name</label>
+                                <input type="text" id="reg_first_name" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" id="reg_last_name" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="password_container">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="reg_password" class="form-control" placeholder="Password">
+                        <small class="text-muted edit-only-text" style="display:none;">Leave blank to keep current password</small>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
