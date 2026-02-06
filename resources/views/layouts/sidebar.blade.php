@@ -39,14 +39,14 @@
             Visitor Log Sheets
         </a>
 
-        <a href="{{ url('usertype') }}"
-        class="sidebar-menu-button {{ Request::is('usertype') ? 'selected' : '' }}">
+        <a href="{{ url('userTypes') }}"
+        class="sidebar-menu-button {{ Request::is('userTypes') ? 'selected' : '' }}">
             <i class="bi bi-people-fill fs-6 p-2"></i>
             User Type
         </a>
 
-        <a href="{{ url('users') }}"
-        class="sidebar-menu-button {{ Request::is('users') ? 'selected' : '' }}">
+        <a href="{{ url('registerUser') }}"
+        class="sidebar-menu-button {{ Request::is('registerUser') ? 'selected' : '' }}">
             <i class="bi bi-person-add fs-6 p-2"></i>
             User
         </a>
@@ -63,8 +63,8 @@
             ID Numbers
         </a>
 
-        <a href="{{ url('report') }}"
-        class="sidebar-menu-button {{ Request::is('report') ? 'selected' : '' }}">
+        <a href="{{ url('reports') }}"
+        class="sidebar-menu-button {{ Request::is('reports') ? 'selected' : '' }}">
             <i class="bi bi-journals fs-6 p-2"></i>
             Reports
         </a>

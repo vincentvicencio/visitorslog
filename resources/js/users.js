@@ -1,12 +1,18 @@
 import { Modal } from 'bootstrap';
 import Triggers from './common/triggers.js';
 
+
+
+const URL = '/registerUser/';
 $(document).ready(function() {
+
     $.ajaxSetup({
     headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
 });
+
+
     // Handle Dropdown placement without breaking the click event
 $(document).on('shown.bs.dropdown', '.dropdown', function () {
     const $toggle = $(this).find('.dropdown-toggle');
@@ -74,7 +80,7 @@ $('#btn_ok').on('click', function() {
     btn.prop('disabled', true).text('Processing...');
 
     $.ajax({
-        url:'/delete-user/' + userIdToDelete,
+        url:URL + 'delete-user/' + userIdToDelete,
         type: "POST",
         data: {
             _token: window.Laravel.csrfToken
@@ -120,7 +126,7 @@ $(document).on('click', '#register_btn', function () {
         if (!userId) return;
 
         // Fetch user details before opening modal
-        $.get("/get-user/" + userId, function(data) {
+        $.get(URL+"get-user/" + userId, function(data) {
             openUserModal(data);
         });
     });
@@ -147,7 +153,7 @@ export function openUserModal(data) {
 
     // Load locations via component helper
     if (typeof component !== 'undefined' && component.createDropdown) {
-        component.createDropdown('/getlocation', '#reg_location', data.location_id, '#registerUserModal');
+        component.createDropdown(URL+'getlocation', '#reg_location', data.location_id, '#registerUserModal');
     } else {
         $('#reg_location').val(data.location_id);
     }
@@ -168,7 +174,7 @@ export function openUserModalBlank() {
     $('.edit-only-text').hide();
 
     // Load locations
-    component.createDropdown('/getlocation', '#reg_location', null, '#registerUserModal');
+    component.createDropdown(URL+'getlocation', '#reg_location', null, '#registerUserModal');
     
     userModal.show();
 }
@@ -200,7 +206,7 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
     if (id === undefined) {
         // --- ADD USER LOGIC ---
         $.ajax({
-            url: "/addusers",
+            url: URL+"addusers",
             type: 'POST',
             data: formData,
             success: function(response) {
@@ -239,7 +245,7 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
         // --- UPDATE USER LOGIC ---
         formData._method = 'PUT'; // Laravel Method Spoofing
         $.ajax({
-            url: "/update-user/" + id,
+            url: URL+"update-user/" + id,
             type: 'POST',
             data: formData,
             success: function(response) {

@@ -230,7 +230,7 @@ class VisitorController extends Controller
         ]);
 
         $visitor = Visitor::where('id', $request->id)
-            ->where('status', 0)
+            // ->where('status', 0)
             ->latest('id')
             ->first();
 

@@ -3,28 +3,7 @@ import Triggers from './common/triggers.js';
 
 $(document).ready(function() {
 
-    
-
-//     $(document).on('shown.bs.dropdown', '.dropdown', function () {
-//     const $toggle = $(this).find('.dropdown-toggle');
-//     const $menu = $(this).find('.dropdown-menu');
-
-//     // Store the original parent so we can put it back later
-//     $menu.data('parent', $(this));
-    
-//     $('body').append($menu);
-    
-//     const offset = $toggle.offset();
-//     $menu.css({
-//         'display': 'block',
-//         'position': 'absolute',
-//         'visibility': 'visible',
-//         'opacity': '1',
-//         'top': offset.top + $toggle.outerHeight(),
-//         'left': offset.left,
-//         'z-index': '9999'
-//     }).addClass('show');
-// });
+let URL = '/userTypes/';
 
 $(document).on('shown.bs.dropdown', '.dropdown', function () {
     const $toggle = $(this).find('.dropdown-toggle');
@@ -66,107 +45,6 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
     }
 });
 
-    
-  
-  
-//     $('#openAddTypePopup').click(function() { 
-//         $('#save_type').text('Save New User Type');
-//         $('#addTypeModal').fadeIn(200); }
-//     );
-//     $('#closeAddType').click(function() { $('#addTypeModal').fadeOut(200); });
-
-//     // Handle Add Form
-//     $('#add_type_form').on('submit', function(e) {
-//         e.preventDefault();
-//         const $btn = $(this).find('button[type="submit"]');
-//         $btn.prop('disabled', true).text('Saving...');
-
-//         $.ajax({
-//             // url: "{{ route('addusertype') }}",
-//             url:'/addusertype', 
-//             type: "POST",
-//             data: $(this).serialize(),
-//             success: function(response) { 
-                
-//             $('#toastMessage').text(response.success || "User Type Added Successfully!");
-
-//             // 2. Initialize and show the Bootstrap Toast
-//             const toastElement = document.getElementById('SUCCESSTOAST');
-//             const toast = new bootstrap.Toast(toastElement);
-//             toast.show();
-
-//             // 3. Optional: Delay the reload so the user can actually see the toast
-//             setTimeout(function() {
-//                 location.reload();
-//             }, 1500); },
-//             error: function(xhr) {
-//                 $btn.prop('disabled', false).text('Save Role');
-//                 alert("Error: " + (xhr.responseJSON.message || "Failed to add."));
-//             }
-//         });
-//     });
-
-//     // Open Edit Modal
-//     $(document).on('click', '.edit-type', function() {
-//         let id = $(this).data('id');
-//         $('#save_type').text('Update');
-//         $.get('/usertype/' + id + '/edit', function(data) {
-//             $('#edit_type_id').val(data.id);
-//             $('#edit_type_name').val(data.name);
-//             $('#addTypeModal').fadeIn(200);
-//         });
-//     });
-
-//     $('#closeEditType').click(function() { $('#addTypeModal').fadeOut(200); });
-//     $('#edit_type_form').on('submit', function(e) {
-//     e.preventDefault();
-    
-//     let id = $('#edit_type_id').val();
-//     const $submitBtn = $(this).find('button[type="submit"]');
-    
-//     $submitBtn.prop('disabled', true).text('Updating...');
-
-//     $.ajax({
-//         url: '/usertype/' + id,
-//         type: 'POST', // Use POST because we are using @method('PUT') in the form
-//         data: $(this).serialize(),
-//         success: function(response) {
-//             // 1. Update the message text
-//             $('#toastMessage').text(response.success || "User Type Updated Successfully!");
-
-//             // 2. Initialize and show the Bootstrap Toast
-//             const toastElement = document.getElementById('SUCCESSTOAST');
-//             const toast = new bootstrap.Toast(toastElement);
-//             toast.show();
-
-//             // 3. Optional: Delay the reload so the user can actually see the toast
-//             setTimeout(function() {
-//                 location.reload();
-//             }, 1500); 
-//         },
-//         error: function(xhr) {
-//             $submitBtn.prop('disabled', false).text('Update Role');
-//             alert("Error: " + (xhr.responseJSON.message || "Update failed."));
-//         }
-//     });
-// });
-
-// // Step C: Close Modal
-// $('#closeEditType').click(function() { 
-//     $('#addTypeModal').fadeOut(200); 
-// });
-
-
-// $('#openAddTypePopup').click(function() { 
-//     const input = document.getElementById('edit_type_name');
-//     input.value = '';
-//     delete input.dataset.id;
-    
-//     $('#modalTitle').text('Add User Type');
-//     $('#save_type').text('Save New User Type');
-//     $('#addTypeModal').show(); 
-// });
-
 const usertypemodal = document.getElementById('addTypeModal');
 const userTypeModal = new Modal(usertypemodal);
 
@@ -182,20 +60,6 @@ $('#openAddTypePopup').click(function() {
     userTypeModal.show(); 
 });
 
-// $(document).on('click', '.edit-type', function() {
-//     let id = $(this).data('id');
-//     const input = document.getElementById('edit_type_name');
-    
-//     $('#save_type').text('Update');
-//     $('#modalTitle').text('Edit User Type');
-
-//     $.get('/usertype/' + id + '/edit', function(data) {
-//         input.value = data.name;
-//         input.dataset.id = data.id; 
-//         $('#addTypeModal').fadeIn(200);
-//     });
-// });
-
 $(document).on('click', '.edit-type', function() {
     let id = $(this).data('id');
     const input = document.getElementById('edit_type_name');
@@ -203,7 +67,7 @@ $(document).on('click', '.edit-type', function() {
     $('#save_type').text('Update');
     $('#modalTitle').text('Edit User Type');
 
-    $.get('/usertype/' + id + '/edit', function(data) {
+    $.get(URL+'usertype/' + id + '/edit', function(data) {
         input.value = data.name;
         input.dataset.id = data.id; 
         
@@ -227,7 +91,7 @@ document.getElementById('save_type').addEventListener('click', () => {
 
     if (id === undefined) {
         $.ajax({
-            url: "/addusertype",
+            url: URL+"addusertype",
             type: 'POST',
             data: {
                 user_type: user_type,
@@ -270,7 +134,7 @@ document.getElementById('save_type').addEventListener('click', () => {
         });
     } else {
         $.ajax({
-            url: '/usertype/' + id,
+            url: URL+'usertype/' + id,
             type: 'POST',
             data: {
                 id: id,
@@ -313,68 +177,6 @@ document.getElementById('save_type').addEventListener('click', () => {
 });
 
 $('#closeAddType').click(function() { $('#addTypeModal').fadeOut(200); });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // let roleIdToDelete = null;
-
-    // $(document).on('click', '.delete-type', function() {
-    //     roleIdToDelete = $(this).data('id'); // Grab the ID
-    //     $('#deleteRoleModal').modal('show');  // Open the Modal
-    // });
-
-    // $('#confirmDeleteRoleBtn').on('click', function() {
-    //     if (!roleIdToDelete) return;
-
-    //     const btn = $(this);
-    //     btn.prop('disabled', true).text('Deleting...'); // Prevent double clicks
-
-    //     $.ajax({
-    //         url:'/usertype/' + roleIdToDelete,
-    //         type: 'DELETE',
-    //         data: { 
-    //             _token: window.Laravel.csrfToken // CSRF token from Laravel
-    //         },
-    //         success: function(response) {
-    //             $('#DeletetoastMessage').text(response.success || "User Type Deleted Successfully!");
-
-    //         const toastElement = document.getElementById('DELETE');
-    //         const toast = new bootstrap.Toast(toastElement);
-    //         toast.show();
-
-    //         setTimeout(function() {
-    //             location.reload();
-    //         }, 1500); 
-
-    //         },
-    //         error: function(xhr) {
-    //             alert("Error deleting role.");
-    //             btn.prop('disabled', false).text('Delete Role');
-    //             $('#deleteRoleModal').modal('hide');
-    //         }
-    //     });
-    // });
-
-
-
-
-
-
-// Initialize the Modal instance using the correct ID from your HTML
 const deleteModalEl = document.getElementById('notificationContainer');
 const deleteModal = new Modal(deleteModalEl);
 
@@ -403,7 +205,7 @@ $('#btn_ok').on('click', function() {
     btn.prop('disabled', true).text('Deleting...');
 
     $.ajax({
-        url: '/usertype/' + roleIdToDelete,
+        url: URL+'usertype/' + roleIdToDelete,
         type: 'DELETE',
         data: { 
             _token: window.Laravel.csrfToken 

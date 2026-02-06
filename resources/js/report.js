@@ -7,7 +7,7 @@ import $ from 'jquery';
 import * as bootstrap from 'bootstrap';
 
 
-
+let URL = '/reports/';
 $(document).ready(function(){
         // =================================Dropdown==================================
     $(document).on('shown.bs.dropdown', '.dropdown', function () {
@@ -219,7 +219,7 @@ document.getElementById('btn_ok').addEventListener('click', function() {
 
     // AJAX request to delete the record
     $.ajax({
-        url:'/delete-visitor/' + id,
+        url:URL+'delete-visitor/' + id,
         type: 'DELETE',
         data: {
             _token: $('meta[name="csrf-token"]').attr('content')
@@ -268,127 +268,6 @@ document.getElementById('btn_ok').addEventListener('click', function() {
     
 
 // =================================Buttons==================================
-    
-
-//     function updateTableRows() {
-//         var limit = parseInt($('#entriesPerPage').val()); 
-//         var $rows = $('#reportTableBody tr');
-//         $rows.hide();
-//         $rows.slice(0, limit).show();
-
-//         console.log("Showing " + limit + " rows");
-//     }
-//     updateTableRows();
-
-//     $('#entriesPerPage').on('change', function() {
-//         updateTableRows();
-//     });
-
-//     $("#tableSearch").on("keyup", function() {
-//         var value = $(this).val().toLowerCase();
-//         var $rows = $("#reportTableBody tr");
-
-//         if (value === "") {
-//             updateTableRows(); 
-//         } else {
-//             $rows.filter(function() {
-//                 $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-//             });
-//         }
-//     });
-
-//  // --- 1. GLOBAL VARIABLES ---
-//     let currentPage = 1;
-
-//     // --- 2. INITIALIZATION ---
-//     // Mark all rows as matches initially so pagination shows them all
-//     $("#reportTableBody tr").addClass('search-match');
-//     applyPagination();
-
-//     // --- 3. SEARCH LOGIC ---
-//     $("#tableSearch").on("keyup", function() {
-//         var value = $(this).val().toLowerCase();
-//         var $rows = $("#reportTableBody tr");
-
-//         $rows.each(function() {
-//             var rowText = $(this).text().toLowerCase();
-//             // Check if row is the "No results" row or if it matches search
-//             var isMatch = rowText.indexOf(value) > -1;
-            
-//             if (isMatch) {
-//                 $(this).addClass('search-match');
-//             } else {
-//                 $(this).removeClass('search-match');
-//             }
-//         });
-
-//         currentPage = 1; // Reset to first page on new search
-//         applyPagination(); 
-//     });
-
-//     // --- 4. PAGINATION CORE FUNCTION ---
-//     function applyPagination() {
-//         const limit = parseInt($('#entriesPerPage').val()) || 10;
-//         const $allRows = $("#reportTableBody tr");
-//         const $rowsToPaginate = $allRows.filter('.search-match');
-
-//         const totalRows = $rowsToPaginate.length;
-//         const totalPages = Math.ceil(totalRows / limit) || 1;
-
-//         // Boundary checks
-//         if (currentPage > totalPages) currentPage = totalPages;
-//         if (currentPage < 1) currentPage = 1;
-
-//         // Hide all rows, then show only the current slice
-//         $allRows.hide();
-//         const start = (currentPage - 1) * limit;
-//         const end = start + limit;
-//         $rowsToPaginate.slice(start, end).show();
-
-//         // Update the custom pagination UI text
-//         $('.number-holder-pagination').text(`Page ${currentPage} of ${totalPages}`);
-
-//         // Visual feedback for arrows (opacity and cursor)
-//         updateArrowStyles(currentPage, totalPages);
-//     }
-
-
-
-//     // --- 5. EVENT LISTENERS ---
-
-//     // Entries Per Page Change
-//     $('#entriesPerPage').on('change', function() {
-//         currentPage = 1;
-//         applyPagination();
-//     });
-
-
-
-//     $(document).on('click', '.pagination-prev', function() {
-//         if (currentPage > 1) {
-//             currentPage--;
-//             applyPagination();
-//         }
-//     });
-
-//     $(document).on('click', '.pagination-next', function() {
-//         const limit = parseInt($('#entriesPerPage').val());
-//         const totalPages = Math.ceil($("#reportTableBody tr.search-match").length / limit);
-//         if (currentPage < totalPages) {
-//             currentPage++;
-//             applyPagination();
-//         }
-//     });
-
-//     $(document).on('click', '.pagination-last', function() {
-//         const limit = parseInt($('#entriesPerPage').val());
-//         const totalPages = Math.ceil($("#reportTableBody tr.search-match").length / limit);
-//         if (currentPage < totalPages) {
-//             currentPage = totalPages;
-//             applyPagination();
-//         }
-//     });
-
      
 
     

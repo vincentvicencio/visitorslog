@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\RegisteredUser;
 use App\Models\User_types;
+use App\Models\VisitorType;
+use App\Models\Visitor;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +14,32 @@ use Illuminate\Support\Facades\Session;
 
 class Registered_UsersController extends Controller
 {
+    public function index(Request $request)
+    {
+        $registeredUsers = RegisteredUser::all();
+        $roles = User_types::all();
+        $visitorTypes = VisitorType::all();
+
+        // $visitorlogs = Visitor::with('visitor_type')->get();
+        $visitorlogs = Visitor::where('status', 0)
+                   ->orderBy('id', 'asc')
+                   ->get();
+        $search = $request->input('search');
+
+        $empMap = collect(session('all_emp'))->keyBy('emp_code');
+        
+        $registeredUsers = RegisteredUser::with('userType')
+        ->whereNull('deleted_at')
+        ->when($search, function ($query, $search) {
+            $query->where('user_name', 'like', "%{$search}%")
+                ->orWhere('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%");
+        })
+        ->get();
+
+        $allEmployeesFromSession = session('all_emp', []);
+        return view('pages.registerUser.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession', 'visitorlogs', 'visitorTypes','empMap'));
+    }
  public function addusers(Request $request)
 {
     // 1. Validation
@@ -110,36 +138,8 @@ class Registered_UsersController extends Controller
 public function getUserTypes()
 {
     // Assuming your model is named User_types based on your use statements
-    return response()->json(\App\Models\User_types::all());
+    return response()->json(User_types::all());
 }
-
-    // --- NEW: GET USER DATA (For Edit Modal) ---
-    // public function getUser($id)
-    // {
-    //     // $user = RegisteredUser::findOrFail($id);
-    //     // return response()->json($user);
-    //     $user = RegisteredUser::findorFail($id);
-
-    //     $location = collect(session('all_location'));
-    // $data = [];
-    
-    // // Placeholder
-    // $data[] = ['id' => '', 'text' => 'Choose Location/Site'];
-
-    // foreach ($location as $record) {
-    //     $data[] = [
-    //         'id'   => $record['id'], // Ensure 'id' exists in your session array
-    //         'text' => $record['name']
-    //     ];
-    // }
-
-    // return response()->json([
-    //     'id'        => $user->id,
-    //     'emp_code'  => $user->user_name,
-    //     'role_id'   => $user->user_type,
-    //     'location_id' => $user->location 
-    // ]);
-    // }
 
 
     public function getUser($id)
