@@ -87,6 +87,8 @@ Route::middleware(['auth'])->group(function () {
             Route::put('/update-user/{id}',   'updateUser')->name('registerUser.updateUser');
             Route::post('/delete-user/{id}',  'deleteUser')->name('registerUser.deleteuser');  
             Route::post('/getlocation',       'location')->name('locations.lookup');
+            Route::post('/get-user-type',     'getUserTypes')->name('getUserTypes');
+            Route::get('/search-employees',   'searchEmployees')->name('registerUser.searchEmployees');
         });
 
     // REPORT

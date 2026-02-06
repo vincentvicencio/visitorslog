@@ -42,68 +42,142 @@ class Registered_UsersController extends Controller
     }
  public function addusers(Request $request)
 {
-    // 1. Validation
-    $request->validate([
+    // Get the user type to check role
+    $userType = User_types::find($request->user_type);
+    $roleName = $userType ? strtolower($userType->name) : '';
+    $isAdminOrReceptionist = in_array($roleName, ['admin', 'receptionist']);
+    $isGuard = $roleName === 'guard';
+    
+    // 1. Validation - different rules based on role
+    $validationRules = [
         'user_type' => 'required',
-        'emp_code'  => 'required|string|unique:registered_users,user_name',
-        'password'  => 'required|string|min:6',
         'locations' => 'required',
-    ]);
+    ];
+    
+    if ($isGuard) {
+        // Guard requires first_name, last_name, password - no emp_code
+        $validationRules['first_name'] = 'required|string';
+        $validationRules['last_name'] = 'required|string';
+        $validationRules['password'] = 'required|string|min:6';
+    } else {
+        // Other roles require emp_code
+        $validationRules['emp_code'] = 'required|string|unique:registered_users,user_name';
+        
+        // Only require password for non-Admin/Receptionist roles
+        if (!$isAdminOrReceptionist) {
+            $validationRules['password'] = 'required|string|min:6';
+        }
+    }
+    
+    $request->validate($validationRules);
 
-    $empCode = $request->input('emp_code');
-    $selectedLocationId = $request->input('locations');
+    $locationsInput = $request->input('locations');
+    
+    // Handle locations - can be a single value or JSON string of array
+    $locations = [];
+    if (is_array($locationsInput)) {
+        $locations = $locationsInput;
+    } elseif (is_string($locationsInput)) {
+        // Try to decode if it's JSON
+        $decoded = json_decode($locationsInput, true);
+        $locations = is_array($decoded) ? $decoded : [$locationsInput];
+    } else {
+        $locations = [$locationsInput];
+    }
 
-    // 2. SEARCH logic (Session)
-    $employees = collect(session('all_emp'));
-    $employeeData = $employees->firstWhere('emp_code', $empCode);
+    $locations = array_values(array_filter($locations, function ($value) {
+        return $value !== null && $value !== '';
+    }));
 
-    if (!$employeeData) {
+    if (count($locations) === 0) {
         return response()->json([
-            'status' => 'error', 
-            'message' => 'Employee Code not found in session records.'
+            'status' => 'error',
+            'message' => 'Please select at least one location.'
         ], 422);
     }
 
-    // 3. TRY/CATCH logic
     try {
+        if ($isGuard) {
+            // Guard: Use provided first_name and last_name, generate username
+            $firstName = $request->input('first_name');
+            $lastName = $request->input('last_name');
+            $baseUsername = trim($firstName . ' ' . $lastName);
+            $username = $baseUsername;
+            $counter = 2;
+            
+            // Check if username already exists and make it unique
+            while (RegisteredUser::where('user_name', $username)->exists()) {
+                $username = $baseUsername . ' ' . $counter;
+                $counter++;
+            }
+            
+            RegisteredUser::create([
+                'user_name'  => $username,
+                'first_name' => $firstName, 
+                'last_name'  => $lastName,
+                'location'   => $locations,
+                'password'   => Hash::make($request->password),     
+                'user_type'  => $request->user_type,
+                'created_by' => Auth::id(), 
+                'updated_by' => Auth::id(),
+            ]);
+            
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Guard registered successfully!'
+            ]);
+        }
+        
+        // For Admin/Receptionist and other roles with emp_code
+        $empCode = $request->input('emp_code');
+        
+        // SEARCH logic (Session)
+        $employees = collect(session('all_emp'));
+        $employeeData = $employees->firstWhere('emp_code', $empCode);
+
+        if (!$employeeData) {
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Employee Code not found in session records.'
+            ], 422);
+        }
+
         $apiUrl = "http://192.168.200.185:1924/api/employee_details/" . $empCode;
-        // Set a timeout so it doesn't hang forever
         $response = Http::timeout(5)->get($apiUrl);
 
         // DATA PREPARATION: Use session data as default
         $firstName = $employeeData['first_name'] ?? 'N/A';
         $lastName  = $employeeData['last_name'] ?? 'N/A';
-        $location = $selectedLocationId ?? 'N/A';
 
         if ($response->successful()) {
             $apiData = $response->json();
             $firstName = $apiData['FirstName'] ?? $firstName;
             $lastName  = $apiData['LastName'] ?? $lastName;
-            $location = $selectedLocationId ?? 'N/A';
         } 
+        
+        // For Admin/Receptionist, use emp_code as default password if not provided
+        $password = $request->password;
+        if (!$password && $isAdminOrReceptionist) {
+            $password = $empCode;
+        }
         
         RegisteredUser::create([
             'user_name'  => $empCode,
             'first_name' => $firstName, 
             'last_name'  => $lastName,
-            'location'   => $employeeData['location'] ?? 'N/A',
-            'password'   => Hash::make($request->password),     
+            'location'   => $locations,
+            'password'   => Hash::make($password),     
             'user_type'  => $request->user_type,
-            'location'   => $location,
             'created_by' => Auth::id(), 
             'updated_by' => Auth::id(),
-            // 'created_by' => Auth::user()->first_name ?? 'System', 
-            // 'updated_by' => Auth::user()->first_name ?? 'System',
         ]);
 
         return response()->json([
             'status' => 'success', 
             'message' => 'User registered successfully!'
-            
         ]);
 
     } catch (\Exception $e) {
-        // This prevents the "undefined" error by returning a JSON message
         return response()->json([
             'status' => 'error', 
             'message' => 'System Error: ' . $e->getMessage()
@@ -154,31 +228,58 @@ public function getUserTypes()
     // 3. Find this specific employee in the session data by their code
     $sessionEmployee = $allEmployees->firstWhere('emp_code', $user->user_name);
 
-    // 4. Get the Location Name (If the user model stores an ID, find the name in session)
-    // If your $user->location is an ID, find the text name for it:
-    $locationData = $allLocations->firstWhere('id', $user->location);
-    $locationName = $locationData['name'] ?? 'N/A';
+    // 4. Get the Location Names
+    // If $user->location is an array of IDs, map them to location objects
+    $locationIds = is_array($user->location) ? $user->location : (is_string($user->location) ? [$user->location] : []);
+    $locationNames = [];
+    
+    foreach ($locationIds as $locId) {
+        $locData = $allLocations->firstWhere('id', $locId);
+        if ($locData) {
+            $locationNames[] = $locData['name'];
+        }
+    }
+    
+    // Get the user type name to determine if it's Admin/Receptionist
+    $userType = User_types::find($user->user_type);
+    $roleName = $userType ? $userType->name : '';
 
     return response()->json([
         'id'            => $user->id,
         'emp_code'      => $user->user_name,
+        'first_name'    => $user->first_name,
+        'last_name'     => $user->last_name,
         'role_id'       => $user->user_type,
-        'location_id'   => $user->location, // The ID for the dropdown
-        'location_name' => $locationName    // The display text
+        'role_name'     => $roleName,
+        'location_id'   => $locationIds, // Return as array of IDs for multi-select
+        'location_names' => $locationNames // Display names
     ]);
 }
 public function updateUser(Request $request, $id) 
 {
-    $request->validate([
-        'user_type' => 'required',
-        'emp_code'  => 'required' // Ensuring the code is present in the request
-    ]);
-
     try {
         // Find the user we are currently editing
         $user = RegisteredUser::findOrFail($id);
         
-        if ($request->emp_code !== $user->user_name) {
+        // Get the user type to check role
+        $userType = User_types::find($request->user_type);
+        $roleName = $userType ? strtolower($userType->name) : '';
+        $isGuard = $roleName === 'guard';
+        
+        // Validation based on role
+        $validationRules = ['user_type' => 'required'];
+        
+        if ($isGuard) {
+            $validationRules['first_name'] = 'required|string';
+            $validationRules['last_name'] = 'required|string';
+        } else {
+            $validationRules['emp_code'] = 'required';
+        }
+        
+        $request->validate($validationRules);
+        
+        // For non-Guard roles, verify emp_code matches
+        if (!$isGuard && $request->emp_code !== $user->user_name) {
             return response()->json([
                 'status' => 'error', 
                 'message' => 'The Entered Employee Code Does not Match'
@@ -187,10 +288,58 @@ public function updateUser(Request $request, $id)
 
         $updateData = [
             'user_type'  => $request->user_type,
-            'user_name'  => $request->emp_code, // Update the code if it changed
-            // 'updated_by' => Auth::user()->first_name ?? 'System',
             'updated_by' => Auth::id(),
         ];
+        
+        // For Guard, update first_name and last_name
+        if ($isGuard) {
+            $updateData['first_name'] = $request->input('first_name');
+            $updateData['last_name'] = $request->input('last_name');
+            
+            $baseUsername = trim($updateData['first_name'] . ' ' . $updateData['last_name']);
+            $username = $baseUsername;
+            $counter = 2;
+            
+            // Ensure username is unique, ignoring current user
+            while (RegisteredUser::where('user_name', $username)->where('id', '!=', $user->id)->exists()) {
+                $username = $baseUsername . ' ' . $counter;
+                $counter++;
+            }
+            
+            $updateData['user_name'] = $username;
+        } else {
+            $updateData['user_name'] = $request->emp_code;
+        }
+
+        // Handle locations if provided
+        if ($request->has('locations')) {
+            $locationsInput = $request->input('locations');
+            
+            // Handle locations - can be a single value or JSON string of array
+            $locations = [];
+            if (is_array($locationsInput)) {
+                $locations = $locationsInput;
+            } elseif (is_string($locationsInput)) {
+                // Try to decode if it's JSON
+                $decoded = json_decode($locationsInput, true);
+                $locations = is_array($decoded) ? $decoded : [$locationsInput];
+            } else {
+                $locations = [$locationsInput];
+            }
+
+            $locations = array_values(array_filter($locations, function ($value) {
+                return $value !== null && $value !== '';
+            }));
+
+            if (count($locations) === 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Please select at least one location.'
+                ], 422);
+            }
+            
+            $updateData['location'] = $locations;
+        }
 
         if ($request->filled('password')) {
             $updateData['password'] = Hash::make($request->password);
@@ -222,6 +371,35 @@ public function updateUser(Request $request, $id)
     return response()->json($data);
 }
 
+    public function searchEmployees(Request $request)
+    {
+        $search = strtolower($request->input('q', ''));
+        $employees = collect(session('all_emp', []));
+        
+        // Filter employees based on search term
+        $filtered = $employees->filter(function ($emp) use ($search) {
+            if (empty($search)) return true;
+            
+            $empCode = strtolower($emp['emp_code'] ?? '');
+            $firstName = strtolower($emp['first_name'] ?? '');
+            $lastName = strtolower($emp['last_name'] ?? '');
+            
+            return str_contains($empCode, $search) || 
+                   str_contains($firstName, $search) || 
+                   str_contains($lastName, $search);
+        })->take(20); // Limit results
+        
+        $results = $filtered->map(function ($emp) {
+            return [
+                'id' => $emp['emp_code'],
+                'text' => $emp['emp_code'] . ' - ' . ($emp['first_name'] ?? '') . ' ' . ($emp['last_name'] ?? ''),
+                'first_name' => $emp['first_name'] ?? '',
+                'last_name' => $emp['last_name'] ?? ''
+            ];
+        })->values()->toArray();
+        
+        return response()->json(['results' => $results]);
+    }
 
 
 public function list(Request $request){

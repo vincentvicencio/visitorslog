@@ -161,7 +161,7 @@ $(document).on('click', '#register_btn', function () {
 
             // Fetch user details before opening modal
             $.ajax({
-                url: URL+"/get-user/" + userId,
+                url: URL+"get-user/" + userId,
                 type: 'GET',
                 timeout: 10000,
                 success: function(data) {
@@ -192,6 +192,25 @@ try {
     const userModalEl = document.getElementById('registerUserModal');
     if (!userModalEl) throw new Error('User modal element not found');
     userModal = new bootstrap.Modal(userModalEl);
+    
+    // Clean up Select2 when modal is hidden
+    userModalEl.addEventListener('hidden.bs.modal', function () {
+        const locationSelect = $('#reg_location');
+        
+        if (locationSelect.hasClass('select2-hidden-accessible')) {
+            locationSelect.select2('destroy');
+        }
+        
+        locationSelect.removeAttr('multiple');
+        $('#reg_emp_code').val('');
+        
+        // Reset visibility
+        $('#reg_fields_container').hide();
+        $('#password_container').show();
+        $('#emp_code_container').show();
+        $('#employee_name_container').hide();
+        $('#reg_first_name, #reg_last_name').val('').prop('readonly', true);
+    });
 } catch (error) {
     console.error('User modal initialization failed:', error);
 }
@@ -204,9 +223,21 @@ export function openUserModal(data) {
             return;
         }
         
+        // Destroy Select2 instances if they exist
+        if ($('#reg_location').hasClass('select2-hidden-accessible')) {
+            $('#reg_location').select2('destroy');
+        }
+        
         // Set Data
-        idInput.dataset.id = data.id; 
-        $('#reg_emp_code').val(data.emp_code); 
+        idInput.dataset.id = data.id;
+        
+        // Set the employee code
+        $('#reg_emp_code').val(data.emp_code);
+        
+        // Set first and last name
+        $('#reg_first_name').val(data.first_name || '');
+        $('#reg_last_name').val(data.last_name || '');
+        
         $('#reg_user_type').val(data.role_id); 
         $('#reg_password').val(''); // Clear password for security/edit
         
@@ -215,12 +246,69 @@ export function openUserModal(data) {
         $('#submit_user_btn').text('Update User');
         $('.edit-only-text').show();
 
+        // Always show fields when editing
+        $('#reg_fields_container').show();
+
         // Load locations via component helper
         if (typeof component !== 'undefined' && component.createDropdown) {
             component.createDropdown(URL+'getlocation', '#reg_location', data.location_id, '#registerUserModal');
         } else {
-            $('#reg_location').val(data.location_id);
+            // If location_id is an array, set multiple values
+            if (Array.isArray(data.location_id)) {
+                $('#reg_location').val(data.location_id);
+            } else {
+                $('#reg_location').val(data.location_id);
+            }
         }
+        
+        // Trigger role change to setup multi-select if needed
+        $('#reg_user_type').trigger('change');
+        
+        // Handle UI based on role
+        const roleName = data.role_name ? data.role_name.toLowerCase() : '';
+        
+        if (roleName === 'guard') {
+            // Guard: show password, editable names, no emp_code
+            $('#emp_code_container').hide();
+            $('#password_container').show();
+            $('#employee_name_container').show();
+            $('#reg_first_name, #reg_last_name').prop('readonly', false);
+        } else if (roleName === 'admin' || roleName === 'receptionist') {
+            // Admin/Receptionist: show emp_code, hide password, show names readonly
+            $('#emp_code_container').show();
+            $('#password_container').hide();
+            if (data.first_name || data.last_name) {
+                $('#employee_name_container').show();
+                $('#reg_first_name, #reg_last_name').prop('readonly', true);
+            }
+        } else {
+            // Other roles: show emp_code & password
+            $('#emp_code_container').show();
+            $('#password_container').show();
+            if (data.first_name || data.last_name) {
+                $('#employee_name_container').show();
+            }
+        }
+        
+        // After loading, set the selected values for Select2 if it's multi-location role
+        setTimeout(() => {
+            if ($('#reg_location').hasClass('select2-hidden-accessible')) {
+                $('#reg_location').val(data.location_id).trigger('change');
+            }
+        }, 500);
+
+        // Ensure single-location roles keep their location selected
+        setTimeout(() => {
+            if (roleName !== 'admin' && roleName !== 'receptionist') {
+                const singleLocation = Array.isArray(data.location_id)
+                    ? data.location_id[0]
+                    : data.location_id;
+
+                if (singleLocation) {
+                    $('#reg_location').val(singleLocation).trigger('change');
+                }
+            }
+        }, 500);
 
         userModal?.show();
     } catch (error) {
@@ -239,8 +327,22 @@ export function openUserModalBlank() {
         
         delete idInput.dataset.id; // Clear ID to signify "Add"
         
+        // Destroy Select2 instances if they exist
+        if ($('#reg_location').hasClass('select2-hidden-accessible')) {
+            $('#reg_location').select2('destroy');
+        }
+        
         // Reset Fields
-        $('#reg_emp_code, #reg_password, #reg_user_type, #reg_location').val('');
+        $('#reg_emp_code').val('');
+        $('#reg_password, #reg_user_type, #reg_location').val('');
+        $('#reg_first_name, #reg_last_name').val('');
+        
+        // Reset visibility
+        $('#reg_fields_container').hide();
+        $('#password_container').show();
+        $('#emp_code_container').show();
+        $('#employee_name_container').hide();
+        $('#reg_location').removeAttr('multiple');
         
         // UI Updates
         $('#userModalTitle').text('Register User');
@@ -259,6 +361,180 @@ export function openUserModalBlank() {
     }
 }
 
+// Handle role-based multi-location selection with Select2 tags
+$(document).on('change', '#reg_user_type', function() {
+    const selectedRoleId = $(this).val();
+    const selectedRoleText = $(this).find('option:selected').text().trim();
+    const locationSelect = $('#reg_location');
+    const passwordContainer = $('#password_container');
+    const nameContainer = $('#employee_name_container');
+    const empCodeContainer = $('#emp_code_container');
+    const fieldsContainer = $('#reg_fields_container');
+    const isEditing = Boolean(document.getElementById('reg_user_db_id')?.dataset?.id);
+    
+    // Check if role is Admin or Receptionist (case-insensitive)
+    const isMultiLocationRole = selectedRoleText.toLowerCase() === 'admin' || 
+                                 selectedRoleText.toLowerCase() === 'receptionist';
+    const isGuard = selectedRoleText.toLowerCase() === 'guard';
+    
+    // Destroy existing Select2 instances if they exist
+    if (locationSelect.hasClass('select2-hidden-accessible')) {
+        locationSelect.select2('destroy');
+    }
+    
+    if (!selectedRoleId) {
+        // No role selected: hide all fields
+        fieldsContainer.hide();
+        passwordContainer.show();
+        empCodeContainer.show();
+        nameContainer.hide();
+        $('#reg_password, #reg_emp_code, #reg_first_name, #reg_last_name').val('');
+        locationSelect.val(null).removeAttr('multiple');
+        if (locationSelect.find('option[value=""]').length === 0) {
+            locationSelect.prepend('<option value="">Select Location</option>');
+        }
+        return;
+    }
+
+    fieldsContainer.show();
+
+    if (isMultiLocationRole) {
+        // Admin/Receptionist: Hide password, show emp code with search, hide names until search
+        passwordContainer.hide();
+        $('#reg_password').val('').removeAttr('required');
+        
+        empCodeContainer.show();
+        nameContainer.hide();
+        $('#reg_first_name, #reg_last_name').prop('readonly', true);
+        
+        // Remove the empty placeholder option for multi-select location
+        locationSelect.find('option[value=""]').remove();
+        
+        // Clear any existing selection before enabling multi-select
+        locationSelect.val(null);
+        
+        // Enable multiple selection with Select2 tags UI
+        locationSelect.attr('multiple', 'multiple');
+        
+        // Initialize Select2 with tag-based UI
+        locationSelect.select2({
+            placeholder: 'Select locations...',
+            allowClear: true,
+            width: '100%',
+            dropdownParent: $('#registerUserModal'),
+            closeOnSelect: false // Keep dropdown open for multiple selections
+        });
+        
+        // Ensure no options are selected after init
+        locationSelect.val(null).trigger('change.select2');
+    } else if (isGuard) {
+        // Guard: Show password, show editable names, hide emp code
+        passwordContainer.show();
+        $('#reg_password').attr('required', 'required');
+        
+        empCodeContainer.hide();
+        $('#reg_emp_code').val('');
+        
+        nameContainer.show();
+        $('#reg_first_name, #reg_last_name').prop('readonly', false);
+        if (!isEditing) {
+            $('#reg_first_name, #reg_last_name').val('');
+        }
+        
+        // Disable multiple selection for location
+        locationSelect.removeAttr('multiple');
+        
+        // Add back the placeholder option if it doesn't exist
+        if (locationSelect.find('option[value=""]').length === 0) {
+            locationSelect.prepend('<option value="">Select Location</option>');
+        }
+        
+        // Keep only the first selected value if switching from multi to single
+        const currentVal = locationSelect.val();
+        if (Array.isArray(currentVal) && currentVal.length > 0) {
+            locationSelect.val(currentVal[0]);
+        }
+    } else {
+        // Other roles: Show password, show emp code, hide names
+        passwordContainer.show();
+        $('#reg_password').attr('required', 'required');
+        
+        empCodeContainer.show();
+        nameContainer.hide();
+        $('#reg_first_name, #reg_last_name').val('');
+        
+        // Disable multiple selection for location
+        locationSelect.removeAttr('multiple');
+        
+        // Add back the placeholder option if it doesn't exist
+        if (locationSelect.find('option[value=""]').length === 0) {
+            locationSelect.prepend('<option value="">Select Location</option>');
+        }
+        
+        // Keep only the first selected value if switching from multi to single
+        const currentVal = locationSelect.val();
+        if (Array.isArray(currentVal) && currentVal.length > 0) {
+            locationSelect.val(currentVal[0]);
+        }
+    }
+});
+
+// Handle employee code search button click
+$(document).on('click', '#search_emp_btn', function() {
+    const empCode = $('#reg_emp_code').val().trim();
+    
+    if (!empCode) {
+        Triggers.showToast('Please enter an employee code.', 1);
+        return;
+    }
+    
+    const $btn = $(this);
+    $btn.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i>');
+    
+    $.ajax({
+        url: URL + 'search-employees',
+        type: 'GET',
+        data: { q: empCode },
+        timeout: 10000,
+        success: function(response) {
+            const results = response.results || [];
+            const exactMatch = results.find(emp => emp.id.toLowerCase() === empCode.toLowerCase());
+            
+            if (exactMatch) {
+                $('#reg_first_name').val(exactMatch.first_name || '');
+                $('#reg_last_name').val(exactMatch.last_name || '');
+                $('#employee_name_container').show();
+                Triggers.showToast('Employee found!', 0);
+            } else if (results.length > 0) {
+                // Use first result if no exact match
+                $('#reg_first_name').val(results[0].first_name || '');
+                $('#reg_last_name').val(results[0].last_name || '');
+                $('#reg_emp_code').val(results[0].id);
+                $('#employee_name_container').show();
+                Triggers.showToast('Employee found!', 0);
+            } else {
+                $('#reg_first_name').val('');
+                $('#reg_last_name').val('');
+                $('#employee_name_container').hide();
+                Triggers.showToast('Employee code not found.', 1);
+            }
+            $btn.prop('disabled', false).html('<i class="bi bi-search"></i>');
+        },
+        error: function(xhr, status, error) {
+            Triggers.showToast('Failed to search employee.', 1);
+            $btn.prop('disabled', false).html('<i class="bi bi-search"></i>');
+        }
+    });
+});
+
+// Allow pressing Enter in employee code field to trigger search
+$(document).on('keypress', '#reg_emp_code', function(e) {
+    if (e.which === 13) {
+        e.preventDefault();
+        $('#search_emp_btn').click();
+    }
+});
+
 document.getElementById('submit_user_btn').addEventListener('click', function(e) {
     e.preventDefault();
     
@@ -273,24 +549,62 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
         const id = idInput.dataset.id;
         const $btn = $(this);
 
+        // Get location value - can be single or array
+        const locationValue = $('#reg_location').val();
+        let locationsData;
+        
+        // If it's an array, convert to JSON, otherwise use as is
+        if (Array.isArray(locationValue)) {
+            locationsData = JSON.stringify(locationValue);
+        } else {
+            locationsData = locationValue;
+        }
+
         // Prepare Data
+        const selectedRoleText = $('#reg_user_type option:selected').text().trim().toLowerCase();
+        const isGuard = selectedRoleText === 'guard';
+        
         const formData = {
             _token: $('meta[name="csrf-token"]').attr('content'),
             emp_code: $('#reg_emp_code').val(),
             user_type: $('#reg_user_type').val(),
-            locations: $('#reg_location').val(),
-            password: $('#reg_password').val()
+            locations: locationsData,
+            password: $('#reg_password').val(),
+            first_name: $('#reg_first_name').val(),
+            last_name: $('#reg_last_name').val()
         };
 
-        // Validation with specific messages
-        if (!formData.emp_code) {
-            Triggers.showToast('Please enter an employee code.', 1);
-            return;
-        }
-        
+        // Validation with specific messages based on role
         if (!formData.user_type) {
             Triggers.showToast('Please select a user type.', 1);
             return;
+        }
+
+        const hasLocation = Array.isArray(locationValue)
+            ? locationValue.length > 0
+            : !!locationValue;
+
+        if (!hasLocation) {
+            Triggers.showToast('Please select at least one location.', 1);
+            return;
+        }
+        
+        if (isGuard) {
+            // Guard validation: require first_name and last_name
+            if (!formData.first_name) {
+                Triggers.showToast('Please enter a first name.', 1);
+                return;
+            }
+            if (!formData.last_name) {
+                Triggers.showToast('Please enter a last name.', 1);
+                return;
+            }
+        } else {
+            // Other roles: require emp_code
+            if (!formData.emp_code) {
+                Triggers.showToast('Please enter an employee code.', 1);
+                return;
+            }
         }
 
         $btn.prop('disabled', true).text('Processing...');

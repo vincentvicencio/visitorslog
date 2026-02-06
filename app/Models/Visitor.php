@@ -13,6 +13,7 @@ class Visitor extends Model
 
     protected $table = 'visitors';
     protected $fillable = [
+        'full_name',
         'first_name',
         'middle_name',
         'last_name',
@@ -20,8 +21,10 @@ class Visitor extends Model
         'visitor_type',
         'visitor_id',
         'location',
+        'address',
         'image_path',
         'status',
+        'time_in',
         'time_out',
         'created_by',
         'updated_by',
