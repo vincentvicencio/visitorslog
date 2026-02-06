@@ -43,143 +43,43 @@ $(document).on('hide.bs.dropdown', '.dropdown', function () {
         }).removeClass('show');
     }
 });
-    function updateTableRows() {
-        var limit = parseInt($('#entriesPerPage').val()); 
-        var $rows = $('#employeeTableBody tr');
-        $rows.hide();
-        $rows.slice(0, limit).show();
-
-        console.log("Showing " + limit + " rows");
-    }
-    updateTableRows();
-
-    $('#entriesPerPage').on('change', function() {
-        updateTableRows();
-    });
-
-    $("#tableSearch").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        var $rows = $("#employeeTableBody tr");
-
-        if (value === "") {
-            updateTableRows(); 
-        } else {
-            $rows.filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-            });
-        }
-    });
-    // --- 1. GLOBAL VARIABLES ---
-    let currentPage = 1;
-
-    // --- 2. INITIALIZATION ---
-    // Mark all rows as matches initially so pagination shows them all
-    $("#employeeTableBody tr").addClass('search-match');
-    applyPagination();
-
-    // --- 3. SEARCH LOGIC ---
-    $("#tableSearch").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        var $rows = $("#employeeTableBody tr");
-
-        $rows.each(function() {
-            var rowText = $(this).text().toLowerCase();
-            // Check if row is the "No results" row or if it matches search
-            var isMatch = rowText.indexOf(value) > -1;
-            
-            if (isMatch) {
-                $(this).addClass('search-match');
-            } else {
-                $(this).removeClass('search-match');
-            }
-        });
-
-        currentPage = 1; // Reset to first page on new search
-        applyPagination(); 
-    });
-
-    // --- 4. PAGINATION CORE FUNCTION ---
-    function applyPagination() {
-        const limit = parseInt($('#entriesPerPage').val()) || 10;
-        const $allRows = $("#employeeTableBody tr");
-        const $rowsToPaginate = $allRows.filter('.search-match');
-
-        const totalRows = $rowsToPaginate.length;
-        const totalPages = Math.ceil(totalRows / limit) || 1;
-
-        // Boundary checks
-        if (currentPage > totalPages) currentPage = totalPages;
-        if (currentPage < 1) currentPage = 1;
-
-        // Hide all rows, then show only the current slice
-        $allRows.hide();
-        const start = (currentPage - 1) * limit;
-        const end = start + limit;
-        $rowsToPaginate.slice(start, end).show();
-
-        // Update the custom pagination UI text
-        $('.number-holder-pagination').text(`Page ${currentPage} of ${totalPages}`);
-
-        // Visual feedback for arrows (opacity and cursor)
-        updateArrowStyles(currentPage, totalPages);
-    }
-
-
-
-    // --- 5. EVENT LISTENERS ---
-
-    // Entries Per Page Change
-    $('#entriesPerPage').on('change', function() {
-        currentPage = 1;
-        applyPagination();
-    });
-
-
-
-    $(document).on('click', '.pagination-prev', function() {
-        if (currentPage > 1) {
-            currentPage--;
-            applyPagination();
-        }
-    });
-
-    $(document).on('click', '.pagination-next', function() {
-        const limit = parseInt($('#entriesPerPage').val());
-        const totalPages = Math.ceil($("#employeeTableBody tr.search-match").length / limit);
-        if (currentPage < totalPages) {
-            currentPage++;
-            applyPagination();
-        }
-    });
-
-    $(document).on('click', '.pagination-last', function() {
-        const limit = parseInt($('#entriesPerPage').val());
-        const totalPages = Math.ceil($("#employeeTableBody tr.search-match").length / limit);
-        if (currentPage < totalPages) {
-            currentPage = totalPages;
-            applyPagination();
-        }
-    });
 
 // Initialize the notification modal instance
-const notificationModalEl = document.getElementById('notificationContainer');
-const notificationModal = new Modal(notificationModalEl);
+let notificationModal;
+try {
+    const notificationModalEl = document.getElementById('notificationContainer');
+    if (!notificationModalEl) throw new Error('Notification modal element not found');
+    notificationModal = new Modal(notificationModalEl);
+} catch (error) {
+    console.error('Notification modal initialization failed:', error);
+}
 
 let userIdToDelete = null;
 
 // 1. When the delete button in the table is clicked
 $(document).on('click', '.delete-user', function() {
-    userIdToDelete = $(this).data('id'); // Store the ID
-    
-    // Set the modal content dynamically
-    $('#notification-title').text('Confirm User Deletion');
-    $('#notification-message').text('Are you sure you want to delete this user? This action cannot be undone.');
-    
-    // Ensure the "Yes" button is reset
-    $('#btn_ok').prop('disabled', false).text('Yes');
+    try {
+        userIdToDelete = $(this).data('id'); // Store the ID
+        
+        if (!userIdToDelete) {
+            console.warn('Delete button clicked without ID');
+            Triggers.showToast('No user ID found.', 1);
+            return;
+        }
+        
+        // Set the modal content dynamically
+        $('#notification-title').text('Confirm User Deletion');
+        $('#notification-message').text('Are you sure you want to delete this user? This action cannot be undone.');
+        
+        // Ensure the "Yes" button is reset
+        $('#btn_ok').prop('disabled', false).text('Yes');
 
-    // Show the modal using the bootstrap instance
-    notificationModal.show();
+        // Show the modal using the bootstrap instance
+        notificationModal?.show();
+    } catch (error) {
+        console.error('Delete user button error:', error);
+        Triggers.showToast('An error occurred.', 1);
+    }
 });
 
 // 2. When the "Yes" button inside the notification modal is clicked
@@ -192,12 +92,13 @@ $('#btn_ok').on('click', function() {
     $.ajax({
         url:'/delete-user/' + userIdToDelete,
         type: "POST",
+        timeout: 10000,
         data: {
             _token: window.Laravel.csrfToken
         },
         success: function(response) {
             // Hide the confirmation modal
-            notificationModal.hide();
+            notificationModal?.hide();
 
             // Handle the Toast
             $('#DeletetoastMessage').text(response.success || "User Deleted Successfully!");
@@ -219,105 +120,181 @@ $('#btn_ok').on('click', function() {
                 $btn.prop('disabled', false).text('Yes');
                 userModal.hide();
         },
-        error: function(xhr) {
-            alert("Error deleting user: " + (xhr.responseJSON?.message || "Internal Server Error"));
+        error: function(xhr, status, error) {
+            if (status === 'timeout') {
+                Triggers.showToast('Request timed out. Please try again.', 1);
+            } else if (xhr.status === 0) {
+                Triggers.showToast('Network error. Check your connection.', 1);
+            } else {
+                const message = xhr.responseJSON?.message || "Failed to delete user.";
+                Triggers.showToast(message, 1);
+            }
+            console.error('Delete user AJAX Error:', { xhr, status, error });
             btn.prop('disabled', false).text('Yes');
-            notificationModal.hide();
+            notificationModal?.hide();
         }
     });
 });
 $(document).on('click', '#register_btn', function () {
-        openUserModalBlank();
+        try {
+            openUserModalBlank();
+        } catch (error) {
+            console.error('Register button error:', error);
+            Triggers.showToast('An error occurred while opening the form.', 1);
+        }
     });
 
     // Click Edit Button
     $(document).on('click', '.edit-user', function () {
-        const userId = $(this).data('id');
-        if (!userId) return;
+        try {
+            const userId = $(this).data('id');
+            if (!userId) {
+                console.warn('Edit button clicked without ID');
+                return;
+            }
 
-        // Fetch user details before opening modal
-        $.get("/get-user/" + userId, function(data) {
-            openUserModal(data);
-        });
+            // Fetch user details before opening modal
+            $.ajax({
+                url: "/get-user/" + userId,
+                type: 'GET',
+                timeout: 10000,
+                success: function(data) {
+                    openUserModal(data);
+                },
+                error: function(xhr, status, error) {
+                    if (status === 'timeout') {
+                        Triggers.showToast('Request timed out. Please try again.', 1);
+                    } else if (xhr.status === 0) {
+                        Triggers.showToast('Network error. Check your connection.', 1);
+                    } else {
+                        Triggers.showToast('Failed to load user data.', 1);
+                    }
+                    console.error('Get user AJAX Error:', { xhr, status, error });
+                }
+            });
+        } catch (error) {
+            console.error('Edit user button error:', error);
+            Triggers.showToast('An error occurred while opening the edit form.', 1);
+        }
     });
 
 });
 
 // Initialize Modal
-const userModalEl = document.getElementById('registerUserModal');
-const userModal = new bootstrap.Modal(userModalEl);
+let userModal;
+try {
+    const userModalEl = document.getElementById('registerUserModal');
+    if (!userModalEl) throw new Error('User modal element not found');
+    userModal = new bootstrap.Modal(userModalEl);
+} catch (error) {
+    console.error('User modal initialization failed:', error);
+}
 
 export function openUserModal(data) {
-    const idInput = document.getElementById('reg_user_db_id');
-    
-    // Set Data
-    idInput.dataset.id = data.id; 
-    $('#reg_emp_code').val(data.emp_code); 
-    $('#reg_user_type').val(data.role_id); 
-    $('#reg_password').val(''); // Clear password for security/edit
-    
-    // UI Updates
-    $('#userModalTitle').text('Edit User');
-    $('#submit_user_btn').text('Update User');
-    $('.edit-only-text').show();
+    try {
+        const idInput = document.getElementById('reg_user_db_id');
+        if (!idInput) {
+            console.error('Required form elements not found');
+            return;
+        }
+        
+        // Set Data
+        idInput.dataset.id = data.id; 
+        $('#reg_emp_code').val(data.emp_code); 
+        $('#reg_user_type').val(data.role_id); 
+        $('#reg_password').val(''); // Clear password for security/edit
+        
+        // UI Updates
+        $('#userModalTitle').text('Edit User');
+        $('#submit_user_btn').text('Update User');
+        $('.edit-only-text').show();
 
-    // Load locations via component helper
-    if (typeof component !== 'undefined' && component.createDropdown) {
-        component.createDropdown('/getlocation', '#reg_location', data.location_id, '#registerUserModal');
-    } else {
-        $('#reg_location').val(data.location_id);
+        // Load locations via component helper
+        if (typeof component !== 'undefined' && component.createDropdown) {
+            component.createDropdown('/getlocation', '#reg_location', data.location_id, '#registerUserModal');
+        } else {
+            $('#reg_location').val(data.location_id);
+        }
+
+        userModal?.show();
+    } catch (error) {
+        console.error('openUserModal error:', error);
+        Triggers.showToast('Failed to open user form.', 1);
     }
-
-    userModal.show();
 }
 
 export function openUserModalBlank() {
-    const idInput = document.getElementById('reg_user_db_id');
-    delete idInput.dataset.id; // Clear ID to signify "Add"
-    
-    // Reset Fields
-    $('#reg_emp_code, #reg_password, #reg_user_type, #reg_location').val('');
-    
-    // UI Updates
-    $('#userModalTitle').text('Register User');
-    $('#submit_user_btn').text('Register User');
-    $('.edit-only-text').hide();
+    try {
+        const idInput = document.getElementById('reg_user_db_id');
+        if (!idInput) {
+            console.error('Required form elements not found');
+            return;
+        }
+        
+        delete idInput.dataset.id; // Clear ID to signify "Add"
+        
+        // Reset Fields
+        $('#reg_emp_code, #reg_password, #reg_user_type, #reg_location').val('');
+        
+        // UI Updates
+        $('#userModalTitle').text('Register User');
+        $('#submit_user_btn').text('Register User');
+        $('.edit-only-text').hide();
 
-    // Load locations
-    component.createDropdown('/getlocation', '#reg_location', null, '#registerUserModal');
-    
-    userModal.show();
+        // Load locations
+        if (typeof component !== 'undefined' && component.createDropdown) {
+            component.createDropdown('/getlocation', '#reg_location', null, '#registerUserModal');
+        }
+        
+        userModal?.show();
+    } catch (error) {
+        console.error('openUserModalBlank error:', error);
+        Triggers.showToast('Failed to open registration form.', 1);
+    }
 }
 
 document.getElementById('submit_user_btn').addEventListener('click', function(e) {
     e.preventDefault();
     
-    const idInput = document.getElementById('reg_user_db_id');
-    const id = idInput.dataset.id;
-    const $btn = $(this);
+    try {
+        const idInput = document.getElementById('reg_user_db_id');
+        if (!idInput) {
+            console.error('Form element not found');
+            Triggers.showToast('Form error. Please refresh the page.', 1);
+            return;
+        }
+        
+        const id = idInput.dataset.id;
+        const $btn = $(this);
 
-    // Prepare Data
-    const formData = {
-        _token: $('meta[name="csrf-token"]').attr('content'),
-        emp_code: $('#reg_emp_code').val(),
-        user_type: $('#reg_user_type').val(),
-        locations: $('#reg_location').val(),
-        password: $('#reg_password').val()
-    };
+        // Prepare Data
+        const formData = {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            emp_code: $('#reg_emp_code').val(),
+            user_type: $('#reg_user_type').val(),
+            locations: $('#reg_location').val(),
+            password: $('#reg_password').val()
+        };
 
-    // Validation
-    if (!formData.emp_code || !formData.user_type) {
-        Triggers.showToast('Please fill in required fields.', 1);
-        return;
-    }
+        // Validation with specific messages
+        if (!formData.emp_code) {
+            Triggers.showToast('Please enter an employee code.', 1);
+            return;
+        }
+        
+        if (!formData.user_type) {
+            Triggers.showToast('Please select a user type.', 1);
+            return;
+        }
 
-    $btn.prop('disabled', true).text('Processing...');
+        $btn.prop('disabled', true).text('Processing...');
 
     if (id === undefined) {
         // --- ADD USER LOGIC ---
         $.ajax({
             url: "/addusers",
             type: 'POST',
+            timeout: 10000,
             data: formData,
             success: function(response) {
                 const message = response.success || "User registered Successfully!";
@@ -346,9 +323,16 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
                 $btn.prop('disabled', false).text('Register User');
                 userModal.hide(); 
             },
-            error: function(xhr) {
+            error: function(xhr, status, error) {
+                if (status === 'timeout') {
+                    Triggers.showToast('Request timed out. Please try again.', 1);
+                } else if (xhr.status === 0) {
+                    Triggers.showToast('Network error. Check your connection.', 1);
+                } else {
+                    Triggers.showToast(xhr.responseJSON?.message ?? 'Failed to register user.', 1);
+                }
+                console.error('Add user AJAX Error:', { xhr, status, error });
                 $btn.prop('disabled', false).text('Register User');
-                Triggers.showToast(xhr.responseJSON?.message ?? 'Registration failed.', 1);
             }
         });
     } else {
@@ -357,6 +341,7 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
         $.ajax({
             url: "/update-user/" + id,
             type: 'POST',
+            timeout: 10000,
             data: formData,
             success: function(response) {
 
@@ -382,10 +367,34 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
                 $btn.prop('disabled', false).text('Update User');
                 userModal.hide();
             },
-            error: function(xhr) {
+            error: function(xhr, status, error) {
+                if (status === 'timeout') {
+                    Triggers.showToast('Request timed out. Please try again.', 1);
+                } else if (xhr.status === 0) {
+                    Triggers.showToast('Network error. Check your connection.', 1);
+                } else {
+                    Triggers.showToast(xhr.responseJSON?.message ?? 'Failed to update user.', 1);
+                }
+                console.error('Update user AJAX Error:', { xhr, status, error });
                 $btn.prop('disabled', false).text('Update User');
-                Triggers.showToast(xhr.responseJSON?.message ?? 'Update failed.', 1);
             }
         });
     }
+    } catch (error) {
+        console.error('Submit handler error:', error);
+        Triggers.showToast('An error occurred while processing your request.', 1);
+        const $btn = $(this);
+        const idInput = document.getElementById('reg_user_db_id');
+        const id = idInput?.dataset?.id;
+        $btn.prop('disabled', false).text(id === undefined ? 'Register User' : 'Update User');
+    }
+});
+
+// Global error handler for uncaught errors
+window.addEventListener('error', (event) => {
+    console.error('Global error in users.js:', event.error);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection in users.js:', event.reason);
 });

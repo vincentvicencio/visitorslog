@@ -32,8 +32,15 @@ document.getElementById('registerIDSubmit').addEventListener('click', () => {
     const visitorType = document.getElementById('visitortype');
     const visitor_type = visitorType.value.trim();
     const id_number = visitor_id.value.trim();
-    if (!visitor_id) {
-        Triggers.showToast('Textfields cannot be empty.', 1);
+    
+    // Validate each field with specific messages
+    if (!visitor_type) {
+        Triggers.showToast('Please select a visitor type.', 1);
+        return;
+    }
+    
+    if (!id_number) {
+        Triggers.showToast('Please enter a visitor ID number.', 1);
         return;
     }
 

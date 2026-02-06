@@ -177,7 +177,7 @@ class RegisterIDController extends Controller
 
 
             $newData[$i] = [
-                'visitor_type' => $d->visitorType->name,
+                'visitor_type' => $d->visitorType?->name ?? '-',
 
                 'id_number' => $d->id_number,
 

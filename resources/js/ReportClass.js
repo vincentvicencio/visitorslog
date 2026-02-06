@@ -60,60 +60,29 @@ class ReportClassTable {
             { targets: [0, 1, 2, 3], orderable: false }
         ];
 
-        settable.createTableAjax(
-            self.table,
-            columns,
-            self.url,
-            columnDefs,
-            10,          // ✅ pagination
-            {},          // ✅ data
-            false
-        );
-
-        $(self.table).on('init.dt', function () {
-
-            console.log('✅ DATATABLE INITIALIZED');
-
-            // const tableApi = $(self.table).DataTable();
-
-            // 🔥 FORCE DRAW
-            // tableApi.draw();
-
-            // =========================================
-            // CUSTOM SEARCH
-            // =========================================
-            $('#typeSearch')
-                .off('keyup')
-                .on('keyup', function () {
-                    tableApi.search(this.value).draw();
-                });
-
-            // =========================================
-            // ENTRIES PER PAGE
-            // =================================
-            $('#entriesPerPage')
-                .off('change')
-                .on('change', function () {
-                    tableApi.page.len(this.value).draw();
-                });
-        });
-        
         const tableElement = $(self.table);
         tableElement.DataTable().clear().destroy();
         
         const table = tableElement.DataTable({
-
+            pageLength: 10,
+            autoWidth: false,
+            scrollX: true,
+            scrollCollapse: true,
+            processing: true,
             serverSide: true,
             stateSave: true,
+            searching: false,
+            pagingType: 'simple',
+            dom: '<"top">rt<"bottom"pi><"clear">',
             stateLoadParams: function (settings, data) {
                 data.length = 10;
             },
             ajax: {
-                  headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 url: window.location.origin + self.url + 'list',
                 type: "POST",
                 data: function (d) { 
-                    d.search = $("input[type='search']").val();
+                    d.search = $("#typeSearch").val();
                     d.date_from = window.reportFilters.date_from;
                     d.date_to = window.reportFilters.date_to;
                     d.visitor_type = window.reportFilters.visitor_type;
@@ -129,18 +98,36 @@ class ReportClassTable {
             },
             columns: columns,
             columnDefs: columnDefs,
-                        // Inside your DataTable({ ... }) config
             drawCallback: function () {
                 const api = this.api();
-                // This forces the cloned header to align with the body
                 $(api.table().container()).find('.dataTables_scrollHeadInner').css('width', '100%');
                 $(api.table().node()).css('width', '100%');
+                component.initializeButtons(self.table, self.url);
             },
             initComplete: function() {
-                // Recalculate column widths once data is first loaded
                 this.api().columns.adjust();
+                // Remove duplicate header created by scrollX
+                $('.dt-scroll-head').remove();
             }
         });
+
+        // =========================================
+        // CUSTOM SEARCH
+        // =========================================
+        $('#typeSearch')
+            .off('keyup')
+            .on('keyup', function () {
+                table.draw();
+            });
+
+        // =========================================
+        // ENTRIES PER PAGE
+        // =========================================
+        $('#entriesPerPage')
+            .off('change')
+            .on('change', function () {
+                table.page.len(this.value).draw();
+            });
 
         setTimeout(() => {
             const searchInput = document.getElementById('dt-search-0');             
