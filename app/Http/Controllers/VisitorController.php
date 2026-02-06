@@ -124,7 +124,7 @@ class VisitorController extends Controller
                                 <div>
                 ',
 
-                'visitor_type' => '<div class="text-center">' . $d->visitorType->name . '</div>',
+                'visitor_type' => '<div class="text-center">' . ($d->visitorType?->name ?? '-') . '</div>',
 
                 'visitor_id' => '<div class="text-center">' . $d->visitor_id . '</div>',
 

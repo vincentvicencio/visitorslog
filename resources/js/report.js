@@ -266,9 +266,3 @@ document.getElementById('btn_ok').addEventListener('click', function() {
     });
 });
     
-
-// =================================Buttons==================================
-     
-
-    
-

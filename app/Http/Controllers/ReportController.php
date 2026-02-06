@@ -81,7 +81,9 @@ class ReportController extends Controller
                 ->withoutTrashed()
                 ->when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
-                        $q->where('full_name', 'LIKE', "%{$keywords}%")
+                        $q->where('first_name', 'LIKE', "%{$keywords}%")
+                        ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
+                        ->orWhere('last_name', 'LIKE', "%{$keywords}%")
                         ->orWhere('visitor_id', 'LIKE', "%{$keywords}%")
                         ->orWhere('phone_number', 'LIKE', "%{$keywords}%")
                         ->orWhereHas('visitorType', function ($qt) use ($keywords) {
@@ -99,7 +101,7 @@ class ReportController extends Controller
             })
             // 4. NEW: Filter by Visitor Type Dropdown
             ->when($request->visitor_type, function ($query) use ($request) {
-                $query->where('visitor_type_id', $request->visitor_type);
+                $query->where('visitor_type', $request->visitor_type);
             });
         
         $totalRecords = $rawquery->get()->count();
@@ -160,15 +162,22 @@ class ReportController extends Controller
             $time_in = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            // Construct full name from individual name fields
+            $fullName = trim(implode(' ', array_filter([
+                $d->first_name,
+                $d->middle_name,
+                $d->last_name
+            ])));
                     
             $newData[$i] = [
                 'full_name' => '
-                    <strong>' . $d->full_name . '</strong>
+                    <strong>' . $fullName . '</strong>
                     <br><small>' . $locationLabel . '</small>
                     <br><small>' . $d->phone_number . '</small>
                 ',
 
-                'visitor_type' => $d->visitorType->name,
+                'visitor_type' => $d->visitorType?->name ?? '-',
 
                 'visitor_id' => $d->visitor_id,
 
@@ -182,7 +191,7 @@ class ReportController extends Controller
                                 <strong>Out:</strong>
                                 '. $time_out .'
                             </small>',
-                'creator' => '<small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'<small><br>
+                'creator' => '<small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'</small><br>
                             <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>',
                 
                 'status' => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
