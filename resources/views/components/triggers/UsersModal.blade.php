@@ -42,9 +42,6 @@
                     <label class="form-label">Select Role</label>
                     <select id="reg_user_type" class="form-control" required>
                         <option value="">Select Role</option>
-                        @foreach($roles as $role)
-                            <option value="{{ $role->id }}">{{ $role->name }}</option>
-                        @endforeach
                     </select>
                 </div>
 
@@ -104,9 +101,9 @@
             <label>Role</label>
             <select name="user_type" id="edit_user_type" class="form-control mb-2" required>
                 <option value="">Select Role</option>
-                @foreach($roles as $role)
+                <!-- @foreach($roles as $role)
                     <option value="{{ $role->id }}">{{ $role->name }}</option>
-                @endforeach
+                @endforeach -->
             </select>
             <label>Employee Code</label>
             <input type="text" id="edit_emp_code" name="emp_code" class="form-control mb-3" required>

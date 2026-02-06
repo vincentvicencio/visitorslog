@@ -1,5 +1,6 @@
 import { Modal } from 'bootstrap';
 import Triggers from './common/triggers.js';
+import component from './common/component.js';
 
 
 
@@ -159,6 +160,8 @@ $(document).on('click', '#register_btn', function () {
                 return;
             }
 
+            console.log('userId:', userId),
+
             // Fetch user details before opening modal
             $.ajax({
                 url: URL+"get-user/" + userId,
@@ -252,6 +255,7 @@ export function openUserModal(data) {
         // Load locations via component helper
         if (typeof component !== 'undefined' && component.createDropdown) {
             component.createDropdown(URL+'getlocation', '#reg_location', data.location_id, '#registerUserModal');
+            component.createDropdown(URL+'get-user-type', '#edit_user_id', null, '#editPopupContainer');
         } else {
             // If location_id is an array, set multiple values
             if (Array.isArray(data.location_id)) {
@@ -352,6 +356,7 @@ export function openUserModalBlank() {
         // Load locations
         if (typeof component !== 'undefined' && component.createDropdown) {
             component.createDropdown(URL+'getlocation', '#reg_location', null, '#registerUserModal');
+            component.createDropdown(URL+'get-user-type', '#reg_user_type', null, '#registerUserModal');
         }
         
         userModal?.show();

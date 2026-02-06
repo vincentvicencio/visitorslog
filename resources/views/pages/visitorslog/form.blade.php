@@ -53,7 +53,7 @@
                                 <label for="address">Address</label>
                             </div>
                         </div>
-                        <div class="capture">
+                        <!-- <div class="capture">
                             <div class="header">Capture Image</div>
                             <div class="imgholder">
                                 Image
@@ -71,6 +71,20 @@
                                     capture="user"
                                     hidden
                                 >
+                        </div> -->
+
+                        <div class="capture">
+                            <div class="header">Capture Image</div>
+                            <div class="imgholder">
+                                <video id="webcam" autoplay playsinline style="width: 100%; height: auto;"></video>
+                                <canvas id="canvas" style="display:none;"></canvas>
+                                <img id="photoPreview" src="" style="display:none; width: 100%; height: auto;">
+                            </div>
+
+                            <button type="button" class="capture-button" id="captureBtn">Capture</button>
+                            <button type="button" class="capture-button" id="recaptureBtn">ReCapture</button>
+                            
+                            <input type="file" id="image_path" name="image_path" hidden>
                         </div>
 
                     </div>

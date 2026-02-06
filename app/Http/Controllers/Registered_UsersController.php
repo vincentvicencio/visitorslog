@@ -52,6 +52,19 @@ class Registered_UsersController extends Controller
     $validationRules = [
         'user_type' => 'required',
         'locations' => 'required',
+        'emp_code' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $exists = RegisteredUser::where('user_name', $value)
+                        ->whereNull('deleted_at')
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('Employee Code already exists.');
+                    }
+                },
+            ],    
     ];
     
     if ($isGuard) {
@@ -212,8 +225,19 @@ class Registered_UsersController extends Controller
 public function getUserTypes()
 {
     // Assuming your model is named User_types based on your use statements
-    return response()->json(User_types::all());
+    // return response()->json(User_types::all());
+    $types = \App\Models\User_types::all();
+    
+    $data = $types->map(function ($type) {
+        return [
+            'id'   => $type->id,
+            'text' => $type->name // Mapping 'name' to 'text'
+        ];
+    });
+
+    return response()->json($data);
 }
+
 
 
     public function getUser($id)

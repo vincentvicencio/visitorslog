@@ -261,6 +261,7 @@ class VisitorController extends Controller
             'middle_name'  => 'nullable|string',
             'last_name'    => 'required|string',
             'visitor_type' => 'required|exists:visitor_types,id',
+            'address'      => 'required|string',
 
             'id_number' => [
                 'required',
@@ -285,17 +286,22 @@ class VisitorController extends Controller
                 },
             ],
 
-            'image_path' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'image_path' => 'nullable',
         ]);
 
 
 
         try {
             // Handle image upload
-            $imagePath = null;
+            // $imagePath = null;
+            
             if ($request->hasFile('image_path')) {
                 $imagePath = $request->file('image_path')->store('visitors', 'public');
             }
+
+            dd($request->all(), $request->file('image_path'));
+
+            // $imagePath = $request->image_path ? $imagePath : null;
             $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
             // $location = collect(session('all_location'));
             // foreach ($location as $record) {
@@ -305,6 +311,8 @@ class VisitorController extends Controller
             //     ];
             // }
             // Save visitor
+
+
             $visitor = new Visitor();
             $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
             $visitor->first_name   = $request->first_name;
