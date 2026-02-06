@@ -69,6 +69,30 @@ $(document).on('click', '#openFilterBtn', function () {
     modalInstance.show();
 });
 
+$(document).on('click', '#exportReportBtn', function () {
+    try {
+        const filters = window.reportFilters || {};
+        
+        // Build query string with filters
+        const params = new URLSearchParams();
+        if (filters.date_from) params.append('date_from', filters.date_from);
+        if (filters.date_to) params.append('date_to', filters.date_to);
+        if (filters.visitor_type) params.append('visitor_type', filters.visitor_type);
+        
+        const searchValue = $('#typeSearch').val();
+        if (searchValue) params.append('search', searchValue);
+
+        // Trigger download
+        const exportUrl = '/reports/export?' + params.toString();
+        window.location.href = exportUrl;
+        
+        // Show success toast
+        triggers.showToast('Exporting report to Excel...', 0);
+    } catch (error) {
+        console.error('Export error:', error);
+        triggers.showToast('Failed to export report. Please try again.', 1);
+    }
+});
 
     $(document).on('submit', '#filterForm', function(e) {
     e.preventDefault();

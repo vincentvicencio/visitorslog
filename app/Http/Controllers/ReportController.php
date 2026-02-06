@@ -15,6 +15,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
+use App\Exports\ReportsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -237,5 +239,19 @@ class ReportController extends Controller
             'recordsFiltered'   => $totalFiltered,
             'data'              => $newData            
         ]);
+    }
+
+    public function exportReport(Request $request)
+    {
+        $filters = [
+            'search' => $request->input('search', ''),
+            'date_from' => $request->input('date_from', ''),
+            'date_to' => $request->input('date_to', ''),
+            'visitor_type' => $request->input('visitor_type', ''),
+        ];
+
+        $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        
+        return Excel::download(new ReportsExport($filters), $fileName);
     }
 }
