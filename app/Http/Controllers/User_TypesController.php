@@ -3,11 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User_types; // Ensure this is correct
+use App\Models\User_types;
+use App\Models\VisitorType;
 use Illuminate\Support\Facades\Auth;
 
 class User_TypesController extends Controller
 {
+    public function index()
+    {
+        $roles = User_types::all(); 
+        $visitorTypes = VisitorType::all();
+        $empMap = collect(session('all_emp'))->keyBy('emp_code');
+        
+        return view('pages.userType.usertype', compact('roles', 'visitorTypes','empMap'));
+    }
     public function addusertype(Request $request)
     {
         $request->validate([
@@ -27,21 +36,12 @@ class User_TypesController extends Controller
      
         $keywords = strtolower($request->search);
         $limit    = $request->input('length');
-        
-
-
-        // $rawquery = VisitorType::withoutTrashed();
-        // ->where(function($query) use ($keywords) {
-        //                 $query->where('name', 'LIKE', "%$keywords%");
-        //             });
 
 
         $rawquery = User_types::withoutTrashed()->where(function($query) use ($keywords) {
                         $query->where('name', 'LIKE', "%$keywords%")
                             ->where('deleted_at', null);
                     });
-        
-
 
         
         $totalRecords = $rawquery->get()->count();
@@ -65,19 +65,6 @@ class User_TypesController extends Controller
  
         $newData = [];
         $i       = 0;
- 
-        // foreach ($data as $d) { 
- 
-        //     $newData[$i] = [
-        //         'id'          => $d->id,
-        //         'name'        => $d->name,
-        //         'description' => $d->description,
-        //         // 'updated_by'  => user_name($d->updated_by),
-        //         // 'updated_date'=> date('Y-m-d H:i:s', strtotime($d->updated_at)),
-        //         // 'action'      => create_action($d->id, $d->name, 'Edit')
-        //     ];
-        //     $i++;
-        // }
       
         foreach ($data as $d) { 
        

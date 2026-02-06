@@ -16,6 +16,7 @@
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
         "laravel/ui": "*",
+        "maatwebsite/excel": "^3.1",
         "onemagellan/centralize-login": "dev-master"
     },
     "require-dev": {

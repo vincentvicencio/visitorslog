@@ -23,7 +23,6 @@ export function openTextInputModalBlank() {
     textInputModal.show();
 }
 
-// Handle submit
 document.getElementById('textInputSubmit').addEventListener('click', () => {
     const input = document.getElementById('userInput');
     const id = input.dataset.id;
@@ -34,7 +33,6 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
     }
 
     if(id === undefined) {
-        // Send AJAX request to update visitor type
         $.ajax({
             url: URL+"save",
             type: 'POST',
@@ -58,7 +56,6 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
             }
         });
     }else{
-        // Send AJAX request to update visitor type
         $.ajax({
             url: URL+"edit",
             type: 'POST',
@@ -69,7 +66,6 @@ document.getElementById('textInputSubmit').addEventListener('click', () => {
             },
             success: function (response) {
                 Triggers.showToast(response.message, 0);
-                // Close modal
                 setTimeout(() => {
                     $(textInputModal.hide()).fadeOut('slow');
                 }, 1000);
@@ -93,10 +89,9 @@ $(document).ready(function () {
         openTextInputModalBlank();
     });
 
-    // Open modal when clicking edit
     $(document).on('click', '#editBtn', function () {
         const id = $(this).data('id');
-        const name = $(this).data('name');   // Make sure this is in your HTML
+        const name = $(this).data('name'); 
         if (!id) return;
         openTextInputModal(id, name);
     });

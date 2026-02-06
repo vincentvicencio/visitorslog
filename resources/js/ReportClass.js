@@ -19,11 +19,11 @@ class ReportClassTable {
     constructor() {
         this.defaultFields  = []
         // first parameter of your route
-        this.url            = "/reporttable/"
+        this.url            = "/reports/"
         // id name of your table listing in user
         this.table          = "#reportTable"
         // module
-        this.module         = "reporttable"
+        this.module         = "reports"
         // form id
         this.form           = "#"
         // offCanvas

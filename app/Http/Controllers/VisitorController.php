@@ -11,12 +11,21 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-
-
-
 class VisitorController extends Controller
 {
     public function index()
+    {
+        $visitors = Visitor::where('status', 0)
+                   ->whereNull('time_out')
+                   ->orderBy('id', 'desc')
+                   ->get();
+        $visitorTypes = VisitorType::where('deleted_at', null)
+                   ->orderBy('id', 'desc')
+                   ->get();
+        $empMap = collect(session('all_emp'))->keyBy('emp_code');
+        return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+    }
+    public function form()
     {
         $visitorTypes = VisitorType::where('deleted_at', null)
                    ->orderBy('id', 'asc')
@@ -24,43 +33,14 @@ class VisitorController extends Controller
         $visitors = Visitor::where('status', 0)
                    ->orderBy('id', 'asc')
                    ->get();
-        return view('homepage.form', compact('visitorTypes', "visitors"));
+        return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
     }
 
     public function list(Request $request){
 
         $keywords = strtolower($request->search);
-        // dd($request->search);
-        // $keywords = strtolower($request->input('search.value'));
 
         $limit    = $request->input('length');
-
-        // $rawquery = Visitor::with('visitorType')
-        //             ->withoutTrashed()
-        //             ->where('status', 0)
-        //             ->where('deleted_at', null)
-        //             ->when($keywords, callback: function ($query) use ($keywords) {
-        //                 $query->where('visitor_id', 'LIKE', "%{$keywords}%")
-        //                     ->orWhereHas(relation: 'visitorType', function ($q) use ($keywords) {
-        //                         $q->where('name', 'LIKE', "%{$keywords}%");
-        //                     });
-        //             });
-
-        // $rawquery = Visitor::with('visitorType')
-        //             ->withoutTrashed()
-        //             ->where('status', 0)
-        //             ->when($keywords, function ($query) use ($keywords) {
-        //                 $query->where('visitor_id', 'LIKE', "%{$keywords}%")
-        //                     ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-        //                         $qt->where('name', 'LIKE', "%{$keywords}%");
-        //                     });
-
-                    
-        //             });
-        // $rawquery = Visitor::withoutTrashed()->where(function($query) use ($keywords) {
-        //         $query->where('first_name', 'LIKE', "%$keywords%")
-        //                 ->where('status', 0);
-        //     });
 
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
@@ -75,10 +55,6 @@ class VisitorController extends Controller
                         });
                     });
                 });
-
-
-
-
         
         $totalRecords = $rawquery->get()->count();
         
@@ -101,19 +77,6 @@ class VisitorController extends Controller
  
         $newData = [];
         $i       = 0;
- 
-        // foreach ($data as $d) { 
- 
-        //     $newData[$i] = [
-        //         'id'          => $d->id,
-        //         'name'        => $d->name,
-        //         'description' => $d->description,
-        //         // 'updated_by'  => user_name($d->updated_by),
-        //         // 'updated_date'=> date('Y-m-d H:i:s', strtotime($d->updated_at)),
-        //         // 'action'      => create_action($d->id, $d->name, 'Edit')
-        //     ];
-        //     $i++;
-        // }
       
         foreach ($data as $d) { 
             $locationLabel = '';
@@ -180,7 +143,7 @@ class VisitorController extends Controller
                                 </small>
                             </div>',
                 'creator' => '<div class="text-center">
-                                <small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'<small><br>
+                                <small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'</small><br>
                                 <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>
                             </div>',
                 
@@ -205,7 +168,7 @@ class VisitorController extends Controller
                                             class="dropdown-item"
                                             id="viewBtn"
                                             data-id="'. $d->id .'"
-                                            data-type="visitorlog">
+                                            data-type="visitorslog">
                                             <i class="bi bi-eye me-2"></i> View
                                         </button>
 
@@ -234,7 +197,7 @@ class VisitorController extends Controller
         ]);
     }
 
-    public function timeoutAjax(Request $request)
+    public function timeout(Request $request)
     {
         $visitor = Visitor::where('id', $request->id)->first();
 
@@ -267,7 +230,7 @@ class VisitorController extends Controller
         ]);
 
         $visitor = Visitor::where('id', $request->id)
-            ->where('status', 0)
+            // ->where('status', 0)
             ->latest('id')
             ->first();
 
@@ -276,10 +239,6 @@ class VisitorController extends Controller
                 'message' => 'Visitor not found or inactive'
             ], 404);
         }
-
-        // return response()->json([
-        //     'redirect' => route('visitor.view.page', $visitor->id, $visitor->type)
-        // ]);
         return response()->json([
             'redirect' => route('view.page', [
                 'id'   => $visitor->id,
@@ -291,7 +250,7 @@ class VisitorController extends Controller
 
 
 
-    public function saveAjax(Request $request)
+    public function save(Request $request)
     {
         $request->validate([
             'first_name'   => 'required|string',

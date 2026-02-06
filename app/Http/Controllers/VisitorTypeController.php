@@ -14,29 +14,21 @@ class VisitorTypeController extends Controller
     // Show the form
     public function index()
     {
-        return view('visitor_types.form');
+        $visitorTypes = VisitorType::where('deleted_at', null)
+        ->orderBy('id', 'desc')
+        ->get();
+        return view('pages.visitorType.visitortype', compact('visitorTypes'));
     }
 
     public function list(Request $request){
      
         $keywords = strtolower($request->search);
         $limit    = $request->input('length');
-        
-
-
-        // $rawquery = VisitorType::withoutTrashed();
-        // ->where(function($query) use ($keywords) {
-        //                 $query->where('name', 'LIKE', "%$keywords%");
-        //             });
-
 
         $rawquery = VisitorType::withoutTrashed()->where(function($query) use ($keywords) {
                         $query->where('name', 'LIKE', "%$keywords%")
                             ->where('deleted_at', null);
                     });
-        
-
-
         
         $totalRecords = $rawquery->get()->count();
         
@@ -59,20 +51,7 @@ class VisitorTypeController extends Controller
  
         $newData = [];
         $i       = 0;
- 
-        // foreach ($data as $d) { 
- 
-        //     $newData[$i] = [
-        //         'id'          => $d->id,
-        //         'name'        => $d->name,
-        //         'description' => $d->description,
-        //         // 'updated_by'  => user_name($d->updated_by),
-        //         // 'updated_date'=> date('Y-m-d H:i:s', strtotime($d->updated_at)),
-        //         // 'action'      => create_action($d->id, $d->name, 'Edit')
-        //     ];
-        //     $i++;
-        // }
-      
+
         foreach ($data as $d) { 
        
             $newData[$i] = [
@@ -123,8 +102,6 @@ class VisitorTypeController extends Controller
         ]);
     }
 
-
-    // Save via AJAX
      public function save(Request $request)
     {
         $request->validate([
@@ -132,7 +109,6 @@ class VisitorTypeController extends Controller
                 'required',
                 'string',
                 function ($attribute, $value, $fail) {
-                    // Check if a visitor type with the same name exists and is not soft-deleted
                     $exists = VisitorType::whereRaw('LOWER(name) = ?', [strtolower($value)])
                                 ->whereNull('deleted_at') // only consider non-deleted rows
                                 ->exists();
@@ -162,7 +138,7 @@ class VisitorTypeController extends Controller
             ]);
         }
     }
-    public function editAjax(Request $request)
+    public function edit(Request $request)
     {
         $request->validate([
             'id' => 'required|exists:visitor_types,id',
@@ -196,7 +172,7 @@ class VisitorTypeController extends Controller
 
 
 
-    public function deleteAjax(Request $request)
+    public function delete(Request $request)
     {
         $visitor = VisitorType::where('id', $request->id)->first();
 

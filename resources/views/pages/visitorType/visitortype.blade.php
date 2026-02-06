@@ -11,7 +11,6 @@
          text-white rounded-2 border-0 cursor-pointer px-3 py-2" id="addBtn">
             Add Visitor Type
         </div>
-        <!-- <div class="top-button" id="addBtn">Add Visitor Type</div> -->
     </div>
     <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
@@ -32,7 +31,6 @@
     
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-{{-- @vite(['resources/js/visitortype.js', 'resources/js/visitorClass.js']) --}}
 
 
 @push('scripts')

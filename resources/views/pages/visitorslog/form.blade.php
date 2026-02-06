@@ -5,11 +5,11 @@
 
 @section('content')
 
-    <div class="container-background position-fixed top-0 start-0 vw-100 vh-100 bg-black"><img src="images/bgg.png" alt="" class="w-100 h-100 d-block opacity-75 object-fit-cover"></div>
+    <div class="container-background position-fixed top-0 start-0 vw-100 vh-100 bg-black"><img src="/images/bgg.png" alt="" class="w-100 h-100 d-block opacity-75 object-fit-cover"></div>
     <div class="addvisitor" id="addVisitorModal">
         <div class="addvisitormodal">
             <div class="panel">
-                <a class="btn-close" href="{{ route('visitorlog.index') }}" id="detailsBtn">
+                <a class="btn-close" href="{{ route('visitorslog') }}" id="detailsBtn">
                     {{-- <i class="bi bi-x-lg"></i> --}}
                 </a>
                 <div class="header fs-4">Add Visitor</div>

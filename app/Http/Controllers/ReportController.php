@@ -16,81 +16,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 
-class PageController extends Controller
+class ReportController extends Controller
 {
-    public function show()
-    {
-        $visitors = Visitor::where('status', 0)
-                   ->whereNull('time_out')
-                   ->orderBy('id', 'desc')
-                   ->get();
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'desc')
-                   ->get();
-        $empMap = collect(session('all_emp'))->keyBy('emp_code');
-        return view('pages.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
-    }
-    public function show_usertype()
-    {
-        $roles = \App\Models\User_types::all(); 
-        $visitorTypes = VisitorType::all();
-        $empMap = collect(session('all_emp'))->keyBy('emp_code');
-        
-        return view('pages.usertype', compact('roles', 'visitorTypes','empMap'));
-    }
-    public function show_user(Request $request)
-    {
-        $registeredUsers = RegisteredUser::all();
-        $roles = \App\Models\user_types::all();
-        $visitorTypes = VisitorType::all();
-
-        // $visitorlogs = Visitor::with('visitor_type')->get();
-        $visitorlogs = Visitor::where('status', 0)
-                   ->orderBy('id', 'asc')
-                   ->get();
-        $search = $request->input('search');
-
-        $empMap = collect(session('all_emp'))->keyBy('emp_code');
-        
-        $registeredUsers = RegisteredUser::with('userType')
-        ->whereNull('deleted_at')
-        ->when($search, function ($query, $search) {
-            $query->where('user_name', 'like', "%{$search}%")
-                ->orWhere('first_name', 'like', "%{$search}%")
-                ->orWhere('last_name', 'like', "%{$search}%");
-        })
-        ->get();
-
-        $allEmployeesFromSession = session('all_emp', []);
-        return view('pages.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession', 'visitorlogs', 'visitorTypes','empMap'));
-    }
-
-    public function show_visitortype()
-    {
-        // Get all registered IDs, latest first
-        $visitorTypes = VisitorType::where('deleted_at', null)
-        ->orderBy('id', 'desc')
-        ->get();
-        // Pass to the view
-        return view('pages.visitortype', compact('visitorTypes'));
-    }
-
-    public function show_id()
-    {
-        $registeredIds = RegisteredID::where('deleted_at', null)
-                   ->orderBy('id', 'desc')
-                   ->get();
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'desc')
-                   ->get();
-        $visitorsLogs = Visitor::where('status', 0)
-                   ->whereNull('time_out')
-                   ->orderBy('id', 'desc')
-                   ->get();
-        return view('pages.id', compact('registeredIds', 'visitorTypes', 'visitorsLogs'));
-    }
-
-    public function show_report(Request $request)
+    public function index(Request $request)
     {
         $visitorlogs = Visitor::where('status', 0)
                     ->orderBy('id', 'asc')
@@ -101,7 +29,7 @@ class PageController extends Controller
 
         
 
-        return view('pages.report', compact('visitorlogs', 'visitorTypes', 'allEmployeesFromSession'));
+        return view('pages.reports.report', compact('visitorlogs', 'visitorTypes', 'allEmployeesFromSession'));
     }
 
 
@@ -141,6 +69,14 @@ class PageController extends Controller
 
         $limit    = $request->input('length');
 
+        // Debug: Log what we're receiving
+        \Log::info('Filter Request:', [
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+            'visitor_type' => $request->visitor_type,
+            'search' => $keywords
+        ]);
+
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
                 ->when($keywords, function ($query) use ($keywords) {
@@ -177,12 +113,12 @@ class PageController extends Controller
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawQuery->orderby($order, $direction)->get(); 
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get(); 
             $totalFiltered = count($temp);
        
         } else { 
        
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
      
             $totalFiltered = $totalRecords;
         }
@@ -273,29 +209,24 @@ class PageController extends Controller
                                     Action
                                 </button>
 
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <button 
-                                            class="dropdown-item"
-                                            id="viewBtn"
-                                            data-id="'. $d->id .'"
-                                            data-type="visitorlog">
-                                            <i class="bi bi-eye me-2"></i> View
-                                        </button>
-
-                                    </li>
-                                    <li>
-                                        <button 
-                                            type="button"
-                                            class="dropdown-item text-danger"
-                                            id="timeoutBtn"
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <button 
+                                        class="dropdown-item"
+                                        id="viewBtn"
+                                        data-id="'. $d->id .'"
+                                        data-type="reports">
+                                        <i class="bi bi-eye me-2"></i> View
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger delete-btn" 
                                             data-id="'. $d->id .'">
-                                            <i class="bi bi-clock-history me-2"></i> Timeout
-                                        </button>
-
-                                    </li>
-                                </ul>
-                            </div>',
+                                        <i class="bi bi-trash me-2"></i> Delete
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>',
             ];
             $i++;
         }

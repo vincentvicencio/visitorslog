@@ -10,7 +10,7 @@
         <div class="addvisitormodal">
             <div class="panel">
 
-                <a class="btn-close" href="{{ route($type.'.index') }}"></a>
+                <a class="btn-close" href="{{ route($type) }}"></a>
 
 
 
@@ -63,29 +63,8 @@
                                 <img src="{{ Storage::url($visitor->image_path) }}" alt="" class="w-100 h-100 object-fit-cover">
                             @endif 
                         </div>
-                        {{-- <button type="button" class="capture-button">capture</button>
-                        <input type="file" name="image_path" accept="image/*"> --}}
-                        {{-- @if ($visitor->image_path == null)
-                            <button type="button" class="capture-button" id="captureBtn">
-                                Capture
-                            </button>
-                            <input 
-                                type="file"
-                                id="imageInput"
-                                name="image_path"
-                                accept="image/*"
-                                capture="environment"
-                                hidden
-                            >
-                        @endif  --}}
                     </div>
                 </div>
-                {{-- @if ($visitor->image_path == null)
-                    <div class="panel-buttons">
-                        <button type="submit" class="save">save</button>
-                        <button type="button" class="clear">clear</button>
-                    </div>
-                @endif --}}
             </div>
         </div>
     </div>

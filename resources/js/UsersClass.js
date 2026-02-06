@@ -10,11 +10,11 @@ class UsersTable {
     constructor() {
         this.defaultFields  = []
         // first parameter of your route
-        this.url            = "/userstable/"
+        this.url            = "/registerUser/"
         // id name of your table listing in user
         this.table          = "#usersTable"
         // module
-        this.module         = "userstable"
+        this.module         = "registerUser"
         // form id
         this.form           = "#"
         // offCanvas

@@ -36,7 +36,7 @@ $(document).ready(function () {
                     $('.toast').fadeOut('slow');
                 }, 1000);
                 setTimeout(() => {
-                    window.location.href = "/visitorlog";
+                    window.location.href = "/visitorslog";
                 }, 1000);
             },
             error: function (xhr, status, error) {

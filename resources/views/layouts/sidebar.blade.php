@@ -33,20 +33,20 @@
 
         <div class="d-flex flex-column vh-100 mx-2">
 
-        <a href="{{ url('visitorlog') }}"
-        class="sidebar-menu-button {{ Request::is('visitorlog') ? 'selected' : '' }}">
+        <a href="{{ url('visitorslog') }}"
+        class="sidebar-menu-button {{ Request::is('visitorslog') ? 'selected' : '' }}">
             <i class="bi bi-person-lines-fill fs-6 p-2"></i>
             Visitor Log Sheets
         </a>
 
-        <a href="{{ url('usertype') }}"
-        class="sidebar-menu-button {{ Request::is('usertype') ? 'selected' : '' }}">
+        <a href="{{ url('userTypes') }}"
+        class="sidebar-menu-button {{ Request::is('userTypes') ? 'selected' : '' }}">
             <i class="bi bi-people-fill fs-6 p-2"></i>
             User Type
         </a>
 
-        <a href="{{ url('users') }}"
-        class="sidebar-menu-button {{ Request::is('users') ? 'selected' : '' }}">
+        <a href="{{ url('registerUser') }}"
+        class="sidebar-menu-button {{ Request::is('registerUser') ? 'selected' : '' }}">
             <i class="bi bi-person-add fs-6 p-2"></i>
             User
         </a>
@@ -57,14 +57,14 @@
             Visitor Type
         </a>
 
-        <a href="{{ url('id') }}"
-        class="sidebar-menu-button {{ Request::is('id') ? 'selected' : '' }}">
+        <a href="{{ url('registerId') }}"
+        class="sidebar-menu-button {{ Request::is('registerId') ? 'selected' : '' }}">
             <i class="bi bi-person-vcard fs-6 p-2"></i>
             ID Numbers
         </a>
 
-        <a href="{{ url('report') }}"
-        class="sidebar-menu-button {{ Request::is('report') ? 'selected' : '' }}">
+        <a href="{{ url('reports') }}"
+        class="sidebar-menu-button {{ Request::is('reports') ? 'selected' : '' }}">
             <i class="bi bi-journals fs-6 p-2"></i>
             Reports
         </a>

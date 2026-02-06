@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\RegisteredID\visitorsLogs;
 use App\Models\RegisteredID;
 use App\Models\VisitorType;
+use App\Models\Visitor;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +16,17 @@ class RegisterIDController extends Controller
     // Show the form
     public function index()
     {
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'asc')
+        $registeredIds = RegisteredID::where('deleted_at', null)
+                   ->orderBy('id', 'desc')
                    ->get();
-        return view('registerid.form', compact('visitorTypes'));
+        $visitorTypes = VisitorType::where('deleted_at', null)
+                   ->orderBy('id', 'desc')
+                   ->get();
+        $visitorsLogs = Visitor::where('status', 0)
+                   ->whereNull('time_out')
+                   ->orderBy('id', 'desc')
+                   ->get();
+        return view('pages.registerid.id', compact('registeredIds', 'visitorTypes', 'visitorsLogs'));
     }
 
 
@@ -26,19 +34,6 @@ class RegisterIDController extends Controller
      
         $keywords = strtolower($request->search);
         $limit    = $request->input('length');
-
-        // $rawquery = RegisteredID::with('visitorType')->withoutTrashed();
-
-        // $rawquery = VisitorType::withoutTrashed();
-        // ->where(function($query) use ($keywords) {
-        //                 $query->where('name', 'LIKE', "%$keywords%");
-        //             });
-
-
-        // $rawquery = RegisteredID::withoutTrashed()->where(function($query) use ($keywords) {
-        //                 $query->where('id_number', 'LIKE', "%$keywords%")
-        //                         ->orWhere('visitor_type', 'LIKE', "%$keywords%");
-        //             });
 
         $rawquery = RegisteredID::with('visitorType')
                     ->withoutTrashed()
@@ -75,70 +70,11 @@ class RegisterIDController extends Controller
  
         $newData = [];
         $i       = 0;
- 
-        // foreach ($data as $d) { 
- 
-        //     $newData[$i] = [
-        //         'id'          => $d->id,
-        //         'name'        => $d->name,
-        //         'description' => $d->description,
-        //         // 'updated_by'  => user_name($d->updated_by),
-        //         // 'updated_date'=> date('Y-m-d H:i:s', strtotime($d->updated_at)),
-        //         // 'action'      => create_action($d->id, $d->name, 'Edit')
-        //     ];
-        //     $i++;
-        // }
-      
-        // foreach ($data as $d) { 
-       
-        //     $newData[$i] = [
-        //         'visitor_type'       => $d->visitor_type,
-        //         'id_number'          => $d->id_number, // show emp_code in first column
-        //         'created_by'          => $d->created_by,
-        //         'updated_by'          => $d->updated_by,
-        //         'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
-        //         'updated_at' => $d->updated_at->format('F j, Y').'<br>'. $d->updated_at->format('l'),
-        //         'action'            => '<button 
-        //                                     class="btn btn-sm btn-primary dropdown-toggle"
-        //                                     type="button"
-        //                                     data-bs-toggle="dropdown"
-        //                                     aria-expanded="false">
-        //                                     Action
-        //                                 </button>
-        //                                 <ul class="dropdown-menu">
-        //                                     <li>
-        //                                         <button 
-        //                                             class="dropdown-item"
-        //                                             id="editBtn"
-        //                                             data-id="'.$d->id.'"
-        //                                             data-name="'.$d->id_number.'"
-        //                                             data-type"'.$d->visitor_type.'"
-        //                                             >
-        //                                             <i class="bi bi-pencil-square me-2"></i> Edit
-        //                                         </button>
-
-        //                                     </li>
-        //                                     <li>
-        //                                         <button 
-        //                                             type="button"
-        //                                             class="dropdown-item text-danger"
-        //                                             id="deleteBtn"
-        //                                             data-id="'.$d->id.'"
-        //                                             <i class="bi bi-trash me-2"></i> Delete
-        //                                         </button>
-
-        //                                     </li>
-        //                                 </ul>' 
-        //     ];
-
-        //     $i++;
-        // } 
 
         foreach ($data as $d) { 
             $exists = $d->visitorsLogs()->exists();
 
             if (!$exists) {
-                // NOT USED → allow edit/delete
                 $action = '<div class="dropdown">
                                 <button 
                                     class="btn btn-sm btn-primary dropdown-toggle"
@@ -170,7 +106,6 @@ class RegisterIDController extends Controller
                                 </ul>
                             </div>';
             } else {
-                // USED → disable actions
             $action = '<span class="badge bg-success">Currently Used</span>';
 
             }
@@ -203,10 +138,8 @@ class RegisterIDController extends Controller
         ]);
     }
 
-    // Save via AJAX
     public function save(Request $request)
     {
-        // 1️⃣ VALIDATION
         $request->validate([
             'id_number' => [
                 'required',
@@ -229,17 +162,13 @@ class RegisterIDController extends Controller
 
 
 
-        // 2️⃣ SAVE DATA
         $registeredID = new RegisteredID();
         $registeredID->id_number = $request->id_number;
-        // visitor_type IS ALREADY the ID from visitor_types table
         $registeredID->visitor_type = $request->visitor_type;
         $registeredID->created_by = Auth::id();
-        // Auth::user()->first_name . ' ' .Auth::user()->last_name ?? 'System';
         $registeredID->created_at = now();
         $registeredID->save();
 
-        // 3️⃣ RESPONSE
         if (!$registeredID) {
             return response()->json([
                 'message' => 'Visitor Id not found'
@@ -251,7 +180,7 @@ class RegisterIDController extends Controller
         ]);
     }
 
-    public function editAjax(Request $request)
+    public function edit(Request $request)
     {
         $request->validate([
             'id' => 'required|exists:registered_visitor_ids,id',
@@ -286,7 +215,7 @@ class RegisterIDController extends Controller
 
 
 
-    public function deleteAjax(Request $request)
+    public function delete(Request $request)
     {
         $visitor = RegisteredID::where('id', $request->id)->first();
 
