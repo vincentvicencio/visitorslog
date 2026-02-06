@@ -12,8 +12,8 @@
                 <a class="btn-close" href="{{ route('visitorslog') }}" id="detailsBtn">
                     {{-- <i class="bi bi-x-lg"></i> --}}
                 </a>
-                <div class="header fs-4">Add Visitor</div>
-                <div class="subheader mb-3">Register and record a new visitor entry</div>
+                <div class="header fs-3">Add Visitor</div>
+                <div class="subheader mb-2">Register and record a new visitor entry</div>
                 <form id="addVisitorForm" enctype="multipart/form-data">
                     @csrf 
                     <div class="form">
@@ -53,15 +53,20 @@
                                 <label for="address">Address</label>
                             </div>
                         </div>
-                        <div class="capture">
-                            <div class="header">Capture Image</div>
-                            <div class="imgholder">
-                                Image
+                        {{-- <div class="capture">
+                            <div class="capturedata">
+                                <div class="header">Captured Image</div>
+                                <div class="imgholder">
+                                    Image
+                                </div>
                             </div>
-                            {{-- <button type="button" class="capture-button">capture</button>
-                            <input type="file" name="image_path" accept="image/*"> --}}
+
+                            <div class="capturedata">
                                 <button type="button" class="capture-button" id="captureBtn">
                                     Capture
+                                </button>
+                                <button type="button" class="capture-button" id="recaptureBtn">
+                                    recapture
                                 </button>
                                 <input 
                                     type="file"
@@ -71,6 +76,22 @@
                                     capture="user"
                                     hidden
                                 >
+                            </div>
+                                
+                        </div> --}}
+
+                        <div class="capture">
+                            <div class="header">Capture Image</div>
+                            <div class="imgholder">
+                                <video id="webcam" autoplay playsinline style="width: 100%; height: auto;"></video>
+                                <canvas id="canvas" style="display:none;"></canvas>
+                                <img id="photoPreview" src="" style="display:none; width: 100%; height: auto;">
+                            </div>
+
+                            <button type="button" class="capture-button" id="captureBtn">Capture</button>
+                            <button type="button" class="capture-button" id="recaptureBtn">ReCapture</button>
+                            
+                            <input type="hidden" id="image_path" name="image_path">
                         </div>
 
                     </div>

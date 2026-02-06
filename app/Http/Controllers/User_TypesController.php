@@ -111,22 +111,46 @@ class User_TypesController extends Controller
         }
     }
 
-public function edit($id)
-{
-    $role = User_types::findOrFail($id); 
-    return response()->json($role);
-}
+    public function edit($id)
+    {
+        $role = User_types::findOrFail($id); 
+        return response()->json($role);
+    }
 
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'user_type' => 'required|string|max:255|unique:user_types,name,' . $id,
-    ]);
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'user_type' => 'required|string|max:255|unique:user_types,name,' . $id,
+        ]);
 
-    $role = User_types::findOrFail($id);
-    $role->update([
-        'name' => $request->user_type,
-        'updated_by' => Auth::id(),
-    ]);
-}
+        $role = User_types::findOrFail($id);
+        $role->update([
+            'name' => $request->user_type,
+            'updated_by' => Auth::id(),
+        ]);
+    }
+
+    public function save(Request $request)
+    {
+        $record = $request->id;
+        $request->validate([
+            'user_type' => 'required|string|max:255|unique:user_types,name',
+        ]);
+
+        if($record){
+            $role = User_types::findOrFail($record);
+            $role->update([
+                'name' => $request->user_type,
+                'updated_by' => Auth::id(),
+            ]);
+        } else {
+            User_types::create([
+                'name' => $request->user_type,
+                'created_by' => Auth::id(),
+                'updated_by' => Auth::id(),
+            ]);
+        }
+
+        return response()->json(['status' => 'success']);
+    }
 }

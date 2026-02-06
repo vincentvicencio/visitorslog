@@ -6,7 +6,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @push('scripts')
-@vite(['resources/js/userTypeClass.js'])
+{{-- @vite(['resources/js/userTypeClass.js']) --}}
 @vite (['resources/js/usertype.js'])
 @include('components.triggers.users-userstype-toast')
 @include('components.triggers.UserTypeModal')

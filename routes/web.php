@@ -50,15 +50,15 @@ Route::middleware(['auth'])->group(function () {
         ->group(function () {
             Route::get('/',                 'index')->name('visitorslog');
             Route::get('/form',             'form')->name('visitorslog.form');
-            Route::post('/list',            'list')->name('visitorslog.list');
-            Route::post('/save',            'save')->name('visitorslog.save');
-            Route::post('/timeout',         'timeout')->name('visitorslog.timeout');
-            Route::post('/view',            'view')->name('visitorslog.view');
             Route::get('/view/{id}/{type}', function ($id, $type) {
                 $visitor = Visitor::where('id', $id)->latest('id')->firstOrFail();
                 $visitorTypes = VisitorType::whereNull('deleted_at')->orderBy('id', 'asc')->get();
                 return view('pages.visitorslog.view', compact('visitor', 'visitorTypes', 'type'));
             })->name('view.page');
+            Route::post('/list',            'list')->name('visitorslog.list');
+            Route::post('/save',            'save')->name('visitorslog.save');
+            Route::post('/timeout',         'timeout')->name('visitorslog.timeout');
+            Route::post('/view',            'view')->name('visitorslog.view');
         });
 
     // USER TYPE
@@ -66,13 +66,12 @@ Route::middleware(['auth'])->group(function () {
         ->controller(User_TypesController::class)
         ->group(function () {
             Route::get('/',                   'index')->name('userTypes');
+            Route::get('/usertype/{id}/edit', 'edit')->name('userTypes.edit');
             Route::post('/list',              'list')->name('userTypes.list');
             Route::post('/delete',            'delete')->name('userTypes.delete');
-            Route::get('/usertype/{id}/edit', 'edit')->name('userTypes.edit');
+            Route::post('/addusertype',       'addusertype')->name('userTypes.addusertype');
             Route::put('/usertype/{id}',      'update')->name('userTypes.update');
             Route::delete('/usertype/{id}',   'destroy')->name('userTypes.destroy');
-            Route::post('/addusertype',       'addusertype')->name('userTypes.addusertype');
-
         });
 
     // USER
@@ -81,12 +80,12 @@ Route::middleware(['auth'])->group(function () {
         ->group(function () {
             Route::get('/',                   'index')->name('registerUser');
             Route::post('/list',              'list')->name('registerUser.list');
+            Route::get('/get-user/{id}',      'getUser')->name('registerUser.getUser');
             Route::post('/update-user/{id}',  'updateUser')->name('registerUser.updateUser');
             Route::post('/addusers',          'addusers')->name('registerUser.addusers');
-            Route::get('/get-user/{id}',      'getUser')->name('registerUser.getUser');
-            Route::put('/update-user/{id}',   'updateUser')->name('registerUser.updateUser');
             Route::post('/delete-user/{id}',  'deleteUser')->name('registerUser.deleteuser');  
             Route::post('/getlocation',       'location')->name('locations.lookup');
+            Route::put('/update-user/{id}',   'updateUser')->name('registerUser.updateUser');
         });
 
     // REPORT

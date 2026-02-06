@@ -59,36 +59,37 @@ class VisitorTypeController extends Controller
                 'created_by' => $d->getEmpName($d->created_by),
                 'updated_by' => ($d->getEmpName($d->updated_by) ?? '-'),
                 'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
-                'action'            => '<button 
-                                            class="btn btn-sm btn-primary dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            Action
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li>
-                                                <button 
-                                                    class="dropdown-item"
-                                                    id="editBtn"
-                                                    data-id="'.$d->id.'"
-                                                    data-name="'.$d->name.'"
-                                                    >
-                                                    <i class="bi bi-pencil-square me-2"></i> Edit
-                                                </button>
+                'action'            => '<div class="dropdown">
+                                            <button 
+                                                class="btn btn-sm btn-primary dropdown-toggle"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                Action
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <button 
+                                                        class="dropdown-item"
+                                                        id="editBtn"
+                                                        data-id="'.$d->id.'"
+                                                        data-name="'.$d->name.'"
+                                                        >
+                                                        <i class="bi bi-pencil-square me-2"></i> Edit
+                                                    </button>
 
-                                            </li>
-                                            <li>
-                                                <button 
-                                                    type="button"
-                                                    class="dropdown-item text-danger"
-                                                    id="deleteBtn"
-                                                    data-id="'.$d->id.'"
-                                                    <i class="bi bi-trash me-2"></i> Delete
-                                                </button>
-
-                                            </li>
-                                        </ul>' 
+                                                </li>
+                                                <li>
+                                                    <button 
+                                                        type="button"
+                                                        class="dropdown-item text-danger"
+                                                        id="deleteBtn"
+                                                        data-id="'.$d->id.'">
+                                                        <i class="bi bi-trash me-2"></i> Delete
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>', 
             ];
 
             $i++;
