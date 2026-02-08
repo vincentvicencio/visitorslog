@@ -38,9 +38,8 @@ $(document).ready(function () {
                 setTimeout(() => {
                     $('.toast').fadeOut('slow');
                 }, 1000);
-                setTimeout(() => {
-                    window.location.href = "/visitorslog";
-                }, 1000);
+            $('#addVisitorForm')[0].reset();
+            $('.imgholder').html('Image');
             },
             error: function (xhr, status, error) {
                 console.error('Save error:', error, xhr);

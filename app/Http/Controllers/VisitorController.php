@@ -16,10 +16,12 @@ class VisitorController extends Controller
 {
     public function index()
     {
-        $visitors = Visitor::where('status', 0)
-                   ->whereNull('time_out')
-                   ->orderBy('id', 'desc')
-                   ->get();
+        $visitors = Visitor::where(function ($query) {
+                $query->where('status', 0)->orWhereNull('status');
+               })
+               ->whereNull('time_out')
+               ->orderBy('id', 'desc')
+               ->get();
         $visitorTypes = VisitorType::where('deleted_at', null)
                    ->orderBy('id', 'desc')
                    ->get();
@@ -45,7 +47,9 @@ class VisitorController extends Controller
 
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
-                ->where('status', 0)
+                ->where(function ($query) {
+                    $query->where('status', 0)->orWhereNull('status');
+                })
                 ->when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
                         $q->where('full_name', 'LIKE', "%{$keywords}%")
@@ -347,6 +351,7 @@ class VisitorController extends Controller
             $visitor->created_by   = Auth::id();
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
+            $visitor->status       = 0;
             $visitor->save();
 
 

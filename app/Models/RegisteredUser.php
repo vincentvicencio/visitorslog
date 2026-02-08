@@ -22,6 +22,10 @@ class RegisteredUser extends Model
     'location',
     ];
 
+    protected $casts = [
+        'location' => 'array',
+    ];
+
     public function userType()
     {
         return $this->belongsTo(User_types::class, 'user_type', 'id');
