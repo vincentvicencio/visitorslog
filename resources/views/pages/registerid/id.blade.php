@@ -29,7 +29,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @include('components.triggers.registerIdModal')
 @push('scripts')
-@vite(['resources/js/registeredid.js', 'resources/js/registerIdClass.js'])
+@vite(['resources/js/registeredid.js'])
 @endpush
-
+{{-- 'resources/js/registerIdClass.js',  --}}
 @endsection

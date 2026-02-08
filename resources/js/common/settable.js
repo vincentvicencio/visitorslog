@@ -35,12 +35,7 @@ class Datatable {
                 lengthMenu: "Rows:  _MENU_",
                 info: "_START_ to _END_ of _TOTAL_"
             },
-            dom: '<"top">rt<"bottom"pil><"clear">',
-            initComplete: function () {
-                $(".dt-paging").css('float', 'right');
-                $(".dt-length").css('float', 'right');
-                $(".dt-info").css('float', 'right');
-            },
+            dom: '<"top">rt<"bottom"pi><"clear">',
             data: data, 
             columns: theads,
             columnDefs: tbodies,
@@ -74,8 +69,7 @@ class Datatable {
             serverSide: true,
             stateSave: true,
             searching: enableSearch,
-            pagingType: 'simple',
-            dom: '<"top">rt<"bottom"pi><"clear">',
+            dom: '<"top">rt<"bottom"ip><"clear">',
             search: { return: true },
             stateLoadParams: function (settings, data) {
                 data.length = pagination
@@ -95,8 +89,10 @@ class Datatable {
             },
             language: {
                 paginate: {
-                    next: '<span aria-hidden="true">&gt;</span>',
-                    previous: '<span aria-hidden="true">&lt;</span>'
+                    next: '&gt;',
+                    previous: '&lt;'
+                    // next: '<span aria-hidden="true">&gt;</span>',
+                    // previous: '<span aria-hidden="true">&lt;</span>'
                 },
                 lengthMenu: "_MENU_",
                 search: ""
@@ -104,6 +100,15 @@ class Datatable {
             },
             columns: theads,
             columnDefs: tbodies,
+            initComplete: function () {
+            // Make bottom row flex container
+                const $bottom = $(this.api().table().container()).find('div.bottom');
+                $bottom.css({
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between' // info left, pagination right
+                });
+            },
             drawCallback: function () { component.initializeButtons(table, url) }
         });
 
@@ -144,12 +149,7 @@ class Datatable {
                 info: "_START_ to _END_ of _TOTAL_"
 
             },
-            dom: '<"top">rt<"bottom"pil><"clear">',
-            initComplete: function () {
-                $(".dt-paging").css('float', 'right')
-                $(".dt-length").css('float', 'right')
-                $(".dt-info").css('float', 'right')
-            },
+            dom: '<"top">rt<"bottom"ip><"clear">',
             ajax: {
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                 url: window.location.origin + url + 'list',

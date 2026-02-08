@@ -13,7 +13,7 @@
 </script>
 
 @vite(['resources/js/report.js'])
-@vite('resources/js/ReportClass.js')
+{{-- @vite('resources/js/ReportClass.js') --}}
 @include('components.triggers.users-userstype-toast')
 @include('components.triggers.reportModals')
 

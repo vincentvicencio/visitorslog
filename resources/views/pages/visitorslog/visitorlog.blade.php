@@ -20,14 +20,14 @@
         <table class="table table-bordered align-middle" id="visitorsLogTable"><thead></thead></table>
         
         <!-- Pagination -->
-        <x-table-pagination/>
+        {{-- <x-table-pagination/> --}}
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @push('scripts')
-@vite(['resources/js/visitors.js', 'resources/js/visitorsClass.js'])
+@vite(['resources/js/visitors.js'])
 @endpush
-
+{{-- 'resources/js/visitors.js',  'resources/js/visitorsClass.js', --}}
 
 @endsection

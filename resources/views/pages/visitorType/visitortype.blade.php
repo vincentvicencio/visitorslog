@@ -34,8 +34,8 @@
 
 
 @push('scripts')
-    @vite(['resources/js/visitortypeClass.js', 'resources/js/visitortype.js'])
+    @vite(['resources/js/visitortype.js'])
 @endpush
-
+{{-- , 'resources/js/visitortypeClass.js' --}}
 @endsection
 

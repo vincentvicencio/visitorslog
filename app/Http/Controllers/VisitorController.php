@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
+use Illuminate\Support\Str;
 class VisitorController extends Controller
 {
     public function index()
@@ -252,10 +253,27 @@ class VisitorController extends Controller
 
     }
 
+    public function search(Request $request)
+    {
+        $id = $request->input('id'); // make sure this is numeric
+        $user = Visitor::find($id);
 
+        if ($user) {
+            return response()->json([
+                'success' => true,
+                'data'    => $user
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found.'
+        ]);
+    }
 
     public function save(Request $request)
     {
+       
         $request->validate([
             'first_name'   => 'required|string',
             'middle_name'  => 'nullable|string',
@@ -286,22 +304,32 @@ class VisitorController extends Controller
                 },
             ],
 
-            'image_path' => 'nullable',
+            'image_path' => 'nullable|',
         ]);
 
 
 
         try {
             // Handle image upload
-            // $imagePath = null;
-            
-            if ($request->hasFile('image_path')) {
-                $imagePath = $request->file('image_path')->store('visitors', 'public');
-            }
+            $imagePath = null;
 
-            dd($request->all(), $request->file('image_path'));
+        if ($request->image_path) {
+            $image = $request->image_path;
 
-            // $imagePath = $request->image_path ? $imagePath : null;
+            // Remove metadata (data:image/png;base64,)
+            $image = preg_replace('/^data:image\/\w+;base64,/', '', $image);
+
+            // Decode base64
+            $image = base64_decode($image);
+
+            // Generate filename
+            $fileName = 'visitors/' . Str::random(20) . '.png';
+
+            // Save to public disk
+            Storage::disk('public')->put($fileName, $image);
+
+            $imagePath = $fileName;
+        }
             $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
             // $location = collect(session('all_location'));
             // foreach ($location as $record) {
