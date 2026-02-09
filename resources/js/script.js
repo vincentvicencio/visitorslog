@@ -1,9 +1,3 @@
-console.log("script.js loaded");
-console.log("script.js loaded");
-console.log("script.js loaded");
-console.log("script.js loaded");
-console.log("script.js loaded");
-
 $(document).ready(function () {
     // Sidebar toggle (only runs if elements exist)
     const sidebarToggle = document.getElementById('sidebarToggle');

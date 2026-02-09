@@ -10,7 +10,8 @@ class RegisteredUser extends Model
 {
     use SoftDeletes;
     protected $table = 'registered_users';
-    protected $fillable = ['user_name',
+    protected $fillable = [
+    'user_name',
     'first_name',
     'last_name',
     'password',

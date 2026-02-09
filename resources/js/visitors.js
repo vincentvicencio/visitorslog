@@ -1,13 +1,19 @@
 import { Modal } from 'bootstrap';
 import Triggers from './common/triggers.js';
+import settable from './common/settable';
+import $ from 'jquery';
 import container from './common/container';
 import datahandling from './common/datahandling';
-import settable from './common/settable';
 import component from './common/component';
-import $ from 'jquery';
 
 const deleteModalEl = document.getElementById('notificationContainer');
 const deleteModal = new Modal(deleteModalEl);
+const video = document.getElementById('webcam');
+const canvas = document.getElementById('canvas');
+const captureBtn = document.getElementById('captureBtn');
+const recaptureBtn = document.getElementById('recaptureBtn');
+const photoPreview = document.getElementById('photoPreview');
+const imageInput = document.getElementById('image_path');
 
 let URL = '/visitorslog/';
 
@@ -40,9 +46,12 @@ $(document).ready(function () {
                 Triggers.showToast(response.message, 0);
                 setTimeout(() => {
                     $('.toast').fadeOut('slow');
-                }, 1000);
-            $('#addVisitorForm')[0].reset();
-            $('.imgholder').html('Image');
+                }, 2000);
+                $('#addVisitorForm')[0].reset();
+                photoPreview.src = "";
+                photoPreview.style.display = 'none';
+                video.style.display = 'block'; // Hide video once captured
+                imageInput.value = ""; 
             },
             error: function (xhr, status, error) {
                 console.error('Save error:', error, xhr);
@@ -69,7 +78,10 @@ $(document).ready(function () {
 
     $(document).on('click', '#clrBtn', function () {
         $('#addVisitorForm')[0].reset();
-        $('.imgholder').html('Image');
+        photoPreview.src = "";
+        photoPreview.style.display = 'none';
+        video.style.display = 'block'; // Hide video once captured
+        imageInput.value = ""; 
     });
 
     $('#captureBtn').on('click', function () {
@@ -154,8 +166,6 @@ $(document).ready(function () {
 
     $(document).on('click', '#timeoutBtn', function () {
         let Id = $(this).data('id');
-        console.log('tanga')
-        // if (!Id) return;
         Triggers.showNotification(
             '#notificationContainer',
             'Time Out',
@@ -171,7 +181,6 @@ $(document).ready(function () {
             Triggers.showToast('Invalid record ID.', 1);
             return;
         }
-        console.log('tanga');
         $.ajax({
             url: URL+"timeout",
             type: "POST",
@@ -212,7 +221,6 @@ $(document).ready(function () {
             }
         });
     });
-    // /////////////////////////////////////////////////
 
     let imageModal;
     try {
@@ -247,166 +255,157 @@ $(document).ready(function () {
         }
     });
 
-console.log('🔥 visitors.js file loaded');
+    class VisitorsLogTable {
+        constructor() {
+            this.defaultFields  = []
+            this.url            = "/visitorslog/"
+            this.table          = "#visitorsLogTable"
+            this.module         = "visitorslog"
+            this.form           = "#"
+            this.modal          = "#"
+            this.formid         = "#"  
+        }
 
-class VisitorsLogTable {
-    constructor() {
-        this.defaultFields  = []
-        this.url            = "/visitorslog/"
-        this.table          = "#visitorsLogTable"
-        this.module         = "visitorslog"
-        this.form           = "#"
-        this.modal          = "#"
-        this.formid         = "#"  
+        async onLoadPage(){
+            this.list();
+        }
+
+        async list() {
+            const self = this;
+
+            const tableHeader = [
+                { id: "full_name",    label: "Personal Details" },
+                { id: "visitor_type", label: "Visitor Type" },
+                { id: "visitor_id",   label: "ID No." },
+                { id: "image",        label: "Image" },
+                { id: "visit",        label: "Visit" },
+                { id: "time",         label: "Time" },
+                { id: "creator",      label: "By" },
+                { id: "status",       label: "Status" },
+                { id: "action",       label: "Action" },
+            ];
+
+            const columns = tableHeader.map(col => ({
+                data: col.id,
+                title: col.label
+            }));
+
+            const columnDefs = [
+                { targets: [0, 1, 2, 3], orderable: false }
+            ];
+            settable.createTableAjax(
+                self.table,
+                columns,
+                self.url,
+                columnDefs,
+                10,
+                {},
+                false 
+            );
+
+            // =====================================================
+            // 🧪 DEBUG: LOG AJAX RESPONSE
+            // =====================================================
+            // $(self.table).on('xhr.dt', function (e, settings, json) {
+                // console.log('✅ AJAX RESPONSE:', json);
+            // });
+
+            // =====================================================
+            // ✅ INIT COMPLETE (SAFE API ACCESS)
+            // =====================================================
+
+            $(self.table).on('init.dt', function () {
+
+                const tableApi = $(self.table).DataTable();
+
+                // 🔁 START POLLING
+                setInterval(() => {
+                    tableApi.ajax.reload(null, false); 
+                }, 2000); 
+
+                // CUSTOM SEARCH
+                $('#typeSearch')
+                    .off('keyup')
+                    .on('keyup', function () {
+                        tableApi.search(this.value).draw();
+                    });
+
+                // ENTRIES PER PAGE
+                $('#entriesPerPage')
+                    .off('change')
+                    .on('change', function () {
+                        tableApi.page.len(this.value).draw();
+                    });
+            });
+
+        }
+    }
+    const visitorsLog = new VisitorsLogTable();
+    visitorsLog.onLoadPage();
+
+    let polling;
+
+    function startPolling(tableApi) {
+        polling = setInterval(() => {
+            tableApi.ajax.reload(null, false);
+        }, 2000);
     }
 
-    async onLoadPage(){
-        this.list();
+    function stopPolling() {
+        clearInterval(polling);
     }
 
-    async list() {
-        const self = this;
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopPolling();
+        } else {
+            const tableApi = $('#visitorsLogTable').DataTable();
+            startPolling(tableApi);
+        }
+    });
 
-        const tableHeader = [
-            { id: "full_name",    label: "Personal Details" },
-            { id: "visitor_type", label: "Visitor Type" },
-            { id: "visitor_id",   label: "ID No." },
-            { id: "image",        label: "Image" },
-            { id: "visit",        label: "Visit" },
-            { id: "time",         label: "Time" },
-            { id: "creator",      label: "By" },
-            { id: "status",       label: "Status" },
-            { id: "action",       label: "Action" },
-        ];
-
-        const columns = tableHeader.map(col => ({
-            data: col.id,
-            title: col.label
-        }));
-
-        const columnDefs = [
-            { targets: [0, 1, 2, 3], orderable: false }
-        ];
-
-        console.log('🚀 BEFORE createTableAjax');
-
-        // ✅ ADD `{ dom: 'rtip' }` to REMOVE default search input
-        settable.createTableAjax(
-            self.table,
-            columns,
-            self.url,
-            columnDefs,
-            10,
-            {},
-            false // 🔥 THIS REMOVES THE DEFAULT SEARCH BAR
-        );
-
-        console.log('🚀 AFTER createTableAjax');
-
-        // =====================================================
-        // 🧪 DEBUG: LOG AJAX RESPONSE
-        // =====================================================
-        $(self.table).on('xhr.dt', function (e, settings, json) {
-            console.log('✅ AJAX RESPONSE:', json);
-        });
-
-        // =====================================================
-        // ✅ INIT COMPLETE (SAFE API ACCESS)
-        // =====================================================
-        $(self.table).on('init.dt', function () {
-
-            console.log('✅ DATATABLE INITIALIZED');
-
-            const tableApi = $(self.table).DataTable();
-
-            // 🔥 FORCE DRAW
-            tableApi.draw();
-
-            // =========================================
-            // CUSTOM SEARCH
-            // =========================================
-            $('#typeSearch')
-                .off('keyup')
-                .on('keyup', function () {
-                    tableApi.search(this.value).draw();
-                });
-
-            // =========================================
-            // ENTRIES PER PAGE
-            // =================================
-            $('#entriesPerPage')
-                .off('change')
-                .on('change', function () {
-                    tableApi.page.len(this.value).draw();
-                });
-        });
+    // 1. Start the Webcam automatically on page load
+    async function startWebcam() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "user" }, // "user" for front, "environment" for back
+                audio: false 
+            });
+            video.srcObject = stream;
+        } catch (err) {
+            console.error("Error accessing webcam: ", err);
+            alert("Webcam access denied or not available.");
+        }
     }
-}
 
-/* =====================================================
-   ✅ THIS WAS MISSING (CRITICAL)
-   ===================================================== */
-const visitorsLog = new VisitorsLogTable();
-visitorsLog.onLoadPage();
+    // 2. Capture the frame
+    captureBtn.addEventListener('click', () => {
+        const context = canvas.getContext('2d');
+        // Set canvas size to match video dimensions
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Draw the current video frame onto the canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Convert canvas to a Base64 URL (image string)
+        const imageData = canvas.toDataURL('image/png');    
+        // Show preview and store data in the hidden input
+        photoPreview.src = imageData;
+        photoPreview.style.display = 'block';
+        video.style.display = 'none'; // Hide video once captured
+        imageInput.value = imageData; 
+    });
 
-
-    // ////////////////////////////////////////////////////////////////////////////////////
-
-    const video = document.getElementById('webcam');
-const canvas = document.getElementById('canvas');
-const captureBtn = document.getElementById('captureBtn');
-const recaptureBtn = document.getElementById('recaptureBtn');
-const photoPreview = document.getElementById('photoPreview');
-const imageInput = document.getElementById('image_path');
-
-// 1. Start the Webcam automatically on page load
-async function startWebcam() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: "user" }, // "user" for front, "environment" for back
-            audio: false 
-        });
-        video.srcObject = stream;
-    } catch (err) {
-        console.error("Error accessing webcam: ", err);
-        alert("Webcam access denied or not available.");
-    }
-}
-
-// 2. Capture the frame
-captureBtn.addEventListener('click', () => {
-    const context = canvas.getContext('2d');
-    console.log(context)
-    // Set canvas size to match video dimensions
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    // Draw the current video frame onto the canvas
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Convert canvas to a Base64 URL (image string)
-    const imageData = canvas.toDataURL('image/png');    
-    console.log(imageData)
-    // Show preview and store data in the hidden input
-    photoPreview.src = imageData;
-    photoPreview.style.display = 'block';
-    video.style.display = 'none'; // Hide video once captured
-    imageInput.value = imageData; 
-    
-    // console.log();
-});
-
-recaptureBtn.addEventListener('click', () => {
-    photoPreview.src = "";
-    photoPreview.style.display = 'none';
-    video.style.display = 'block'; // Hide video once captured
-    imageInput.value = ""; 
-    
-    console.log("Image captured successfully!");
-});
+    recaptureBtn.addEventListener('click', () => {
+        photoPreview.src = "";
+        photoPreview.style.display = 'none';
+        video.style.display = 'block'; // Hide video once captured
+        imageInput.value = ""; 
+    });
 
 
-startWebcam();
+    startWebcam();
 
 
 

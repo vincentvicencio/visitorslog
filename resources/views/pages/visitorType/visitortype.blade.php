@@ -21,9 +21,6 @@
         <table class="table table-bordered align-middle" id="visitorsTable">
             <thead></thead>
         </table>
-
-        <!-- Pagination -->
-        <x-table-pagination/>
     </div>
 
     

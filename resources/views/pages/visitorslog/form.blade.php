@@ -82,8 +82,8 @@
 
                         <div class="capture">
                             <div class="header">Capture Image</div>
-                            <div class="imgholder">
-                                <video id="webcam" autoplay playsinline style="width: 100%; height: auto;"></video>
+                            <div class="imgholder" style="overflow: hidden">
+                                <video id="webcam" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
                                 <canvas id="canvas" style="display:none;"></canvas>
                                 <img id="photoPreview" src="" style="display:none; width: 100%; height: auto;">
                             </div>

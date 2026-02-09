@@ -41,8 +41,6 @@
             <thead></thead>
         </table>
 
-        <!-- Pagination -->
-        <x-table-pagination/>
     </div>
 </div>
 @endsection
