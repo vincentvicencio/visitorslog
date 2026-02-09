@@ -21,9 +21,6 @@
         <table class="table table-bordered align-middle" id="registerIdTable">
             <thead></thead>
         </table>
-        
-        <!-- Pagination -->
-        <x-table-pagination/>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

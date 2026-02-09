@@ -40,9 +40,6 @@
         <table class="table table-bordered align-middle" id="reportTable">
             <thead></thead>
         </table>
-
-        <!-- Pagination -->
-        <x-table-pagination/>
     </div>
 </div>
 

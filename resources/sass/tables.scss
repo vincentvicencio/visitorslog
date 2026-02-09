@@ -32,7 +32,7 @@
             text-align: center;
         }
     }
-    
+    // comment to
     .table-pagination{
         background-color: #0f43830e;
         display: flex;
@@ -41,6 +41,7 @@
         padding: 3px;
         border-radius: 5px;
     }
+
     .arrow-holder-pagination{
         width: 135px;
     }
@@ -59,6 +60,8 @@
         font-weight: bold;
         color: rgba(128, 128, 128, 0.5);
     }
+
+
     .search-field{
         font-variant: small-caps;
         color: #0F4383;
@@ -159,12 +162,12 @@
 // #visitortypeTable td:nth-child(4) {
 //     text-align: center;
 // }
-#IDTable{
-    border-radius: 10px ;
-}
-#IDTable{
-    text-align: center;
-}
+// #IDTable{
+//     border-radius: 10px ;
+// }
+// #IDTable{
+//     text-align: center;
+// }
 
 
 
@@ -175,3 +178,47 @@
 //     justify-content: end;
 //     background-color: red;
 // }
+
+
+.dt-paging {
+  .pagination {
+    gap: 5px;
+    background-color: #0f43830e;
+    border-radius: 5px;
+    padding: 3px;
+  }
+
+  .page-link {
+    border-radius: 5px !important;
+    border: none;
+    color: rgba(128, 128, 128, 0.8);
+    button{
+        background-color: red !important;
+    }
+  }
+
+  .page-link:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .page-item.active .page-link {
+    background-color: #0F4383 !important;
+    color: white !important;
+    cursor: default;
+  }
+
+  .first,
+  .previous,
+  .next,
+  .last {
+    background-color: white;
+    width: 50px;
+  }
+  .previous{
+    margin-right: 10px;
+  }
+  .next{
+    margin-left: 10px !important;
+  }
+}
