@@ -19,8 +19,6 @@
         <!-- table -->
         <table class="table table-bordered align-middle" id="visitorsLogTable"><thead></thead></table>
         
-        <!-- Pagination -->
-        {{-- <x-table-pagination/> --}}
     </div>
 </div>
 

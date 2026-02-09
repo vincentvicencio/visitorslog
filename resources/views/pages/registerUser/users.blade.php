@@ -44,9 +44,6 @@
         <table class="table table-bordered align-middle" id="usersTable">
             <thead></thead>
         </table>
-
-        <!-- Pagination -->
-        <x-table-pagination/>
     </div>
 </div>
  {{-- <div class="container mt-4">
