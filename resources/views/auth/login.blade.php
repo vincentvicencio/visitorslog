@@ -20,12 +20,12 @@
                     @csrf
                     <!-- EMAIL ADDRESS -->
                     <div class="input-holder">
-                        <label for="email" class="">{{ __('Email Address') }}</label>
+                        <label for="emp_code" class="">{{ __('Username') }}</label>
 
                         <div class="">
-                            <input id="emp_code" type="text" class="form-control" name="emp_code" required autocomplete="email" autofocus>
+                            <input id="emp_code" type="text" class="form-control" name="emp_code" required autocomplete="emp_code" autofocus>
 
-                            @error('email')
+                            @error('emp_code')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>

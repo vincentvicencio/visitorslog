@@ -46,7 +46,7 @@
 
         <!-- table -->
         <table class="table table-bordered align-middle" id="reportTable">
-            <thead></thead>
+
         </table>
     </div>
 </div>

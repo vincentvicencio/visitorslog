@@ -1,151 +1,147 @@
 import { Modal } from 'bootstrap';
-import container from './common/container';
-import datahandling from './common/datahandling';
 import Triggers from './common/triggers';
 import settable from './common/settable';
-import Component from './common/component';
 import $ from 'jquery';
+import container from './common/container';
+import datahandling from './common/datahandling';
+import Component from './common/component';
 
-
+// prefix url
 const URL = '/registerUser/';
+
 $(document).ready(function() {
 
     $.ajaxSetup({
     headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
-});
+    });
 
 
     // Handle Dropdown placement without breaking the click event
-$(document).on('shown.bs.dropdown', '.dropdown', function () {
-    const $toggle = $(this).find('.dropdown-toggle');
-    const $menu = $(this).find('.dropdown-menu');
+    $(document).on('shown.bs.dropdown', '.dropdown', function () {
+        const $toggle = $(this).find('.dropdown-toggle');
+        const $menu = $(this).find('.dropdown-menu');
 
-    // Store the original parent so we can put it back later
-    $menu.data('parent', $(this));
-    
-    $('body').append($menu);
-    
-    const offset = $toggle.offset();
-    $menu.css({
-        'display': 'block',
-        'position': 'absolute',
-        'visibility': 'visible',
-        'opacity': '1',
-        'top': offset.top + $toggle.outerHeight(),
-        'left': offset.left,
-        'z-index': '9999'
-    }).addClass('show');
-});
-
-$(document).on('hide.bs.dropdown', '.dropdown', function () {
-    const $menu = $('body > .dropdown-menu'); // Find the menu we moved to body
-    const $parent = $menu.data('parent');
-    
-    if ($parent) {
-        $parent.append($menu); // Put it back where it belongs
+        // Store the original parent so we can put it back later
+        $menu.data('parent', $(this));
+        
+        $('body').append($menu);
+        
+        const offset = $toggle.offset();
         $menu.css({
-            'display': '',
-            'position': '',
-            'top': '',
-            'left': ''
-        }).removeClass('show');
-    }
-});
+            'display': 'block',
+            'position': 'absolute',
+            'visibility': 'visible',
+            'opacity': '1',
+            'top': offset.top + $toggle.outerHeight(),
+            'left': offset.left,
+            'z-index': '9999'
+        }).addClass('show');
+    });
 
-// Initialize the notification modal instance
-let notificationModal;
-try {
-    const notificationModalEl = document.getElementById('notificationContainer');
-    if (!notificationModalEl) throw new Error('Notification modal element not found');
-    notificationModal = new Modal(notificationModalEl);
-} catch (error) {
-    console.error('Notification modal initialization failed:', error);
-}
-
-let userIdToDelete = null;
-
-// 1. When the delete button in the table is clicked
-$(document).on('click', '.delete-user', function() {
-    try {
-        userIdToDelete = $(this).data('id'); // Store the ID
+    $(document).on('hide.bs.dropdown', '.dropdown', function () {
+        const $menu = $('body > .dropdown-menu'); // Find the menu we moved to body
+        const $parent = $menu.data('parent');
         
-        if (!userIdToDelete) {
-            console.warn('Delete button clicked without ID');
-            Triggers.showToast('No user ID found.', 1);
-            return;
-        }
-        
-        // Set the modal content dynamically
-        $('#notification-title').text('Confirm User Deletion');
-        $('#notification-message').text('Are you sure you want to delete this user? This action cannot be undone.');
-        
-        // Ensure the "Yes" button is reset
-        $('#btn_ok').prop('disabled', false).text('Yes');
-
-        // Show the modal using the bootstrap instance
-        notificationModal?.show();
-    } catch (error) {
-        console.error('Delete user button error:', error);
-        Triggers.showToast('An error occurred.', 1);
-    }
-});
-
-// 2. When the "Yes" button inside the notification modal is clicked
-$('#btn_ok').on('click', function() {
-    if (!userIdToDelete) return;
-
-    const btn = $(this);
-    btn.prop('disabled', true).text('Processing...');
-
-    $.ajax({
-        url:URL + 'delete-user/' + userIdToDelete,
-        type: "POST",
-        timeout: 10000,
-        data: {
-            _token: window.Laravel.csrfToken
-        },
-        success: function(response) {
-            // Hide the confirmation modal
-            notificationModal?.hide();
-
-            // Handle the Toast
-            $('#DeletetoastMessage').text(response.success || "User Deleted Successfully!");
-            const toastElement = document.getElementById('DELETE');
-            if (toastElement) {
-                const toast = new bootstrap.Toast(toastElement);
-                toast.show();
-            }
-
-            // Reload the page
-            // setTimeout(function() {
-            //     location.reload();
-            // }, 1500); 
-
-            if ($.fn.DataTable.isDataTable('#usersTable')) {
-                $('#usersTable').DataTable().draw(false);
-
-                }
-                $btn.prop('disabled', false).text('Yes');
-                userModal.hide();
-        },
-        error: function(xhr, status, error) {
-            if (status === 'timeout') {
-                Triggers.showToast('Request timed out. Please try again.', 1);
-            } else if (xhr.status === 0) {
-                Triggers.showToast('Network error. Check your connection.', 1);
-            } else {
-                const message = xhr.responseJSON?.message || "Failed to delete user.";
-                Triggers.showToast(message, 1);
-            }
-            console.error('Delete user AJAX Error:', { xhr, status, error });
-            btn.prop('disabled', false).text('Yes');
-            notificationModal?.hide();
+        if ($parent) {
+            $parent.append($menu); // Put it back where it belongs
+            $menu.css({
+                'display': '',
+                'position': '',
+                'top': '',
+                'left': ''
+            }).removeClass('show');
         }
     });
-});
-$(document).on('click', '#register_btn', function () {
+
+    // Initialize the notification modal instance
+    let notificationModal;
+        try {
+            const notificationModalEl = document.getElementById('notificationContainer');
+            if (!notificationModalEl) throw new Error('Notification modal element not found');
+            notificationModal = new Modal(notificationModalEl);
+        } catch (error) {
+            console.error('Notification modal initialization failed:', error);
+    }
+
+    let userIdToDelete = null;
+
+    // 1. When the delete button in the table is clicked
+    $(document).on('click', '.delete-user', function() {
+        try {
+            userIdToDelete = $(this).data('id'); // Store the ID
+            
+            if (!userIdToDelete) {
+                console.warn('Delete button clicked without ID');
+                Triggers.showToast('No user ID found.', 1);
+                return;
+            }
+            
+            // Set the modal content dynamically
+            $('#notification-title').text('Confirm User Deletion');
+            $('#notification-message').text('Are you sure you want to delete this user? This action cannot be undone.');
+            
+            // Ensure the "Yes" button is reset
+            $('#btn_ok').prop('disabled', false).text('Yes');
+
+            // Show the modal using the bootstrap instance
+            notificationModal?.show();
+        } catch (error) {
+            console.error('Delete user button error:', error);
+            Triggers.showToast('An error occurred.', 1);
+        }
+    });
+
+    // 2. When the "Yes" button inside the notification modal is clicked
+    $('#btn_ok').on('click', function() {
+        if (!userIdToDelete) return;
+
+        const btn = $(this);
+        btn.prop('disabled', true).text('Processing...');
+
+        $.ajax({
+            url:URL + 'delete-user/' + userIdToDelete,
+            type: "POST",
+            timeout: 10000,
+            data: {
+                _token: window.Laravel.csrfToken
+            },
+            success: function(response) {
+                // Hide the confirmation modal
+                notificationModal?.hide();
+
+                // Handle the Toast
+                $('#DeletetoastMessage').text(response.success || "User Deleted Successfully!");
+                const toastElement = document.getElementById('DELETE');
+                if (toastElement) {
+                    const toast = new bootstrap.Toast(toastElement);
+                    toast.show();
+                }
+
+                if ($.fn.DataTable.isDataTable('#usersTable')) {
+                    $('#usersTable').DataTable().draw(false);
+
+                    }
+                    $btn.prop('disabled', false).text('Yes');
+                    userModal.hide();
+            },
+            error: function(xhr, status, error) {
+                if (status === 'timeout') {
+                    Triggers.showToast('Request timed out. Please try again.', 1);
+                } else if (xhr.status === 0) {
+                    Triggers.showToast('Network error. Check your connection.', 1);
+                } else {
+                    const message = xhr.responseJSON?.message || "Failed to delete user.";
+                    Triggers.showToast(message, 1);
+                }
+                console.error('Delete user AJAX Error:', { xhr, status, error });
+                btn.prop('disabled', false).text('Yes');
+                notificationModal?.hide();
+            }
+        });
+    });
+    $(document).on('click', '#register_btn', function () {
         try {
             openUserModalBlank();
         } catch (error) {
@@ -613,97 +609,93 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
 
         $btn.prop('disabled', true).text('Processing...');
 
-    if (id === undefined) {
-        // --- ADD USER LOGIC ---
-        $.ajax({
-            url: URL+"addusers",
-            type: 'POST',
-            timeout: 10000,
-            data: formData,
-            success: function(response) {
-                const message = response.success || "User registered Successfully!";
-                
-                // 1. Set the Title (Optional but looks better)
-                $('.toast-title').text("Success");
-                
-                // 2. Set the Body Text
-                $('#toastMessageforadd').text(message);
+        if (id === undefined) {
+            // --- ADD USER LOGIC ---
+            $.ajax({
+                url: URL+"addusers",
+                type: 'POST',
+                timeout: 10000,
+                data: formData,
+                success: function(response) {
+                    const message = response.success || "User registered Successfully!";
+                    
+                    // 1. Set the Title (Optional but looks better)
+                    $('.toast-title').text("Success");
+                    
+                    // 2. Set the Body Text
+                    $('#toastMessageforadd').text(message);
 
-                // 3. Show the Toast
-                const toastElement = document.getElementById('SUCCESSTOAST');
-                if (toastElement) {
-                    const toast = new bootstrap.Toast(toastElement);
-                    toast.show();
+                    // 3. Show the Toast
+                    const toastElement = document.getElementById('SUCCESSTOAST');
+                    if (toastElement) {
+                        const toast = new bootstrap.Toast(toastElement);
+                        toast.show();
+                    }
+
+                    if ($.fn.DataTable.isDataTable('#usersTable')) {
+                    $('#usersTable').DataTable().draw(false);
+
+                    }
+                    $btn.prop('disabled', false).text('Register User');
+                    userModal.hide(); 
+                },
+                error: function(xhr, status, error) {
+                    if (status === 'timeout') {
+                        Triggers.showToast('Request timed out. Please try again.', 1);
+                    } else if (xhr.status === 0) {
+                        Triggers.showToast('Network error. Check your connection.', 1);
+                    } else {
+                        Triggers.showToast(xhr.responseJSON?.message ?? 'Failed to register user.', 1);
+                    }
+                    console.error('Add user AJAX Error:', { xhr, status, error });
+                    $btn.prop('disabled', false).text('Register User');
                 }
+            });
+        } else {
+            // --- UPDATE USER LOGIC ---
+            formData._method = 'PUT'; // Laravel Method Spoofing
+            $.ajax({
+                url: URL+"update-user/" + id,
+                type: 'POST',
+                timeout: 10000,
+                data: formData,
+                success: function(response) {
 
-                // setTimeout(() => {
-                //     location.reload();
-                // }, 1500);
+                    const message = response.success || "User Updated Successfully!";
+                    
+                    // 1. Set the Title (Optional but looks better)
+                    $('.toast-title').text("Success");
+                    
+                    // 2. Set the Body Text
+                    $('#toastMessageforadd').text(message);
 
-                if ($.fn.DataTable.isDataTable('#usersTable')) {
-                $('#usersTable').DataTable().draw(false);
+                    // 3. Show the Toast
+                    const toastElement = document.getElementById('SUCCESSTOAST');
+                    if (toastElement) {
+                        const toast = new bootstrap.Toast(toastElement);
+                        toast.show();
+                    }
 
+                    if ($.fn.DataTable.isDataTable('#usersTable')) {
+                    $('#usersTable').DataTable().draw(false);
+
+                    }
+                    $btn.prop('disabled', false).text('Update User');
+                    userModal.hide();
+                },
+                error: function(xhr, status, error) {
+                    if (status === 'timeout') {
+                        Triggers.showToast('Request timed out. Please try again.', 1);
+                    } else if (xhr.status === 0) {
+                        Triggers.showToast('Network error. Check your connection.', 1);
+                    } else {
+                        Triggers.showToast(xhr.responseJSON?.message ?? 'Failed to update user.', 1);
+                    }
+                    console.error('Update user AJAX Error:', { xhr, status, error });
+                    $btn.prop('disabled', false).text('Update User');
                 }
-                $btn.prop('disabled', false).text('Register User');
-                userModal.hide(); 
-            },
-            error: function(xhr, status, error) {
-                if (status === 'timeout') {
-                    Triggers.showToast('Request timed out. Please try again.', 1);
-                } else if (xhr.status === 0) {
-                    Triggers.showToast('Network error. Check your connection.', 1);
-                } else {
-                    Triggers.showToast(xhr.responseJSON?.message ?? 'Failed to register user.', 1);
-                }
-                console.error('Add user AJAX Error:', { xhr, status, error });
-                $btn.prop('disabled', false).text('Register User');
-            }
-        });
-    } else {
-        // --- UPDATE USER LOGIC ---
-        formData._method = 'PUT'; // Laravel Method Spoofing
-        $.ajax({
-            url: URL+"update-user/" + id,
-            type: 'POST',
-            timeout: 10000,
-            data: formData,
-            success: function(response) {
-
-                const message = response.success || "User Updated Successfully!";
-                
-                // 1. Set the Title (Optional but looks better)
-                $('.toast-title').text("Success");
-                
-                // 2. Set the Body Text
-                $('#toastMessageforadd').text(message);
-
-                // 3. Show the Toast
-                const toastElement = document.getElementById('SUCCESSTOAST');
-                if (toastElement) {
-                    const toast = new bootstrap.Toast(toastElement);
-                    toast.show();
-                }
-
-                if ($.fn.DataTable.isDataTable('#usersTable')) {
-                $('#usersTable').DataTable().draw(false);
-
-                }
-                $btn.prop('disabled', false).text('Update User');
-                userModal.hide();
-            },
-            error: function(xhr, status, error) {
-                if (status === 'timeout') {
-                    Triggers.showToast('Request timed out. Please try again.', 1);
-                } else if (xhr.status === 0) {
-                    Triggers.showToast('Network error. Check your connection.', 1);
-                } else {
-                    Triggers.showToast(xhr.responseJSON?.message ?? 'Failed to update user.', 1);
-                }
-                console.error('Update user AJAX Error:', { xhr, status, error });
-                $btn.prop('disabled', false).text('Update User');
-            }
-        });
-    }
+            });
+        }
     } catch (error) {
         console.error('Submit handler error:', error);
         Triggers.showToast('An error occurred while processing your request.', 1);
@@ -770,18 +762,15 @@ class UsersTable {
             columns,
             self.url,
             columnDefs,
-            10,          // ✅ pagination
-            {},          // ✅ data
+            10,          //  pagination
+            {},          //  data
             false
         );
 
         $(self.table).on('init.dt', function () {
 
-            console.log('✅ DATATABLE INITIALIZED');
-
             const tableApi = $(self.table).DataTable();
 
-            // 🔥 FORCE DRAW
             tableApi.draw();
 
             // =========================================
@@ -803,8 +792,6 @@ class UsersTable {
                 });
         });
     }
-
-
 }
 const users = new UsersTable();
 users.onLoadPage();

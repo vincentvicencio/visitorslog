@@ -166,15 +166,15 @@ class ReportController extends Controller
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
 
             // Construct full name from individual name fields
-            $fullName = trim(implode(' ', array_filter([
-                $d->first_name,
-                $d->middle_name,
-                $d->last_name
-            ])));
+            // $fullName = trim(implode(' ', array_filter([
+            //     $d->first_name,
+            //     $d->middle_name,
+            //     $d->last_name
+            // ])));
                     
             $newData[$i] = [
                 'full_name' => '
-                    <strong>' . $fullName . '</strong>
+                    <strong>' . $d->full_name . '</strong>
                     <br><small>' . $locationLabel . '</small>
                     <br><small>' . $d->phone_number . '</small>
                 ',

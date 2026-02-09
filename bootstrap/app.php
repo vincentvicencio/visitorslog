@@ -16,6 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'prevent-back' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
     })
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'user_type' => \App\Http\Middleware\UsertypeMiddleware::class,
+        ]);
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
+    
