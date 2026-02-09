@@ -81,7 +81,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/',                   'index')->name('registerUser');
             Route::post('/list',              'list')->name('registerUser.list');
             Route::get('/get-user/{id}',      'getUser')->name('registerUser.getUser');
-            Route::post('/update-user/{id}',  'updateUser')->name('registerUser.updateUser');
+            Route::put('/update-user/{id}',  'updateUser')->name('registerUser.updateUser');
             Route::post('/addusers',          'addusers')->name('registerUser.addusers');
             Route::post('/delete-user/{id}',  'deleteUser')->name('registerUser.deleteuser');  
             Route::post('/getlocation',       'location')->name('locations.lookup');

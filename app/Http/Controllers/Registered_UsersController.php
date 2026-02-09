@@ -96,18 +96,25 @@ class Registered_UsersController extends Controller
         ], 422);
     }
 
+    if ($roleName === 'receptionist' && count($locations) > 1) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Receptionist can only have one location.'
+        ], 422);
+    }
+
     try {
         if ($isGuard) {
             // Guard: Use provided first_name and last_name, generate username
             $firstName = $request->input('first_name');
             $lastName = $request->input('last_name');
-            $baseUsername = trim($firstName . ' ' . $lastName);
+            $baseUsername = strtolower(preg_replace('/\s+/', '', $firstName)) . '.' . strtolower(preg_replace('/\s+/', '', $lastName));
             $username = $baseUsername;
             $counter = 2;
             
             // Check if username already exists and make it unique
             while (RegisteredUser::where('user_name', $username)->exists()) {
-                $username = $baseUsername . ' ' . $counter;
+                $username = $baseUsername . '.' . $counter;
                 $counter++;
             }
             
@@ -296,13 +303,13 @@ public function updateUser(Request $request, $id)
             $updateData['first_name'] = $request->input('first_name');
             $updateData['last_name'] = $request->input('last_name');
             
-            $baseUsername = trim($updateData['first_name'] . ' ' . $updateData['last_name']);
+            $baseUsername = strtolower(preg_replace('/\s+/', '', $updateData['first_name'])) . '.' . strtolower(preg_replace('/\s+/', '', $updateData['last_name']));
             $username = $baseUsername;
             $counter = 2;
             
             // Ensure username is unique, ignoring current user
             while (RegisteredUser::where('user_name', $username)->where('id', '!=', $user->id)->exists()) {
-                $username = $baseUsername . ' ' . $counter;
+                $username = $baseUsername . '.' . $counter;
                 $counter++;
             }
             
@@ -335,6 +342,13 @@ public function updateUser(Request $request, $id)
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Please select at least one location.'
+                ], 422);
+            }
+
+            if ($roleName === 'receptionist' && count($locations) > 1) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Receptionist can only have one location.'
                 ], 422);
             }
             
@@ -406,14 +420,6 @@ public function list(Request $request){
      
         $keywords = strtolower($request->search);
         $limit    = $request->input('length');
-        
-
-
-        // $rawquery = VisitorType::withoutTrashed();
-        // ->where(function($query) use ($keywords) {
-        //                 $query->where('name', 'LIKE', "%$keywords%");
-        //             });
-
 
         $rawquery = RegisteredUser::with('userType')
                     ->withoutTrashed()
@@ -426,11 +432,6 @@ public function list(Request $request){
                             
                             
                     });
-
-        
-
-
-        
         $totalRecords = $rawquery->get()->count();
         
         if ($request->input('draw') > 1) { 

@@ -49,8 +49,8 @@
             <thead></thead>
         </table>
 
-        <!-- Pagination -->
-        <x-table-pagination/>
+        <!-- Pagination
+        <x-table-pagination/> -->
     </div>
 </div>
 

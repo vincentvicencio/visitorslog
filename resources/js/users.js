@@ -1,10 +1,6 @@
 import { Modal } from 'bootstrap';
-import container from './common/container';
-import datahandling from './common/datahandling';
-import Triggers from './common/triggers';
-import settable from './common/settable';
-import Component from './common/component';
-import $ from 'jquery';
+import Triggers from './common/triggers.js';
+
 
 
 const URL = '/registerUser/';
@@ -303,7 +299,7 @@ export function openUserModal(data) {
 
         // Ensure single-location roles keep their location selected
         setTimeout(() => {
-            if (roleName !== 'admin' && roleName !== 'receptionist') {
+            if (roleName !== 'admin') {
                 const singleLocation = Array.isArray(data.location_id)
                     ? data.location_id[0]
                     : data.location_id;
@@ -376,9 +372,10 @@ $(document).on('change', '#reg_user_type', function() {
     const fieldsContainer = $('#reg_fields_container');
     const isEditing = Boolean(document.getElementById('reg_user_db_id')?.dataset?.id);
     
-    // Check if role is Admin or Receptionist (case-insensitive)
-    const isMultiLocationRole = selectedRoleText.toLowerCase() === 'admin' || 
-                                 selectedRoleText.toLowerCase() === 'receptionist';
+    // Check if role is Admin (case-insensitive)
+    const roleLower = selectedRoleText.toLowerCase();
+    const isMultiLocationRole = roleLower === 'admin';
+    const isReceptionist = roleLower === 'receptionist';
     const isGuard = selectedRoleText.toLowerCase() === 'guard';
     
     // Destroy existing Select2 instances if they exist
@@ -403,7 +400,7 @@ $(document).on('change', '#reg_user_type', function() {
     fieldsContainer.show();
 
     if (isMultiLocationRole) {
-        // Admin/Receptionist: Hide password, show emp code with search, hide names until search
+        // Admin: Hide password, show emp code with search, hide names until search
         passwordContainer.hide();
         $('#reg_password').val('').removeAttr('required');
         
@@ -431,6 +428,28 @@ $(document).on('change', '#reg_user_type', function() {
         
         // Ensure no options are selected after init
         locationSelect.val(null).trigger('change.select2');
+    } else if (isReceptionist) {
+        // Receptionist: Single location, hide password, show emp code with search
+        passwordContainer.hide();
+        $('#reg_password').val('').removeAttr('required');
+
+        empCodeContainer.show();
+        nameContainer.hide();
+        $('#reg_first_name, #reg_last_name').prop('readonly', true);
+
+        // Disable multiple selection for location
+        locationSelect.removeAttr('multiple');
+
+        // Add back the placeholder option if it doesn't exist
+        if (locationSelect.find('option[value=""]').length === 0) {
+            locationSelect.prepend('<option value="">Select Location</option>');
+        }
+
+        // Keep only the first selected value if switching from multi to single
+        const currentVal = locationSelect.val();
+        if (Array.isArray(currentVal) && currentVal.length > 0) {
+            locationSelect.val(currentVal[0]);
+        }
     } else if (isGuard) {
         // Guard: Show password, show editable names, hide emp code
         passwordContainer.show();
@@ -722,89 +741,3 @@ window.addEventListener('error', (event) => {
 window.addEventListener('unhandledrejection', (event) => {
     console.error('Unhandled promise rejection in users.js:', event.reason);
 });
-
-class UsersTable {
-    constructor() {
-        this.defaultFields  = []
-        // first parameter of your route
-        this.url            = "/registerUser/"
-        // id name of your table listing in user
-        this.table          = "#usersTable"
-        // module
-        this.module         = "registerUser"
-        // form id
-        this.form           = "#"
-        // offCanvas
-        this.modal          = "#"
-        // add user form id
-        this.formid         = "#"  
-    }
-
-    async onLoadPage(){
-        this.list();
-    }
-    async list() {
-        const self = this;
-
-        const tableHeader = [
-            { id: "user_name",       label: "Username" },
-            { id: "user_type",       label: "Role" },
-            { id: "created_by",       label: "Created By" },
-            { id: "updated_by",      label: "Updated By" },
-            { id: "created_at",   label: "Created Date" },
-            { id: "updated_at",   label: "Updated Date" },
-            { id: "action",         label: "Action" },
-        ];
-
-        const columns = tableHeader.map(col => ({
-            data: col.id, 
-            title: col.label,
-        }));
-
-        const columnDefs = [
-            { targets: [0, 1, 2, 3], orderable: false }
-        ]; 
-
-        settable.createTableAjax(
-            self.table,
-            columns,
-            self.url,
-            columnDefs,
-            10,          // ✅ pagination
-            {},          // ✅ data
-            false
-        );
-
-        $(self.table).on('init.dt', function () {
-
-            console.log('✅ DATATABLE INITIALIZED');
-
-            const tableApi = $(self.table).DataTable();
-
-            // 🔥 FORCE DRAW
-            tableApi.draw();
-
-            // =========================================
-            // CUSTOM SEARCH
-            // =========================================
-            $('#typeSearch')
-                .off('keyup')
-                .on('keyup', function () {
-                    tableApi.search(this.value).draw();
-                });
-
-            // =========================================
-            // ENTRIES PER PAGE
-            // =================================
-            $('#entriesPerPage')
-                .off('change')
-                .on('change', function () {
-                    tableApi.page.len(this.value).draw();
-                });
-        });
-    }
-
-
-}
-const users = new UsersTable();
-users.onLoadPage();

@@ -1,10 +1,10 @@
+import triggers from './common/triggers';
+import component from './common/component';
+import * as bootstrap from 'bootstrap';
+import $ from 'jquery';
 import container from './common/container';
 import datahandling from './common/datahandling';
-import triggers from './common/triggers';
 import settable from './common/settable';
-import component from './common/component';
-import $ from 'jquery';
-import * as bootstrap from 'bootstrap';
 
 window.reportFilters = {
     date_from: '',
@@ -12,9 +12,11 @@ window.reportFilters = {
     visitor_type: ''
 };
 
+// prefix url
 let URL = '/reports/';
+
 $(document).ready(function(){
-        // =================================Dropdown==================================
+    // =================================Dropdown==================================
     $(document).on('shown.bs.dropdown', '.dropdown', function () {
         const $toggle = $(this).find('.dropdown-toggle');
         const $menu = $(this).find('.dropdown-menu');
@@ -64,94 +66,94 @@ $(document).ready(function(){
         openDeleteModal(id, name);
     });
 
-$(document).on('click', '#openFilterBtn', function () {
+    $(document).on('click', '#openFilterBtn', function () {
 
-    const modalEl = document.getElementById('filterModal');
-    const modalInstance =
-        bootstrap.Modal.getInstance(modalEl) ||
-        new bootstrap.Modal(modalEl);
+        const modalEl = document.getElementById('filterModal');
+        const modalInstance =
+            bootstrap.Modal.getInstance(modalEl) ||
+            new bootstrap.Modal(modalEl);
 
-    modalInstance.show();
-});
+        modalInstance.show();
+    });
 
-$(document).on('click', '#exportReportBtn', function () {
-    try {
-        const filters = window.reportFilters || {};
-        
-        // Build query string with filters
-        const params = new URLSearchParams();
-        if (filters.date_from) params.append('date_from', filters.date_from);
-        if (filters.date_to) params.append('date_to', filters.date_to);
-        if (filters.visitor_type) params.append('visitor_type', filters.visitor_type);
-        
-        const searchValue = $('#typeSearch').val();
-        if (searchValue) params.append('search', searchValue);
+    $(document).on('click', '#exportReportBtn', function () {
+        try {
+            const filters = window.reportFilters || {};
+            
+            // Build query string with filters
+            const params = new URLSearchParams();
+            if (filters.date_from) params.append('date_from', filters.date_from);
+            if (filters.date_to) params.append('date_to', filters.date_to);
+            if (filters.visitor_type) params.append('visitor_type', filters.visitor_type);
+            
+            const searchValue = $('#typeSearch').val();
+            if (searchValue) params.append('search', searchValue);
 
-        // Trigger download
-        const exportUrl = '/reports/export?' + params.toString();
-        window.location.href = exportUrl;
-        
-        // Show success toast
-        triggers.showToast('Exporting report to Excel...', 0);
-    } catch (error) {
-        console.error('Export error:', error);
-        triggers.showToast('Failed to export report. Please try again.', 1);
-    }
-});
+            // Trigger download
+            const exportUrl = '/reports/export?' + params.toString();
+            window.location.href = exportUrl;
+            
+            // Show success toast
+            triggers.showToast('Exporting report to Excel...', 0);
+        } catch (error) {
+            console.error('Export error:', error);
+            triggers.showToast('Failed to export report. Please try again.', 1);
+        }
+    });
 
     $(document).on('submit', '#filterForm', function(e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    window.reportFilters = {
-        date_from: $('input[name="date_from"]').val(),
-        date_to: $('input[name="date_to"]').val(),
-        visitor_type: $('select[name="visitor_type"]').val()
-    };
+        Object.assign(window.reportFilters, {
+            date_from: $('input[name="date_from"]').val(),
+            date_to: $('input[name="date_to"]').val(),
+            visitor_type: $('select[name="visitor_type"]').val()
+        });
 
-    if ($.fn.DataTable.isDataTable('#reportTable')) {
-        $('#reportTable').DataTable().draw(); 
-    }
+        if ($.fn.DataTable.isDataTable('#reportTable')) {
+            $('#reportTable').DataTable().draw(); 
+        }
 
-    const filterModal = document.getElementById('filterModal');
-    const modalInstance = bootstrap.Modal.getInstance(filterModal);
+        const filterModal = document.getElementById('filterModal');
+        const modalInstance = bootstrap.Modal.getInstance(filterModal);
 
-    if (modalInstance) {
-        modalInstance.hide();
-    }
-});
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    });
 
 
     // Handle Reset Button
     $(document).on('click', '.btn-secondary[href*="/report"]', function(e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    // Reset form UI
-    $('#filterForm')[0].reset();
+        // Reset form UI
+        $('#filterForm')[0].reset();
 
-    // IMPORTANT: clear the global filters
-    window.reportFilters = {
-        date_from: '',
-        date_to: '',
-        visitor_type: ''
-    };
+        // IMPORTANT: clear the global filters
+        Object.assign(window.reportFilters, {
+            date_from: '',
+            date_to: '',
+            visitor_type: ''
+        });
 
 
-    const filterModal = document.getElementById('filterModal');
-    const modalInstance = bootstrap.Modal.getInstance(filterModal);
+        const filterModal = document.getElementById('filterModal');
+        const modalInstance = bootstrap.Modal.getInstance(filterModal);
 
-    if (modalInstance) {
-        modalInstance.hide();
-    }
+        if (modalInstance) {
+            modalInstance.hide();
+        }
 
-    // Reload table with no filters
-    $('#reportTable').DataTable().draw();
-    
-});
+        // Reload table with no filters
+        $('#reportTable').DataTable().draw();
+        
+    });
 
 
 }); // End of document.ready
 
-$(document).on('click', '.view-button', function(e) {
+    $(document).on('click', '.view-button', function(e) {
         // 1. Prevent the page from reloading
         e.preventDefault();
         
@@ -164,6 +166,7 @@ $(document).on('click', '.view-button', function(e) {
         // 4. Show the modal
         $('#View_imageModal').modal('show');
     });
+
     $('#View_imageModal').on('hidden.bs.modal', function () {
         $('#modalImage').attr('src', ''); 
     });
@@ -171,31 +174,31 @@ $(document).on('click', '.view-button', function(e) {
 
 
     $(document).on('click', '#viewBtn', function () {
-            let visitorId = $(this).data('id');
-            let type = $(this).data('type');
-    
-            if (!visitorId) return;
-    
-            $.ajax({
-                url: "/visitorslog/view",
-                type: "POST",
-                data: {
-                    id: visitorId,
-                    type: type,
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    window.location.href = response.redirect;
-                },
-                error: function (xhr) {
-                    let msg = 'Unable to load visitor details.';
-                    if (xhr.responseJSON?.message) {
-                        msg = xhr.responseJSON.message;
-                    }
-                    Triggers.showToast(msg, 1);
+        let visitorId = $(this).data('id');
+        let type = $(this).data('type');
+
+        if (!visitorId) return;
+
+        $.ajax({
+            url: "/visitorslog/view",
+            type: "POST",
+            data: {
+                id: visitorId,
+                type: type,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                window.location.href = response.redirect;
+            },
+            error: function (xhr) {
+                let msg = 'Unable to load visitor details.';
+                if (xhr.responseJSON?.message) {
+                    msg = xhr.responseJSON.message;
                 }
-            });
+                Triggers.showToast(msg, 1);
+            }
         });
+    });
 
     $.ajaxSetup({
         headers: {
@@ -210,11 +213,6 @@ const notificationModal = new bootstrap.Modal(notificationModalEl);
 
 // --- OPEN DELETE MODAL FUNCTION ---
 
-/**
- * Open the custom notification modal for deletion
- * @param {number|string} id - The ID of the record to delete
- * @param {string} name - Optional name to display in the message
- */
 export function openDeleteModal(id, name = "this record") {
     const recordInput = document.getElementById('record_id');
     const messageTitle = document.getElementById('notification-title');
@@ -266,9 +264,6 @@ document.getElementById('btn_ok').addEventListener('click', function() {
                 const toast = new bootstrap.Toast(toastElement);
                 toast.show();
             }
-            // setTimeout(() => {
-            //     location.reload();
-            // }, 1500);
 
             // refresh the datatable only
             if ($.fn.DataTable.isDataTable('#reportTable')) {
@@ -278,11 +273,11 @@ document.getElementById('btn_ok').addEventListener('click', function() {
             // 3. Re-enable the button
             $btn.prop('disabled', false).text('Yes');
             const modalEl = document.getElementById('filterModal');
-    const modalInstance =
-        bootstrap.Modal.getInstance(modalEl) ||
-        new bootstrap.Modal(modalEl);
+            const modalInstance =
+                bootstrap.Modal.getInstance(modalEl) ||
+                new bootstrap.Modal(modalEl);
 
-    modalInstance.hide();
+            modalInstance.hide();
 
         },
         error: function (xhr) {
@@ -334,81 +329,52 @@ class ReportClassTable {
         const columns = tableHeader.map(col => ({
             data: col.id, 
             title: col.label,
-            width: 'auto'
         }));
 
         const columnDefs = [
             { targets: [0, 1, 2, 3], orderable: false }
         ];
 
-        const tableElement = $(self.table);
-        tableElement.DataTable().clear().destroy();
-        
-        const table = tableElement.DataTable({
-            pageLength: 10,
-            autoWidth: false,
-            scrollX: true,
-            scrollCollapse: true,
-            processing: true,
-            serverSide: true,
-            stateSave: true,
-            searching: false,
-            pagingType: 'simple',
-            dom: '<"top">rt<"bottom"pi><"clear">',
-            stateLoadParams: function (settings, data) {
-                data.length = 10;
-            },
-            ajax: {
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                url: window.location.origin + self.url + 'list',
-                type: "POST",
-                data: function (d) { 
-                    d.search = $("#typeSearch").val();
-                    d.date_from = window.reportFilters.date_from;
-                    d.date_to = window.reportFilters.date_to;
-                    d.visitor_type = window.reportFilters.visitor_type;
-                }
-            },
-            language: {
-                paginate: {
-                    next: '<span aria-hidden="true">&gt;</span>',
-                    previous: '<span aria-hidden="true">&lt;</span>'
-                },
-                lengthMenu: "_MENU_",
-                search: ""
-            },
-            columns: columns,
-            columnDefs: columnDefs,
-            drawCallback: function () {
-                const api = this.api();
-                $(api.table().container()).find('.dataTables_scrollHeadInner').css('width', '100%');
-                $(api.table().node()).css('width', '100%');
-                component.initializeButtons(self.table, self.url);
-            },
-            initComplete: function() {
-                this.api().columns.adjust();
-                // Remove duplicate header created by scrollX
-                $('.dt-scroll-head').remove();
-            }
-        });
+        settable.createTableAjax(
+            self.table,
+            columns,
+            self.url,
+            columnDefs,
+            10,
+            window.reportFilters,//data
+            false
+        );
 
-        // =========================================
-        // CUSTOM SEARCH
-        // =========================================
-        $('#typeSearch')
-            .off('keyup')
-            .on('keyup', function () {
-                table.draw();
+        $(self.table)
+            .off('init.dt')
+            .on('init.dt', function () {
+                const tableApi = $(self.table).DataTable();
+
+                tableApi.draw();
+                tableApi.on('draw', function () {
+                    $(tableApi.table().container()).find('.dataTables_scrollHeadInner').css('width', '100%');
+                    $(tableApi.table().node()).css('width', '99%');
+                });
+
+                // =========================================
+                // CUSTOM SEARCH
+                // =========================================
+                $('#typeSearch')
+                    .off('keyup')
+                    .on('keyup', function () {
+                        tableApi.draw();
+                    });
+
+                // =========================================
+                // ENTRIES PER PAGE
+                // =========================================
+                $('#entriesPerPage')
+                    .off('change')
+                    .on('change', function () {
+                        tableApi.page.len(this.value).draw();
+                    });
             });
 
-        // =========================================
-        // ENTRIES PER PAGE
-        // =========================================
-        $('#entriesPerPage')
-            .off('change')
-            .on('change', function () {
-                table.page.len(this.value).draw();
-            });
 
         setTimeout(() => {
             const searchInput = document.getElementById('dt-search-0');             
