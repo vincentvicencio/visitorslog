@@ -13,61 +13,8 @@ let URL = '/visitorslog/';
 
 $(document).ready(function () {
 
-    const video = document.getElementById('webcam');
-    const canvas = document.getElementById('canvas');
-    const captureBtn = document.getElementById('captureBtn');
-    const recaptureBtn = document.getElementById('recaptureBtn');
-    const photoPreview = document.getElementById('photoPreview');
-    const imageInput = document.getElementById('image_path');
+    
 
-    // 1. Start the Webcam automatically on page load
-    async function startWebcam() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "user" }, // "user" for front, "environment" for back
-                audio: false 
-            });
-            video.srcObject = stream;
-        } catch (err) {
-            console.error("Error accessing webcam: ", err);
-            alert("Webcam access denied or not available.");
-        }
-    }
-
-    // 2. Capture the frame
-    captureBtn.addEventListener('click', () => {
-        const context = canvas.getContext('2d');
-        
-        // Set canvas size to match video dimensions
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        // Draw the current video frame onto the canvas
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // Convert canvas to a Base64 URL (image string)
-        const imageData = canvas.toDataURL('image/png');
-        
-        // Show preview and store data in the hidden input
-        photoPreview.src = imageData;
-        photoPreview.style.display = 'block';
-        video.style.display = 'none'; // Hide video once captured
-        imageInput.value = imageData; 
-        
-        console.log("Image captured successfully!");
-        console.log(imageData);
-    });
-
-    recaptureBtn.addEventListener('click', () => {
-        const context = canvas.getContext('2d');
-        video.style.display = 'block'; // Hide video once captured
-        photoPreview.style.display = 'none';
-        photoPreview.src = "";
-        imageInput.value = ""; 
-        console.log("Image captured successfully!");
-    });
-
-    startWebcam();
 
     $('#addVisitorForm').on('submit', function (e) {
         e.preventDefault();
