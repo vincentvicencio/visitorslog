@@ -161,23 +161,6 @@ class Registered_UsersController extends Controller
             $firstName = $apiData['FirstName'] ?? $firstName;
             $lastName  = $apiData['LastName'] ?? $lastName;
         } 
-        
-        // For Admin/Receptionist, use emp_code as default password if not provided
-        $password = $request->password;
-        if (!$password && $isAdminOrReceptionist) {
-            $password = $empCode;
-        }
-        
-        RegisteredUser::create([
-            'user_name'  => $empCode,
-            'first_name' => $firstName, 
-            'last_name'  => $lastName,
-            'location'   => $locations,
-            'password'   => Hash::make($password),     
-            'user_type'  => $request->user_type,
-            'created_by' => Auth::id(), 
-            'updated_by' => Auth::id(),
-        ]);
 
         return response()->json([
             'status' => 'success', 
@@ -466,7 +449,7 @@ public function list(Request $request){
                 'action'            => ' <div class="dropdown">
                                                     <button class="btn btn-sm btn-primary dropdown-toggle" 
                                                         type="button" 
-                                                        data-bs-toggle="dropdown" 
+                                                        data-bs-toggle="dropdown"
                                                         data-bs-boundary="viewport" aria-expanded="false">
                                                     Action
                                                 </button>

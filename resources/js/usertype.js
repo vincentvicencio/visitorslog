@@ -1,4 +1,4 @@
-import { Modal } from 'bootstrap';
+import { Modal, Dropdown } from 'bootstrap';
 import container from './common/container';
 import datahandling from './common/datahandling';
 import triggers from './common/triggers';
@@ -10,45 +10,21 @@ $(document).ready(function() {
 
 let URL = '/userTypes/';
 
-$(document).on('shown.bs.dropdown', '.dropdown', function () {
-    const $toggle = $(this).find('.dropdown-toggle');
-    const $menu = $(this).find('.dropdown-menu');
-
-    // Store the original parent
-    $menu.data('parent', $(this));
-    
-    // Move to body
-    $('body').append($menu);
-    
-    const offset = $toggle.offset();
-    
-    // Force visibility and correct placement
-    $menu.css({
-        'display': 'block',
-        'position': 'absolute',
-        'visibility': 'visible',
-        'opacity': '1',
-        'top': offset.top + $toggle.outerHeight(),
-        'left': offset.left,
-        'z-index': '9999', // Ensure this is higher than the modal or table
-        'min-width': $toggle.outerWidth() // Matches the button width
-    }).addClass('show'); 
-});
-
-$(document).on('hide.bs.dropdown', '.dropdown', function () {
-    const $menu = $('body > .dropdown-menu'); // Find the menu we moved to body
-    const $parent = $menu.data('parent');
-    
-    if ($parent) {
-        $parent.append($menu); // Put it back where it belongs
-        $menu.css({
-            'display': '',
-            'position': '',
-            'top': '',
-            'left': ''
-        }).removeClass('show');
+// Allow Bootstrap dropdown menus to render without clipping inside responsive tables.
+    const $usersTableWrapper = $('#userTypeTable').closest(
+        '.table-responsive, .table-responsive-sm, .table-responsive-md, .table-responsive-lg'
+    );
+    if ($usersTableWrapper.length) {
+        $usersTableWrapper.css('overflow', 'visible');
     }
-});
+
+    // Ensure dropdown toggles work even when rows are injected by DataTables.
+    $(document).on('click', '.dropdown-toggle', function (event) {
+        event.preventDefault();
+        const dropdown = Dropdown.getOrCreateInstance(this);
+        dropdown.toggle();
+    });
+
 
 const usertypemodal = document.getElementById('addTypeModal');
 const userTypeModal = new Modal(usertypemodal);
@@ -129,7 +105,7 @@ document.getElementById('save_type').addEventListener('click', () => {
                 $('#userTypeTable').DataTable().draw(false);
 
                 }
-                $btn.prop('disabled', false).text('Save New User Type');
+                // $btn.prop('disabled', false).text('Save New User Type');
                 userTypeModal.hide(); 
 },
             error: function (xhr) {
@@ -237,7 +213,7 @@ $('#btn_ok').on('click', function() {
                 $('#userTypeTable').DataTable().draw(false);
 
                 }
-                $btn.prop('disabled', false).text('Yes');
+                // $btn.prop('disabled', false).text('Yes');
                 userTypeModal.hide(); 
         },
         error: function(xhr) {
