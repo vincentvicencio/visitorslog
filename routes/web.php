@@ -22,7 +22,6 @@ Auth::routes();
 
 // middleware
 Route::middleware(['auth'])->group(function () {
-    
 
     // VISITORSLOG
     Route::prefix('visitorslog')
@@ -40,10 +39,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/timeout',         'timeout')->name('visitorslog.timeout');
             Route::post('/view',            'view')->name('visitorslog.view');
         });
-
-   
-
-    Route::middleware('user_type:1')->group( function(){
+        
+    // Route::middleware('user_type:1')->group( function(){
          // USER TYPE
         Route::prefix('userTypes')
             ->controller(User_TypesController::class)
@@ -102,5 +99,5 @@ Route::middleware(['auth'])->group(function () {
                 Route::post('/delete',      'delete')->name('registerId.delete');
                 Route::post('/edit',        'edit')->name('registerId.edit');
             });
-    });
+    // });
 });

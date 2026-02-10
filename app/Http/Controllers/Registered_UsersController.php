@@ -96,18 +96,25 @@ class Registered_UsersController extends Controller
         ], 422);
     }
 
+    if ($roleName === 'receptionist' && count($locations) > 1) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Receptionist can only have one location.'
+        ], 422);
+    }
+
     try {
         if ($isGuard) {
             // Guard: Use provided first_name and last_name, generate username
             $firstName = $request->input('first_name');
             $lastName = $request->input('last_name');
-            $baseUsername = trim($firstName . ' ' . $lastName);
+            $baseUsername = strtolower(preg_replace('/\s+/', '', $firstName)) . '.' . strtolower(preg_replace('/\s+/', '', $lastName));
             $username = $baseUsername;
             $counter = 2;
             
             // Check if username already exists and make it unique
             while (RegisteredUser::where('user_name', $username)->exists()) {
-                $username = $baseUsername . ' ' . $counter;
+                $username = $baseUsername . '.' . $counter;
                 $counter++;
             }
             
@@ -149,28 +156,22 @@ class Registered_UsersController extends Controller
         $firstName = $employeeData['first_name'] ?? 'N/A';
         $lastName  = $employeeData['last_name'] ?? 'N/A';
 
-        if ($response->successful()) {
-            $apiData = $response->json();
-            $firstName = $apiData['FirstName'] ?? $firstName;
-            $lastName  = $apiData['LastName'] ?? $lastName;
-        } 
-        
-        // For Admin/Receptionist, use emp_code as default password if not provided
-        $password = $request->password;
-        if (!$password && $isAdminOrReceptionist) {
-            $password = $empCode;
-        }
-        
         RegisteredUser::create([
             'user_name'  => $empCode,
             'first_name' => $firstName, 
             'last_name'  => $lastName,
             'location'   => $locations,
-            'password'   => Hash::make($password),     
+            'password'   => Hash::make($request->password),     
             'user_type'  => $request->user_type,
             'created_by' => Auth::id(), 
             'updated_by' => Auth::id(),
         ]);
+
+        if ($response->successful()) {
+            $apiData = $response->json();
+            $firstName = $apiData['FirstName'] ?? $firstName;
+            $lastName  = $apiData['LastName'] ?? $lastName;
+        } 
 
         return response()->json([
             'status' => 'success', 
@@ -296,13 +297,13 @@ public function updateUser(Request $request, $id)
             $updateData['first_name'] = $request->input('first_name');
             $updateData['last_name'] = $request->input('last_name');
             
-            $baseUsername = trim($updateData['first_name'] . ' ' . $updateData['last_name']);
+            $baseUsername = strtolower(preg_replace('/\s+/', '', $updateData['first_name'])) . '.' . strtolower(preg_replace('/\s+/', '', $updateData['last_name']));
             $username = $baseUsername;
             $counter = 2;
             
             // Ensure username is unique, ignoring current user
             while (RegisteredUser::where('user_name', $username)->where('id', '!=', $user->id)->exists()) {
-                $username = $baseUsername . ' ' . $counter;
+                $username = $baseUsername . '.' . $counter;
                 $counter++;
             }
             
@@ -335,6 +336,13 @@ public function updateUser(Request $request, $id)
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Please select at least one location.'
+                ], 422);
+            }
+
+            if ($roleName === 'receptionist' && count($locations) > 1) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Receptionist can only have one location.'
                 ], 422);
             }
             
@@ -406,14 +414,6 @@ public function list(Request $request){
      
         $keywords = strtolower($request->search);
         $limit    = $request->input('length');
-        
-
-
-        // $rawquery = VisitorType::withoutTrashed();
-        // ->where(function($query) use ($keywords) {
-        //                 $query->where('name', 'LIKE', "%$keywords%");
-        //             });
-
 
         $rawquery = RegisteredUser::with('userType')
                     ->withoutTrashed()
@@ -426,11 +426,6 @@ public function list(Request $request){
                             
                             
                     });
-
-        
-
-
-        
         $totalRecords = $rawquery->get()->count();
         
         if ($request->input('draw') > 1) { 
@@ -458,14 +453,14 @@ public function list(Request $request){
             $newData[$i] = [
                 'user_name'  => $d->user_name, // show emp_code in first column
                 'user_type'  => $d->userType->name ?? '-',
-                'created_by' => $d->getEmpName($d->created_by),
-                'updated_by' => ($d->getEmpName($d->updated_by) ?? '-'),
+                'created_by' => user_name($d->created_by) ?? '',
+                'updated_by' => user_name($d->updated_by) ?? '',
                 'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
                 'updated_at' => $d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l'),
                 'action'            => ' <div class="dropdown">
                                                     <button class="btn btn-sm btn-primary dropdown-toggle" 
                                                         type="button" 
-                                                        data-bs-toggle="dropdown" 
+                                                        data-bs-toggle="dropdown"
                                                         data-bs-boundary="viewport" aria-expanded="false">
                                                     Action
                                                 </button>

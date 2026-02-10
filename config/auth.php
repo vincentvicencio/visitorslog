@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'web'),
+        'guard'     => 'employee',
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'employee' => [
+            'driver' => 'session',
+            'provider' => 'employee',
+         ],
     ],
 
     /*
@@ -61,7 +65,11 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'login-api',
+            'driver' => 'eloquent',
+            'model' => App\Models\RegisteredUser::class,
+        ],
+        'employee' => [
+            'driver' => 'api_user',
             'model' => App\Models\User::class,
         ],
 

@@ -1,4 +1,5 @@
 <?php
+use App\Models\RegisteredUser;
 
 //PAGE NAME
 if (!function_exists("page_name")) {
@@ -26,5 +27,16 @@ if (!function_exists("current_page")) {
     {
         $link  = Request::segments();
         return end($link);
+    }
+}
+
+if(!function_exists(("user_name"))){
+    function user_name($id){
+        $user = RegisteredUser::find($id);
+   
+        $first_name = $user->first_name ?? '';
+        $last_name = $user->last_name ?? '';
+
+        return $first_name . ' ' . $last_name;
     }
 }

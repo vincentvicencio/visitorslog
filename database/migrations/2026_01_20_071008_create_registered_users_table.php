@@ -16,15 +16,15 @@ return new class extends Migration
             $table->string('user_name');
             $table->string('first_name');
             $table->string('last_name');
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->unsignedBigInteger('user_type');
-            $table->string('location');
-            $table->string('created_by');
-            $table->string('updated_by');
-            $table->string('deleted_by');
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
-            $table->timestamp(column: 'deleted_at');
+            $table->json('location');
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
+            $table->string('deleted_by')->nullable();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
+            $table->timestamp( 'deleted_at')->nullable();
         });
     }
 

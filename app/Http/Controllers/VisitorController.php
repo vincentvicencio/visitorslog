@@ -16,6 +16,8 @@ class VisitorController extends Controller
 {
     public function index()
     {
+        
+        // dd(Auth::user()->user_type);
         $visitors = Visitor::where(function ($query) {
                 $query->where('status', 0)->orWhereNull('status');
                })

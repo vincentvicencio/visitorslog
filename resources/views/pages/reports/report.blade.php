@@ -47,7 +47,8 @@
         <!-- table -->
         <table class="table table-bordered align-middle" id="reportTable">
 
-        </table>
+        {{-- <!-- Pagination
+        <x-table-pagination/> --> --}}
     </div>
 </div>
 

@@ -39,7 +39,7 @@
             Visitor Log Sheets
         </a>
 
-        @if(session('user_type') == 1)
+        @if(Auth::user()->user_type == 1)
             <a href="{{ url('userTypes') }}"
             class="sidebar-menu-button {{ Request::is('userTypes') ? 'selected' : '' }}">
                 <i class="bi bi-people-fill fs-6 p-2"></i>
