@@ -165,6 +165,7 @@ class RegisterIDController extends Controller
         $registeredID->id_number = $request->id_number;
         $registeredID->visitor_type = $request->visitor_type;
         $registeredID->created_by = Auth::user()->id;
+        $registeredID->updated_by = Auth::user()->id;
         $registeredID->created_at = now();
         $registeredID->save();
 

@@ -451,7 +451,7 @@ public function list(Request $request){
         foreach ($data as $d) { 
        
             $newData[$i] = [
-                'user_name'  => $d->user_name, // show emp_code in first column
+                'user_name'  => $d->first_name . ' ' . $d->last_name, // show emp_code in first column
                 'user_type'  => $d->userType->name ?? '-',
                 'created_by' => user_name($d->created_by) ?? '-',
                 'updated_by' => user_name($d->updated_by) ?? '-',
