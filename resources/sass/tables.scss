@@ -6,9 +6,6 @@
         box-sizing: border-box;
         overflow: visible !important;
     }
-    .dt-scroll-body{
-        overflow: visible !important;
-    }
     #visitorsLogTable, 
     #userTypeTable, 
     #usersTable, 
@@ -160,3 +157,31 @@
     background-color: #0f438377;
     border-color: #0f438377;
 }
+
+@media (max-width:880px) {
+  .first,
+  .previous,
+  .next,
+  .last {
+    width: 30px !important;
+  }
+  .previous{
+    margin-right: 10px;
+  }
+  .next{
+    margin-left: 10px !important;
+  }
+}
+  .first,
+  .previous,
+  .next,
+  .last {
+    background-color: white;
+    width: 50px;
+  }
+  .previous{
+    margin-right: 10px;
+  }
+  .next{
+    margin-left: 10px !important;
+  }
