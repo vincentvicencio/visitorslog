@@ -116,9 +116,8 @@ class RegisterIDController extends Controller
 
                 'id_number' => $d->id_number,
 
-                'created_by' => $d->getEmpName($d->created_by),
-
-                'updated_by' => ($d->getEmpName($d->updated_by) ?? '-'),
+                'created_by' => user_name($d->created_by) ?? '-',
+                'updated_by' => user_name($d->updated_by) ?? '-',
 
                 'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
 
@@ -165,7 +164,7 @@ class RegisterIDController extends Controller
         $registeredID = new RegisteredID();
         $registeredID->id_number = $request->id_number;
         $registeredID->visitor_type = $request->visitor_type;
-        $registeredID->created_by = Auth::id();
+        $registeredID->created_by = Auth::user()->id;
         $registeredID->created_at = now();
         $registeredID->save();
 
@@ -205,7 +204,7 @@ class RegisterIDController extends Controller
             'id_number' => $request->id_number,
             'visitor_type' => $request->visitor_type,
             'updated_at' => now(),
-            'updated_by' => Auth::id(),
+            'updated_by' => Auth::user()->id,
         ]);
 
         return response()->json([
@@ -233,7 +232,7 @@ class RegisterIDController extends Controller
 
         $visitor->update([
             'deleted_at' => Carbon::now(),
-            'deleted_by' => Auth::id(),
+            'deleted_by' => Auth::user()->id,
         ]);
 
         return response()->json([

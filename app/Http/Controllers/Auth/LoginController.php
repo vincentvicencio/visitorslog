@@ -120,13 +120,12 @@ class LoginController extends Controller
     }
 
 
-    public function authenticated(Request $request, $user)
+    public function authenticated(Request $request, $sessionKey)
     {
 
         $registeredUser = RegisteredUser::where('user_name', $request->emp_code)->first();
         if ($registeredUser->user_type != 3){
             $registeredUser->update(['password' => NULL]);
-            
         }
 
         $this->fetch_emp_data('all_emp');
@@ -174,7 +173,6 @@ class LoginController extends Controller
         else{
             $api_data = Session::get($sessionKey);
         }
-
         return $api_data;
     }
 }

@@ -4,6 +4,10 @@
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         box-sizing: border-box;
+        overflow: visible !important;
+    }
+    .dt-scroll-body{
+        overflow: visible !important;
     }
     #visitorsLogTable, 
     #userTypeTable, 
@@ -31,34 +35,6 @@
             color: white;
             text-align: center;
         }
-    }
-    // comment to
-    .table-pagination{
-        background-color: #0f43830e;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 3px;
-        border-radius: 5px;
-    }
-
-    .arrow-holder-pagination{
-        width: 135px;
-    }
-    .arrow-holder-pagination .bi{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: white;
-        padding: 5px 25px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-        color: rgba(128, 128, 128, 0.8);
-    }
-    .number-holder-pagination{
-        font-weight: bold;
-        color: rgba(128, 128, 128, 0.5);
     }
 
 
@@ -97,19 +73,15 @@
 .pagination-next, .pagination-last{
     transition: 0.2s ease;
 }
-.pagination-first:hover, .pagination-prev:hover,
-.pagination-next:hover, .pagination-last:hover{
+.pagination-first:hover, 
+.pagination-prev:hover,
+.pagination-next:hover, 
+.pagination-last:hover{
     transition: 0.2s ease;
     color: black;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
-// #visitorsTable td:nth-child(2),
-// #visitorsTable td:nth-child(3),
-// #visitorsTable td:nth-child(4),
-// #visitorsTable td:nth-child(8),
-// #visitorsTable td:nth-child(9) {
-//     text-align: center;
-// }
+
 .view-button{
     background-color: #0F4383;
     transition: 0.2s ease;
@@ -126,59 +98,12 @@
     display: inline-block;
 }
 .status-cell {
-    text-align: center;      /* horizontal */
-    vertical-align: middle;  /* vertical */
+    text-align: center;
+    vertical-align: middle;
 }
 #usertypesTable{
     border-radius: 10px ;
 }
-// #usertypesTable td:nth-child(2),
-// #usertypesTable td:nth-child(4) {
-//     padding-left: 20px;
-//     box-sizing: border-box;
-// }
-// #usertypesTable td:nth-child(1),
-// #usertypesTable td:nth-child(2),
-// #usertypesTable td:nth-child(3),
-// #usertypesTable td:nth-child(4) {
-//     text-align: center;
-// }
-// #usersTable{
-//     text-align: center;
-// }
-// #usersTable td:nth-child(1),
-// #usersTable td:nth-child(2),
-// #usersTable td:nth-child(3),
-// #usersTable td:nth-child(4),
-// #usersTable td:nth-child(5) {
-//     text-align: center;
-// }
-// #visitortypeTable{
-//     border-radius: 10px ;  
-// }
-// #visitortypeTable td:nth-child(1),
-// #visitortypeTable td:nth-child(2),
-// #visitortypeTable td:nth-child(3),
-// #visitortypeTable td:nth-child(4) {
-//     text-align: center;
-// }
-// #IDTable{
-//     border-radius: 10px ;
-// }
-// #IDTable{
-//     text-align: center;
-// }
-
-
-
-
-// dt-info
-// .pagination{
-//     display: flex;
-//     justify-content: end;
-//     background-color: red;
-// }
-
 
 .dt-paging {
   .pagination {
@@ -192,9 +117,6 @@
     border-radius: 5px !important;
     border: none;
     color: rgba(128, 128, 128, 0.8);
-    button{
-        background-color: red !important;
-    }
   }
 
   .page-link:focus {
@@ -221,4 +143,20 @@
   .next{
     margin-left: 10px !important;
   }
+}
+
+
+.dropdown-toggle {
+    white-space: nowrap;
+    background-color: #0F4383;
+    border-color: #0F4383;
+    transition: 0.2s ease;
+}
+.dropdown-toggle:focus{
+    background-color: #0F4383;
+    border-color: #0F4383;
+}
+.dropdown-toggle:hover{
+    background-color: #0f438377;
+    border-color: #0f438377;
 }

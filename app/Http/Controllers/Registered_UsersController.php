@@ -125,8 +125,8 @@ class Registered_UsersController extends Controller
                 'location'   => $locations,
                 'password'   => Hash::make($request->password),     
                 'user_type'  => $request->user_type,
-                'created_by' => Auth::id(), 
-                'updated_by' => Auth::id(),
+                'created_by' => Auth::user()->id, 
+                'updated_by' => Auth::user()->id,
             ]);
             
             return response()->json([
@@ -195,7 +195,7 @@ class Registered_UsersController extends Controller
         // Instead of $user->delete(), we update the column
         $user->update([
             'deleted_at' => NOW(),
-            'deleted_by' => Auth::id() // Optional: track who deleted it
+            'deleted_by' => Auth::user()->id // Optional: track who deleted it
         ]);
 
         return response()->json([
@@ -289,7 +289,7 @@ public function updateUser(Request $request, $id)
 
         $updateData = [
             'user_type'  => $request->user_type,
-            'updated_by' => Auth::id(),
+            'updated_by' => Auth::user()->id,
         ];
         
         // For Guard, update first_name and last_name
@@ -453,8 +453,8 @@ public function list(Request $request){
             $newData[$i] = [
                 'user_name'  => $d->user_name, // show emp_code in first column
                 'user_type'  => $d->userType->name ?? '-',
-                'created_by' => user_name($d->created_by) ?? '',
-                'updated_by' => user_name($d->updated_by) ?? '',
+                'created_by' => user_name($d->created_by) ?? '-',
+                'updated_by' => user_name($d->updated_by) ?? '-',
                 'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
                 'updated_at' => $d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l'),
                 'action'            => ' <div class="dropdown">
