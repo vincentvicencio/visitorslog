@@ -27,9 +27,6 @@ $(document).ready(function() {
         dropdown.toggle();
     });
 
-
-
-
 // Initialize the notification modal instance
 let notificationModal;
 try {
@@ -68,6 +65,10 @@ $(document).on('click', '.delete-user', function() {
     }
 });
 
+$('#cancel').on('click', function(){
+    notificationModal?.hide();
+});
+
 // 2. When the "Yes" button inside the notification modal is clicked
 $('#btn_ok').on('click', function() {
     if (!userIdToDelete) return;
@@ -86,13 +87,7 @@ $('#btn_ok').on('click', function() {
             // Hide the confirmation modal
             notificationModal?.hide();
 
-            // Handle the Toast
-            $('#DeletetoastMessage').text(response.success || "User Deleted Successfully!");
-            const toastElement = document.getElementById('DELETE');
-            if (toastElement) {
-                const toast = new bootstrap.Toast(toastElement);
-                toast.show();
-            }
+            Triggers.showToast('User Deleted Successfully!',1);
 
             if ($.fn.DataTable.isDataTable('#usersTable')) {
                 $('#usersTable').DataTable().draw(false);
@@ -617,23 +612,14 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
             success: function(response) {
                 const message = response.success || "User registered Successfully!";
                 
-                // 1. Set the Title (Optional but looks better)
-                $('.toast-title').text("Success");
-                
-                // 2. Set the Body Text
-                $('#toastMessageforadd').text(message);
-
-                // 3. Show the Toast
-                const toastElement = document.getElementById('SUCCESSTOAST');
-                if (toastElement) {
-                    const toast = new bootstrap.Toast(toastElement);
-                    toast.show();
-                }
+                Triggers.showToast(message,0);
 
                 if ($.fn.DataTable.isDataTable('#usersTable')) {
-                $('#usersTable').DataTable().draw(false);
 
+                $('#usersTable').DataTable().draw(false);
+                
                 }
+
                 $btn.prop('disabled', false).text('Register User');
                 userModal.hide(); 
             },
@@ -660,19 +646,8 @@ document.getElementById('submit_user_btn').addEventListener('click', function(e)
             success: function(response) {
 
                 const message = response.success || "User Updated Successfully!";
-                
-                // 1. Set the Title (Optional but looks better)
-                $('.toast-title').text("Success");
-                
-                // 2. Set the Body Text
-                $('#toastMessageforadd').text(message);
 
-                // 3. Show the Toast
-                const toastElement = document.getElementById('SUCCESSTOAST');
-                if (toastElement) {
-                    const toast = new bootstrap.Toast(toastElement);
-                    toast.show();
-                }
+                Triggers.showToast(message,0);
 
                 if ($.fn.DataTable.isDataTable('#usersTable')) {
                 $('#usersTable').DataTable().draw(false);

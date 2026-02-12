@@ -1,7 +1,7 @@
 import { Modal, Dropdown } from 'bootstrap';
 import container from './common/container';
 import datahandling from './common/datahandling';
-import triggers from './common/triggers';
+import Triggers from './common/triggers';
 import settable from './common/settable';
 import component from './common/component';
 import $ from 'jquery';
@@ -9,6 +9,15 @@ import $ from 'jquery';
 $(document).ready(function() {
 
 let URL = '/userTypes/';
+
+let notificationModal;
+try {
+    const notificationModalEl = document.getElementById('notificationContainer');
+    if (!notificationModalEl) throw new Error('Notification modal element not found');
+    notificationModal = new Modal(notificationModalEl);
+} catch (error) {
+    console.error('Notification modal initialization failed:', error);
+}
 
 // Allow Bootstrap dropdown menus to render without clipping inside responsive tables.
     const $usersTableWrapper = $('#userTypeTable').closest(
@@ -76,37 +85,22 @@ document.getElementById('save_type').addEventListener('click', () => {
             type: 'POST',
             data: {
                 user_type: user_type,
-                // _token: $('meta[name="csrf-token"]').attr('content')
                 _token: window.Laravel.csrfToken
             },
 
             success: function (response) {
                 const message = response.success || "User Type Added Successfully!";
-                
-                // 1. Set the Title (Optional but looks better)
-                $('.toast-title').text("Success");
-                
-                // 2. Set the Body Text
-                $('#toastMessageforadd').text(message);
 
-                // 3. Show the Toast
-                const toastElement = document.getElementById('SUCCESSTOAST');
-                if (toastElement) {
-                    const toast = new bootstrap.Toast(toastElement);
-                    toast.show();
-                }
-
-                // 4. Reload
-                // setTimeout(() => {
-                //     location.reload();
-                // }, 1500);
+                Triggers.showToast(message, 0);
 
                 if ($.fn.DataTable.isDataTable('#userTypeTable')) {
                 $('#userTypeTable').DataTable().draw(false);
 
                 }
-                // $btn.prop('disabled', false).text('Save New User Type');
+                
                 userTypeModal.hide(); 
+                Triggers.showToast($btn.prop('disable', false) .text('Save New User Type'),1);
+                
 },
             error: function (xhr) {
                 $btn.prop('disabled', false).text('Save New User Type');
@@ -125,22 +119,8 @@ document.getElementById('save_type').addEventListener('click', () => {
             },
             success: function (response) {
                 const message = response.success || "User Type Updated Successfully!";
-                
-                // 1. Set the Title (Optional but looks better)
-                $('.toast-title').text("Success");
-                
-                // 2. Set the Body Text
-                $('#toastMessageforadd').text(message);
-
-                // 3. Show the Toast
-                const toastElement = document.getElementById('SUCCESSTOAST');
-                if (toastElement) {
-                    const toast = new bootstrap.Toast(toastElement);
-                    toast.show();
-                }
-                // setTimeout(() => {
-                //     location.reload();
-                // }, 1500);
+           
+                    Triggers.showToast(message,0);
 
                 if ($.fn.DataTable.isDataTable('#userTypeTable')) {
                 $('#userTypeTable').DataTable().draw(false);
@@ -165,19 +145,26 @@ let roleIdToDelete = null;
 
 // Open Delete Modal
 $(document).on('click', '.delete-type', function() {
+    try{
     roleIdToDelete = $(this).data('id'); // Grab the ID from the button
     
-    // Update the notification text dynamically
-    $('#notification-title').text('Confirm Deletion');
-    $('#notification-message').text('Are you sure you want to delete this user type?');
+       // Set the modal content dynamically
+            $('#notification-title').text('Confirm User Deletion');
+            $('#notification-message').text('Are you sure you want to delete this user? This action cannot be undone.');
+            
+            // Ensure the "Yes" button is reset
+            $('#btn_ok').prop('disabled', false).text('Yes');
     
-    // Reset button state in case it was stuck on "Deleting..."
-    $('#btn_ok').prop('disabled', false).text('Yes');
-
-    // Show the modal
-    deleteModal.show();
+            // Show the modal using the bootstrap instance
+            notificationModal?.show();
+        } catch (error) {
+            console.error('Delete user button error:', error);
+            Triggers.showToast('An error occurred.', 1);
+        }
 });
-
+$('#cancel').on('click', function(){
+    notificationModal?.hide();
+});
 // Handle "Yes" Button Click
 $('#btn_ok').on('click', function() {
     if (!roleIdToDelete) return;
@@ -192,28 +179,17 @@ $('#btn_ok').on('click', function() {
             _token: window.Laravel.csrfToken 
         },
         success: function(response) {
+            const message = response.success || "User Type Updated Successfully!";
             // Hide the confirmation modal
-            deleteModal.hide();
+            notificationModal?.hide();
 
-            // Set message and fire the toast
-            $('#DeletetoastMessage').text(response.success || "User Type Deleted Successfully!");
-            const toastElement = document.getElementById('DELETE');
-            
-            if (toastElement) {
-                const toast = new bootstrap.Toast(toastElement);
-                toast.show();
-            }
-
-            // Reload after toast
-            // setTimeout(function() {
-            //     location.reload();
-            // }, 1500); 
+            Triggers.showToast(message,0);
 
             if ($.fn.DataTable.isDataTable('#userTypeTable')) {
                 $('#userTypeTable').DataTable().draw(false);
 
                 }
-                // $btn.prop('disabled', false).text('Yes');
+                $btn.prop('disabled', false).text('Yes');
                 userTypeModal.hide(); 
         },
         error: function(xhr) {
