@@ -4,7 +4,10 @@
         <div class="toast-header">
             <strong class="me-auto"><i class="bi bi-bell-fill"></i> &nbsp; <span class="toast-title"></span></strong>
             <small>&nbsp;</small>
+<<<<<<< HEAD
              <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+=======
+>>>>>>> b9f5eab92d97d014f501ef89784c529eecffa38f
         </div>
         <div class="toast-body" id="toastMessage">
             <strong></strong>

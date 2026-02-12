@@ -75,6 +75,7 @@ class Registered_UsersController extends Controller
         $validationRules['password'] = 'required|string|min:6';
     } else {
         // Other roles require emp_code
+<<<<<<< HEAD
         // $validationRules['emp_code'] = 'required|string|unique:registered_users,user_name';
         $validationRules['emp_code'] = [
         'required',
@@ -90,6 +91,26 @@ class Registered_UsersController extends Controller
         },
     ];
         
+=======
+
+        // original code
+        $validationRules['emp_code'] = 'required|string|unique:registered_users,user_name';
+        // charle - changes
+            // $validationRules['emp_code'] = [
+            //     'required',
+            //     'string',
+            //     function ($attribute, $value, $fail) {
+            //         $exist = RegisteredUser::where('user_name', $value)
+            //             ->whereNull('deleted_at')
+            //             ->exists();
+            //         if ($exist) {
+            //             $fail('Employee Code already exists.');
+            //         }
+            //     }
+
+            // ];        
+
+>>>>>>> b9f5eab92d97d014f501ef89784c529eecffa38f
         // Only require password for non-Admin/Receptionist roles
         if (!$isAdminOrReceptionist) {
             $validationRules['password'] = 'required|string|min:6';

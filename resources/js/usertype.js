@@ -255,18 +255,18 @@ class UserTypeTable {
             columns,
             self.url,
             columnDefs,
-            10,          // ✅ pagination
-            {},           // ✅ data
+            10,          // pagination
+            {},           // data
             false
         );
 
         $(self.table).on('init.dt', function () {
 
-            console.log('✅ DATATABLE INITIALIZED');
+            console.log('DATATABLE INITIALIZED');
 
             const tableApi = $(self.table).DataTable();
 
-            // 🔥 FORCE DRAW
+            // FORCE DRAW
             tableApi.draw();
 
             // =========================================

@@ -1,7 +1,9 @@
 @extends('layout')
 
 @section('content')
+
 <div class="user-types-container mt-4">
+    {{-- header --}}
     <div class="page-header">
         <div class="header-content">
             <div class="page-title fs-2">Registered IDs</div>
@@ -12,21 +14,15 @@
             Register ID
         </div>
     </div>
-    <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
-        <!-- search and filter -->
+        <!-- search and filter - calling table filter component -->
         <x-table-filter/>
-
         <!-- table -->
-        <table class="table table-bordered align-middle" id="registerIdTable">
-            <thead></thead>
-        </table>
+        <table class="table table-bordered align-middle" id="registerIdTable"><thead></thead></table>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @include('components.triggers.registerIdModal')
 @push('scripts')
 @vite(['resources/js/registeredid.js'])
 @endpush
-{{-- 'resources/js/registerIdClass.js',  --}}
 @endsection

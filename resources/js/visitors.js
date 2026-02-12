@@ -304,21 +304,21 @@ $(document).ready(function () {
             );
 
             // =====================================================
-            // 🧪 DEBUG: LOG AJAX RESPONSE
+            //  DEBUG: LOG AJAX RESPONSE
             // =====================================================
             // $(self.table).on('xhr.dt', function (e, settings, json) {
-                // console.log('✅ AJAX RESPONSE:', json);
+                // console.log(' AJAX RESPONSE:', json);
             // });
 
             // =====================================================
-            // ✅ INIT COMPLETE (SAFE API ACCESS)
+            //  INIT COMPLETE (SAFE API ACCESS)
             // =====================================================
 
             $(self.table).on('init.dt', function () {
 
                 const tableApi = $(self.table).DataTable();
 
-                // 🔁 START POLLING
+                // START POLLING
                 setInterval(() => {
                     tableApi.ajax.reload(null, false); 
                 }, 2000); 

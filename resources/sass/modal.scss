@@ -1,8 +1,4 @@
-#addTypeModal, #editTypeModal{
-
-    #closeAddType{
-
-    }
+#addTypeModal{
     .header{
         color: #0F4383;
     }
@@ -14,7 +10,7 @@
     }
 }
 
-// Select2 Multi-Select Tag Styling
+
 .select2-container--default {
     .select2-selection--multiple {
         border: 1px solid #cdd3da;

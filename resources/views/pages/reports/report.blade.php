@@ -1,13 +1,17 @@
 @extends('layout')
 
 @section('content')
+<<<<<<< HEAD
+=======
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+>>>>>>> b9f5eab92d97d014f501ef89784c529eecffa38f
 
 @vite(['resources/js/report.js'])
-{{-- @vite('resources/js/ReportClass.js') --}}
 @include('components.triggers.users-userstype-toast')
 @include('components.triggers.reportModals')
 
 <div class="user-types-container mt-4">
+    {{-- header --}}
     <div class="page-header">
         <div class="header-content">
             <div class="page-title fs-2">Reports</div>
@@ -27,16 +31,18 @@
             </div>
         </div>
     </div>
-    <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
-        <!-- search and filter -->
+        <!-- search and filter - calling table filter component -->
         <x-table-filter/>
-
         <!-- table -->
+<<<<<<< HEAD
         <table class="table table-bordered align-middle" id="reportTable">
             <thead></thead>
             <tbody></tbody>
         </table>
+=======
+        <table class="table table-bordered align-middle" id="reportTable"><thead></thead></table>
+>>>>>>> b9f5eab92d97d014f501ef89784c529eecffa38f
     </div>
 </div>
 

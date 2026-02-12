@@ -2,6 +2,16 @@
 @section('content')
 @include('components.triggers.UsersModal')
 @vite(['resources/js/users.js'])
+<<<<<<< HEAD
+=======
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+
+>>>>>>> b9f5eab92d97d014f501ef89784c529eecffa38f
 
 <div class="user-types-container mt-4">
     <div class="page-header">
@@ -14,16 +24,15 @@
             Register User
         </div>
     </div>
-    <!-- table.scss -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
         <!-- search and filter -->
         <x-table-filter/>
     
-        <table class="table table-bordered align-middle" id="usersTable">
-            <thead></thead>
-        </table>
+        {{-- table --}}
+        <table class="table table-bordered align-middle" id="usersTable"><thead></thead></table>
     </div>
 </div>
+<<<<<<< HEAD
 <<<<<<< HEAD
 
     <div class="container mt-4">
@@ -66,4 +75,6 @@
 =======
 >>>>>>> e7e00a8fade2c50b2713f5330b2d56eebe6dbe2a
 
+=======
+>>>>>>> b9f5eab92d97d014f501ef89784c529eecffa38f
 @endsection
