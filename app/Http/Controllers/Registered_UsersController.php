@@ -10,6 +10,7 @@ use App\Models\Visitor;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Session;
 
 class Registered_UsersController extends Controller
@@ -74,7 +75,20 @@ class Registered_UsersController extends Controller
         $validationRules['password'] = 'required|string|min:6';
     } else {
         // Other roles require emp_code
-        $validationRules['emp_code'] = 'required|string|unique:registered_users,user_name';
+        // $validationRules['emp_code'] = 'required|string|unique:registered_users,user_name';
+        $validationRules['emp_code'] = [
+        'required',
+        'string',
+        function ($attribute, $value, $fail) {
+            $exists = RegisteredUser::where('user_name', $value)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if ($exists) {
+                $fail('Employee Code already exists.');
+            }
+        },
+    ];
         
         // Only require password for non-Admin/Receptionist roles
         if (!$isAdminOrReceptionist) {

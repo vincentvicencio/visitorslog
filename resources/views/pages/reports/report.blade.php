@@ -2,22 +2,10 @@
 
 @section('content')
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    window.Laravel = {
-        baseUrl: "{{ url('/') }}",
-        csrfToken: "{{ csrf_token() }}" // This correctly gets the token from Laravel
-    };
-</script>
-
 @vite(['resources/js/report.js'])
 {{-- @vite('resources/js/ReportClass.js') --}}
 @include('components.triggers.users-userstype-toast')
 @include('components.triggers.reportModals')
-
-
 
 <div class="user-types-container mt-4">
     <div class="page-header">
@@ -46,9 +34,9 @@
 
         <!-- table -->
         <table class="table table-bordered align-middle" id="reportTable">
-
-        {{-- <!-- Pagination
-        <x-table-pagination/> --> --}}
+            <thead></thead>
+            <tbody></tbody>
+        </table>
     </div>
 </div>
 
