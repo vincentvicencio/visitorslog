@@ -193,8 +193,8 @@ $(document).ready(function () {
                 columns,
                 self.url,
                 columnDefs,
-                10,          // ✅ pagination
-                {},          // ✅ data
+                10,          // pagination
+                {},          // data
                 false
             );
 

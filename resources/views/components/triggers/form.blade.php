@@ -13,7 +13,7 @@
                     </div>
                     <div class="input-holder floating">
                         <select name="visitor_type" id="visitor_type" class="form-control" required >
-                            <option value="" disabled selected>Select Visitor Type</option> <!-- Empty option for floating effect -->
+                            <option value="" disabled selected>Select Visitor Type</option>
                             <option value="summit_one">Summit One</option>
                             <option value="facility_center">Facility Center</option>
                             <option value="mezzanine">Mezzanine</option>

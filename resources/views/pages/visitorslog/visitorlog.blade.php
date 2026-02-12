@@ -1,6 +1,9 @@
 @extends('layout')
+
 @section('content')
+
 <div class="user-types-container mt-4">
+    {{-- header --}}
     <div class="page-header">
         <div class="header-content">
             <div class="page-title fs-2">Visitor Log Sheets</div>
@@ -13,19 +16,14 @@
     </div>
     <!-- table holder -->
     <div class="visitor-log-sheet-table table-responsive ">
-        <!-- search and filter -->
+        <!-- search and filter - calling table filter component -->
         <x-table-filter/>
-
         <!-- table -->
         <table class="table table-bordered align-middle" id="visitorsLogTable"><thead></thead></table>
-        
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @push('scripts')
 @vite(['resources/js/visitors.js'])
 @endpush
-{{-- 'resources/js/visitors.js',  'resources/js/visitorsClass.js', --}}
-
 @endsection
