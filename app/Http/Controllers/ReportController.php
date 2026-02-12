@@ -196,8 +196,7 @@ class ReportController extends Controller
                 'creator' => '<small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
                             <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>',
                 
-                'status' => '<div class="status-cell" style="background-color:red;">
-                <div class="status rounded-2"> '. $status .'</div></div>',
+                'status' => '<div class="status-cell" style="background-color:red;"><div class="status"> '. $status .'</div></div>',
 
                 'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
 
