@@ -48,6 +48,11 @@ class LoginController extends Controller
     {
         return 'emp_code';
     }
+
+    protected function guard()
+    {
+        return Auth::guard('employee');
+    }
     
     public function __construct()
     {
@@ -105,37 +110,31 @@ class LoginController extends Controller
     //     return redirect()->route('visitorslog');
     // }
 
-    // protected function authenticated(Request $request, $user)
-    // {
-    //     $emp_code = $user->emp_code;
-    //     $registeredUser = null;
+    
+    protected function attemptLogin(Request $request)
+    {
+        return Auth::guard('employee')->attempt(
+            $this->credentials($request),
+            $request->filled('remember')
+        );
+    }
 
-    //     // 1. Check Central Hub first
-    //     // fetch_emp_data returns the list of employees from the API
-    //     $allEmployees = $this->fetch_emp_data('all_emp'); 
-    //     $centralUser = collect($allEmployees)->firstWhere('emp_code', $emp_code);
-    //     if (!$centralUser) {
-    //         // User found in Central Hub, now find their specific app permissions (user_type)
-    //         $registeredUser = RegisteredUser::where('user_name', $emp_code)->first();
-    //     } else {
-    //         // 2. Fallback: Check local RegisteredUser table directly if not in Central Hub
-    //         $registeredUser = RegisteredUser::where('user_name', $emp_code)->first();
-    //     }
 
-    //     // 3. Final Validation: If they aren't in either or have no local record, deny access
-    //     if (!$registeredUser) {
-    //         Auth::logout();
-    //         return redirect('/login')->with('error', 'Access denied. Your account is not registered in this system.');
-    //     }
+    public function authenticated(Request $request, $sessionKey)
+    {
 
-    //     // 4. Store user_type in session for the sidebar and middleware
-    //     session(['user_type' => $registeredUser->user_type]);
+        $registeredUser = RegisteredUser::where('user_name', $request->emp_code)->first();
+        if ($registeredUser->user_type != 3){
+            $registeredUser->update(['password' => NULL]);
+        }
 
-    //     // Fetch other necessary API data
-    //     $this->fetch_api_data('all_location', 'location');
+        $this->fetch_emp_data('all_emp');
+        $this->fetch_api_data('all_location', 'location');
 
-    //     return redirect()->route('visitorslog');
-    // }
+        // return redirect()->route('visitorslog');
+
+    }
+    
     private function fetch_emp_data($sessionKey){
         if(!Session::has($sessionKey)){
             $payload = [
@@ -174,7 +173,6 @@ class LoginController extends Controller
         else{
             $api_data = Session::get($sessionKey);
         }
-
         return $api_data;
     }
 }

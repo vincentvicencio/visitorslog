@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\User_types;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class RegisteredUser extends Model
+class RegisteredUser extends Authenticatable
 {
     use SoftDeletes;
     protected $table = 'registered_users';

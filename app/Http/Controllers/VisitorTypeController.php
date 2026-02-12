@@ -56,8 +56,8 @@ class VisitorTypeController extends Controller
        
             $newData[$i] = [
                 'name'          => $d->name, // show emp_code in first column
-                'created_by' => $d->getEmpName($d->created_by),
-                'updated_by' => ($d->getEmpName($d->updated_by) ?? '-'),
+                'created_by' => user_name($d->created_by) ?? '-',
+                'updated_by' => user_name($d->updated_by) ?? '-',
                 'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
                 'action'            => '<div class="dropdown">
                                             <button 
@@ -125,7 +125,7 @@ class VisitorTypeController extends Controller
         try {
             $id = new VisitorType();
             $id->name = ucfirst(strtolower($request->visitor_type)); // normalize case
-            $id->created_by = Auth::id();
+            $id->created_by = Auth::user()->id;
             $id->created_at = now();
             $id->save();
 
@@ -163,7 +163,7 @@ class VisitorTypeController extends Controller
         $visitor->update([
             'name' => ucfirst(strtolower($request->visitor_type)),
             'updated_at' => now(),
-            'updated_by' => Auth::id(),
+            'updated_by' => Auth::user()->id,
         ]);
 
         return response()->json([
@@ -191,7 +191,7 @@ class VisitorTypeController extends Controller
 
         $visitor->update([
             'deleted_at' => Carbon::now(),
-            'deleted_by' => Auth::id(),
+            'deleted_by' => Auth::user()->id,
         ]);
 
         return response()->json([

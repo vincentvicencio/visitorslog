@@ -44,7 +44,7 @@ class ReportController extends Controller
             // Instead of $user->delete(), we update the column
             $visitor->update([
                 'deleted_at' => NOW(),
-                'deleted_by' => Auth::user()->first_name ?? 'System' // Optional: track who deleted it
+                'deleted_by' => Auth::user()->id // Optional: track who deleted it
             ]);
 
         } catch (\Exception $e) {
@@ -193,8 +193,8 @@ class ReportController extends Controller
                                 <strong>Out:</strong>
                                 '. $time_out .'
                             </small>',
-                'creator' => '<small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'</small><br>
-                            <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>',
+                'creator' => '<small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
+                            <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>',
                 
                 'status' => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
 

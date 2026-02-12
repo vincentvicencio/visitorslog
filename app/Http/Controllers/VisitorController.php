@@ -16,6 +16,8 @@ class VisitorController extends Controller
 {
     public function index()
     {
+        
+        // dd(Auth::user()->user_type);
         $visitors = Visitor::where(function ($query) {
                 $query->where('status', 0)->orWhereNull('status');
                })
@@ -40,16 +42,27 @@ class VisitorController extends Controller
     }
 
     public function list(Request $request){
-
         $keywords = strtolower($request->search);
-
         $limit    = $request->input('length');
+
 
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
                 ->where(function ($query) {
-                    $query->where('status', 0)->orWhereNull('status');
+                $userLocations = []; 
+
+                foreach ((array) Auth::user()->location as $loc) {
+                    $userLocations[] = (int) $loc;
+                }
+                $query->where(function ($q) {
+                    $q->where('status', 0)
+                    ->orWhereNull('status');
+                })->whereIn('location', $userLocations);
+
                 })
+
+
+
                 ->when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
                         $q->where('full_name', 'LIKE', "%{$keywords}%")
@@ -87,6 +100,8 @@ class VisitorController extends Controller
             $locationLabel = '';
 
             $location = collect(session('all_location'));
+
+            // dd(Auth::user());
             foreach ($location as $record) {
                 if($d->location == $record['id']){
                     $locationLabel = $record['name'];
@@ -120,14 +135,19 @@ class VisitorController extends Controller
             $time_in = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
-                    
+            $fullName = '<div class="text-center">
+                <strong>' . $d->full_name . '</strong>';
+
+                if (Auth::user()->user_type != 3) {
+                    $fullName .= '<br><small>' . $locationLabel . '</small>';
+                }
+
+                $fullName .= '<br><small>' . $d->phone_number . '</small>
+                            </div>';
             $newData[$i] = [
-                'full_name' => '<div class="text-center">   
-                                    <strong>' . $d->full_name . '</strong>
-                                    <br><small>' . $locationLabel . '</small>
-                                    <br><small>' . $d->phone_number . '</small>
-                                <div>
-                ',
+                
+
+                'full_name' => $fullName,
 
                 'visitor_type' => '<div class="text-center">' . ($d->visitorType?->name ?? '-') . '</div>',
 
@@ -148,8 +168,8 @@ class VisitorController extends Controller
                                 </small>
                             </div>',
                 'creator' => '<div class="text-center">
-                                <small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'</small><br>
-                                <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>
+                                <small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
+                                <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>
                             </div>',
                 
                 'status' => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
@@ -221,7 +241,7 @@ class VisitorController extends Controller
         $visitor->update([
             'time_out' => Carbon::now(),
             'status'   => 1,
-            'updated_by' => Auth::id(),
+            'updated_by' => Auth::user()->id,
         ]);
 
         return response()->json([
@@ -340,7 +360,11 @@ class VisitorController extends Controller
             // }
             // Save visitor
 
+            $userLocations = []; 
 
+                foreach ((array) Auth::user()->location as $loc) {
+                    $userLocations[] = (int) $loc;
+                }
             $visitor = new Visitor();
             $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
             $visitor->first_name   = $request->first_name;
@@ -349,9 +373,9 @@ class VisitorController extends Controller
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = Auth::user()->location_id;
+            $visitor->location     = $userLocations[0];
             $visitor->address     = $request->address;
-            $visitor->created_by   = Auth::id();
+            $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
             $visitor->status       = 0;

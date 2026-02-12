@@ -139,6 +139,11 @@ $(document).ready(function () {
         
     });
 
+
+
+
+});
+
     class VisitorTypeTable {
         constructor() {
             this.defaultFields  = []
@@ -223,9 +228,5 @@ $(document).ready(function () {
     }
     const visitorsType = new VisitorTypeTable();
     visitorsType.onLoadPage();
-
-
-
-});
 
 

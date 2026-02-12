@@ -70,8 +70,8 @@ class User_TypesController extends Controller
        
             $newData[$i] = [
                 'name'          => '<div class="text-center">' . $d->name . '</div>', // show emp_code in first column
-                'created_by' => '<div class="text-center">' . $d->getEmpName($d->created_by) . '</div>',
-                'updated_by' => '<div class="text-center"> ' . ($d->getEmpName($d->updated_by) ?? '-') . '</div>',
+                'created_by' => user_name($d->created_by) ?? '-',
+                'updated_by' => user_name($d->updated_by) ?? '-',
                 'created_at' => '<div class="text-center">' . $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') . '</div>',
                 'action'            => '<div class="dropdown text-center">
                                         <button class="btn btn-sm btn-primary dropdown-toggle" 
@@ -104,7 +104,7 @@ class User_TypesController extends Controller
             $role = User_types::findOrFail($id);
             $role->update([
                 'deleted_at' => now(), 
-                'deleted_by' => Auth::id(), 
+                'deleted_by' => Auth::user()->id, 
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete role.'], 500);
@@ -126,7 +126,7 @@ class User_TypesController extends Controller
         $role = User_types::findOrFail($id);
         $role->update([
             'name' => $request->user_type,
-            'updated_by' => Auth::id(),
+            'updated_by' => Auth::user()->id,
         ]);
     }
 
@@ -146,8 +146,8 @@ class User_TypesController extends Controller
         } else {
             User_types::create([
                 'name' => $request->user_type,
-                'created_by' => Auth::id(),
-                'updated_by' => Auth::id(),
+                'created_by' => Auth::user()->id,
+                'updated_by' => Auth::user()->id,
             ]);
         }
 

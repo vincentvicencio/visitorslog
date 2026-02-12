@@ -18,12 +18,7 @@
                 <div class="user-name ps-2">
                     <div class="fs-6 " style="margin-top:2px;">Welcome</div>
                     <div class="d-block text-truncate fw-bold" style="width:120px; margin-top:-2px;">
-                          @auth
-                            {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}
-                          @endauth
-                          @guest
-                            Guest User
-                          @endguest
+                          {{ user_name(Auth::user()->id) ?? 'Guest User' }}
                     </div>
                 </div>
 
@@ -39,7 +34,7 @@
             Visitor Log Sheets
         </a>
 
-        @if(session('user_type') == 1)
+        @if(Auth::user()->user_type == 1)
             <a href="{{ url('userTypes') }}"
             class="sidebar-menu-button {{ Request::is('userTypes') ? 'selected' : '' }}">
                 <i class="bi bi-people-fill fs-6 p-2"></i>
