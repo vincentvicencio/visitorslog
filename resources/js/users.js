@@ -113,6 +113,7 @@ $('#btn_ok').on('click', function() {
 });
 $(document).on('click', '#register_btn', function () {
         try {
+            // userModal.show();
             openUserModalBlank();
         } catch (error) {
             console.error('Register button error:', error);
@@ -161,7 +162,7 @@ let userModal;
 try {
     const userModalEl = document.getElementById('registerUserModal');
     if (!userModalEl) throw new Error('User modal element not found');
-    userModal = new bootstrap.Modal(userModalEl);
+    userModal = new Modal(userModalEl);
     
     // Clean up Select2 when modal is hidden
     userModalEl.addEventListener('hidden.bs.modal', function () {

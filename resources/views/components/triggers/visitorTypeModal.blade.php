@@ -1,16 +1,15 @@
-<!-- Modal -->
 <div class="modal fade" id="textInputModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="textInputModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-md">
         <div class="modal-content">
 
-            <!-- Modal Header -->
+            <!-- Header -->
             <div class="modal-header">
                 <h5 class="modal-title" id="textInputModalLabel">Register Visitor Type</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <!-- Modal Body -->
+            <!-- Body -->
             <div class="modal-body">
                 <form id="textInputForm">
                     <div class="mb-3">
@@ -21,9 +20,8 @@
                 </form>
             </div>
 
-            <!-- Modal Footer -->
+            <!-- button -->
             <div class="modal-footer">
-                {{-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button> --}}
                 <button type="button" class="btn btn-primary" id="textInputSubmit">Submit</button>
             </div>
 

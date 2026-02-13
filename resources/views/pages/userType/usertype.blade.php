@@ -1,13 +1,15 @@
 @extends('layout')
 
 @section('content')
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @push('scripts')
 @vite (['resources/js/usertype.js'])
 @include('components.triggers.UserTypeModal')
 @endpush
 
-
 <div class="user-types-container mt-4">
+    {{-- header --}}
     <div class="page-header">
         <div class="header-content">
             <div class="page-title fs-2">User Types</div>
@@ -20,14 +22,10 @@
     </div>
 
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
-        <!-- search and filter -->
+        <!-- search and filter - calling table filter componentq -->
         <x-table-filter/>
-
         <!-- table -->
-        <table class="table table-bordered align-middle" id="userTypeTable">
-            <thead></thead>
-        </table>
-
+        <table class="table table-bordered align-middle" id="userTypeTable"><thead></thead></table>
     </div>
 </div>
 @endsection

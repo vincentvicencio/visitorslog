@@ -1,56 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-@if (!View::hasSection('hideSidebar'))
-    @include('layouts.sidebar')
-@endif
-@include('layouts.head')
 
-<body>
+    @include('layouts.head')
 
-    @if(! page_name('main') || page_name('main') == 'login' ) @yield('content')
-    @else
-
-    {{-- @include('layouts.sidebar') --}}
-
-    <div id="content" class="ps-0 d-flex flex-column">
-
+    <body>
         @if (!View::hasSection('hideSidebar'))
-            @include('layouts.header')
-        @endif  
-        
+            @include('layouts.sidebar')
+        @endif
+        @if(! page_name('main') || page_name('main') == 'login' ) @yield('content')
+        @else
 
-        @yield('content')
+        {{-- @include('layouts.sidebar') --}}
 
-        <!-- Notification -->
-        @include('components.triggers.toast')
-        @include('components.triggers.delete')
-        @include('components.triggers.visitorTypeModal')
-        @include('components.triggers.viewImage')
-        <!-- Notification -->
+        <div id="content" class="ps-0 d-flex flex-column">
 
-        @stack('scripts')
-        @yield('footer-scripts')
+            @if (!View::hasSection('hideSidebar'))
+                @include('layouts.header')
+            @endif  
+            
 
-    </div>
-    @endif
+            @yield('content')
 
-    @include('layouts.footer')
+            <!-- Notification -->
+            @include('components.triggers.toast')
+            @include('components.triggers.delete')
+            @include('components.triggers.visitorTypeModal')
+            @include('components.triggers.viewImage')
+            <!-- Notification -->
 
-<!-- Bootstrap JS AFTER jQuery -->
+            @stack('scripts')
+            @yield('footer-scripts')
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        </div>
+        @endif
+
+        @include('layouts.footer')
+    </body>
+</html>
+
 
 <script>
     window.Laravel = {
         baseUrl: "{{ url('/') }}",
-        csrfToken: "{{ csrf_token() }}" // This correctly gets the token from Laravel
+        csrfToken: "{{ csrf_token() }}"
     };
 </script>
 
-</body>
-
-</html>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

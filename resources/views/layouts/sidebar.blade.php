@@ -21,72 +21,59 @@
                           {{ user_name(Auth::user()->id) ?? 'Guest User' }}
                     </div>
                 </div>
-
             </div>
-        </div>  
+        </div>
+
         <div class="menu fw-bold mt-3 py-1 ps-4">Menu</div>
-
         <div class="d-flex flex-column vh-100 mx-2">
-
-        <a href="{{ url('visitorslog') }}"
-        class="sidebar-menu-button {{ Request::is('visitorslog') ? 'selected' : '' }}">
-            <i class="bi bi-person-lines-fill fs-6 p-2"></i>
-            Visitor Log Sheets
-        </a>
-
-        @if(Auth::user()->user_type == 1)
-            <a href="{{ url('userTypes') }}"
-            class="sidebar-menu-button {{ Request::is('userTypes') ? 'selected' : '' }}">
-                <i class="bi bi-people-fill fs-6 p-2"></i>
-                User Type
+            <a href="{{ url('visitorslog') }}"
+            class="sidebar-menu-button {{ Request::is('visitorslog') ? 'selected' : '' }}">
+                <i class="bi bi-person-lines-fill fs-6 p-2"></i>
+                Visitor Log Sheets
             </a>
+            @if(Auth::user()->user_type == 1)
+                <a href="{{ url('userTypes') }}"
+                class="sidebar-menu-button {{ Request::is('userTypes') ? 'selected' : '' }}">
+                    <i class="bi bi-people-fill fs-6 p-2"></i>
+                    User Type
+                </a>
 
-            <a href="{{ url('registerUser') }}"
-            class="sidebar-menu-button {{ Request::is('registerUser') ? 'selected' : '' }}">
-                <i class="bi bi-person-add fs-6 p-2"></i>
-                User
-            </a>
+                <a href="{{ url('registerUser') }}"
+                class="sidebar-menu-button {{ Request::is('registerUser') ? 'selected' : '' }}">
+                    <i class="bi bi-person-add fs-6 p-2"></i>
+                    User
+                </a>
 
-            <a href="{{ url('visitortype') }}"
-            class="sidebar-menu-button {{ Request::is('visitortype') ? 'selected' : '' }}">
-                <i class="bi bi-person-badge fs-6 p-2"></i>
-                Visitor Type
-            </a>
+                <a href="{{ url('visitortype') }}"
+                class="sidebar-menu-button {{ Request::is('visitortype') ? 'selected' : '' }}">
+                    <i class="bi bi-person-badge fs-6 p-2"></i>
+                    Visitor Type
+                </a>
 
-            <a href="{{ url('registerId') }}"
-            class="sidebar-menu-button {{ Request::is('registerId') ? 'selected' : '' }}">
-                <i class="bi bi-person-vcard fs-6 p-2"></i>
-                ID Numbers
-            </a>
+                <a href="{{ url('registerId') }}"
+                class="sidebar-menu-button {{ Request::is('registerId') ? 'selected' : '' }}">
+                    <i class="bi bi-person-vcard fs-6 p-2"></i>
+                    ID Numbers
+                </a>
 
-            <a href="{{ url('reports') }}"
-            class="sidebar-menu-button {{ Request::is('reports') ? 'selected' : '' }}">
-                <i class="bi bi-journals fs-6 p-2"></i>
-                Reports
-            </a>
-        @endif
-    </div>
+                <a href="{{ url('reports') }}"
+                class="sidebar-menu-button {{ Request::is('reports') ? 'selected' : '' }}">
+                    <i class="bi bi-journals fs-6 p-2"></i>
+                    Reports
+                </a>
+            @endif
+        </div>
+        <!-- Log out -->
+        <div class="logout-button d-flex mt-auto pe-4 fw-bold align-items-center justify-content-center" 
+            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            
+            <i class="bi bi-box-arrow-left p-2"></i>
+            <span>{{ __('Logout') }}</span>
 
-            <!-- Log out -->
-            <!-- <div class="logout-button d-flex mt-auto pe-4 fw-bold">
-                <i class="bi bi-box-arrow-left p-2"></i>
-                <a  href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"> {{ __('Logout') }}</a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                    @csrf
-                </form>
-            </div> -->
-            <div class="logout-button d-flex mt-auto pe-4 fw-bold align-items-center justify-content-center" 
-                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                
-                <i class="bi bi-box-arrow-left p-2"></i>
-                <span>{{ __('Logout') }}</span>
-
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                    @csrf
-                </form>
-            </div>
-
-        <br>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+            </form>
+        </div><br>
 
     </div>
 </div>
@@ -94,34 +81,34 @@
 
 
 <script>
-function updateClock() {
-    const now = new Date();
+    function updateClock() {
+        const now = new Date();
 
-    // Day (Monday)
-    const day = now.toLocaleDateString('en-US', { weekday: 'long' });
+        // Day
+        const day = now.toLocaleDateString('en-US', { weekday: 'long' });
 
-    // Date (January 12, 2004)
-    const date = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        // Date
+        const date = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    // Time (hour:minute)
-    let hours = now.getHours();
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // Convert 0 to 12 for 12AM
+        // Time hour : minute
+        let hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
 
-    const time = `${hours}:${minutes}`;
+        const time = `${hours}:${minutes}`;
 
-    // Update HTML
-    document.getElementById('clock-day').textContent = day;
-    document.getElementById('clock-date').textContent = date;
-    document.getElementById('clock-time').textContent = time + ampm;
-}
+        // data holders
+        document.getElementById('clock-day').textContent = day;
+        document.getElementById('clock-date').textContent = date;
+        document.getElementById('clock-time').textContent = time + ampm;
+    }
 
-// Update every second to keep minutes accurate
-setInterval(updateClock, 1000);
+    // 1000 = 1s update
+    setInterval(updateClock, 1000);
 
-// Initial call
-updateClock();
+    // Initial call
+    updateClock();
 </script>
 

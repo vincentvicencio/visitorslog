@@ -9,7 +9,7 @@
         "@popperjs/core": "^2.11.6",
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.4",
-        "bootstrap": "^5.2.3",
+        "bootstrap": "^5.3.8",
         "concurrently": "^9.0.1",
         "datatables.net": "^2.3.6",
         "datatables.net-bs5": "^2.3.6",

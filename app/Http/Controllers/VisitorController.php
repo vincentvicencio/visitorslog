@@ -365,7 +365,14 @@ class VisitorController extends Controller
                     $userLocations[] = (int) $loc;
                 }
             $visitor = new Visitor();
-            $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
+            // clint - remove dot when there is no middle name
+            if (!empty($middleInitial)) {
+                $visitor->full_name = $request->first_name . ' ' . $middleInitial . '. ' . $request->last_name;
+            } else {
+                $visitor->full_name = $request->first_name . ' ' . $request->last_name;
+            }
+            // original code - kardo
+            // $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
             $visitor->first_name   = $request->first_name;
             $visitor->middle_name  = $request->middle_name;
             $visitor->last_name    = $request->last_name;

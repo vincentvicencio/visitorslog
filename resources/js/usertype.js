@@ -99,7 +99,6 @@ document.getElementById('save_type').addEventListener('click', () => {
                 }
                 
                 userTypeModal.hide(); 
-                Triggers.showToast($btn.prop('disable', false) .text('Save New User Type'),1);
                 
 },
             error: function (xhr) {
@@ -255,18 +254,18 @@ class UserTypeTable {
             columns,
             self.url,
             columnDefs,
-            10,          // ✅ pagination
-            {},           // ✅ data
+            10,          // pagination
+            {},           // data
             false
         );
 
         $(self.table).on('init.dt', function () {
 
-            console.log('✅ DATATABLE INITIALIZED');
+            console.log('DATATABLE INITIALIZED');
 
             const tableApi = $(self.table).DataTable();
 
-            // 🔥 FORCE DRAW
+            // FORCE DRAW
             tableApi.draw();
 
             // =========================================

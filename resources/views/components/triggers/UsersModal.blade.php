@@ -25,7 +25,6 @@
                             <option value="">Select Location</option>
                         </select>
                     </div>
-
                     <div class="mb-3" id="emp_code_container">
                         <label class="form-label">Employee Code</label>
                         <div class="input-group">
@@ -35,7 +34,6 @@
                             </button>
                         </div>
                     </div>
-
                     <div class="mb-3" id="employee_name_container" style="display: none;">
                         <div class="row">
                             <div class="col-6">
@@ -48,7 +46,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="mb-3" id="password_container">
                         <label class="form-label">Password</label>
                         <input type="password" id="reg_password" class="form-control" placeholder="Password">
@@ -63,7 +60,7 @@
     </div>
 </div>
 
-
+{{-- Edit User Type --}}
 <div id="editPopupContainer" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
     <div style="background:white; width:350px; margin:100px auto; padding:20px; border-radius:8px; position:relative;">
         <button id="closeEditPopup" type="button" style="float:right;">X</button>
