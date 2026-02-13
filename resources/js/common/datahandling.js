@@ -56,7 +56,7 @@ class Datahandling {
 
                 if (!errors) {
 
-                    triggers.showToast(data);
+                    triggers.showToast(data.message, data.status);
 
                     if (config.module) datatable.createTable(config.table, config.columns, config.url, config.targets)
                     else $(table).DataTable().ajax.reload()

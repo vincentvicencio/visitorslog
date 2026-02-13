@@ -46,12 +46,10 @@ Route::middleware(['auth'])->group(function () {
             ->controller(User_TypesController::class)
             ->group(function () {
                 Route::get('/',                   'index')->name('userTypes');
-                Route::get('/usertype/{id}/edit', 'edit')->name('userTypes.edit');
-                Route::put('/usertype/{id}',      'update')->name('userTypes.update');
                 Route::post('/list',              'list')->name('userTypes.list');
-                Route::post('/delete',            'delete')->name('userTypes.delete');
-                Route::post('/addusertype',       'addusertype')->name('userTypes.addusertype');
-                Route::delete('/usertype/{id}',   'destroy')->name('userTypes.destroy');
+                Route::post('/save',       'save')->name('userTypes.save');
+                Route::post('/search',      'search')->name('userTypes.search');
+                Route::post('/delete',      'delete')->name('userTypes.delete');
             });
 
         // USER

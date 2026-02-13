@@ -56,7 +56,7 @@ class Datatable {
      * @param module = method name (e.g window.forecasting  )
      * @param pagination= how many rows will display
      */
-    async createTableAjax(table, theads, url, tbodies = "", pagination = 10, data = {}, enableSearch = true) {
+    async createTableAjax(table, theads, url, tbodies = "", module, pagination = 10, data = {}, enableSearch = true) {
         const self = this
 
         $(table).DataTable().clear().destroy()
@@ -109,7 +109,7 @@ class Datatable {
                     justifyContent: 'space-between' // info left, pagination right
                 });
             },
-            drawCallback: function () { component.initializeButtons(table, url) }
+            drawCallback: function () { component.initializeButtons(table, url,module) }
         });
 
         $('.dt-scroll-head').remove();

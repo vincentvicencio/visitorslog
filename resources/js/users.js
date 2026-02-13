@@ -191,13 +191,13 @@ try {
 }
 
 export function openUserModal(data) {
-    console.log('openUserModal:', data);
     try {
         const idInput = document.getElementById('reg_user_db_id');
         if (!idInput) {
             console.error('Required form elements not found');
             return;
         }
+        
         // Destroy Select2 instances if they exist
         if ($('#reg_location').hasClass('select2-hidden-accessible')) {
             $('#reg_location').select2('destroy');
@@ -293,7 +293,6 @@ export function openUserModal(data) {
 }
 
 export function openUserModalBlank() {
-    console.log('openUserModalBlank');
     try {
         const idInput = document.getElementById('reg_user_db_id');
         if (!idInput) {
