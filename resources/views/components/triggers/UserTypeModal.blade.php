@@ -10,7 +10,7 @@
                     <div class="mb-3">
                         <input hidden="hidden" name="record_id" id="record_id">
                         <label class="form-label">Role Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="e.g. Administrator" required id='name' autocomplete="off">
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Administrator" required id='name'>
                         <span class="error-span error-name text-danger"></span>
                     </div>
                 </form>

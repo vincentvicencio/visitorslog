@@ -18,8 +18,10 @@
     </div>
 </div>
 
+
 @include('components.triggers.users-userstype-toast')
 @include('components.triggers.UsersModal')
+
 
 @endsection
 

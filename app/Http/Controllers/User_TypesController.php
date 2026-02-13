@@ -17,20 +17,19 @@ class User_TypesController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name'              => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
+                'name'              => 'required',
             ],
             [
-                'name.required'     => 'User Type is Required',
-                'name.regex'        => 'User Type must contain letters only'
+                'name'              => 'Name is Required'
             ]
         );
 
         if($validator->fails()){
-            return response()->json(['status' => 1, 'title' => 'Invalid','errors' => $validator->errors()]);
+            return response()->json(['status' => 1,'errors' => $validator->errors()]);
         }
 
         $record_id      = $request->record_id;
-        $emp_code       = Auth::user()->id;
+        $emp_code       = Auth::user()->emp_code;
         $name           = trim(string: $request->name);
 
         $duplicateQuery = User_types::withoutTrashed()
@@ -43,13 +42,13 @@ class User_TypesController extends Controller
         if($duplicateQuery->exists()){
             return response()->json([
                 'status'    => 1,
-                'message'   => 'User Type Already Exists'
+                'message'   => 'Name Already Exists'
             ]);
 
         }
 
         $data       = [
-            'name'          => $request->name,
+            'name'               => $request->name,
         ];
 
         if ($record_id > 0) {
@@ -57,10 +56,10 @@ class User_TypesController extends Controller
             $oldData    = $status->getOriginal();
 
             $status     = $status->update(['updated_by' => $emp_code] + $data);
-            $message    = 'User Type Successfully Updated';
+            $message    = 'UserType Successfully Updated';
         } else {
             $status     = User_types::create(['created_by' => $emp_code] + $data);
-            $message    = 'User Type Successfully Created';
+            $message    = 'UserType Status Successfully Created';
         }
         return response()->json([
             'status'    => 0,
@@ -109,9 +108,17 @@ class User_TypesController extends Controller
                 'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
                 'created_at' => '<div class="text-center">' . ($d->created_at ? $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') : '-')  . '</div>',
                 'action'            => '<div class="dropdown text-center">
-                                            <button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>
-                                            <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"> Delete</button>
-                                    </div>',
+                                        <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                                type="button" 
+                                                data-bs-toggle="dropdown" 
+                                                data-bs-boundary="viewport" aria-expanded="false">
+                                            Action
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
+                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"><i class="bi bi-pencil-square me-2"></i> Delete</a></li></li>
+                                        </ul>
+                                    </div>' 
             ];
             $i++;
         } 
@@ -128,29 +135,28 @@ class User_TypesController extends Controller
         $record = User_types::find($request->id);
         if(!$record){
             return response()->json([
-                'status'     => 1,
-                'message'    => 'No Data Found'
+                'status'    => 1,
+                'message'   => 'No Data Found'
             ]);
         }
 
         return response()->json([
-            'status'     => 0,
-            'data'       => $record
+            'status'    => 0,
+            'data'      => $record
         ]);
     }
+
 
     public function delete(Request $request){
         $record  = User_types::find($request->id);
         $details = $record->name;
-        $record  -> update(['deleted_by' => Auth::user()->emp_code]);
-        $record  -> delete();
+        $record->update(['deleted_by' => Auth::user()->emp_code]);
+        $record->delete();
 
-        $message = 'User Type Successfully Deleted';
-            return response()->json([
-                'status'     => 0,
-                'message'    => $message
-            ]);
+        return response()->json(['You have successfully delete '. $details]);
     }
+
+
 
     public function destroy($id) 
     {

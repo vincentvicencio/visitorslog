@@ -46,9 +46,9 @@ Route::middleware(['auth', 'single.session'])->group(function () {
         Route::prefix('userTypes')
             ->controller(User_TypesController::class)
             ->group(function () {
-                Route::get('/',             'index')->name('userTypes');
-                Route::post('/list',        'list')->name('userTypes.list');
-                Route::post('/save',        'save')->name('userTypes.save');
+                Route::get('/',                   'index')->name('userTypes');
+                Route::post('/list',              'list')->name('userTypes.list');
+                Route::post('/save',       'save')->name('userTypes.save');
                 Route::post('/search',      'search')->name('userTypes.search');
                 Route::post('/delete',      'delete')->name('userTypes.delete');
             });

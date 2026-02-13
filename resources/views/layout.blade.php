@@ -12,9 +12,9 @@
 
         <div id="content" class="ps-0 d-flex flex-column">
 
-            @if (!View::hasSection('hideSidebar'))
+            {{-- @if (!View::hasSection('hideSidebar'))
                 @include('layouts.header')
-            @endif  
+            @endif   --}}
             
             @yield('content')
 
