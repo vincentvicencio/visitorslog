@@ -25,6 +25,7 @@
         "bootstrap-icons": "^1.13.1",
         "bootstrap-tokenfield": "^0.12.0",
         "jquery": "^4.0.0",
-        "select2": "^4.1.0-rc.0"
+        "select2": "^4.1.0-rc.0",
+        "update": "^0.7.4"
     }
 }
