@@ -13,9 +13,11 @@
             <div class="modal-body">
                 <form id="textInputForm">
                     <div class="mb-3">
-                        <label for="userInput" class="form-label">Visitor Type</label>
-                        <input type="text" class="form-control" id="userInput" name="userInput"
+                        <input type="hidden" id="record_id" name="record_id">
+                        <label for="name" class="form-label">Visitor Type</label>
+                        <input type="text" class="form-control" id="name" name="name"
                             placeholder="Enter Visitor Type" autocomplete="off" required>
+                        <span class="error-span error-name text-danger"></span>
                     </div>
                 </form>
             </div>

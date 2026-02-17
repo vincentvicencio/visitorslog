@@ -79,36 +79,3 @@
 </div>
 
 
-
-<script>
-    function updateClock() {
-        const now = new Date();
-
-        // Day
-        const day = now.toLocaleDateString('en-US', { weekday: 'long' });
-
-        // Date
-        const date = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-        // Time hour : minute
-        let hours = now.getHours();
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12;
-
-        const time = `${hours}:${minutes}`;
-
-        // data holders
-        document.getElementById('clock-day').textContent = day;
-        document.getElementById('clock-date').textContent = date;
-        document.getElementById('clock-time').textContent = time + ampm;
-    }
-
-    // 1000 = 1s update
-    setInterval(updateClock, 1000);
-
-    // Initial call
-    updateClock();
-</script>
-

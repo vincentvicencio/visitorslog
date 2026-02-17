@@ -21,8 +21,8 @@ public function run(): void
             'last_name'    => 'Loreto',
             'phone_number' => '09123456789',
             'image_path'   => 'default.png',
-            'created_by'   => 'System',
-            'updated_by'   => 'System',
+            'created_by'   => '1',
+            'updated_by'   => '1',
             'deleted_by'   => 'None',
 
             // Integers (Numbers only - NO strings like 'Summit One')

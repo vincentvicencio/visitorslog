@@ -54,9 +54,16 @@ class Datahandling {
                     triggers.showError(formid, index, value)
                 })
 
+                if (errors) {
+                    // Show toast for validation errors
+                    const firstError = Object.values(errors)[0];
+                    const errorMsg = Array.isArray(firstError) ? firstError[0] : firstError;
+                    triggers.showToast(errorMsg, 1);
+                }
+
                 if (!errors) {
 
-                    triggers.showToast(data);
+                    triggers.showToast(data.message, data.status);
 
                     if (config.module) datatable.createTable(config.table, config.columns, config.url, config.targets)
                     else $(table).DataTable().ajax.reload()

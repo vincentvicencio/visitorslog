@@ -1,17 +1,5 @@
 @extends('layout')
 @section('content')
-@include('components.triggers.users-userstype-toast')
-@include('components.triggers.UsersModal')
-@vite(['resources/js/users.js'])
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-
-
 <div class="user-types-container mt-4">
     <div class="page-header">
         <div class="header-content">
@@ -19,8 +7,8 @@
             <div class="page-subtitle mb-3">Manage and organize user accounts and their details</div>
         </div>
         <div class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
-         text-white rounded-2 border-0 cursor-pointer px-3 py-2" id="register_btn">
-            Register User
+         text-white rounded-2 border-0 cursor-pointer px-3 py-2">
+            <button type="button" class="btn btn-primary me-2" id="reg_user">Register User</button>
         </div>
     </div>
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
@@ -31,4 +19,14 @@
         <table class="table table-bordered align-middle" id="usersTable"><thead></thead></table>
     </div>
 </div>
+
+
+@include('components.triggers.users-userstype-toast')
+@include('components.triggers.UsersModal')
+
+
 @endsection
+
+@push('scripts')
+@vite(['resources/js/users.js'])
+@endpush

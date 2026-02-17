@@ -25,9 +25,11 @@
                         </select>
                     </div>
                     <div class="mb-3">
+                        <input hidden="hidden" name="record_id" id="record_id">
                         <label for="visitorID" class="form-label">Visitor ID</label>
-                        <input type="text" class="form-control" id="visitorID" name="visitorID"
+                        <input type="text" class="form-control" id="name" name="name"
                             placeholder="Enter Visitor ID" autocomplete="off" required>
+                        <span class="error-span error-name text-danger"></span>
                     </div>
                 </form>
             </div>

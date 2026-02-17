@@ -17,27 +17,7 @@ window.reportFilters = {
 let URL = '/reports/';
 
 $(document).ready(function(){
-    // =================================Dropdown==================================
-// Allow Bootstrap dropdown menus to render without clipping inside responsive tables.
-    const $usersTableWrapper = $('#reportTable').closest(
-        '.table-responsive, .table-responsive-sm, .table-responsive-md, .table-responsive-lg'
-    );
-    if ($usersTableWrapper.length) {
-        $usersTableWrapper.css('overflow', 'visible');
-    }
-
-    // Ensure dropdown toggles work even when rows are injected by DataTables.
-    $(document).on('click', '.dropdown-toggle', function (event) {
-        event.preventDefault();
-        const dropdown = Dropdown.getOrCreateInstance(this);
-        dropdown.toggle();
-    });
-
-
-    // =================================Dropdown==================================
-    // =================================Buttons==================================
     
-
     $(document).on('click', '.delete-btn', function () {
         const id = $(this).data('id');
         const name = $(this).data('name') || "this visitor"; // Assuming you have data-name in your button
@@ -188,90 +168,6 @@ $(document).ready(function(){
         }
     });
 
-// Initialize Modal
-const notificationModalEl = document.getElementById('notificationContainer');
-const notificationModal = new bootstrap.Modal(notificationModalEl);
-
-// --- OPEN DELETE MODAL FUNCTION ---
-
-export function openDeleteModal(id, name = "this record") {
-    const recordInput = document.getElementById('record_id');
-    const messageTitle = document.getElementById('notification-title');
-    const messageBody = document.getElementById('notification-message');
-
-    // Set Data
-    recordInput.value = id; 
-    
-    // UI Updates
-    messageTitle.innerText = "Confirm Deletion";
-    messageBody.innerText = `Are you sure you want to delete ${name}?`;
-    
-    // Reset button state in case it was disabled previously
-    $('#btn_ok').prop('disabled', false).text('Yes');
-
-    notificationModal.show();
-}
-
-// --- HANDLE DELETE SUBMIT ---
-
-document.getElementById('btn_ok').addEventListener('click', function() {
-    const id = document.getElementById('record_id').value;
-    const $btn = $(this);
-
-    if (!id) {
-        Triggers.showToast('Invalid record ID.', 1);
-        return;
-    }
-
-    $btn.prop('disabled', true).text('Processing...');
-
-    // AJAX request to delete the record
-    $.ajax({
-        url:URL+'delete-visitor/' + id,
-        type: 'DELETE',
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function (response) {
-
-            // 1. Hide the confirmation modal
-            notificationModal.hide();
-
-            // 2. Set the text and show the manual Bootstrap Toast (#DELETE)
-            $('#DeletetoastMessage').text(response.success || "Report Log Deleted Successfully!");
-            
-            const toastElement = document.getElementById('DELETE');
-            if (toastElement) {
-                const toast = new bootstrap.Toast(toastElement);
-                toast.show();
-            }
-
-            // refresh the datatable only
-            if ($.fn.DataTable.isDataTable('#reportTable')) {
-                $('#reportTable').DataTable().draw(false);
-            }
-
-            // 3. Re-enable the button
-            $btn.prop('disabled', false).text('Yes');
-            const modalEl = document.getElementById('filterModal');
-            const modalInstance =
-                bootstrap.Modal.getInstance(modalEl) ||
-                new bootstrap.Modal(modalEl);
-
-            modalInstance.hide();
-
-        },
-        error: function (xhr) {
-            // Re-enable button on error
-            $btn.prop('disabled', false).text('Yes');
-            
-            const errorMsg = xhr.responseJSON?.message ?? 'Delete failed.';
-            Triggers.showToast(errorMsg, 1);
-        }
-    });
-});
-
-
 class ReportClassTable {
     constructor() {
         this.defaultFields  = []
@@ -289,8 +185,9 @@ class ReportClassTable {
         this.formid         = "#"  
     }
 
-    async onLoadPage(){
+    async initializePage(){
         this.list();
+        this.initializeButtons();
     }
     async list() {
         const self = this;
@@ -321,9 +218,10 @@ class ReportClassTable {
             columns,
             self.url,
             columnDefs,
-            10,
-            window.reportFilters,//data
-            false
+            self.module,            // module
+            10,                   // pagination
+            window.reportFilters, // data
+            false                 // enableSearch
         );
 
         $(self.table)
@@ -366,9 +264,26 @@ class ReportClassTable {
 
     }
 
+    async initializeButtons(){
+        const self = this
+        $('#btn_add').off('click').on('click', async function (e) {
+            e.preventDefault()
+            datahandling.clearForm(self.form)
+            container.showModal('#addTypeModal')
+        })
+        
+        $(document).off('click', '#btn_submit').on('click', '#btn_submit', async function(e) {
+            e.preventDefault();
+            const formid    = self.form;
+            const formdata  = new FormData($(formid)[0]);
+            await Triggers.removeErrorOnInput(formid);
+            await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
+        });
+    }
+
 
 }
-const reportlog = new ReportClassTable();
-reportlog.onLoadPage();
+const instance = new ReportClassTable();
+instance.initializePage();
 
-export default reportlog;
+export default instance;

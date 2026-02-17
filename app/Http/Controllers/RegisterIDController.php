@@ -10,25 +10,76 @@ use App\Models\Visitor;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
 
 class RegisterIDController extends Controller
 {
-    // Show the form
     public function index()
-    {
-        $registeredIds = RegisteredID::where('deleted_at', null)
-                   ->orderBy('id', 'desc')
-                   ->get();
+    {   
         $visitorTypes = VisitorType::where('deleted_at', null)
                    ->orderBy('id', 'desc')
                    ->get();
-        $visitorsLogs = Visitor::where('status', 0)
-                   ->whereNull('time_out')
-                   ->orderBy('id', 'desc')
-                   ->get();
-        return view('pages.registerid.id', compact('registeredIds', 'visitorTypes', 'visitorsLogs'));
+        return view('pages.registerID.id', compact('visitorTypes'));
     }
+    public function save(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name'              => 'required',
+                'visitorType'        => 'required|exists:visitor_types,id',
+            ],
+            [
+                'name'              => 'Name is Required',  
+                'visitorType'        => 'required|exists:visitor_types,id',
+            ]
+        );
 
+        if($validator->fails()){
+            return response()->json(['status' => 1,'errors' => $validator->errors()]);
+        }
+
+        $record_id      = $request->record_id;
+        $emp_code       = Auth::user()->id;
+        $name           = trim(string: $request->name);
+
+        $duplicateQuery = RegisteredID::withoutTrashed()
+                            ->whereRaw('LOWER(id_number) = ?', [strtolower($name)]);
+
+        if($record_id > 0){
+            $duplicateQuery->where('id', '!=', $record_id);
+        }
+        
+        if($duplicateQuery->exists()){
+            return response()->json([
+                'status'    => 1,
+                'message'   => 'Name Already Exists'
+            ]);
+
+        }
+
+        $data       = [
+            'id_number'          => $request->name,
+            'visitor_type'       => $request->visitorType,
+        ];
+
+        if ($record_id > 0) {
+            $status     =  RegisteredID::findorFail($record_id);
+            $oldData    = $status->getOriginal();
+
+            $status     = $status->update(['updated_by' => $emp_code] + $data);
+            $message    = 'Registered ID Successfully Updated';
+        } else {
+            $status     = RegisteredID::create(['created_by' => $emp_code] + $data);
+            $message    = 'Registered ID Successfully Created';
+        }
+        return response()->json([
+            'status'    => 0,
+            'message'   => $message
+        ]);
+
+    }
 
     public function list(Request $request){
      
@@ -46,8 +97,6 @@ class RegisterIDController extends Controller
                             
                             
                     });
-
-
         
         $totalRecords = $rawquery->get()->count();
         
@@ -84,25 +133,8 @@ class RegisterIDController extends Controller
                                     Action
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li>
-                                        <button 
-                                            class="dropdown-item"
-                                            id="editBtn"
-                                            data-id="'.$d->id.'"
-                                            data-name="'.$d->id_number.'"
-                                            data-type="'.$d->visitor_type.'">
-                                            <i class="bi bi-pencil-square me-2"></i> Edit
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button 
-                                            type="button"
-                                            class="dropdown-item text-danger"
-                                            id="deleteBtn"
-                                            data-id="'.$d->id.'">
-                                            <i class="bi bi-trash me-2"></i> Delete
-                                        </button>
-                                    </li>
+                                    <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
+                                    <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
                                 </ul>
                             </div>';
             } else {
@@ -137,107 +169,61 @@ class RegisterIDController extends Controller
         ]);
     }
 
-    public function save(Request $request)
-    {
-        $request->validate([
-            'id_number' => [
-                'required',
-                'string',
-                function ($attribute, $value, $fail) {
-                    $exists = RegisteredID::where('id_number', $value)
-                        ->whereNull('deleted_at')
-                        ->exists();
-
-                    if ($exists) {
-                        $fail('Visitor ID already exists.');
-                    }
-                },
-            ],
-            'visitor_type' => [
-                'required',
-                'exists:visitor_types,id',
-            ],
-        ]);
-
-
-
-        $registeredID = new RegisteredID();
-        $registeredID->id_number = $request->id_number;
-        $registeredID->visitor_type = $request->visitor_type;
-        $registeredID->created_by = Auth::user()->id;
-        $registeredID->updated_by = Auth::user()->id;
-        $registeredID->created_at = now();
-        $registeredID->save();
-
-        if (!$registeredID) {
+    public function search(Request $request){
+        $record = RegisteredID::find($request->id);
+        if(!$record){
             return response()->json([
-                'message' => 'Visitor Id not found'
-            ], 404);
+                'status'    => 1,
+                'message'   => 'No Data Found'
+            ]);
         }
 
         return response()->json([
-            'message' => 'Visitor Id successfully registered'
+            'status'    => 0,
+            'data'      => $record
         ]);
     }
 
-    public function edit(Request $request)
+    public function delete(Request $request){
+        $record  = RegisteredID::find($request->id);
+        $details = $record->id_number;
+        $record->update(['deleted_by' => Auth::user()->id]);
+        $record->delete();
+
+        $message    = 'Registered ID Successfully Deleted';
+            return response()->json([
+                'status'    => 0,
+                'message'   => $message
+            ]);
+    }
+
+    public function destroy($id) 
+    {
+        try {
+            $role = RegisteredID::findOrFail($id);
+            $role->update(['deleted_by' => Auth::user()->id]);
+            $role->delete();
+            
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'An error occurred while deleting the Registered ID.'], 500);
+        }
+    }   
+    public function edit($id)
+    {
+        $role = RegisteredID::findOrFail($id); 
+        return response()->json($role);
+    }
+
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'id' => 'required|exists:registered_visitor_ids,id',
-            'id_number' => [
-                'required',
-                'string',
-                function ($attribute, $value, $fail) use ($request) {
-                    $exists = RegisteredID::whereRaw('id_number = ?', [$value])
-                        ->where('id', '!=', $request->id)  // exclude current record
-                        ->whereNull('deleted_at')
-                        ->exists();
-                    if ($exists) {
-                        $fail('Visitor ID already exists.');
-                    }
-                },
-            ],
+            'RegisteredID' => 'required|string|max:255|unique:registered_ids,name,' . $id,
         ]);
 
-        $visitor = RegisteredID::find($request->id);
-
-        $visitor->update([
-            'id_number' => $request->id_number,
-            'visitor_type' => $request->visitor_type,
-            'updated_at' => now(),
+        $role = RegisteredID::findOrFail($id);
+        $role->update([
+            'name' => $request->RegisteredID,
             'updated_by' => Auth::user()->id,
-        ]);
-
-        return response()->json([
-            'message' => 'Visitor ID successfully updated'
-        ], 200);
-    }
-
-
-
-    public function delete(Request $request)
-    {
-        $visitor = RegisteredID::where('id', $request->id)->first();
-
-        if (!$visitor) {
-            return response()->json([
-                'message' => 'Visitor Id not found'
-            ], 404);
-        }
-
-        if ($visitor->deleted_at !== null) {
-            return response()->json([
-                'message' => 'Visitor Id already deleted'
-            ], 400);
-        }
-
-        $visitor->update([
-            'deleted_at' => Carbon::now(),
-            'deleted_by' => Auth::user()->id,
-        ]);
-
-        return response()->json([
-            'message' => 'Visitor Id successfully deleted'
         ]);
     }
 
