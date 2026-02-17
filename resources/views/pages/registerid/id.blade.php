@@ -22,7 +22,8 @@
     </div>
 </div>
 @include('components.triggers.registerIdModal')
+@endsection
+
 @push('scripts')
 @vite(['resources/js/registeredid.js'])
 @endpush
-@endsection

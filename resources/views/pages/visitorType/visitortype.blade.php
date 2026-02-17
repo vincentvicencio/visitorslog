@@ -22,8 +22,9 @@
     </div>
 </div>
 
-@push('scripts')
-    @vite(['resources/js/visitortype.js'])
-@endpush
+@include('components.triggers.visitorTypeModal')
 @endsection
 
+@push('scripts')
+@vite(['resources/js/visitortype.js'])
+@endpush

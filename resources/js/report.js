@@ -19,20 +19,7 @@ let URL = '/reports/';
 $(document).ready(function(){
     // =================================Dropdown==================================
 // Allow Bootstrap dropdown menus to render without clipping inside responsive tables.
-    const $usersTableWrapper = $('#reportTable').closest(
-        '.table-responsive, .table-responsive-sm, .table-responsive-md, .table-responsive-lg'
-    );
-    if ($usersTableWrapper.length) {
-        $usersTableWrapper.css('overflow', 'visible');
-    }
-
-    // Ensure dropdown toggles work even when rows are injected by DataTables.
-    $(document).on('click', '.dropdown-toggle', function (event) {
-        event.preventDefault();
-        const dropdown = Dropdown.getOrCreateInstance(this);
-        dropdown.toggle();
-    });
-
+    
 
     // =================================Dropdown==================================
     // =================================Buttons==================================
@@ -289,8 +276,9 @@ class ReportClassTable {
         this.formid         = "#"  
     }
 
-    async onLoadPage(){
+    async initializePage(){
         this.list();
+        this.initializeButtons();
     }
     async list() {
         const self = this;
@@ -321,9 +309,10 @@ class ReportClassTable {
             columns,
             self.url,
             columnDefs,
-            10,
-            window.reportFilters,//data
-            false
+            self.module,            // module
+            10,                   // pagination
+            window.reportFilters, // data
+            false                 // enableSearch
         );
 
         $(self.table)
@@ -366,9 +355,26 @@ class ReportClassTable {
 
     }
 
+    async initializeButtons(){
+        const self = this
+        $('#btn_add').off('click').on('click', async function (e) {
+            e.preventDefault()
+            datahandling.clearForm(self.form)
+            container.showModal('#addTypeModal')
+        })
+        
+        $(document).off('click', '#btn_submit').on('click', '#btn_submit', async function(e) {
+            e.preventDefault();
+            const formid    = self.form;
+            const formdata  = new FormData($(formid)[0]);
+            await Triggers.removeErrorOnInput(formid);
+            await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
+        });
+    }
+
 
 }
-const reportlog = new ReportClassTable();
-reportlog.onLoadPage();
+const instance = new ReportClassTable();
+instance.initializePage();
 
-export default reportlog;
+export default instance;

@@ -22,14 +22,15 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
+        // $visitorlogs = Visitor::where('status', 1)
+        //             ->orderBy('id', 'asc')
+        //             ->get();
         $visitorlogs = Visitor::where('status', 0)
-                    ->orderBy('id', 'asc')
-                    ->get();
+            ->withoutTrashed()
+            ->orderBy('id', 'asc')
+            ->get();
         $visitorTypes = VisitorType::all();
         $allEmployeesFromSession = session('all_emp', []);
-
-
-        
 
         return view('pages.reports.report', compact('visitorlogs', 'visitorTypes', 'allEmployeesFromSession'));
     }
@@ -65,27 +66,17 @@ class ReportController extends Controller
     }
 
     public function list(Request $request){
+        
 
         $keywords = strtolower($request->search);
-        // $keywords = strtolower($request->input('search.value'));
 
         $limit    = $request->input('length');
-
-        // Debug: Log what we're receiving
-        \Log::info('Filter Request:', [
-            'date_from' => $request->date_from,
-            'date_to' => $request->date_to,
-            'visitor_type' => $request->visitor_type,
-            'search' => $keywords
-        ]);
 
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
                 ->when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
-                        $q->where('first_name', 'LIKE', "%{$keywords}%")
-                        ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
-                        ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+                        $q->where('full_name', 'LIKE', "%{$keywords}%")
                         ->orWhere('visitor_id', 'LIKE', "%{$keywords}%")
                         ->orWhere('phone_number', 'LIKE', "%{$keywords}%")
                         ->orWhereHas('visitorType', function ($qt) use ($keywords) {
@@ -164,14 +155,14 @@ class ReportController extends Controller
             $time_in = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
-
-            // Construct full name from individual name fields
-            // $fullName = trim(implode(' ', array_filter([
-            //     $d->first_name,
-            //     $d->middle_name,
-            //     $d->last_name
-            // ])));
                     
+            if ($status === 'Timed Out') {
+                $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger"> '. $status .'</div></div>';
+            }
+            else{
+                $statuslayout = '<div class="status-cell"><div class="status" > '. $status .'</div></div>';
+            }
+
             $newData[$i] = [
                 'full_name' => '
                     <strong>' . $d->full_name . '</strong>
@@ -196,7 +187,7 @@ class ReportController extends Controller
                 'creator' => '<small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
                             <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>',
                 
-                'status' => '<div class="status-cell" style="background-color:red;"><div class="status"> '. $status .'</div></div>',
+                'status' => $statuslayout,
 
                 'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
 
@@ -221,12 +212,7 @@ class ReportController extends Controller
                                         <i class="bi bi-eye me-2"></i> View
                                     </button>
                                 </li>
-                                <li>
-                                    <button type="button" class="dropdown-item text-danger delete-btn" 
-                                            data-id="'. $d->id .'">
-                                        <i class="bi bi-trash me-2"></i> Delete
-                                    </button>
-                                </li>
+                                        <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li>
                             </ul>
                         </div>',
             ];
@@ -253,5 +239,18 @@ class ReportController extends Controller
         $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
         
         return Excel::download(new ReportsExport($filters), $fileName);
+    }
+
+    public function delete(Request $request){
+        $record  = Visitor::find($request->id);
+        $details = $record->name;
+        $record->update(['deleted_by' => Auth::user()->emp_code]);
+        $record->delete();
+
+        $message    = 'Report Log Successfully Deleted';
+            return response()->json([
+                'status'    => 0,
+                'message'   => $message
+            ]);
     }
 }

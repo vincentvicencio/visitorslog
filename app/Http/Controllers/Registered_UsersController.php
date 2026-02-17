@@ -12,36 +12,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 
 class Registered_UsersController extends Controller
 {
     public function index(Request $request)
     {
-        $registeredUsers = RegisteredUser::all();
-        $roles = User_types::all();
-        $visitorTypes = VisitorType::all();
-
-        // $visitorlogs = Visitor::with('visitor_type')->get();
-        $visitorlogs = Visitor::where('status', 0)
-                   ->orderBy('id', 'asc')
-                   ->get();
-        $search = $request->input('search');
-
-        $empMap = collect(session('all_emp'))->keyBy('emp_code');
-        
-        $registeredUsers = RegisteredUser::with('userType')
-        ->whereNull('deleted_at')
-        ->when($search, function ($query, $search) {
-            $query->where('user_name', 'like', "%{$search}%")
-                ->orWhere('first_name', 'like', "%{$search}%")
-                ->orWhere('last_name', 'like', "%{$search}%");
-        })
-        ->get();
-
-        $allEmployeesFromSession = session('all_emp', []);
-        return view('pages.registerUser.users', compact('roles', 'registeredUsers', 'allEmployeesFromSession', 'visitorlogs', 'visitorTypes','empMap'));
+         return view('pages.registerUser.users');
     }
- public function addusers(Request $request)
+ public function save(Request $request)
 {
     // Get the user type to check role
     $userType = User_types::find($request->user_type);
@@ -55,38 +34,58 @@ class Registered_UsersController extends Controller
         'locations' => 'required',
     ];
     
+    // Check if editing (record_id present)
+    $recordId = $request->input('record_id');
+    $isEditing = !empty($recordId);
+    
     if ($isGuard) {
-        // Guard requires first_name, last_name, password - no emp_code
+        // Guard requires first_name, last_name, password (only required when creating)
         $validationRules['first_name'] = 'required|string';
         $validationRules['last_name'] = 'required|string';
-        $validationRules['password'] = 'required|string|min:6';
-    } else {
-        // Other roles require emp_code
-
-        // original code
-        $validationRules['emp_code'] = 'required|string|unique:registered_users,user_name';
-        // charle - changes
-            // $validationRules['emp_code'] = [
-            //     'required',
-            //     'string',
-            //     function ($attribute, $value, $fail) {
-            //         $exist = RegisteredUser::where('user_name', $value)
-            //             ->whereNull('deleted_at')
-            //             ->exists();
-            //         if ($exist) {
-            //             $fail('Employee Code already exists.');
-            //         }
-            //     }
-
-            // ];        
-
-        // Only require password for non-Admin/Receptionist roles
-        if (!$isAdminOrReceptionist) {
+        if (!$isEditing) {
             $validationRules['password'] = 'required|string|min:6';
         }
+    } else {
+        // Skip duplicate check when editing (record_id is present)
+        $validationRules['emp_code'] = [
+            'required',
+            'string',
+            function ($attribute, $value, $fail) use ($recordId) {
+                
+                $query = RegisteredUser::where('user_name', $value)
+                    ->whereNull('deleted_at');
+                
+                // Exclude current record when editing (cast to int for comparison)
+                if (!empty($recordId)) {
+                    $query->where('id', '!=', (int) $recordId);
+                }
+                
+                if ($query->exists()) {
+                    $fail('Employee Code already exists.');
+                }
+            }
+        ];
     }
     
-    $request->validate($validationRules);
+    $messages = [
+        'user_type.required' => 'User type is required.',
+        'locations.required' => 'Location is required.',
+        'first_name.required' => 'First name is required.',
+        'last_name.required' => 'Last name is required.',
+        'password.required' => 'Password is required.',
+        'password.min' => 'Password must be at least 6 characters.',
+        'emp_code.required' => 'Employee code is required.',
+        'emp_code.unique' => 'Employee code already exists.',
+    ];
+
+    $validator = Validator::make($request->all(), $validationRules, $messages);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => 1,
+            'errors' => $validator->errors(),
+        ]);
+    }
 
     $locationsInput = $request->input('locations');
     
@@ -108,14 +107,14 @@ class Registered_UsersController extends Controller
 
     if (count($locations) === 0) {
         return response()->json([
-            'status' => 'error',
+            'status' => 1,
             'message' => 'Please select at least one location.'
         ], 422);
     }
 
     if ($roleName === 'receptionist' && count($locations) > 1) {
         return response()->json([
-            'status' => 'error',
+            'status' => 1,
             'message' => 'Receptionist can only have one location.'
         ], 422);
     }
@@ -129,26 +128,48 @@ class Registered_UsersController extends Controller
             $username = $baseUsername;
             $counter = 2;
             
-            // Check if username already exists and make it unique
-            while (RegisteredUser::where('user_name', $username)->exists()) {
+            // Check if username already exists and make it unique (exclude current record when editing)
+            $usernameQuery = RegisteredUser::where('user_name', $username);
+            if ($isEditing) {
+                $usernameQuery->where('id', '!=', $recordId);
+            }
+            while ($usernameQuery->exists()) {
                 $username = $baseUsername . '.' . $counter;
                 $counter++;
+                $usernameQuery = RegisteredUser::where('user_name', $username);
+                if ($isEditing) {
+                    $usernameQuery->where('id', '!=', $recordId);
+                }
             }
             
-            RegisteredUser::create([
+            $guardData = [
                 'user_name'  => $username,
                 'first_name' => $firstName, 
                 'last_name'  => $lastName,
                 'location'   => $locations,
-                'password'   => Hash::make($request->password),     
                 'user_type'  => $request->user_type,
-                'created_by' => Auth::user()->id, 
                 'updated_by' => Auth::user()->id,
-            ]);
+            ];
+            
+            // Only hash password if provided
+            if ($request->filled('password')) {
+                $guardData['password'] = Hash::make($request->password);
+            }
+            
+            if ($isEditing) {
+                $user = RegisteredUser::findOrFail($recordId);
+                $user->update($guardData);
+                $message = 'Guard updated successfully!';
+            } else {
+                $guardData['password'] = Hash::make($request->password);
+                $guardData['created_by'] = Auth::user()->id;
+                RegisteredUser::create($guardData);
+                $message = 'Guard registered successfully!';
+            }
             
             return response()->json([
-                'status' => 'success', 
-                'message' => 'Guard registered successfully!'
+                'status' => 0,
+                'message' => $message
             ]);
         }
         
@@ -159,45 +180,66 @@ class Registered_UsersController extends Controller
         $employees = collect(session('all_emp'));
         $employeeData = $employees->firstWhere('emp_code', $empCode);
 
-        if (!$employeeData) {
-            return response()->json([
-                'status' => 'error', 
-                'message' => 'Employee Code not found in session records.'
-            ], 422);
+        // When editing, use existing DB data if session lookup fails
+        if ($isEditing) {
+            $existingUser = RegisteredUser::findOrFail($recordId);
+            $firstName = $existingUser->first_name;
+            $lastName  = $existingUser->last_name;
+        } else {
+            // For new users, require session data
+            if (!$employeeData) {
+                return response()->json([
+                    'status' => 1,
+                    'message' => 'Employee Code not found in session records.'
+                ], 422);
+            }
+            $firstName = $employeeData['first_name'] ?? 'N/A';
+            $lastName  = $employeeData['last_name'] ?? 'N/A';
         }
 
+        // Try to get updated name from API (optional)
         $apiUrl = "http://192.168.200.185:1924/api/employee_details/" . $empCode;
         $response = Http::timeout(5)->get($apiUrl);
-
-        // DATA PREPARATION: Use session data as default
-        $firstName = $employeeData['first_name'] ?? 'N/A';
-        $lastName  = $employeeData['last_name'] ?? 'N/A';
-
-        RegisteredUser::create([
-            'user_name'  => $empCode,
-            'first_name' => $firstName, 
-            'last_name'  => $lastName,
-            'location'   => $locations,
-            'password'   => Hash::make($request->password),     
-            'user_type'  => $request->user_type,
-            'created_by' => Auth::id(), 
-            'updated_by' => Auth::id(),
-        ]);
-
+        
         if ($response->successful()) {
             $apiData = $response->json();
             $firstName = $apiData['FirstName'] ?? $firstName;
             $lastName  = $apiData['LastName'] ?? $lastName;
-        } 
+        }
+
+        $userData = [
+            'user_name'  => $empCode,
+            'first_name' => $firstName, 
+            'last_name'  => $lastName,
+            'location'   => $locations,
+            'user_type'  => $request->user_type,
+            'updated_by' => Auth::id(),
+        ];
+        
+        // Only hash password if provided
+        if ($request->filled('password')) {
+            $userData['password'] = Hash::make($request->password);
+        }
+        
+        if ($isEditing) {
+            $user = RegisteredUser::findOrFail($recordId);
+            $user->update($userData);
+            $message = 'User updated successfully!';
+        } else {
+            $userData['password'] = Hash::make($request->password);
+            $userData['created_by'] = Auth::id();
+            RegisteredUser::create($userData);
+            $message = 'User registered successfully!';
+        }
 
         return response()->json([
-            'status' => 'success', 
-            'message' => 'User registered successfully!'
+            'status' => 0,
+            'message' => $message
         ]);
 
     } catch (\Exception $e) {
         return response()->json([
-            'status' => 'error', 
+            'status' => 1,
             'message' => 'System Error: ' . $e->getMessage()
         ], 500);
     }
@@ -227,11 +269,24 @@ class Registered_UsersController extends Controller
     }
 }
 
-public function getUserTypes()
-{
-    // Assuming your model is named User_types based on your use statements
-    return response()->json(User_types::all());
-}
+    public function getUserTypes()
+    {
+
+        $user_type = User_types::get(['id', 'name']);
+        $data = [];
+    
+        // Placeholder
+        $data[] = ['id' => '', 'text' => 'Choose User Type'];
+
+        foreach ($user_type as $record) {
+            $data[] = [
+                'id'   => $record['id'], 
+                'text' => $record['name']
+            ];
+        }
+
+        return response()->json($data);
+    }
 
 
     public function getUser($id)
@@ -273,7 +328,7 @@ public function getUserTypes()
         'location_names' => $locationNames // Display names
     ]);
 }
-public function updateUser(Request $request, $id) 
+public function edit(Request $request, $id) 
 {
     try {
         // Find the user we are currently editing
@@ -474,28 +529,18 @@ public function list(Request $request){
                 'updated_by' => user_name($d->updated_by) ?? '-',
                 'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
                 'updated_at' => $d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l'),
-                'action'            => ' <div class="dropdown">
-                                                    <button class="btn btn-sm btn-primary dropdown-toggle" 
-                                                        type="button" 
-                                                        data-bs-toggle="dropdown"
-                                                        data-bs-boundary="viewport" aria-expanded="false">
-                                                    Action
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li>
-                                                        <a class="dropdown-item edit-user" href="javascript:void(0)" 
-                                                        data-id="'.$d->id .'">
-                                                            <i class="bi bi-pencil-square me-2"></i> Edit
-                                                        </a>
-                                                    </li>
-                                                <li>
-                                                    <button type="button" class="dropdown-item text-danger delete-user" 
-                                                            data-id="'.$d->id .'">
-                                                        <i class="bi bi-trash me-2"></i> Delete
-                                                    </button>
-                                                </li>
-                                                </ul>
-                                            </div>' 
+                'action'            => '<div class="dropdown text-center">
+                                        <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                                type="button" 
+                                                data-bs-toggle="dropdown" 
+                                                data-bs-boundary="viewport" aria-expanded="false">
+                                            Action
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
+                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"><i class="bi bi-pencil-square me-2"></i> Delete</a></li></li>
+                                        </ul>
+                                    </div>' 
             ];
 
             $i++;
@@ -509,4 +554,65 @@ public function list(Request $request){
         ]);
     }
 
+
+
+    public function search(Request $request){
+        $record = RegisteredUser::find($request->id);
+        if(!$record){
+            return response()->json([
+                'status'    => 1,
+                'message'   => 'No Data Found'
+            ]);
+        }
+
+        return response()->json([
+            'status'    => 0,
+            'data'      => $record
+        ]);
+    }
+
+    public function delete(Request $request){
+        $record  = RegisteredUser::find($request->id);
+        $details = $record->emp_code;
+        $record->update(['deleted_by' => Auth::user()->id]);
+        $record->delete();
+
+        $message    = 'Registered ID Successfully Deleted';
+            return response()->json([
+                'status'    => 0,
+                'message'   => $message
+            ]);
+
+        // return response()->json(['message' => 'You have successfully deleted '. $details, 'status' => 0]);
+    }
+
+    public function destroy($id) 
+    {
+        try {
+            $role = RegisteredUser::findOrFail($id);
+            $role->update(['deleted_by' => Auth::user()->id]);
+            $role->delete();
+            
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'An error occurred while deleting the Registered User.'], 500);
+        }
+    }   
+    // public function edit($id)
+    // {
+    //     $role = RegisteredUser::findOrFail($id); 
+    //     return response()->json($role);
+    // }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'RegisteredID' => 'required|string|max:255|unique:registered_users,name,' . $id,
+        ]);
+
+        $role = RegisteredUser::findOrFail($id);
+        $role->update([
+            'name' => $request->RegisteredID,
+            'updated_by' => Auth::user()->id,
+        ]);
+    }
 }

@@ -7,18 +7,82 @@ use App\Models\VisitorType;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 
 class VisitorTypeController extends Controller
 {
     // Show the form
+    // public function index()
+    // {
+    //     $visitorTypes = VisitorType::where('deleted_at', null)
+    //     ->orderBy('id', 'desc')
+    //     ->get();
+    //     return view('pages.visitorType.visitortype', compact('visitorTypes'));
+    // }
+
     public function index()
-    {
-        $visitorTypes = VisitorType::where('deleted_at', null)
-        ->orderBy('id', 'desc')
-        ->get();
-        return view('pages.visitorType.visitortype', compact('visitorTypes'));
+    {   
+        return view('pages.visitorType.visitortype');
     }
+
+
+    public function save(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'name'              => 'required',
+            ],
+            [
+                'name'              => 'Name is Required'
+            ]
+        );
+
+        if($validator->fails()){
+            return response()->json(['status' => 1,'errors' => $validator->errors()]);
+        }
+
+        $record_id      = $request->record_id;
+        $emp_code       = Auth::user()->id;
+        $name           = trim(string: $request->name);
+
+        $duplicateQuery = VisitorType::withoutTrashed()
+                            ->whereRaw('LOWER(name) = ?', [strtolower($name)]);
+
+        if($record_id > 0){
+            $duplicateQuery->where('id', '!=', $record_id);
+        }
+        
+        if($duplicateQuery->exists()){
+            return response()->json([
+                'status'    => 1,
+                'message'   => 'Name Already Exists'
+            ]);
+
+        }
+
+        $data       = [
+            'name'               => $request->name,
+        ];
+
+        if ($record_id > 0) {
+            $status     =  VisitorType::findorFail($record_id);
+            $oldData    = $status->getOriginal();
+
+            $status     = $status->update(['updated_by' => $emp_code] + $data);
+            $message    = 'VisitorType Successfully Updated';
+        } else {
+            $status     = VisitorType::create(['created_by' => $emp_code] + $data);
+            $message    = 'VisitorType Successfully Created';
+        }
+        return response()->json([
+            'status'    => 0,
+            'message'   => $message
+        ]);
+
+    }
+
 
     public function list(Request $request){
      
@@ -68,27 +132,9 @@ class VisitorTypeController extends Controller
                                                 Action
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li>
-                                                    <button 
-                                                        class="dropdown-item"
-                                                        id="editBtn"
-                                                        data-id="'.$d->id.'"
-                                                        data-name="'.$d->name.'"
-                                                        >
-                                                        <i class="bi bi-pencil-square me-2"></i> Edit
-                                                    </button>
-
-                                                </li>
-                                                <li>
-                                                    <button 
-                                                        type="button"
-                                                        class="dropdown-item text-danger"
-                                                        id="deleteBtn"
-                                                        data-id="'.$d->id.'">
-                                                        <i class="bi bi-trash me-2"></i> Delete
-                                                    </button>
-                                                </li>
-                                            </ul>
+                                            <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
+                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"><i class="bi bi-pencil-square me-2"></i> Delete</a></li></li>
+                                        </ul>
                                         </div>', 
             ];
 
@@ -103,99 +149,163 @@ class VisitorTypeController extends Controller
         ]);
     }
 
-     public function save(Request $request)
-    {
-        $request->validate([
-            'visitor_type' => [
-                'required',
-                'string',
-                function ($attribute, $value, $fail) {
-                    $exists = VisitorType::whereRaw('LOWER(name) = ?', [strtolower($value)])
-                                ->whereNull('deleted_at') // only consider non-deleted rows
-                                ->exists();
+    // public function save(Request $request)
+    // {
+    //     $request->validate([
+    //         'visitor_type' => [
+    //             'required',
+    //             'string',
+    //             function ($attribute, $value, $fail) {
+    //                 $exists = VisitorType::whereRaw('LOWER(name) = ?', [strtolower($value)])
+    //                             ->whereNull('deleted_at') // only consider non-deleted rows
+    //                             ->exists();
 
-                    if ($exists) {
-                        $fail('Visitor Type already exists.');
-                    }
-                },
-            ],
-        ]);
+    //                 if ($exists) {
+    //                     $fail('Visitor Type already exists.');
+    //                 }
+    //             },
+    //         ],
+    //     ]);
 
 
-        try {
-            $id = new VisitorType();
-            $id->name = ucfirst(strtolower($request->visitor_type)); // normalize case
-            $id->created_by = Auth::user()->id;
-            $id->created_at = now();
-            $id->save();
+    //     try {
+    //         $id = new VisitorType();
+    //         $id->name = ucfirst(strtolower($request->visitor_type)); // normalize case
+    //         $id->created_by = Auth::user()->id;
+    //         $id->created_at = now();
+    //         $id->save();
 
+    //         return response()->json([
+    //             'message' => 'Visitor Type successfully added'
+    //         ], 200);
+
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'message' => 'Error saving Visitor Type: ' . $e->getMessage(),
+    //         ]);
+    //     }
+    // }
+    // public function edit(Request $request)
+    // {
+    //     $request->validate([
+    //         'id' => 'required|exists:visitor_types,id',
+    //         'visitor_type' => [
+    //             'required',
+    //             'string',
+    //             function ($attribute, $value, $fail) use ($request) {
+    //                 $exists = VisitorType::whereRaw('LOWER(name) = ?', [strtolower($value)])
+    //                     ->where('id', '!=', $request->id)  // exclude current record
+    //                     ->whereNull('deleted_at')
+    //                     ->exists();
+    //                 if ($exists) {
+    //                     $fail('Visitor Type already exists.');
+    //                 }
+    //             },
+    //         ],
+    //     ]);
+
+    //     $visitor = VisitorType::find($request->id);
+
+    //     $visitor->update([
+    //         'name' => ucfirst(strtolower($request->visitor_type)),
+    //         'updated_at' => now(),
+    //         'updated_by' => Auth::user()->id,
+    //     ]);
+
+    //     return response()->json([
+    //         'message' => 'Visitor type successfully updated'
+    //     ], 200);
+    // }
+
+
+
+    // public function delete(Request $request)
+    // {
+    //     $visitor = VisitorType::where('id', $request->id)->first();
+
+    //     if (!$visitor) {
+    //         return response()->json([
+    //             'message' => 'Visitor Type not found'
+    //         ], 404);
+    //     }
+
+    //     if ($visitor->deleted_at !== null) {
+    //         return response()->json([
+    //             'message' => 'Visitor type already deleted'
+    //         ], 400);
+    //     }
+
+    //     $visitor->update([
+    //         'deleted_at' => Carbon::now(),
+    //         'deleted_by' => Auth::user()->id,
+    //     ]);
+
+    //     return response()->json([
+    //         'message' => 'Visitor type successfully deleted'
+    //     ]);
+    // }
+
+
+    public function search(Request $request){
+        $record = VisitorType::find($request->id);
+        if(!$record){
             return response()->json([
-                'message' => 'Visitor Type successfully added'
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error saving Visitor Type: ' . $e->getMessage(),
+                'status'    => 1,
+                'message'   => 'No Data Found'
             ]);
         }
+
+        return response()->json([
+            'status'    => 0,
+            'data'      => $record
+        ]);
     }
-    public function edit(Request $request)
+
+
+    public function delete(Request $request){
+        $record  = VisitorType::find($request->id);
+        $details = $record->name;
+        $record->update(['deleted_by' => Auth::user()->emp_code]);
+        $record->delete();
+
+        $message    = 'Visitor Type Successfully Deleted';
+            return response()->json([
+                'status'    => 0,
+                'message'   => $message
+            ]);
+    }
+
+
+
+    public function destroy($id) 
+    {
+        try {
+            $role = VisitorType::findOrFail($id);
+            $role->update([
+                'deleted_at' => now(), 
+                'deleted_by' => Auth::user()->id, 
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete role.'], 500);
+        }
+    }
+
+    public function edit($id)
+    {
+        $role = VisitorType::findOrFail($id); 
+        return response()->json($role);
+    }
+
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'id' => 'required|exists:visitor_types,id',
-            'visitor_type' => [
-                'required',
-                'string',
-                function ($attribute, $value, $fail) use ($request) {
-                    $exists = VisitorType::whereRaw('LOWER(name) = ?', [strtolower($value)])
-                        ->where('id', '!=', $request->id)  // exclude current record
-                        ->whereNull('deleted_at')
-                        ->exists();
-                    if ($exists) {
-                        $fail('Visitor Type already exists.');
-                    }
-                },
-            ],
+            'visitor_type' => 'required|string|max:255|unique:visitor_types,name,' . $id,
         ]);
 
-        $visitor = VisitorType::find($request->id);
-
-        $visitor->update([
-            'name' => ucfirst(strtolower($request->visitor_type)),
-            'updated_at' => now(),
+        $role = VisitorType::findOrFail($id);
+        $role->update([
+            'name' => $request->visitor_type,
             'updated_by' => Auth::user()->id,
-        ]);
-
-        return response()->json([
-            'message' => 'Visitor type successfully updated'
-        ], 200);
-    }
-
-
-
-    public function delete(Request $request)
-    {
-        $visitor = VisitorType::where('id', $request->id)->first();
-
-        if (!$visitor) {
-            return response()->json([
-                'message' => 'Visitor Type not found'
-            ], 404);
-        }
-
-        if ($visitor->deleted_at !== null) {
-            return response()->json([
-                'message' => 'Visitor type already deleted'
-            ], 400);
-        }
-
-        $visitor->update([
-            'deleted_at' => Carbon::now(),
-            'deleted_by' => Auth::user()->id,
-        ]);
-
-        return response()->json([
-            'message' => 'Visitor type successfully deleted'
         ]);
     }
 }

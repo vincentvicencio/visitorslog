@@ -21,9 +21,9 @@ class Component {
         const self = this;
         const $table = $(table_name);
         const tableApi = $table.DataTable();
-
+  
         const modules = import.meta.glob('../*.js', { eager: false });
-
+   
         const loadModule = async () => {
             const key = Object.keys(modules).find(
                 path => path.endsWith(moduleName+".js")
@@ -51,7 +51,7 @@ class Component {
             const instance = typeof Module === 'function'
                 ? new Module()
                 : Module;
-        
+           
             instance.onLoadForm?.($(this).data('id'));
 
         });

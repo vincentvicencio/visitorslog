@@ -34,7 +34,9 @@ import 'datatables.net-bs5';
 // ------------------------------------
 // Select2
 // ------------------------------------
-import 'select2';
+
+import select2 from 'select2';
+select2();
 
 
 // ------------------------------------
