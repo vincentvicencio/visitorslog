@@ -17,12 +17,11 @@ class VisitorController extends Controller
     public function index()
     {
         
-        // dd(Auth::user()->user_type);
         $visitors = Visitor::where(function ($query) {
                 $query->where('status', 0)->orWhereNull('status');
                })
                ->whereNull('time_out')
-               ->orderBy('id', 'desc')
+               ->orderBy('updated_at', 'desc')
                ->get();
         $visitorTypes = VisitorType::where('deleted_at', null)
                    ->orderBy('id', 'desc')
@@ -49,15 +48,15 @@ class VisitorController extends Controller
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
                 ->where(function ($query) {
-                $userLocations = []; 
+                    $userLocations = []; 
 
-                foreach ((array) Auth::user()->location as $loc) {
-                    $userLocations[] = (int) $loc;
-                }
-                $query->where(function ($q) {
-                    $q->where('status', 0)
-                    ->orWhereNull('status');
-                })->whereIn('location', $userLocations);
+                    foreach ((array) Auth::user()->location as $loc) {
+                        $userLocations[] = (int) $loc;
+                    }
+                    $query->where(function ($q) {
+                        $q->where('status', 0)
+                        ->orWhereNull('status');
+                    })->whereIn('location', $userLocations);
 
                 })
 
@@ -69,7 +68,7 @@ class VisitorController extends Controller
                         ->orWhere('visitor_id', 'LIKE', "%{$keywords}%")
                         ->orWhere('phone_number', 'LIKE', "%{$keywords}%")
                         ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-                            $qt->where('first_name', 'LIKE', "%{$keywords}%");
+                            $qt->where('name', 'LIKE', "%{$keywords}%");
                         });
                     });
                 });

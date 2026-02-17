@@ -303,9 +303,9 @@ $(document).ready(function () {
             // =====================================================
             //  DEBUG: LOG AJAX RESPONSE
             // =====================================================
-            // $(self.table).on('xhr.dt', function (e, settings, json) {
-                // console.log(' AJAX RESPONSE:', json);
-            // });
+            $(self.table).on('xhr.dt', function (e, settings, json) {
+                console.log(' AJAX RESPONSE:', json);
+            });
 
             // =====================================================
             //  INIT COMPLETE (SAFE API ACCESS)
@@ -348,18 +348,18 @@ $(document).ready(function () {
         }, 2000);
     }
 
-    function stopPolling() {
-        clearInterval(polling);
-    }
+    // function stopPolling() {
+    //     clearInterval(polling);
+    // }
 
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            stopPolling();
-        } else {
-            const tableApi = $('#visitorsLogTable').DataTable();
-            startPolling(tableApi);
-        }
-    });
+    // document.addEventListener('visibilitychange', () => {
+    //     if (document.hidden) {
+    //         stopPolling();
+    //     } else {
+    //         const tableApi = $('#visitorsLogTable').DataTable();
+    //         startPolling(tableApi);
+    //     }
+    // });
 
     // 1. Start the Webcam automatically on page load
     async function startWebcam() {

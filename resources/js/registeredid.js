@@ -167,7 +167,7 @@ import component from './common/component';
             this.table          = "#registerIdTable"
             // module
             this.module         = "registeredid"
-            // form id
+            // form iddt-type-numeric
             this.form           = "#textInputForm"
             // offCanvas
             this.modal          = "#registerIDModal"
