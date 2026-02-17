@@ -269,6 +269,14 @@ $(document).ready(function () {
                 {},
                 false 
             );
+
+            // =====================================================
+            //  DEBUG: LOG AJAX RESPONSE
+            // =====================================================
+            $(self.table).on('xhr.dt', function (e, settings, json) {
+                console.log(' AJAX RESPONSE:', json);
+            });
+
             // =====================================================
             //  INIT COMPLETE (SAFE API ACCESS)
             // =====================================================
@@ -316,9 +324,43 @@ $(document).ready(function () {
     //     }
     // }
 
-    // // 2. Capture photo
+    function startPolling(tableApi) {
+        polling = setInterval(() => {
+            tableApi.ajax.reload(null, false);
+        }, 2000);
+    }
+
+    // function stopPolling() {
+    //     clearInterval(polling);
+    // }
+
+    // document.addEventListener('visibilitychange', () => {
+    //     if (document.hidden) {
+    //         stopPolling();
+    //     } else {
+    //         const tableApi = $('#visitorsLogTable').DataTable();
+    //         startPolling(tableApi);
+    //     }
+    // });
+
+    // 1. Start the Webcam automatically on page load
+    async function startWebcam() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "user" }, // "user" for front, "environment" for back
+                audio: false 
+            });
+            video.srcObject = stream;
+        } catch (err) {
+            console.error("Error accessing webcam: ", err);
+            alert("Webcam access denied or not available.");
+        }
+    }
+
+    // 2. Capture the frame
     // captureBtn.addEventListener('click', () => {
     //     const context = canvas.getContext('2d');
+    //     // Set canvas size to match video dimensions
     //     canvas.width = video.videoWidth;
     //     canvas.height = video.videoHeight;
         

@@ -15,13 +15,13 @@ class VisitorController extends Controller
 {
     public function index()
     {
+        
         $visitors = Visitor::where(function ($query) {
-            $query->where('status', 0)->orWhereNull('status');
-            })
-                -> whereNull('time_out')
-                -> orderBy('id', 'desc')
-                -> get();
-
+                $query->where('status', 0)->orWhereNull('status');
+               })
+               ->whereNull('time_out')
+               ->orderBy('updated_at', 'desc')
+               ->get();
         $visitorTypes = VisitorType::where('deleted_at', null)
                 -> orderBy('id', 'desc')
                 -> get();
@@ -46,9 +46,9 @@ class VisitorController extends Controller
 
 
         $rawquery = Visitor::with('visitorType')
-                -> withoutTrashed()
-                -> where(function ($query) {
-                $userLocations = []; 
+                ->withoutTrashed()
+                ->where(function ($query) {
+                    $userLocations = []; 
 
                     foreach ((array) Auth::user()->location as $loc) {
                         $userLocations[] = (int) $loc;

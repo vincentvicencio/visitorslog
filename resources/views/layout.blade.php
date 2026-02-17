@@ -3,18 +3,19 @@
 
     @include('layouts.head')
 
-    <body class="{{ Auth::check() && Auth::user()->user_type != 1 ? 'non-admin-body' : '' }}">
-        @if (!View::hasSection('hideSidebar') && Auth::user()->user_type == 1)
+    <body>
+        @if (!View::hasSection('hideSidebar'))
                 @include('layouts.sidebar')
         @endif
         @if(! page_name('main') || page_name('main') == 'login' ) @yield('content')
         @else
+        {{-- @include('layouts.sidebar') --}}
 
         <div id="content" class="ps-0 d-flex flex-column">
 
-            {{-- @if (!View::hasSection('hideSidebar'))
+            @if (!View::hasSection('hideSidebar'))
                 @include('layouts.header')
-            @endif   --}}
+            @endif  
             
             @yield('content')
 

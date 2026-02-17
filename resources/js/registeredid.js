@@ -11,6 +11,7 @@ import datahandling from './common/datahandling';
             this.url            = "/registerId/"
             this.table          = "#registerIdTable"
             this.module         = "registeredid"
+            // form iddt-type-numeric
             this.form           = "#textInputForm"
             this.modal          = "#registerIDModal"
         }
