@@ -232,7 +232,7 @@ class ReportController extends Controller
     public function delete(Request $request){
         $record  = Visitor::find($request->id);
         $details = $record->name;
-        $record->update(['deleted_by' => Auth::user()->emp_code]);
+        $record->update(['deleted_by' => Auth::user()->id]);
         $record->delete();
 
         $message    = 'Report Log Successfully Deleted';

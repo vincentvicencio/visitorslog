@@ -159,7 +159,7 @@ if ($request->input('draw') > 1) {
     public function delete(Request $request){
         $record  = VisitorType::find($request->id);
         $details = $record->name;
-        $record->update(['deleted_by' => Auth::user()->emp_code]);
+        $record->update(['deleted_by' => Auth::user()->id]);
         $record->delete();
 
         $message    = 'Visitor Type Successfully Deleted';
