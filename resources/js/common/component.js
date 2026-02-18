@@ -18,14 +18,14 @@ class Component {
 
     // Initialize Button
     initializeButtons(table_name, url, moduleName) {
-        const self = this;
-        const $table = $(table_name);
+        const self     = this;
+        const $table   = $(table_name);
         const tableApi = $table.DataTable();
   
-        const modules = import.meta.glob('../*.js', { eager: false });
+        const modules  = import.meta.glob('../*.js', { eager: false });
    
         const loadModule = async () => {
-            const key = Object.keys(modules).find(
+            const key  = Object.keys(modules).find(
                 path => path.endsWith(moduleName+".js")
             );
             
@@ -51,7 +51,6 @@ class Component {
             const instance = typeof Module === 'function'
                 ? new Module()
                 : Module;
-           
             instance.onLoadForm?.($(this).data('id'));
 
         });
@@ -61,18 +60,17 @@ class Component {
         // -------------------------
         $table.off('click', '.btn-view').on('click', '.btn-view', async function () {
 
-            const regex = new RegExp(`/${moduleName}\\.js$`)
+            const regex     =  new RegExp(`/${moduleName}\\.js$`)
 
             const importKey = Object.keys(modules).find(key => regex.test(key))
 
+            const imported  = await modules[importKey]()
 
-            const imported = await modules[importKey]()
-
-            const instance = typeof imported.default === 'function'
+            const instance  = typeof imported.default === 'function'
                 ? new imported.default()
                 : imported.default
 
-            let record_id = $(this).attr('data-id');
+            let record_id   =   $(this).attr('data-id');
             instance.onLoadView?.(record_id)
         });
 
@@ -161,7 +159,7 @@ class Component {
     }
 
     btnSpinner(btn, spinner, btn_text, show) {
-        const $btn = btn;
+        const $btn     = btn;
         const $spinner = $btn.find(spinner);
         const $btnText = $btn.find(btn_text);
 
@@ -181,12 +179,12 @@ class Component {
 
     createDropdown(url, element_id, data = null, popContainer_id) {
         var records = $.ajax({
-            url: window.location.origin + url,
-            type: "POST",
-            async: false,
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            data: data,
-            success: function (data) { return data; },
+            url     :    window.location.origin + url,
+            type    :    "POST",
+            async   :    false,
+            headers :    { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            data    :    data,
+            success :    function (data) { return data; },
         }).responseJSON;
 
         // $(element_id).empty();
@@ -197,31 +195,29 @@ class Component {
 
     formatDate(datetime) {
 
-        var datetime = new Date(datetime);
-
-        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-        var day = datetime.getDate();
-        var month = months[datetime.getMonth()];
-        var year = datetime.getFullYear();
-        var hours = datetime.getHours();
-        var minutes = datetime.getMinutes();
+        var datetime =  new Date(datetime);
+        var months   =  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        var day      =  datetime.getDate();
+        var month    =  months[datetime.getMonth()];
+        var year     =  datetime.getFullYear();
+        var hours    =  datetime.getHours();
+        var minutes  =  datetime.getMinutes();
 
         minutes = minutes < 10 ? "0" + minutes : minutes;
 
-        hours = hours % 12; // Convert to 12-hour format
-        hours = hours ? hours : 12; // Handle midnight case
+        hours   =  hours % 12; // Convert to 12-hour format
+        hours   =  hours ? hours : 12; // Handle midnight case
 
         return day + " " + month + " " + year + " " + hours + ":" + minutes + " " + (hours >= 12 ? 'PM' : 'AM');
     }
 
     formatTime(seconds) {
-        var hours = Math.floor(seconds / 3600);
+        var hours   = Math.floor(seconds / 3600);
         var minutes = Math.floor((seconds % 3600) / 60);
         var remainingSeconds = seconds % 60;
 
         // Add leading zeros if necessary
-        hours = (hours < 10) ? "0" + hours : hours;
+        hours   = (hours < 10) ? "0" + hours : hours;
         minutes = (minutes < 10) ? "0" + minutes : minutes;
         remainingSeconds = (remainingSeconds < 10) ? "0" + remainingSeconds : remainingSeconds;
 
@@ -258,16 +254,16 @@ class Component {
 
             let $li = $('<li>', { class: 'list-group-item' })
             let $input = $('<input>', {
-                'class': 'form-check-input column_chk me-1',
-                'type': 'checkbox',
-                'id': `${id}_chk`,
-                'data-col-id': id,
-                'checked': true
+                'class'      :  'form-check-input column_chk me-1',
+                'type'       :  'checkbox',
+                'id'         :  `${id}_chk`,
+                'data-col-id':  id,
+                'checked'    :  true
             })
             let $label = $('<label>', {
-                'class': 'form-check-label',
-                'for': `${id}_chk`,
-                'text': label
+                'class' :   'form-check-label',
+                'for'   :   `${id}_chk`,
+                'text'  :   label
             })
 
 
@@ -275,23 +271,18 @@ class Component {
 
             $displayFields.append($li)
 
-            let $sortable_li = $('<li>', { class: 'list-group-item mb-2' })
-            let $sortable_icon = $('<i>', { class: 'bi bi-grip-vertical me-3' })
+            let $sortable_li    = $('<li>', { class: 'list-group-item mb-2' })
+            let $sortable_icon  = $('<i>', { class: 'bi bi-grip-vertical me-3' })
             let $sortable_label = $('<label>', {
                 'class': 'form-check-label',
-                'for': `${id}_chk`,
-                'text': label
+                'for'  : `${id}_chk`,
+                'text' : label
             })
 
-
             $sortable_li.append($sortable_icon).append($sortable_label)
-
             $sortable.append($sortable_li)
-
         })
-
     }
-
 
     createSortable(selector, options = {}, cursor = 'grab') {
         $(selector).each(function () {
@@ -307,7 +298,6 @@ class Component {
             $(this).css('cursor', 'grabbing')
         })
     }
-
 }
 
 export default new Component;

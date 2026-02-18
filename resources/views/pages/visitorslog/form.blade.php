@@ -86,7 +86,5 @@
         </div>
     </div>
 
-
-
 @vite('resources/js/visitors.js')
 @endsection

@@ -1,10 +1,8 @@
-import { Modal } from 'bootstrap';
 import $ from 'jquery';
 import Triggers from './common/triggers';
 import settable from './common/settable';
 import container from './common/container';
 import datahandling from './common/datahandling';
-import component from './common/component';
 
     // TABLE
     class RegisterIdTable {
@@ -30,13 +28,13 @@ import component from './common/component';
             const self = this;
 
             const tableHeader = [
-                { id: "visitor_type",       label: "Name" },
-                { id: "id_number",       label: "ID Number" },
-                { id: "created_by",       label: "Created By" },
-                { id: "updated_by",      label: "Updated By" },
-                { id: "created_at",   label: "Created Date" },
-                { id: "updated_at",   label: "Updated Date" },
-                { id: "action",         label: "Action" },
+                { id: "visitor_type",    label: "Name"         },
+                { id: "id_number",       label: "ID Number"    },
+                { id: "created_by",      label: "Created By"   },
+                { id: "updated_by",      label: "Updated By"   },
+                { id: "created_at",      label: "Created Date" },
+                { id: "updated_at",      label: "Updated Date" },
+                { id: "action",          label: "Action"       },
             ];
 
             const columns = tableHeader.map(col => ({
@@ -106,22 +104,21 @@ import component from './common/component';
             });
         }
         async onLoadForm(record_id) {
-                const self = this;
+            const self = this;
         
-                const url = `${self.url}search`;
-                const response = await datahandling.processData(
-                    url,
-                    'POST',
-                    { id: record_id }
-                );
+            const url = `${self.url}search`;
+            const response = await datahandling.processData(
+                url,
+                'POST',
+                { id: record_id }
+            );
         
-                $("#record_id").val(record_id);
-                $("#name").val(response.data.id_number);
-                $("#visitortype").val(response.data.visitor_type);
+            $("#record_id").val(record_id);
+            $("#name").val(response.data.id_number);
+            $("#visitortype").val(response.data.visitor_type);
         
-                container.showModal(self.modal);
+            container.showModal(self.modal);
         }
-
     }
     
     const instance = new RegisterIdTable();

@@ -1,6 +1,4 @@
-import { Modal, Dropdown } from 'bootstrap';
 import triggers from './common/triggers';
-import component from './common/component';
 import * as bootstrap from 'bootstrap';
 import $ from 'jquery';
 import container from './common/container';
@@ -35,7 +33,6 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '#openFilterBtn', function () {
-
         const modalEl = document.getElementById('filterModal');
         const modalInstance =
             bootstrap.Modal.getInstance(modalEl) ||
@@ -104,7 +101,6 @@ $(document).ready(function(){
             date_to: '',
             visitor_type: ''
         });
-
 
         const filterModal = document.getElementById('filterModal');
         const modalInstance = bootstrap.Modal.getInstance(filterModal);
@@ -246,7 +242,6 @@ document.getElementById('btn_ok').addEventListener('click', function() {
                 new bootstrap.Modal(modalEl);
 
             modalInstance.hide();
-
         },
         error: function (xhr) {
             // Re-enable button on error
@@ -284,15 +279,15 @@ class ReportClassTable {
         const self = this;
 
         const tableHeader = [
-            { id: "full_name",       label: "Personal Details" },
-            { id: "visitor_type",       label: "Visitor Type" },
-            { id: "visitor_id",       label: "ID No." },
-            { id: "image",      label: "Image" },
-            { id: "visit",   label: "Visit" },
-            { id: "time",   label: "Time" },
-            { id: "creator",   label: "By" },
-            { id: "status",   label: "Status" },
-            { id: "action",         label: "Action" },
+            { id: "full_name",       label: "Personal Details"},
+            { id: "visitor_type",    label: "Visitor Type"    },
+            { id: "visitor_id",      label: "ID No."          },
+            { id: "image",           label: "Image"           },
+            { id: "visit",           label: "Visit"           },
+            { id: "time",            label: "Time"            },
+            { id: "creator",         label: "By"              },
+            { id: "status",          label: "Status"          },
+            { id: "action",          label: "Action"          },
         ];
 
         const columns = tableHeader.map(col => ({
@@ -345,14 +340,12 @@ class ReportClassTable {
                     });
             });
 
-
         setTimeout(() => {
             const searchInput = document.getElementById('dt-search-0');             
                 if (searchInput) {
                     searchInput.setAttribute('placeholder', 'Search here...');
                 }
-            }, 100);
-
+        },  100);
     }
 
     async initializeButtons(){
@@ -371,8 +364,6 @@ class ReportClassTable {
             await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
         });
     }
-
-
 }
 const instance = new ReportClassTable();
 instance.initializePage();

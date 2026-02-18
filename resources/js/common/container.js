@@ -10,9 +10,9 @@ class Container {
         const modalElement = document.querySelector(modal_id);
         
         // Get or create Bootstrap modal instance
-        let modalInstance = Modal.getInstance(modalElement);
+        let modalInstance  = Modal.getInstance(modalElement);
         if (!modalInstance) {
-            modalInstance = new Modal(modalElement);
+            modalInstance  = new Modal(modalElement);
         }
 
         
@@ -27,7 +27,7 @@ class Container {
      */
     async hideModal(modal_id) {
 
-        var modalElement = document.querySelector(modal_id);
+        var modalElement  = document.querySelector(modal_id);
         var modalInstance = bootstrap.Modal.getInstance(modalElement);
 
         if (!modalInstance) {
@@ -42,7 +42,7 @@ class Container {
      * @param offcanvas_id = offcanvas id
      */
     async showOffcanvas(offcanvas_id) {
-        var offcanvasElement = document.querySelector(offcanvas_id);
+        var offcanvasElement  = document.querySelector(offcanvas_id);
         var offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasElement);
 
         if (!offcanvasInstance) {

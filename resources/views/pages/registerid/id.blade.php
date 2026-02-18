@@ -21,6 +21,7 @@
         <table class="table table-bordered align-middle" id="registerIdTable"><thead></thead></table>
     </div>
 </div>
+
 @include('components.triggers.registerIdModal')
 @endsection
 

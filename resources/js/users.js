@@ -1,10 +1,9 @@
-import { Modal, Dropdown } from 'bootstrap';
+import { Modal } from 'bootstrap';
 import container from './common/container';
 import datahandling from './common/datahandling';
 import Triggers from './common/triggers';
 import settable from './common/settable';
 import component from './common/component';
-
 
 const URL = '/registerUser/';
 
@@ -111,7 +110,6 @@ class UsersTable {
         this.initializeEmployeeSearchButton();
         component.createDropdown(self.url + 'get-user-type', '#reg_user_type',  null, self.modal);
         // Removed undefined selectedValue usage
-        // component.createDropdown(URL + 'get-user-type', '#edit_location', selectedValue, '#editPopupContainer');
         this.location_dropdown();
         this.handleRoleChange();
     }
@@ -274,13 +272,13 @@ class UsersTable {
         const self = this;
 
         const tableHeader = [
-            { id: "user_name",       label: "Username" },
-            { id: "user_type",       label: "Role" },
-            { id: "created_by",       label: "Created By" },
-            { id: "updated_by",      label: "Updated By" },
-            { id: "created_at",   label: "Created Date" },
-            { id: "updated_at",   label: "Updated Date" },
-            { id: "action",         label: "Action" },
+            { id: "user_name",       label: "Username"     },
+            { id: "user_type",       label: "Role"         },
+            { id: "created_by",      label: "Created By"   },
+            { id: "updated_by",      label: "Updated By"   },
+            { id: "created_at",      label: "Created Date" },
+            { id: "updated_at",      label: "Updated Date" },
+            { id: "action",          label: "Action"       },
         ];
 
         const columns = tableHeader.map(col => ({
@@ -376,7 +374,7 @@ class UsersTable {
                 $('#reg_emp_code').val(response.emp_code || '');
                 $('#reg_user_type').val(response.role_id || '');
 
-                // Trigger change event on user type to update UI (after all values set)
+                // Trigger change event on user type to update UI (before setting location)
                 $('#reg_user_type').trigger('change');
 
                 // Wait for location dropdown to be populated, then set value
@@ -420,10 +418,9 @@ class UsersTable {
         }
 
         component.createDropdown(URL + 'getlocation', '#reg_location', selectedValue, '#registerUserModal');
-        
     }
-
 }
 const instance = new UsersTable();
 instance.InitializePage();
+
 export default instance;

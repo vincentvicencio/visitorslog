@@ -2,9 +2,6 @@ import { Modal } from 'bootstrap';
 import Triggers from './common/triggers.js';
 import settable from './common/settable';
 import $ from 'jquery';
-import container from './common/container';
-import datahandling from './common/datahandling';
-import component from './common/component';
 
 const deleteModalEl = document.getElementById('notificationContainer');
 const deleteModal = new Modal(deleteModalEl);
@@ -272,14 +269,14 @@ $(document).ready(function () {
 
             const tableHeader = [
                 { id: "full_name",    label: "Personal Details" },
-                { id: "visitor_type", label: "Visitor Type" },
-                { id: "visitor_id",   label: "ID No." },
-                { id: "image",        label: "Image" },
-                { id: "visit",        label: "Visit" },
-                { id: "time",         label: "Time" },
-                { id: "creator",      label: "By" },
-                { id: "status",       label: "Status" },
-                { id: "action",       label: "Action" },
+                { id: "visitor_type", label: "Visitor Type"     },
+                { id: "visitor_id",   label: "ID No."           },
+                { id: "image",        label: "Image"            },
+                { id: "visit",        label: "Visit"            },
+                { id: "time",         label: "Time"             },
+                { id: "creator",      label: "By"               },
+                { id: "status",       label: "Status"           },
+                { id: "action",       label: "Action"           },
             ];
 
             const columns = tableHeader.map(col => ({
@@ -301,16 +298,6 @@ $(document).ready(function () {
                 false 
             );
             
-
-            
-
-            // =====================================================
-            //  DEBUG: LOG AJAX RESPONSE
-            // =====================================================
-            $(self.table).on('xhr.dt', function (e, settings, json) {
-                console.log(' AJAX RESPONSE:', json);
-            });
-
             // =====================================================
             //  INIT COMPLETE (SAFE API ACCESS)
             // =====================================================
@@ -338,9 +325,9 @@ $(document).ready(function () {
                         tableApi.page.len(this.value).draw();
                     });
             });
-
         }
     }
+
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();
 
@@ -384,10 +371,5 @@ $(document).ready(function () {
         imageInput.value = ""; 
     });
 
-
     startWebcam();
-
-
-
-    
 });
