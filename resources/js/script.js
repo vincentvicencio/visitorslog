@@ -2,6 +2,7 @@ $(document).ready(function () {
     // Sidebar toggle (only runs if elements exist)
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sideMenu = document.getElementById('sideMenu');
+ 
     if (sidebarToggle && sideMenu) {
         sidebarToggle.addEventListener('click', () => {
             sideMenu.classList.toggle('show');

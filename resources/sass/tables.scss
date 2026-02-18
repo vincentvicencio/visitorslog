@@ -6,12 +6,13 @@
         box-sizing: border-box;
         overflow: visible !important;
     }
-    #visitorsLogTable, 
-    #userTypeTable, 
-    #usersTable, 
-    #visitorsTable, 
-    #registerIdTable,
-    #reportTable {
+    // #visitorsLogTable, 
+    // #userTypeTable, 
+    // #usersTable, 
+    // #visitorsTable, 
+    // #registerIdTable,
+    // #reportTable, 
+    .table.dataTable {
         box-sizing: border-box;
         width: 99%;
         text-align: center;
@@ -28,9 +29,9 @@
             }
         }
         th{
-            background-color: #0F4383;
-            color: white;
-            text-align: center;
+            background-color: #0F4383 !important;
+            color: white !important;
+            text-align: center !important;
         }
     }
 
@@ -196,4 +197,8 @@
 
   .dt-processing{
     display: none !important;
+  }
+
+  .dt-type-numeric{
+    text-align: center !important;
   }

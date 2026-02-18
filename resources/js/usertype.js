@@ -57,8 +57,6 @@ class UserTypeTable {
 
         $(self.table).on('init.dt', function () {
 
-            console.log('DATATABLE INITIALIZED');
-
             const tableApi = $(self.table).DataTable();
 
             // FORCE DRAW

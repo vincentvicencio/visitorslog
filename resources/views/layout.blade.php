@@ -4,15 +4,18 @@
     @include('layouts.head')
 
     <body>
+        @if (!View::hasSection('hideSidebar'))
+                @include('layouts.sidebar')
+        @endif
         @if(! page_name('main') || page_name('main') == 'login' ) @yield('content')
         @else
-        @include('layouts.sidebar')
+        {{-- @include('layouts.sidebar') --}}
 
         <div id="content" class="ps-0 d-flex flex-column">
 
-            {{-- @if (!View::hasSection('hideSidebar'))
+            @if (!View::hasSection('hideSidebar'))
                 @include('layouts.header')
-            @endif   --}}
+            @endif  
             
 
             @yield('content')

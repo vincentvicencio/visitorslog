@@ -1,12 +1,9 @@
-import { Modal } from 'bootstrap';
 import $ from 'jquery';
 import Triggers from './common/triggers';
 import settable from './common/settable';
 import container from './common/container';
 import datahandling from './common/datahandling';
-import component from './common/component';
 
-    // TABLE
 class RegisterIdTable {
         constructor() {
             this.defaultFields  = []
@@ -16,7 +13,7 @@ class RegisterIdTable {
             this.table          = "#registerIdTable"
             // module
             this.module         = "registeredid"
-            // form id
+            // form iddt-type-numeric
             this.form           = "#textInputForm"
             // offCanvas
             this.modal          = "#registerIDModal"
