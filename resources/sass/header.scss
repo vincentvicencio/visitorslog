@@ -11,21 +11,16 @@
         display: none;
         z-index: 999;
     }
-#logout-form {
-    z-index:10!important;
-}
-#sidebarToggle {
-    background-color: transparent !important;
-    border: none !important;
-    display: none;
-    font-size: 20px; 
-    transition: left 0.3s ease;
-}
-@media (max-width: 880px) { 
-    #sidebarToggle {
-        display: block;
+    #logout-form {
+        z-index:10!important;
     }
-}
+    #sidebarToggle {
+        background-color: transparent !important;
+        border: none !important;
+        display: none;
+        font-size: 20px; 
+        transition: left 0.3s ease;
+    }
     .navlink{
         padding: 5px 20px !important;
         font-size: 1rem !important;
@@ -58,11 +53,13 @@
         margin: auto;
         
     }
-
-@media (max-width:880px) {
-    .navbar {
-        display: flex;
+    @media (max-width: 880px) {
+        .navbar {
+            display: flex;
+        }
+        #sidebarToggle {
+            display: block;
+        }
     }
-}
 }
 

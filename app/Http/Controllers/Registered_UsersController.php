@@ -487,6 +487,8 @@ public function list(Request $request){
                     ->where('deleted_at', null)
                     ->when($keywords, function ($query) use ($keywords) {
                         $query->where('user_name', 'LIKE', "%{$keywords}%")
+                            ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+                            ->orWhere('last_name', 'LIKE', "%{$keywords}%")
                             ->orWhereHas('userType', function ($q) use ($keywords) {
                                 $q->where('name', 'LIKE', "%{$keywords}%");
                             });
@@ -572,7 +574,7 @@ public function list(Request $request){
         $record->update(['deleted_by' => Auth::user()->id]);
         $record->delete();
 
-        $message    = 'Registered ID Successfully Deleted';
+        $message    = 'Registered User Successfully Deleted';
             return response()->json([
                 'status'    => 0,
                 'message'   => $message

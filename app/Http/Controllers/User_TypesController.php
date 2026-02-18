@@ -17,10 +17,11 @@ class User_TypesController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name'              => 'required',
+                'name'              => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
             ],
             [
-                'name'              => 'Name is Required'
+                'name.required'              => 'Name is Required',
+                'name.regex'        => 'Role Name must contain letters only'
             ]
         );
 

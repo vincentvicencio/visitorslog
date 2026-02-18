@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('last_name')->nullable();
             $table->string('phone_number')->nullable();
             $table->integer('visitor_type')->nullable();
-            $table->integer('visitor_id')->nullable();
+            $table->string('visitor_id')->nullable();
             $table->integer('location')->nullable();
             $table->string('address')->nullable();
             $table->string('image_path')->nullable();

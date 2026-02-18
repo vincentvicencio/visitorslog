@@ -283,10 +283,11 @@ class VisitorController extends Controller
     {
        
         $request->validate([
-            'first_name'   => 'required|string',
-            'middle_name'  => 'nullable|string',
-            'last_name'    => 'required|string',
-            'visitor_type' => 'required|exists:visitor_types,id',
+            'first_name'        => 'required|string',
+            'middle_name'       => 'nullable|string',
+            'last_name'         => 'required|string',
+            'visitor_type'      => 'required|exists:visitor_types,id',
+            'contact_number'    => ['required','min:11','max:11','regex:/^[0-9]+$/','starts_with:09'],
 
             'id_number' => [
                 'required',
@@ -309,6 +310,14 @@ class VisitorController extends Controller
                         $fail('This Visitor ID is registered under a different visitor type.');
                     }
                 },
+            ],
+
+            [
+                'contact_number.required' => 'Contact Number is required',
+                'contact_number.max' => 'Contact Number must not exceed 11 digits',
+                'contact_number.min' => 'Contact Number must be at least 11 digits',
+                'contact_number.regex' => 'Contact Number must contain only numbers',
+                'contact_number.starts_with' => 'Contact Number must start with 09',
             ],
 
             'image_path' => 'nullable|',
@@ -337,7 +346,9 @@ class VisitorController extends Controller
 
             $imagePath = $fileName;
         }
-            $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
+            $middleInitial = collect(preg_split('/\s+/', trim($request->middle_name)))
+                ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
+                ->implode('');
 
             $userLocations = []; 
 

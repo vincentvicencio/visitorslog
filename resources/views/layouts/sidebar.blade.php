@@ -5,7 +5,7 @@
             <img src="/images/Magellan_pure_white_logo.png" class="logo d-flex me-3" alt="">
         </div>   
         <div class="side-menu-icon-2 position-relative text-white d-flex flex-column justify-content-between align-items-center w-100">
-            <img src="/images/bgg.png" class="side-menu-icon-bg position-absolute top-0 start-0 w-100" alt="">
+            <img src="/images/bgg.png" class="position-absolute top-0 start-0 w-100" alt="" style="z-index: 0">
             <div id="live-clock" class="d-flex flex-column">
                 <div class="d-flex justify-content-between fw-bold fs-6 align-items-start">
                     <div id="clock-day" class="mt-n2"></div>
