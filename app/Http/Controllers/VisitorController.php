@@ -15,7 +15,19 @@ class VisitorController extends Controller
 {
     public function index()
     {
-         return view('pages.visitorslog.visitorlog');
+        $visitors = Visitor::where(function ($query) {
+            $query->where('status', 0)->orWhereNull('status');
+            })
+                -> whereNull('time_out')
+                -> orderBy('id', 'desc')
+                -> get();
+
+        $visitorTypes = VisitorType::where('deleted_at', null)
+                -> orderBy('id', 'desc')
+                -> get();
+
+        $empMap = collect(session('all_emp'))->keyBy('emp_code');
+        return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
     }
     public function form()
     {
@@ -34,9 +46,9 @@ class VisitorController extends Controller
 
 
         $rawquery = Visitor::with('visitorType')
-                ->withoutTrashed()
-                ->where(function ($query) {
-                    $userLocations = []; 
+                -> withoutTrashed()
+                -> where(function ($query) {
+                $userLocations = []; 
 
                     foreach ((array) Auth::user()->location as $loc) {
                         $userLocations[] = (int) $loc;
@@ -130,31 +142,30 @@ class VisitorController extends Controller
             $newData[$i] = [
                 
 
-                'full_name' => $d->full_name,
-
-                'location' => '<div class="text-center">' . $locationLabel . '</div>',
-
-                'contact_number' => '<div class="text-center">' . $d->phone_number . '</div>',
+                'full_name'    => $fullName,
 
                 'visitor_type' => '<div class="text-center">' . ($d->visitorType?->name ?? '-') . '</div>',
 
                 'visitor_id'   => '<div class="text-center">' . $d->visitor_id . '</div>',
 
-                'visit' =>  '<div class="text-center">' . 
+                'image'        => '<div class="text-center">' . $image . '</div>',
+
+                'visit'        =>  '<div class="text-center">' . 
                                     $d->created_at->format("F d, Y") .'<br>
                                     '. $d->created_at->format('l')
                                  . '</div>',
 
-                'time_in' => '<div class="text-center">
-                                <small> '. $time_in .'</small><br>
-                            </div>',
-                'time_out' => '<div class="text-center">
-                                <small> '. $time_out .'</small><br>
-                            </div>',
-                'creator' => '<div class="text-center">
-                                <small><strong>Created: </strong>'. $createdby .'</small><br>
-                                <small><strong>Updated: </strong>'. $updatedby .'</small>
-                            </div>',
+                'time'         => '<div class="text-center">
+                                    <small><strong>In:</strong> '. $time_in .'</small><br>
+                                    <small>
+                                        <strong>Out:</strong>
+                                        '. $time_out .'
+                                    </small>
+                                  </div>',
+                'creator'      => '<div class="text-center">
+                                    <small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
+                                    <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>
+                                  </div>',
                 
                 'status'       => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
 
@@ -162,23 +173,37 @@ class VisitorController extends Controller
 
                 'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
-                'action' => '<div class="dropdown">
-                                        <button 
-                                            class="dropdown-item"
-                                            id="viewBtn"
-                                            data-id="'. $d->id .'"
-                                            data-type="visitorslog">
-                                            View
-                                        </button>
-                                        <button 
-                                            type="button"
-                                            class="dropdown-item text-danger"
-                                            id="timeoutBtn"
-                                            data-id="'. $d->id .'">
-                                            Timeout
-                                        </button>
-                            </div>',
-            ];
+                'action'       => '<div class="dropdown text-center">
+                                    <button 
+                                        class="btn btn-sm btn-primary dropdown-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        Action
+                                    </button>
+
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button 
+                                                class="dropdown-item"
+                                                id="viewBtn"
+                                                data-id="'. $d->id .'"
+                                                data-type="visitorslog">
+                                                <i class="bi bi-eye me-2"></i> View
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button 
+                                                type="button"
+                                                class="dropdown-item text-danger"
+                                                id="timeoutBtn"
+                                                data-id="'. $d->id .'">
+                                                <i class="bi bi-clock-history me-2"></i> Timeout
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>',
+                ];
             $i++;
                                             // <i class="bi bi-clock-history"></i>
                                             // <i class="bi bi-eye"></i>
@@ -329,25 +354,23 @@ class VisitorController extends Controller
             }
 
         if ($request->image_path) {
-            $image = $request->image_path;
+            $image     = $request->image_path;
 
             // Remove metadata (data:image/png;base64,)
-            $image = preg_replace('/^data:image\/\w+;base64,/', '', $image);
+            $image     = preg_replace('/^data:image\/\w+;base64,/', '', $image);
 
             // Decode base64
-            $image = base64_decode($image);
+            $image     = base64_decode($image);
 
             // Generate filename
-            $fileName = 'visitors/' . Str::random(20) . '.png';
+            $fileName  = 'visitors/' . Str::random(20) . '.png';
 
             // Save to public disk
             Storage::disk('public')->put($fileName, $image);
 
             $imagePath = $fileName;
         }
-            $middleInitial = collect(preg_split('/\s+/', trim($request->middle_name)))
-                ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
-                ->implode('');
+            $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
 
             $userLocations = (array) Auth::user()->location;
 
@@ -364,7 +387,7 @@ class VisitorController extends Controller
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $userLocations[0] ?? null;
+            $visitor->location     = $userLocations[0];
             $visitor->address      = $request->address;
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
@@ -376,6 +399,7 @@ class VisitorController extends Controller
             return response()->json([
                 'message' => 'Visitor successfully added'
             ], 200);
+            
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error saving visitor: ' . $e->getMessage(),

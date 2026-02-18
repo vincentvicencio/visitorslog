@@ -88,8 +88,8 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
                 'Time In'      =>     $timeIn,
                 'Time Out'     =>     $timeOut,
                 'Status'       =>     $status,
-                'Created By'   =>     user_name($visitor->created_by) ?? '-',
-                'Updated By'   =>     user_name($visitor->updated_by) ?? '-',
+                'Created By'   =>     $visitor->getEmpName($visitor->created_by),
+                'Updated By'   =>     $visitor->getEmpName($visitor->updated_by) ?? '-',
                 'Created At'   =>     $visitor->created_at->format('F j, Y H:i A'),
             ];
         });

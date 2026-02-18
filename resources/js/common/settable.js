@@ -1,4 +1,3 @@
-
 class Datatable {
      /**
      * Create Table  = it will pullout all data
@@ -25,17 +24,9 @@ class Datatable {
             responsive:     false,
             stateSave:      true,
             paging:         true,
-            layout: {
-                bottomEnd: {
-                    paging: {
-                        type: 'simple_numbers',
-                        numbers: 3
-                    }
-                }
-            },
             ordering:       true,
             info:           true,
-            pagingType: 'simple_numbers',
+            pagingType: 'simple',
             language: {
                 'paginate': {
                     next:     '<span aria-hidden="true">&gt;</span>',
@@ -112,9 +103,9 @@ class Datatable {
             // Make bottom row flex container
                 const $bottom = $(this.api().table().container()).find('div.bottom');
                 $bottom.css({
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
+                    display:        'flex',
+                    alignItems:     'center',
+                    justifyContent: 'space-between' // info left, pagination right
                 });
             },
             drawCallback: function () { component.initializeButtons(table, url,module) }
@@ -146,7 +137,7 @@ class Datatable {
             stateSave       :     true,
             searching       :     enableSearch,
             search          :     { return: true },
-            pagingType      :     'simple_numbers',
+            pagingType      :     'simple',
             language: {
                 'paginate': {
                     next:     '<span aria-hidden="true">&gt;</span>',

@@ -16,13 +16,14 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
+        $visitorlogs = Visitor::where('status', 0)
+            ->withoutTrashed()
+            ->orderBy('id', 'asc')
+            ->get();
         $visitorTypes = VisitorType::all();
 
         return view('pages.reports.report', compact('visitorTypes'));
     }
-
-    
-
 
     public function destroy($id)
     {
@@ -138,11 +139,7 @@ class ReportController extends Controller
 
             $time_in    = Carbon::parse($d->time_in)->format('h:i A');
 
-            $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
-
-            
-            $createdby = $d->created_by ? user_name($d->created_by) : '-';
-            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
+            $time_out   = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
                     
             if ($status === 'Timed Out') {
                 $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger"> '. $status .'</div></div>';
@@ -152,36 +149,46 @@ class ReportController extends Controller
             }
 
             $newData[$i] = [
-                
-
-                'full_name' => $d->full_name,
-
-                'location' => '<div class="text-center">' . $locationLabel . '</div>',
-
-                'contact_number' => '<div class="text-center">' . $d->phone_number . '</div>',
+                'full_name' => '
+                    <strong>' .    $d->full_name . '</strong>
+                    <br><small>' . $locationLabel . '</small>
+                    <br><small>' . $d->phone_number . '</small>
+                ',
 
                 'visitor_type' =>  $d->visitorType?->name ?? '-',
 
                 'visitor_id'   =>  $d->visitor_id,
 
-                'visit' =>  $d->created_at->format("F d, Y") .'<br>
-                        '. $d->created_at->format('l'),
+                'image'        =>  $image,
 
-                'time' => '<small><strong>In:</strong> '. $time_in .'</small><br>
+                'visit'        =>  $d->created_at->format("F d, Y") .'<br>
+                                '. $d->created_at->format('l'),
+
+                'time'         => '<small><strong>In:</strong> '. $time_in .'</small><br>
                             <small>
                                 <strong>Out:</strong>
                                 '. $time_out .'
                             </small>',
-                'creator' => '<small><strong>Created: </strong>'. $createdby .'</small><br>
-                                <small><strong>Updated: </strong>'. $updatedby .'</small>',
+                'creator'      => '<small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
+                            <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>',
                 
-                'status' => $statuslayout,
+                'status'       => $statuslayout,
 
-                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
+                'created_at'   => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
 
-                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
+                'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
-                'action' => '<div class="dropdown text-center">
+                'action'       => '<div class="dropdown">
+                                <button 
+                                    class="btn btn-sm btn-primary dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    Action
+                                </button>
+
+                            <ul class="dropdown-menu">
+                                <li>
                                     <button 
                                         class="dropdown-item"
                                         id="viewBtn"
@@ -190,7 +197,10 @@ class ReportController extends Controller
                                         View
                                     </button>
                                 </li>
-                                        <li><a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li>
+                                <li>
+                                    <a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '">
+                                    <i class="bi bi-trash me-2"> </i> Delete </a>
+                                </li>
                             </ul>
                         </div>',
             ];
@@ -207,13 +217,13 @@ class ReportController extends Controller
 
     public function exportReport(Request $request)
     {
-        try {
-            $filters = [
-                'search'            => $request->input('search', ''),
-                'date_from'         => $request->input('date_from', ''),
-                'date_to'           => $request->input('date_to', ''),
-                'visitor_type'      => $request->input('visitor_type', ''),
-            ];
+        try{
+        $filters = [
+            'search'            => $request->input('search', ''),
+            'date_from'         => $request->input('date_from', ''),
+            'date_to'           => $request->input('date_to', ''),
+            'visitor_type'      => $request->input('visitor_type', ''),
+        ];
 
             $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
             

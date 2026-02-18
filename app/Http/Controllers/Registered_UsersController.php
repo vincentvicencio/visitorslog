@@ -423,7 +423,6 @@ public function edit(Request $request, $id)
             if (count($locations) === 0) {
                 return response()->json([
                     'status'  => 'error',
-                    'title'   => 'Select Location',
                     'message' => 'Please select at least one location.'
                 ], 422);
             }
@@ -431,7 +430,6 @@ public function edit(Request $request, $id)
             if ($roleId === 2 && count($locations) > 1) { // Receptionist
                 return response()->json([
                     'status'  => 'error',
-                    'title'   => 'Select Location',
                     'message' => 'Receptionist can only have one location.'
                 ], 422);
             }
@@ -508,8 +506,10 @@ public function list(Request $request){
                     ->whereNull('deleted_at')
                     ->when($keywords, function ($query) use ($keywords) {
                         $query->where('user_name', 'LIKE', "%{$keywords}%")
-                            ->orWhere('first_name', 'LIKE', "%{$keywords}%")
-                            ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+                              ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+                              ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+                              ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+                              ->orWhere('last_name', 'LIKE', "%{$keywords}%")
                             ->orWhereHas('userType', function ($q) use ($keywords) {
                                 $q->where('name', 'LIKE', "%{$keywords}%");
                             });
@@ -557,6 +557,14 @@ public function list(Request $request){
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
                                             <li><a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
+                                            <li>
+                                                <a class="dropdown-item btn-edit" data-id="'. $d->id .'">
+                                                <i class="bi bi-pencil-square me-2"></i> Edit</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '">
+                                                <i class="bi bi-trash me-2"></i> Delete</a>
+                                            </li>
                                         </ul>
                                     </div>' 
             ];
@@ -576,14 +584,12 @@ public function list(Request $request){
         if(!$record){
             return response()->json([
                 'status'     => 1,
-                'title'      => 'Error',
                 'message'    => 'No Data Found'
             ]);
         }
 
         return response()->json([
             'status'     => 0,
-            'title'      => 'Success',
             'data'       => $record
         ]);
     }
@@ -597,7 +603,6 @@ public function list(Request $request){
         $message    = 'Registered User Successfully Deleted';
             return response()->json([
                 'status'     => 0,
-                'title'      => 'Success',
                 'message'    => $message
             ]);
     }

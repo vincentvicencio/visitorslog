@@ -40,15 +40,13 @@ Route::middleware(['auth', 'single.session'])->group(function () {
             })->where('any', '.*');
         });
         
-    Route::middleware(['auth', 'user_type:1'])->group(function () {
-        // ADMIN ONLY ROUTES HERE
          // USER TYPE
         Route::prefix('userTypes')
             ->controller(User_TypesController::class)
             ->group(function () {
-                Route::get('/',                   'index')->name('userTypes');
-                Route::post('/list',              'list')->name('userTypes.list');
-                Route::post('/save',       'save')->name('userTypes.save');
+                Route::get('/',             'index')->name('userTypes');
+                Route::post('/list',        'list')->name('userTypes.list');
+                Route::post('/save',        'save')->name('userTypes.save');
                 Route::post('/search',      'search')->name('userTypes.search');
                 Route::post('/delete',      'delete')->name('userTypes.delete');
             });
@@ -73,10 +71,10 @@ Route::middleware(['auth', 'single.session'])->group(function () {
         Route::prefix('reports')
             ->controller(ReportController::class)
             ->group(function () {
-                Route::get('/',                       'index')->name('reports');
-                Route::get('/export',                 'exportReport')->name('reports.export');
-                Route::post('/list',                  'list')->name('reports.list');
-                Route::post('/delete',              'delete')->name('reports.delete');
+                Route::get('/',              'index')->name('reports');
+                Route::get('/export',        'exportReport')->name('reports.export');
+                Route::post('/list',         'list')->name('reports.list');
+                Route::post('/delete',       'delete')->name('reports.delete');
             });
         // VISITOR TYPE
         Route::prefix('visitortype')
@@ -99,5 +97,4 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                 Route::post('/delete',      'delete')->name('registerId.delete');
                 Route::post('/search',      'search')->name('registerId.search');
             });
-    });
 });

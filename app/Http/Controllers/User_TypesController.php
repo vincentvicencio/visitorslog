@@ -49,7 +49,7 @@ class User_TypesController extends Controller
         }
 
         $data       = [
-            'name'               => $request->name,
+            'name'          => $request->name,
         ];
 
         if ($record_id > 0) {
@@ -105,10 +105,10 @@ class User_TypesController extends Controller
        
             $newData[$i] = [
                 'name'          => '<div class="text-center">' . $d->name . '</div>', // show emp_code in first column
-                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
-                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
-                'created_at' => '<div class="text-center">' . ($d->created_at ? $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') : '-')  . '</div>',
-                'action'            => '<div class="dropdown text-center">
+                'created_by'    => user_name($d->created_by) ?? '-',
+                'updated_by'    => user_name($d->updated_by) ?? '-',
+                'created_at'    => '<div class="text-center">' . $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') . '</div>',
+                'action'        => '<div class="dropdown text-center">
                                         <button class="btn btn-sm btn-primary dropdown-toggle" 
                                                 type="button" 
                                                 data-bs-toggle="dropdown" 
@@ -116,8 +116,14 @@ class User_TypesController extends Controller
                                             Action
                                         </button>
                                         <ul class="dropdown-menu">
-                                            <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
-                                            <li><a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
+                                            <li>   
+                                                <a class="dropdown-item btn-edit" data-id="'. $d->id .'">
+                                                <i class="bi bi-pencil-square me-2"> </i> Edit</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '">
+                                                <i class="bi bi-trash me-2"> </i> Delete</a>
+                                            </li>
                                         </ul>
                                     </div>' 
             ];
@@ -136,14 +142,14 @@ class User_TypesController extends Controller
         $record = User_types::find($request->id);
         if(!$record){
             return response()->json([
-                'status'    => 1,
-                'message'   => 'No Data Found'
+                'status'     => 1,
+                'message'    => 'No Data Found'
             ]);
         }
 
         return response()->json([
-            'status'    => 0,
-            'data'      => $record
+            'status'     => 0,
+            'data'       => $record
         ]);
     }
 
@@ -151,13 +157,15 @@ class User_TypesController extends Controller
     public function delete(Request $request){
         $record  = User_types::find($request->id);
         $details = $record->name;
-        $record->update(['deleted_by' => Auth::user()->id]);
-        $record->delete();
+        $record  -> update(['deleted_by' => Auth::user()->emp_code]);
+        $record  -> delete();
 
-        return response()->json(['You have successfully delete '. $details]);
+        $message = 'User Type Successfully Deleted';
+            return response()->json([
+                'status'     => 0,
+                'message'    => $message
+            ]);
     }
-
-
 
     public function destroy($id) 
     {

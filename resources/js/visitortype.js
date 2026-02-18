@@ -40,16 +40,16 @@ import Triggers from './common/triggers';
             { targets: [0, 1, 2, 3], orderable: false }
         ]; 
 
-            settable.createTableAjax(
-                self.table,
-                columns,
-                self.url,
-                columnDefs,
-                self.module,
-                10,
-                {},
-                false
-            );
+        settable.createTableAjax(
+            self.table,
+            columns,
+            self.url,
+            columnDefs,
+            self.module,
+            10,          // pagination
+            {},          // data
+            false
+        );
 
         $(self.table).on('init.dt', function () {
 
@@ -66,43 +66,38 @@ import Triggers from './common/triggers';
                     tableApi.search(this.value).draw();
                 });
 
-                // =========================================
-                // ENTRIES PER PAGE
-                // =========================================
-                $('#entriesPerPage')
-                    .off('change')
-                    .on('change', function () {
-                        tableApi.page.len(this.value).draw();
-                    });
+            // =========================================
+            // ENTRIES PER PAGE
+            // =================================
+            $('#entriesPerPage')
+                .off('change')
+                .on('change', function () {
+                    tableApi.page.len(this.value).draw();
+                });
             });
         }
 
-        // Initialize buttons and their event listeners
-        async initializeButtons() {
-            const self = this
+    async initializeButtons() {
+        const self = this
             
-            // Add Button
-            $('#addBtn').off('click').on('click', async function (e) {
-                e.preventDefault()
+        $('#addBtn').off('click').on('click', async function (e) {
+            e.preventDefault()
                 datahandling.clearForm(self.form)
                 container.showModal(self.modal)
         })
                     
-            // Save Button
-            $(document).off('click', '#textInputSubmit').on('click', '#textInputSubmit', async function(e) {
-                e.preventDefault();
+        $(document).off('click', '#textInputSubmit').on('click', '#textInputSubmit', async function(e) {
+            e.preventDefault();
                 
             const formid    = self.form;
             const formdata  = new FormData($(formid)[0]);
         
-                await Triggers.removeErrorOnInput(formid);
-                await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
-            });
-        }
-
-        // Load form data for editing
-        async onLoadForm(record_id) {
-            const self = this;
+            await Triggers.removeErrorOnInput(formid);
+            await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
+        });
+    }
+    async onLoadForm(record_id) {
+        const self = this;
     
             const url = `${self.url}search`;
             const response = await datahandling.processData(
@@ -115,9 +110,7 @@ import Triggers from './common/triggers';
             $("#name").val(response.data.name);
     
             container.showModal(self.modal);
-        }
-
-
+    }
 }
 
 const instance = new VisitorTypeTable();

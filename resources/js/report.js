@@ -233,7 +233,6 @@ document.getElementById('btn_ok').addEventListener('click', function() {
                 new bootstrap.Modal(modalEl);
 
             modalInstance.hide();
-
         },
         error: function (xhr) {
             // Re-enable button on error

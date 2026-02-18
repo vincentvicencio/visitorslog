@@ -24,15 +24,12 @@ class RegisterIDController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name'               => ['required','regex:/^[0-9]+$/', 'max:4', 'min:4'],
-                'visitorType'        => 'required|exists:visitor_types,id',
+                'name'              => 'required',
+                'visitorType'       => 'required|exists:visitor_types,id',
             ],
             [
-                'name.required'           => 'Visitor ID is Required',
-                'name.regex'              => 'Visitor ID must contain only numbers',
-                'name.max'                => 'Visitor ID must not exceed 4 digits',
-                'name.min'                => 'Visitor ID must be at least 4 digits',
-                'visitorType.required'    => 'Visitor Type is Required',
+                'name'              => 'Name is Required',  
+                'visitorType'       => 'required|exists:visitor_types,id',
             ]
         );
 
@@ -135,6 +132,14 @@ class RegisterIDController extends Controller
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
                                     <li><a class=" text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
+                                    <li>
+                                        <a class="dropdown-item btn-edit" data-id="'. $d->id .'">
+                                        <i class="bi bi-pencil-square me-2"></i> Edit</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '">
+                                        <i class="bi bi-trash me-2"></i> Delete</a>
+                                    </li>
                                 </ul>
                             </div>';
             } else {
@@ -154,6 +159,12 @@ class RegisterIDController extends Controller
                 'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
 
                 'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
+                'created_by'   => user_name($d->created_by) ?? '-',
+                'updated_by'   => user_name($d->updated_by) ?? '-',
+
+                'created_at'   => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
+
+                'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
                 'action'       => $action
             ];

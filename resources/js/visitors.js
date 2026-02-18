@@ -265,17 +265,15 @@ $(document).ready(function () {
             const isAdmin = appEl.dataset.type == 1;
 
             const tableHeader = [
-                { id: "full_name", label: "Name" },
-                ...(isAdmin ? [{ id: "location", label: "Location" }] : []),
-                { id: 'contact_number', label: 'Contact No.' },
-                { id: "visitor_type", label: "Visitor Type" },
-                { id: "visitor_id", label: "ID No." },
-                { id: "visit", label: "Visit Date" },
-                { id: "time_in", label: "Time In" },
-                { id: "time_out", label: "Time Out" },
-                { id: "creator", label: "Logged by" },
-                { id: "status", label: "Status" },
-                { id: "action", label: "Action" },
+                { id: "full_name",    label: "Personal Details" },
+                { id: "visitor_type", label: "Visitor Type"     },
+                { id: "visitor_id",   label: "ID No."           },
+                { id: "image",        label: "Image"            },
+                { id: "visit",        label: "Visit"            },
+                { id: "time",         label: "Time"             },
+                { id: "creator",      label: "By"               },
+                { id: "status",       label: "Status"           },
+                { id: "action",       label: "Action"           },
             ];
 
             const columns = tableHeader.map(col => ({
@@ -296,7 +294,7 @@ $(document).ready(function () {
                 {},
                 false 
             );
-
+            
             // =====================================================
             //  INIT COMPLETE (SAFE API ACCESS)
             // =====================================================
@@ -370,5 +368,6 @@ $(document).ready(function () {
         video.style.display = 'block'; 
         imageInput.value = ""; 
     });
+
     startWebcam();
 });
