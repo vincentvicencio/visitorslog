@@ -121,6 +121,9 @@ class VisitorController extends Controller
             $time_in = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            $createdby = $d->created_by ? user_name($d->created_by) : '-';
+            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
             $fullName = '<div class="text-center">
                 <strong>' . $d->full_name . '</strong>';
 
@@ -154,8 +157,8 @@ class VisitorController extends Controller
                                 </small>
                             </div>',
                 'creator' => '<div class="text-center">
-                                <small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
-                                <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>
+                                <small><strong>Created: </strong>'. $createdby .'</small><br>
+                                <small><strong>Updated: </strong>'. $updatedby .'</small>
                             </div>',
                 
                 'status' => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',

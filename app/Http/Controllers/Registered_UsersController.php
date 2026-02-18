@@ -520,10 +520,10 @@ public function list(Request $request){
             $newData[$i] = [
                 'user_name'  => $d->first_name . ' ' . $d->last_name, // show emp_code in first column
                 'user_type'  => $d->userType->name ?? '-',
-                'created_by' => user_name($d->created_by) ?? '-',
-                'updated_by' => user_name($d->updated_by) ?? '-',
-                'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
-                'updated_at' => $d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l'),
+                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
+                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
+                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l')) : '-',
+                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l')) : '-',
                 'action'            => '<div class="dropdown text-center">
                                         <button class="btn btn-sm btn-primary dropdown-toggle" 
                                                 type="button" 

@@ -143,6 +143,10 @@ class ReportController extends Controller
             $time_in = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            
+            $createdby = $d->created_by ? user_name($d->created_by) : '-';
+            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
                     
             if ($status === 'Timed Out') {
                 $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger"> '. $status .'</div></div>';
@@ -172,14 +176,14 @@ class ReportController extends Controller
                                 <strong>Out:</strong>
                                 '. $time_out .'
                             </small>',
-                'creator' => '<small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
-                            <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>',
+                'creator' => '<small><strong>Created: </strong>'. $createdby .'</small><br>
+                                <small><strong>Updated: </strong>'. $updatedby .'</small>',
                 
                 'status' => $statuslayout,
 
-                'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
+                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
 
-                'updated_at' => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
 
                 'action' => '<div class="dropdown">
                                 <button 

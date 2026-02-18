@@ -145,12 +145,12 @@ class RegisterIDController extends Controller
 
                 'id_number' => $d->id_number,
 
-                'created_by' => user_name($d->created_by) ?? '-',
-                'updated_by' => user_name($d->updated_by) ?? '-',
+                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
+                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
 
-                'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
+                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
 
-                'updated_at' => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
 
                 'action' => $action
             ];

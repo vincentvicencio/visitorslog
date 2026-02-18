@@ -106,9 +106,9 @@ class User_TypesController extends Controller
        
             $newData[$i] = [
                 'name'          => '<div class="text-center">' . $d->name . '</div>', // show emp_code in first column
-                'created_by' => user_name($d->created_by) ?? '-',
-                'updated_by' => user_name($d->updated_by) ?? '-',
-                'created_at' => '<div class="text-center">' . $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') . '</div>',
+                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
+                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
+                'created_at' => '<div class="text-center">' . ($d->created_at ? $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') : '-')  . '</div>',
                 'action'            => '<div class="dropdown text-center">
                                         <button class="btn btn-sm btn-primary dropdown-toggle" 
                                                 type="button" 
