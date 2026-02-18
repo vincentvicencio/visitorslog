@@ -550,9 +550,16 @@ public function list(Request $request){
                 'created_at' => $d->created_at ? ($d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l')) : '-',
                 'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l')) : '-',
                 'action'            => '<div class="dropdown text-center">
-                                        
-                                        <button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>
-                                        <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Delete</button>
+                                        <button class="btn btn-sm btn-primary dropdown-toggle" 
+                                                type="button" 
+                                                data-bs-toggle="dropdown" 
+                                                data-bs-boundary="viewport" aria-expanded="false">
+                                            Action
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
+                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
+                                        </ul>
                                     </div>' 
             ];
             $i++;

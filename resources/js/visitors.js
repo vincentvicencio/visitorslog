@@ -377,13 +377,11 @@ $(document).ready(function () {
     //     imageInput.value = imageData; 
     // });
 
-    // // 3. Recapture photo
-    // recaptureBtn.addEventListener('click', () => {
-    //     photoPreview.src = "";
-    //     photoPreview.style.display = 'none';
-    //     video.style.display = 'block'; 
-    //     imageInput.value = ""; 
-    // });
-
-    // startWebcam();
+    recaptureBtn.addEventListener('click', () => {
+        photoPreview.src = "";
+        photoPreview.style.display = 'none';
+        video.style.display = 'block'; // Hide video once captured
+        imageInput.value = ""; 
+    });
+    startWebcam();
 });

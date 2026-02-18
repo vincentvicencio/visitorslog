@@ -1074,6 +1074,9 @@ class UsersTable {
                 $('#reg_user_db_id').val(response.id);
                 $('#reg_emp_code').val(response.emp_code || '');
                 $('#reg_user_type').val(response.role_id || '');
+                
+                // Trigger change event on user type to update UI (after all values set)
+                $('#reg_user_type').trigger('change');
 
                 // Fill usertype
                 $('#reg_user_type').trigger('change');
@@ -1088,7 +1091,9 @@ class UsersTable {
                     $('#reg_location').val('').trigger('change');
                 }
 
-                // Fill name
+                
+
+                // Always show and fill first/last name fields after role change
                 $('#employee_name_container').removeClass('d-none');
                 $('#reg_first_name').val(response.first_name || '');
                 $('#reg_last_name').val(response.last_name || '');

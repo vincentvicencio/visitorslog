@@ -104,6 +104,20 @@ class VisitorController extends Controller
                 }
             }
 
+            $image = '';
+
+            if ($d->image_path == null) {
+                $image = 'No Image Provided';
+            }else{
+                $image ='<button 
+                    class="btn-sm view-button text-white border-0 rounded-2 px-3 py-1"
+                        id="viewImageBtn"
+                        data-id="'. $d->id .'"
+                        data-image="'. Storage::url($d->image_path) .'">
+                        View
+                    </button>';
+            }
+
             $status = '';
 
             if($d->status == 0){
@@ -355,7 +369,6 @@ class VisitorController extends Controller
             return response()->json([
                 'message' => 'Visitor successfully added'
             ], 200);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error saving visitor: ' . $e->getMessage(),
