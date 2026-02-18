@@ -155,7 +155,6 @@ $(document).ready(function () {
                 } else if (xhr.status >= 500) {
                     msg = 'Server error. Please try again later.';
                 }
-                
                 Triggers.showToast(msg, 1);
             }
         });
@@ -379,11 +378,5 @@ $(document).ready(function () {
         video.style.display = 'block'; // Hide video once captured
         imageInput.value = ""; 
     });
-
-
     startWebcam();
-
-
-
-    
 });

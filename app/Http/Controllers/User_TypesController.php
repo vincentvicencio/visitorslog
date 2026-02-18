@@ -15,14 +15,16 @@ class User_TypesController extends Controller
     public function save(Request $request)
     {
         $validator = Validator::make(
-            $request->all(),
-            [
-                'name'              => 'required',
-            ],
-            [
-                'name'              => 'Name is Required'
-            ]
-        );
+                $request->all(),
+                [
+                    'name' => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s]+$/'],
+                ],
+                [
+                    'name.required' => 'This Field is Required',
+                    'name.regex'    => 'Role Name must contain letters only',
+                ]
+            );
+
 
         if($validator->fails()){
             return response()->json(['status' => 1,'errors' => $validator->errors()]);
@@ -118,7 +120,7 @@ class User_TypesController extends Controller
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
-                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"><i class="bi bi-pencil-square me-2"></i> Delete</a></li></li>
+                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
                                         </ul>
                                     </div>' 
             ];

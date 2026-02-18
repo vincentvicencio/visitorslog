@@ -375,6 +375,9 @@ class UsersTable {
                 $('#reg_user_db_id').val(response.id);
                 $('#reg_emp_code').val(response.emp_code || '');
                 $('#reg_user_type').val(response.role_id || '');
+                
+                // Trigger change event on user type to update UI (after all values set)
+                $('#reg_user_type').trigger('change');
 
                 // Wait for location dropdown to be populated, then set value
                 await self.location_dropdown(response.location_id);
@@ -386,8 +389,7 @@ class UsersTable {
                     $('#reg_location').val('').trigger('change');
                 }
 
-                // Trigger change event on user type to update UI (after all values set)
-                $('#reg_user_type').trigger('change');
+                
 
                 // Always show and fill first/last name fields after role change
                 $('#employee_name_container').removeClass('d-none');

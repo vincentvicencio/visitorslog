@@ -15,6 +15,7 @@
                     <select id="reg_user_type" name="user_type" class="form-control" required>
     
                     </select>
+                    <span class="error-span error-location text-danger"></span>
                 </div>
 
                 <div id="reg_fields_container" style="display: none;">
@@ -23,6 +24,7 @@
                         <select id="reg_location" name="locations[]" class="form-control" required>
                             <option value="">Select Location</option>
                         </select>
+                        <span class="error-span error-location text-danger"></span>
                     </div>
                     <div class="mb-3" id="emp_code_container">
                         <label class="form-label">Employee Code</label>
@@ -31,6 +33,7 @@
                             <button class="btn btn-outline-primary" type="button" id="search_emp_btn">
                                 <i class="bi bi-search"></i>
                             </button>
+                            <span class="error-span error-location text-danger"></span>
                         </div>
                     </div>
                     <div class="mb-3 d-none" id="employee_name_container">

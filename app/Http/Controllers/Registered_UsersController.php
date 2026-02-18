@@ -32,6 +32,7 @@ class Registered_UsersController extends Controller
     $validationRules = [
         'user_type' => 'required',
         'locations' => 'required',
+        'emp_code' => ['required', 'numeric', 'max:999999'],
     ];
     
     // Check if editing (record_id present)
@@ -50,6 +51,8 @@ class Registered_UsersController extends Controller
         $validationRules['emp_code'] = [
             'required',
             'string',
+            'numeric',
+            'max:999999',
             function ($attribute, $value, $fail) use ($recordId) {
                 
                 $query = RegisteredUser::where('user_name', $value)
@@ -538,7 +541,7 @@ public function list(Request $request){
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
-                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"><i class="bi bi-pencil-square me-2"></i> Delete</a></li></li>
+                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
                                         </ul>
                                     </div>' 
             ];
@@ -553,8 +556,6 @@ public function list(Request $request){
             'data'              => $newData            
         ]);
     }
-
-
 
     public function search(Request $request){
         $record = RegisteredUser::find($request->id);
@@ -582,8 +583,6 @@ public function list(Request $request){
                 'status'    => 0,
                 'message'   => $message
             ]);
-
-        // return response()->json(['message' => 'You have successfully deleted '. $details, 'status' => 0]);
     }
 
     public function destroy($id) 

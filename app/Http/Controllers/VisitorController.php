@@ -100,14 +100,11 @@ class VisitorController extends Controller
 
             $location = collect(session('all_location'));
 
-            // dd(Auth::user());
             foreach ($location as $record) {
                 if($d->location == $record['id']){
                     $locationLabel = $record['name'];
                 }
-
             }
-
 
             $image = '';
 
@@ -269,7 +266,6 @@ class VisitorController extends Controller
                 'type' => $request->type,
             ])
         ]);
-
     }
 
     public function search(Request $request)
@@ -349,14 +345,6 @@ class VisitorController extends Controller
             $imagePath = $fileName;
         }
             $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
-            // $location = collect(session('all_location'));
-            // foreach ($location as $record) {
-            //     $data[] = [
-            //         'id'   => $record['id'], // Ensure 'id' exists in your session array
-            //         'text' => $record['name']
-            //     ];
-            // }
-            // Save visitor
 
             $userLocations = []; 
 
@@ -370,8 +358,6 @@ class VisitorController extends Controller
             } else {
                 $visitor->full_name = $request->first_name . ' ' . $request->last_name;
             }
-            // original code - kardo
-            // $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
             $visitor->first_name   = $request->first_name;
             $visitor->middle_name  = $request->middle_name;
             $visitor->last_name    = $request->last_name;
@@ -391,8 +377,6 @@ class VisitorController extends Controller
                 'message' => 'Visitor successfully added'
             ], 200);
 
-
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error saving visitor: ' . $e->getMessage(),
@@ -400,4 +384,3 @@ class VisitorController extends Controller
         }
     }
 }
-
