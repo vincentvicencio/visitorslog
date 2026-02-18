@@ -15,16 +15,15 @@ class User_TypesController extends Controller
     public function save(Request $request)
     {
         $validator = Validator::make(
-                $request->all(),
-                [
-                    'name' => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s]+$/'],
-                ],
-                [
-                    'name.required' => 'This Field is Required',
-                    'name.regex'    => 'Role Name must contain letters only',
-                ]
-            );
-
+            $request->all(),
+            [
+                'name'              => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
+            ],
+            [
+                'name.required'              => 'Name is Required',
+                'name.regex'        => 'Role Name must contain letters only'
+            ]
+        );
 
         if($validator->fails()){
             return response()->json(['status' => 1,'errors' => $validator->errors()]);

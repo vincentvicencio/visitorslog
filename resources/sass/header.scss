@@ -14,6 +14,9 @@
     #logout-form {
         z-index:10 !important;
     }
+    #logout-form {
+        z-index:10!important;
+    }
     #sidebarToggle {
         background-color: transparent !important;
         border: none !important;
@@ -21,6 +24,26 @@
         font-size: 20px; 
         transition: left 0.3s ease;
     }
+    .navlink{
+        padding: 5px 20px !important;
+        font-size: 1rem !important;
+        background-color: #3e9af000;
+        border-radius: 10px;
+        box-shadow: rgba(0, 0, 0, 0.123) 2px 2px 5px 0px;
+        color: white !important;
+        cursor: pointer;
+        text-decoration: none !important;
+        margin-right: .5rem;
+    }
+    .navlink:hover {
+        background-color: #145AB0 !important;
+        border-radius: 10px;
+    }
+    .nav-treeview .nav-link {
+        color: white !important;
+        margin-bottom: 5px;
+    }
+
     .nav-item {
         margin-bottom: 5px;
         font-size: 1rem;
@@ -33,67 +56,6 @@
         margin: auto;
         
     }
-    .username-holder{
-        background-color: #0f438383 ;
-        margin-left: auto;
-        height: 36px;
-        position: relative;    
-        border-top-right-radius: 18px;
-        border-bottom-right-radius: 18px;
-        padding-left: 25px;
-        padding-right: 10px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        .profile-holder{
-            position: absolute;
-            box-sizing: border-box;
-            border-radius: 20px;
-            background-image: linear-gradient(to top left, #0F4383 , #145AB0, #145AB0, #3492E9);
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-            height: 40px;
-            width: 40px;
-            left: -20px !important;
-            top: -2px;
-            border: 3px solid #0f4383;
-            img{
-                margin-left: 0px !important;
-            }
-        }
-        .name-holder{
-            max-width:120px;
-            color: white;
-        }
-
-    }
-    .logout-button{
-        height: 30px;
-        box-sizing: border-box;
-        padding: 10px;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: 0.2s;
-        color: #0F4383;
-        letter-spacing: 1px;
-    }
-    .logout-button:hover{
-        background-color: rgba(0, 0, 0, 0.2) !important; 
-        border-radius: 8px;
-    }
-    .divider{
-        background-color: #145AB0;
-        width: 2px !important;
-        height: 100%;
-        margin: 0px 10px 0px 15px;
-        color: #00000000;
-    }
-
-    &.always-show .navbar {
-        display: flex !important;
-    }
-
     @media (max-width: 880px) {
         .navbar {
             display: flex;
@@ -103,5 +65,4 @@
         }
     }
 }
-
 

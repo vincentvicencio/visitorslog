@@ -508,10 +508,8 @@ public function list(Request $request){
                     ->whereNull('deleted_at')
                     ->when($keywords, function ($query) use ($keywords) {
                         $query->where('user_name', 'LIKE', "%{$keywords}%")
-                              ->orWhere('first_name', 'LIKE', "%{$keywords}%")
-                              ->orWhere('last_name', 'LIKE', "%{$keywords}%")
-                              ->orWhere('first_name', 'LIKE', "%{$keywords}%")
-                              ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+                            ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+                            ->orWhere('last_name', 'LIKE', "%{$keywords}%")
                             ->orWhereHas('userType', function ($q) use ($keywords) {
                                 $q->where('name', 'LIKE', "%{$keywords}%");
                             });
