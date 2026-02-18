@@ -138,8 +138,9 @@ class ReportController extends Controller
 
             $time_in    = Carbon::parse($d->time_in)->format('h:i A');
 
-            $time_out   = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+            $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
 
+            
             $createdby = $d->created_by ? user_name($d->created_by) : '-';
             $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
                     
@@ -166,26 +167,19 @@ class ReportController extends Controller
                 'visit' =>  $d->created_at->format("F d, Y") .'<br>
                         '. $d->created_at->format('l'),
 
-                'time_in' => '<div class="text-center">
-                                <small> '. $time_in .'</small><br>
-                            </div>',
-                'time_out' => '<div class="text-center">
-                                <small> '. $time_out .'</small><br>
-                            </div>',
-
-                'logged_by' => '<div class="text-center">
-                                '. $createdby .'
-                            </div>',
-
-                'updated_by' => '<div class="text-center">
-                                '. $updatedby .'
-                            </div>',
-            
+                'time' => '<small><strong>In:</strong> '. $time_in .'</small><br>
+                            <small>
+                                <strong>Out:</strong>
+                                '. $time_out .'
+                            </small>',
+                'creator' => '<small><strong>Created: </strong>'. $createdby .'</small><br>
+                                <small><strong>Updated: </strong>'. $updatedby .'</small>',
+                
                 'status' => $statuslayout,
 
-                'created_at'   => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
+                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
 
-                'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
 
                 'action' => '<div class="dropdown text-center">
                                     <button 

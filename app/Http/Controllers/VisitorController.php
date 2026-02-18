@@ -120,6 +120,11 @@ class VisitorController extends Controller
 
             $createdby = $d->created_by ? user_name($d->created_by) : '-';
             $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
+            $fullName = '<div class="text-center">
+                <strong>' . $d->full_name . '</strong>';
+
+            $createdby = $d->created_by ? user_name($d->created_by) : '-';
+            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
             
 
             $newData[$i] = [
@@ -147,7 +152,8 @@ class VisitorController extends Controller
                                 <small> '. $time_out .'</small><br>
                             </div>',
                 'creator' => '<div class="text-center">
-                                '. $createdby .'
+                                <small><strong>Created: </strong>'. $createdby .'</small><br>
+                                <small><strong>Updated: </strong>'. $updatedby .'</small>
                             </div>',
                 
                 'status'       => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
