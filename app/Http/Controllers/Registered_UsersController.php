@@ -5,18 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\RegisteredUser;
 use App\Models\User_types;
-use App\Models\VisitorType;
-use App\Models\Visitor;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class Registered_UsersController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
          return view('pages.registerUser.users');
     }
@@ -440,7 +436,6 @@ public function edit(Request $request, $id)
     
     // Placeholder
     $data[] = ['id' => '', 'text' => 'Choose Location/Site'];
-    // dd($data);
         foreach ($location as $record) {
         $data[] = [
             'id'   => $record['id'], // Ensure 'id' exists in your session array
@@ -538,7 +533,7 @@ public function list(Request $request){
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
-                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"><i class="bi bi-pencil-square me-2"></i> Delete</a></li></li>
+                                            <li><a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
                                         </ul>
                                     </div>' 
             ];
@@ -582,8 +577,6 @@ public function list(Request $request){
                 'status'    => 0,
                 'message'   => $message
             ]);
-
-        // return response()->json(['message' => 'You have successfully deleted '. $details, 'status' => 0]);
     }
 
     public function destroy($id) 
@@ -597,11 +590,6 @@ public function list(Request $request){
             return response()->json(['message' => 'An error occurred while deleting the Registered User.'], 500);
         }
     }   
-    // public function edit($id)
-    // {
-    //     $role = RegisteredUser::findOrFail($id); 
-    //     return response()->json($role);
-    // }
 
     public function update(Request $request, $id)
     {

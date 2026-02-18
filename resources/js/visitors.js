@@ -284,7 +284,7 @@ $(document).ready(function () {
 
             const columns = tableHeader.map(col => ({
                 data: col.id,
-                title: col.label
+                title: col.label,
             }));
 
             const columnDefs = [
@@ -295,10 +295,14 @@ $(document).ready(function () {
                 columns,
                 self.url,
                 columnDefs,
+                self.module,
                 10,
                 {},
                 false 
             );
+            
+
+            
 
             // =====================================================
             //  DEBUG: LOG AJAX RESPONSE
@@ -318,7 +322,7 @@ $(document).ready(function () {
                 // START POLLING
                 setInterval(() => {
                     tableApi.ajax.reload(null, false); 
-                }, 2000); 
+                }, 5000); 
 
                 // CUSTOM SEARCH
                 $('#typeSearch')
@@ -339,27 +343,6 @@ $(document).ready(function () {
     }
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();
-
-    let polling;
-
-    function startPolling(tableApi) {
-        polling = setInterval(() => {
-            tableApi.ajax.reload(null, false);
-        }, 2000);
-    }
-
-    // function stopPolling() {
-    //     clearInterval(polling);
-    // }
-
-    // document.addEventListener('visibilitychange', () => {
-    //     if (document.hidden) {
-    //         stopPolling();
-    //     } else {
-    //         const tableApi = $('#visitorsLogTable').DataTable();
-    //         startPolling(tableApi);
-    //     }
-    // });
 
     // 1. Start the Webcam automatically on page load
     async function startWebcam() {

@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\RegisteredID\visitorsLogs;
 use App\Models\RegisteredID;
 use App\Models\VisitorType;
-use App\Models\Visitor;
 use Carbon\Carbon;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -134,7 +131,7 @@ class RegisterIDController extends Controller
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
-                                    <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
+                                    <li><a class=" text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
                                 </ul>
                             </div>';
             } else {
@@ -195,8 +192,6 @@ class RegisterIDController extends Controller
                 'status'    => 0,
                 'message'   => $message
             ]);
-
-        // return response()->json(['message' => 'You have successfully deleted '. $details, 'status' => 0]);
     }
 
     public function destroy($id) 

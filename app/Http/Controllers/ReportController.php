@@ -5,12 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\VisitorType;
-use App\Models\UserType;
-use App\Models\RegisteredUser;
-use App\Models\RegisteredID;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -22,18 +16,12 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        // $visitorlogs = Visitor::where('status', 1)
-        //             ->orderBy('id', 'asc')
-        //             ->get();
-        $visitorlogs = Visitor::where('status', 0)
-            ->withoutTrashed()
-            ->orderBy('id', 'asc')
-            ->get();
         $visitorTypes = VisitorType::all();
-        $allEmployeesFromSession = session('all_emp', []);
 
-        return view('pages.reports.report', compact('visitorlogs', 'visitorTypes', 'allEmployeesFromSession'));
+        return view('pages.reports.report', compact('visitorTypes'));
     }
+
+    
 
 
     public function destroy($id)
@@ -212,7 +200,7 @@ class ReportController extends Controller
                                         <i class="bi bi-eye me-2"></i> View
                                     </button>
                                 </li>
-                                        <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li>
+                                        <li><a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li>
                             </ul>
                         </div>',
             ];

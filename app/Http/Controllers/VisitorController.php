@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\VisitorType;
 use App\Models\RegisteredID;
-use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -16,18 +15,7 @@ class VisitorController extends Controller
 {
     public function index()
     {
-        
-        $visitors = Visitor::where(function ($query) {
-                $query->where('status', 0)->orWhereNull('status');
-               })
-               ->whereNull('time_out')
-               ->orderBy('updated_at', 'desc')
-               ->get();
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'desc')
-                   ->get();
-        $empMap = collect(session('all_emp'))->keyBy('emp_code');
-        return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+         return view('pages.visitorslog.visitorlog');
     }
     public function form()
     {
@@ -82,7 +70,7 @@ class VisitorController extends Controller
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get(); 
             $totalFiltered = count($temp);
        
         } else { 
@@ -100,7 +88,6 @@ class VisitorController extends Controller
 
             $location = collect(session('all_location'));
 
-            // dd(Auth::user());
             foreach ($location as $record) {
                 if($d->location == $record['id']){
                     $locationLabel = $record['name'];
@@ -254,7 +241,6 @@ class VisitorController extends Controller
         ]);
 
         $visitor = Visitor::where('id', $request->id)
-            // ->where('status', 0)
             ->latest('id')
             ->first();
 
@@ -349,14 +335,6 @@ class VisitorController extends Controller
             $imagePath = $fileName;
         }
             $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
-            // $location = collect(session('all_location'));
-            // foreach ($location as $record) {
-            //     $data[] = [
-            //         'id'   => $record['id'], // Ensure 'id' exists in your session array
-            //         'text' => $record['name']
-            //     ];
-            // }
-            // Save visitor
 
             $userLocations = []; 
 
