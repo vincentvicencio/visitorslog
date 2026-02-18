@@ -15,19 +15,7 @@ class VisitorController extends Controller
 {
     public function index()
     {
-        
-        $visitors = Visitor::where(function ($query) {
-                $query->where('status', 0)->orWhereNull('status');
-               })
-               ->whereNull('time_out')
-               ->orderBy('updated_at', 'desc')
-               ->get();
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                -> orderBy('id', 'desc')
-                -> get();
-
-        $empMap = collect(session('all_emp'))->keyBy('emp_code');
-        return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+         return view('pages.visitorslog.visitorlog');
     }
     public function form()
     {

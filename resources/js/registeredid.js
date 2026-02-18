@@ -4,7 +4,7 @@ import settable from './common/settable';
 import container from './common/container';
 import datahandling from './common/datahandling';
 
-    // RegisterIdTable
+    // TABLE
     class RegisterIdTable {
         constructor() {
             this.defaultFields  = []

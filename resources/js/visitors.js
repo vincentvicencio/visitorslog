@@ -269,6 +269,9 @@ $(document).ready(function () {
                 {},
                 false 
             );
+            
+
+            
 
             // =====================================================
             //  DEBUG: LOG AJAX RESPONSE
@@ -309,39 +312,6 @@ $(document).ready(function () {
 
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();
-
-    // 1. Start the webcam
-    // async function startWebcam() {
-    //     try {
-    //         const stream = await navigator.mediaDevices.getUserMedia({ 
-    //             video: { facingMode: "user" }, 
-    //             audio: false 
-    //         });
-    //         video.srcObject = stream;
-    //     } catch (err) {
-    //         console.error("Error accessing webcam: ", err);
-    //         alert("Webcam access denied or not available.");
-    //     }
-    // }
-
-    function startPolling(tableApi) {
-        polling = setInterval(() => {
-            tableApi.ajax.reload(null, false);
-        }, 2000);
-    }
-
-    // function stopPolling() {
-    //     clearInterval(polling);
-    // }
-
-    // document.addEventListener('visibilitychange', () => {
-    //     if (document.hidden) {
-    //         stopPolling();
-    //     } else {
-    //         const tableApi = $('#visitorsLogTable').DataTable();
-    //         startPolling(tableApi);
-    //     }
-    // });
 
     // 1. Start the Webcam automatically on page load
     async function startWebcam() {

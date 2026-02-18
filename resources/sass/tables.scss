@@ -42,8 +42,10 @@
     // #reportTable, 
     .table.dataTable {
         box-sizing: border-box;
-        width: 99%;
+        width: 99% !important;
         text-align: center;
+        background-color: red !important;
+        margin:0px 0.5% !important;
         
         #visitorsTable{
             .form-select {
@@ -153,7 +155,6 @@
 
 .dt-paging {
   margin-top: 10px !important;
-
   .pagination {
     gap: 5px;
     background-color: #0f43830e;
@@ -188,6 +189,7 @@
   .next{
     margin-left: 0px !important;
   }
+}
 }
 #reportTable{
   .status{
@@ -244,4 +246,8 @@
   .dt-type-numeric{
     text-align: center !important;
   }
-}
+
+  .dt-scroll-body{
+    display: flex !important;
+    align-items: center !important;
+  }

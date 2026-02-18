@@ -16,14 +16,13 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $visitorlogs = Visitor::where('status', 0)
-            ->withoutTrashed()
-            ->orderBy('id', 'asc')
-            ->get();
         $visitorTypes = VisitorType::all();
 
         return view('pages.reports.report', compact('visitorTypes'));
     }
+
+    
+
 
     public function destroy($id)
     {
@@ -196,8 +195,10 @@ class ReportController extends Controller
                                         data-type="reports">
                                         View
                                     </button>
-                                    <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '">Delete</button>
-                            </div>',
+                                </li>
+                                        <li><a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li>
+                            </ul>
+                        </div>',
             ];
             $i++;
         }

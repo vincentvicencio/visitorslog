@@ -9,7 +9,6 @@
         @endif
         @if(! page_name('main') || page_name('main') == 'login' ) @yield('content')
         @else
-        {{-- @include('layouts.sidebar') --}}
 
         <div id="content" class="ps-0 d-flex flex-column">
 
