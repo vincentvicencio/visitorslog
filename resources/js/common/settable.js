@@ -106,7 +106,7 @@ class Datatable {
                 $bottom.css({
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between' // info left, pagination right
+                    justifyContent: 'space-between'
                 });
             },
             drawCallback: function () { component.initializeButtons(table, url,module) }

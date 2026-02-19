@@ -87,8 +87,7 @@ class RegisterIDController extends Controller
         $limit    = $request->input('length');
 
         $rawquery = RegisteredID::with('visitorType')
-                    ->withoutTrashed()
-                    ->where('deleted_at', null)
+                    ->whereNull('deleted_at')
                     ->when($keywords, function ($query) use ($keywords) {
                         $query->where('id_number', 'LIKE', "%{$keywords}%")
                             ->orWhereHas('visitorType', function ($q) use ($keywords) {

@@ -24,7 +24,7 @@ $(document).ready(function () {
 
         let formData = new FormData(this);
         
-        // Disable submit button to prevent duplicate submissions
+        // Disable submit button and show loading state
         const submitBtn = $(this).find('button[type="submit"]');
         const originalText = submitBtn.text();
         submitBtn.prop('disabled', true).text('Processing...');
@@ -35,7 +35,7 @@ $(document).ready(function () {
             data: formData,
             processData: false,
             contentType: false,
-            timeout: 30000, // 30 second timeout
+            timeout: 30000,
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
@@ -47,7 +47,7 @@ $(document).ready(function () {
                 $('#addVisitorForm')[0].reset();
                 photoPreview.src = "";
                 photoPreview.style.display = 'none';
-                video.style.display = 'block'; // Hide video once captured
+                video.style.display = 'block'; 
                 imageInput.value = ""; 
             },
             error: function (xhr, status, error) {
@@ -67,7 +67,6 @@ $(document).ready(function () {
                 Triggers.showToast(msg, 1);
             },
             complete: function () {
-                // Re-enable submit button
                 submitBtn.prop('disabled', false).text(originalText);
             }
         });
@@ -77,7 +76,7 @@ $(document).ready(function () {
         $('#addVisitorForm')[0].reset();
         photoPreview.src = "";
         photoPreview.style.display = 'none';
-        video.style.display = 'block'; // Hide video once captured
+        video.style.display = 'block'; 
         imageInput.value = ""; 
     });
 
@@ -95,7 +94,7 @@ $(document).ready(function () {
                 return;
             }
             
-            // Validate file size (max 5MB)
+            // Validate file size
             const maxSize = 5 * 1024 * 1024;
             if (file.size > maxSize) {
                 Triggers.showToast('File size exceeds 5MB limit.', 1);
@@ -134,7 +133,7 @@ $(document).ready(function () {
                 type: type,
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
-            timeout: 15000, // 15 second timeout
+            timeout: 15000, 
             success: function (response) {
                 if (response.redirect) {
                     window.location.href = response.redirect;
@@ -185,7 +184,7 @@ $(document).ready(function () {
                 id: Id,
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
-            timeout: 15000, // 15 second timeout
+            timeout: 15000,
             success: function (response) {
                 Triggers.showToast(response.message, 0);
                 setTimeout(() => {
@@ -300,16 +299,6 @@ $(document).ready(function () {
                 {},
                 false 
             );
-            
-
-            
-
-            // =====================================================
-            //  DEBUG: LOG AJAX RESPONSE
-            // =====================================================
-            $(self.table).on('xhr.dt', function (e, settings, json) {
-                console.log(' AJAX RESPONSE:', json);
-            });
 
             // =====================================================
             //  INIT COMPLETE (SAFE API ACCESS)
@@ -344,11 +333,11 @@ $(document).ready(function () {
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();
 
-    // 1. Start the Webcam automatically on page load
+    // 1. Start the webcam
     async function startWebcam() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "user" }, // "user" for front, "environment" for back
+                video: { facingMode: "user" }, 
                 audio: false 
             });
             video.srcObject = stream;
@@ -358,36 +347,33 @@ $(document).ready(function () {
         }
     }
 
-    // 2. Capture the frame
+    // 2. Capture photo
     captureBtn.addEventListener('click', () => {
         const context = canvas.getContext('2d');
-        // Set canvas size to match video dimensions
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         
-        // Draw the current video frame onto the canvas
+        // Draw the current video frame to the canvas
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-        // Convert canvas to a Base64 URL (image string)
+        // Convert the canvas image to a data URL
         const imageData = canvas.toDataURL('image/png');    
-        // Show preview and store data in the hidden input
+        
+        // Display the captured image
         photoPreview.src = imageData;
         photoPreview.style.display = 'block';
-        video.style.display = 'none'; // Hide video once captured
+        video.style.display = 'none'; 
         imageInput.value = imageData; 
     });
 
+    // 3. Recapture photo
     recaptureBtn.addEventListener('click', () => {
         photoPreview.src = "";
         photoPreview.style.display = 'none';
-        video.style.display = 'block'; // Hide video once captured
+        video.style.display = 'block'; 
         imageInput.value = ""; 
     });
 
 
     startWebcam();
-
-
-
-    
 });

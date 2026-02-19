@@ -82,30 +82,30 @@
 function updateClock() {
     const now = new Date();
 
-    // Day (Monday)
+    // Day
     const day = now.toLocaleDateString('en-US', { weekday: 'long' });
 
-    // Date (January 12, 2004)
+    // Date
     const date = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    // Time (hour:minute)
+    // Time hh:mm
     let hours = now.getHours();
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
-    hours = hours ? hours : 12; // Convert 0 to 12 for 12AM
+    hours = hours ? hours : 12;
 
     const time = `${hours}:${minutes}`;
 
-    // Update HTML
+    // Update 
     document.getElementById('clock-day').textContent = day;
     document.getElementById('clock-date').textContent = date;
     document.getElementById('clock-time').textContent = time + ampm;
 }
 
-// Update every second to keep minutes accurate
+// 1s refresh
 setInterval(updateClock, 1000);
 
-// Initial call
+// Update clock
 updateClock();
 </script>

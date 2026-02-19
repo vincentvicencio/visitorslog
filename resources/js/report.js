@@ -13,29 +13,20 @@ window.reportFilters = {
     visitor_type: ''
 };
 
-// prefix url
+// Define the URL 
 let URL = '/reports/';
 
+// --- SETTABLE FUNCTION OVERRIDE FOR FILTERING --- 
 $(document).ready(function(){
-    // =================================Dropdown==================================
-// Allow Bootstrap dropdown menus to render without clipping inside responsive tables.
-    
-
-    // =================================Dropdown==================================
-    // =================================Buttons==================================
-    
-
+    // --- HANDLE DELETE BUTTON CLICK ---
     $(document).on('click', '.delete-btn', function () {
         const id = $(this).data('id');
-        const name = $(this).data('name') || "this visitor"; // Assuming you have data-name in your button
-        
+        const name = $(this).data('name') || "this visitor"; 
         if (!id) return;
-        
         openDeleteModal(id, name);
     });
-
+    // --- INITIALIZE DATATABLE ---
     $(document).on('click', '#openFilterBtn', function () {
-
         const modalEl = document.getElementById('filterModal');
         const modalInstance =
             bootstrap.Modal.getInstance(modalEl) ||
@@ -43,7 +34,7 @@ $(document).ready(function(){
 
         modalInstance.show();
     });
-
+    // --- EXPORT TO EXCEL ---
     $(document).on('click', '#exportReportBtn', function () {
         try {
             const filters = window.reportFilters || {};
@@ -90,15 +81,14 @@ $(document).ready(function(){
         }
     });
 
-
     // Handle Reset Button
     $(document).on('click', '.btn-secondary[href*="/report"]', function(e) {
         e.preventDefault();
 
-        // Reset form UI
+        // Reset
         $('#filterForm')[0].reset();
 
-        // IMPORTANT: clear the global filters
+        // Reset filters
         Object.assign(window.reportFilters, {
             date_from: '',
             date_to: '',
@@ -119,19 +109,19 @@ $(document).ready(function(){
     });
 
 
-}); // End of document.ready
+}); 
 
     $(document).on('click', '.view-button', function(e) {
-        // 1. Prevent the page from reloading
+        // Prevent default action
         e.preventDefault();
         
-        // 2. Get the image URL from the data-image attribute
+        // Get the image URL from the data attribute
         const imageUrl = $(this).data('image');
         
-        // 3. Set the src of the image inside the modal
+        // Set the image source in the modal
         $('#modalImage').attr('src', imageUrl);
         
-        // 4. Show the modal
+        // Show the modal
         $('#View_imageModal').modal('show');
     });
 
@@ -221,10 +211,10 @@ document.getElementById('btn_ok').addEventListener('click', function() {
         },
         success: function (response) {
 
-            // 1. Hide the confirmation modal
+            // Hide the confirmation modal
             notificationModal.hide();
 
-            // 2. Set the text and show the manual Bootstrap Toast (#DELETE)
+            // Set the text and show the manual Bootstrap Toast (#DELETE)
             $('#DeletetoastMessage').text(response.success || "Report Log Deleted Successfully!");
             
             const toastElement = document.getElementById('DELETE');
@@ -238,7 +228,7 @@ document.getElementById('btn_ok').addEventListener('click', function() {
                 $('#reportTable').DataTable().draw(false);
             }
 
-            // 3. Re-enable the button
+            // Re-enable the button
             $btn.prop('disabled', false).text('Yes');
             const modalEl = document.getElementById('filterModal');
             const modalInstance =
@@ -262,17 +252,11 @@ document.getElementById('btn_ok').addEventListener('click', function() {
 class ReportClassTable {
     constructor() {
         this.defaultFields  = []
-        // first parameter of your route
         this.url            = "/reports/"
-        // id name of your table listing in user
         this.table          = "#reportTable"
-        // module
         this.module         = "reports"
-        // form id
         this.form           = "#"
-        // offCanvas
         this.modal          = "#"
-        // add user form id
         this.formid         = "#"  
     }
 
@@ -309,10 +293,10 @@ class ReportClassTable {
             columns,
             self.url,
             columnDefs,
-            self.module,            // module
-            10,                   // pagination
-            window.reportFilters, // data
-            false                 // enableSearch
+            self.module,
+            10,
+            window.reportFilters,
+            false
         );
 
         $(self.table)

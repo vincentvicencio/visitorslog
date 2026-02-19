@@ -3,7 +3,6 @@
     <div class="modal-dialog modal-md">
         <div class="modal-content">
 
-
             <!-- Header -->
             <div class="modal-header">
                 <h5 class="modal-title" id="textInputModalLabel">Register Visitor ID</h5>

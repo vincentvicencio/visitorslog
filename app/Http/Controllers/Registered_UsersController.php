@@ -483,8 +483,7 @@ public function list(Request $request){
         $limit    = $request->input('length');
 
         $rawquery = RegisteredUser::with('userType')
-                    ->withoutTrashed()
-                    ->where('deleted_at', null)
+                    ->whereNull('deleted_at')
                     ->when($keywords, function ($query) use ($keywords) {
                         $query->where('user_name', 'LIKE', "%{$keywords}%")
                             ->orWhere('first_name', 'LIKE', "%{$keywords}%")
@@ -504,12 +503,12 @@ public function list(Request $request){
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
             $totalFiltered = count($temp);
        
         } else { 
        
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
      
             $totalFiltered = $totalRecords;
         }
