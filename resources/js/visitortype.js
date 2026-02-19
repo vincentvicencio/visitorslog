@@ -84,7 +84,7 @@ import Triggers from './common/triggers';
             // Add Button
             $('#addBtn').off('click').on('click', async function (e) {
                 e.preventDefault()
-                datahandling.clearForm(self.form)
+                    datahandling.clearForm(self.form)
                 container.showModal(self.modal)
         })
                     

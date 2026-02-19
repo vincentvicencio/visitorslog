@@ -36,9 +36,10 @@ $(document).ready(function () {
                     $('.toast').fadeOut('slow');
                 }, 2000);
                 $('#addVisitorForm')[0].reset();
-                $('#image_path').val(''); 
-                $('#photoPreview').css('display', 'none');
-                $('#photoPreview').attr('src', '');
+                photoPreview.src = "";
+                photoPreview.style.display = 'none';
+                video.style.display = 'block'; 
+                imageInput.value = ""; 
             },
             error: function (xhr, status, error) {
                 console.error('Save error:', error, xhr);
@@ -64,20 +65,46 @@ $(document).ready(function () {
 
     $(document).on('click', '#clrBtn', function () {
         $('#addVisitorForm')[0].reset();
-        $('#photoPreview').css('display', 'none');
-        $('#photoPreview').attr('src', '');
-        $('#imageInput').val(''); 
+        photoPreview.src = "";
+        photoPreview.style.display = 'none';
+        video.style.display = 'block'; 
+        imageInput.value = ""; 
     });
 
     $('#captureBtn').on('click', function () {
         $('#imageInput').click();
     });
 
-    $('#recaptureBtn').on('click', function () {
-        $('#photoPreview').css('display', 'none');
-        $('#photoPreview').attr('src', '');
-        $('#imageInput').val(''); 
-
+    $('#imageInput').on('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                Triggers.showToast('Invalid file type. Please upload an image.', 1);
+                return;
+            }
+            
+            // Validate file size
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                Triggers.showToast('File size exceeds 5MB limit.', 1);
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                $('.imgholder').html(`<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`);
+            };
+            reader.onerror = function (error) {
+                console.error('FileReader error:', error);
+                Triggers.showToast('Failed to read image file.', 1);
+            };
+            reader.onabort = function () {
+                Triggers.showToast('Image read was cancelled.', 1);
+            };
+            reader.readAsDataURL(file);
+        }
     });
 
     $(document).on('click', '#viewBtn', function () {
@@ -269,16 +296,6 @@ $(document).ready(function () {
                 {},
                 false 
             );
-            
-
-            
-
-            // =====================================================
-            //  DEBUG: LOG AJAX RESPONSE
-            // =====================================================
-            $(self.table).on('xhr.dt', function (e, settings, json) {
-                console.log(' AJAX RESPONSE:', json);
-            });
 
             // =====================================================
             //  INIT COMPLETE (SAFE API ACCESS)
@@ -313,11 +330,11 @@ $(document).ready(function () {
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();
 
-    // 1. Start the Webcam automatically on page load
+    // 1. Start the webcam
     async function startWebcam() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "user" }, // "user" for front, "environment" for back
+                video: { facingMode: "user" }, 
                 audio: false 
             });
             video.srcObject = stream;
@@ -327,30 +344,30 @@ $(document).ready(function () {
         }
     }
 
-    // 2. Capture the frame
-    // captureBtn.addEventListener('click', () => {
-    //     const context = canvas.getContext('2d');
-    //     // Set canvas size to match video dimensions
-    //     canvas.width = video.videoWidth;
-    //     canvas.height = video.videoHeight;
+    // 2. Capture photo
+    captureBtn.addEventListener('click', () => {
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
         
-    //     // Draw the current video frame to the canvas
-    //     context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Draw the current video frame to the canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-    //     // Convert the canvas image to a data URL
-    //     const imageData = canvas.toDataURL('image/png');    
+        // Convert the canvas image to a data URL
+        const imageData = canvas.toDataURL('image/png');    
         
-    //     // Display the captured image
-    //     photoPreview.src = imageData;
-    //     photoPreview.style.display = 'block';
-    //     video.style.display = 'none'; 
-    //     imageInput.value = imageData; 
-    // });
+        // Display the captured image
+        photoPreview.src = imageData;
+        photoPreview.style.display = 'block';
+        video.style.display = 'none'; 
+        imageInput.value = imageData; 
+    });
 
+    // 3. Recapture photo
     recaptureBtn.addEventListener('click', () => {
         photoPreview.src = "";
         photoPreview.style.display = 'none';
-        video.style.display = 'block'; // Hide video once captured
+        video.style.display = 'block'; 
         imageInput.value = ""; 
     });
     startWebcam();

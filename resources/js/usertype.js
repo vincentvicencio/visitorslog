@@ -8,11 +8,8 @@ class UserTypeTable {
         this.defaultFields  = []
         this.url            = "/userTypes/"
         this.table          = "#userTypeTable"
-        // module
         this.module         = "usertype"
-        // form id
         this.form           = "#add_type_form"
-        // offCanvas
         this.modal          = "#addTypeModal"
     }
 
@@ -47,8 +44,8 @@ class UserTypeTable {
             self.url,
             columnDefs,
             self.module,
-            10,          // pagination
-            {},           // data
+            10,
+            {},
             false
         );
 

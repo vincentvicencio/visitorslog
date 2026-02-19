@@ -112,9 +112,9 @@ class Datatable {
             // Make bottom row flex container
                 const $bottom = $(this.api().table().container()).find('div.bottom');
                 $bottom.css({
-                    display:        'flex',
-                    alignItems:     'center',
-                    justifyContent: 'space-between' // info left, pagination right
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
                 });
             },
             drawCallback: function () { component.initializeButtons(table, url,module) }

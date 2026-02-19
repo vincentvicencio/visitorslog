@@ -4,14 +4,13 @@ import settable from './common/settable';
 import container from './common/container';
 import datahandling from './common/datahandling';
 
-    // TABLE
+    // RegisterIdTable
     class RegisterIdTable {
         constructor() {
             this.defaultFields  = []
             this.url            = "/registerId/"
             this.table          = "#registerIdTable"
             this.module         = "registeredid"
-            // form iddt-type-numeric
             this.form           = "#textInputForm"
             this.modal          = "#registerIDModal"
         }
