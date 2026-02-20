@@ -8,22 +8,22 @@ class Triggers {
     async showToast(msg, err = 0) {
         $('.toast-body strong').text(msg);
         $('.toast').css('z-index', 10000);
+        $('.toast').removeClass('bg-danger bg-success');
+        $('.toast').addClass(err > 0 ? 'bg-danger' : 'bg-success');
         $('.toast').fadeIn('slow');
-        $('.toast').addClass(err > 0 ? 'bg-danger' : 'bg-success')
 
         setTimeout(() => {
             $('.toast').fadeOut('slow');
         }, 2000);
 
     }
-
     /**
-     *
      * @param container_id = modal id
      * @param title    = title
      * @param message  = message
      * @param id       = record id
      */
+
     async showNotification(container_id, title, message, id) {
 
         $(".notification-message").empty()
@@ -74,16 +74,15 @@ class Triggers {
     async removeAllError() {
         $('.error-span').empty();
     }
-
     /**
      * Remove Error on input = auto remove when has input value
      * @param formid = form id
      */
     async removeErrorOnInput(formid) {
-        let self = this
+        let self = this;
         $(formid).find(':input').on('input', function (e) {
-            var index = $(this).attr('name');
-            if ($(this).val() != '') self.removeError(index);
+            var index = $(this).attr('id');
+            if ($(this).val() != '' && index) self.removeError(index);
         });
     }
 }

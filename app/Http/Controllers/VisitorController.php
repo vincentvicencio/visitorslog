@@ -6,24 +6,16 @@ use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\VisitorType;
 use App\Models\RegisteredID;
-use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
+use Illuminate\Support\Str;
 class VisitorController extends Controller
 {
     public function index()
     {
-        $visitors = Visitor::where('status', 0)
-                   ->whereNull('time_out')
-                   ->orderBy('id', 'desc')
-                   ->get();
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'desc')
-                   ->get();
-        $empMap = collect(session('all_emp'))->keyBy('emp_code');
-        return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+         return view('pages.visitorslog.visitorlog');
     }
     public function form()
     {
@@ -37,21 +29,34 @@ class VisitorController extends Controller
     }
 
     public function list(Request $request){
-
         $keywords = strtolower($request->search);
-
         $limit    = $request->input('length');
+
 
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
-                ->where('status', 0)
+                ->where(function ($query) {
+                    $userLocations = []; 
+
+                    foreach ((array) Auth::user()->location as $loc) {
+                        $userLocations[] = (int) $loc;
+                    }
+                    $query->where(function ($q) {
+                        $q->where('status', 0)
+                        ->orWhereNull('status');
+                    })->whereIn('location', $userLocations);
+
+                })
+
+
+
                 ->when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
                         $q->where('full_name', 'LIKE', "%{$keywords}%")
                         ->orWhere('visitor_id', 'LIKE', "%{$keywords}%")
                         ->orWhere('phone_number', 'LIKE', "%{$keywords}%")
                         ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-                            $qt->where('first_name', 'LIKE', "%{$keywords}%");
+                            $qt->where('name', 'LIKE', "%{$keywords}%");
                         });
                     });
                 });
@@ -65,7 +70,7 @@ class VisitorController extends Controller
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get(); 
             $totalFiltered = count($temp);
        
         } else { 
@@ -82,6 +87,7 @@ class VisitorController extends Controller
             $locationLabel = '';
 
             $location = collect(session('all_location'));
+
             foreach ($location as $record) {
                 if($d->location == $record['id']){
                     $locationLabel = $record['name'];
@@ -115,16 +121,24 @@ class VisitorController extends Controller
             $time_in = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
-                    
-            $newData[$i] = [
-                'full_name' => '<div class="text-center">   
-                                    <strong>' . $d->full_name . '</strong>
-                                    <br><small>' . $locationLabel . '</small>
-                                    <br><small>' . $d->phone_number . '</small>
-                                <div>
-                ',
 
-                'visitor_type' => '<div class="text-center">' . $d->visitorType->name . '</div>',
+            $createdby = $d->created_by ? user_name($d->created_by) : '-';
+            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
+            $fullName = '<div class="text-center">
+                <strong>' . $d->full_name . '</strong>';
+
+                if (Auth::user()->user_type != 3) {
+                    $fullName .= '<br><small>' . $locationLabel . '</small>';
+                }
+
+                $fullName .= '<br><small>' . $d->phone_number . '</small>
+                            </div>';
+            $newData[$i] = [
+                
+
+                'full_name' => $fullName,
+
+                'visitor_type' => '<div class="text-center">' . ($d->visitorType?->name ?? '-') . '</div>',
 
                 'visitor_id' => '<div class="text-center">' . $d->visitor_id . '</div>',
 
@@ -143,8 +157,8 @@ class VisitorController extends Controller
                                 </small>
                             </div>',
                 'creator' => '<div class="text-center">
-                                <small><strong>Created: </strong>'. $d->getEmpName($d->created_by) .'</small><br>
-                                <small><strong>Updated: </strong>'. ($d->getEmpName($d->updated_by) ?? "-") .'</small>
+                                <small><strong>Created: </strong>'. $createdby .'</small><br>
+                                <small><strong>Updated: </strong>'. $updatedby .'</small>
                             </div>',
                 
                 'status' => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
@@ -216,7 +230,7 @@ class VisitorController extends Controller
         $visitor->update([
             'time_out' => Carbon::now(),
             'status'   => 1,
-            'updated_by' => Auth::id(),
+            'updated_by' => Auth::user()->id,
         ]);
 
         return response()->json([
@@ -230,7 +244,6 @@ class VisitorController extends Controller
         ]);
 
         $visitor = Visitor::where('id', $request->id)
-            ->where('status', 0)
             ->latest('id')
             ->first();
 
@@ -248,15 +261,33 @@ class VisitorController extends Controller
 
     }
 
+    public function search(Request $request)
+    {
+        $id = $request->input('id'); // make sure this is numeric
+        $user = Visitor::find($id);
 
+        if ($user) {
+            return response()->json([
+                'success' => true,
+                'data'    => $user
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found.'
+        ]);
+    }
 
     public function save(Request $request)
     {
+       
         $request->validate([
-            'first_name'   => 'required|string',
-            'middle_name'  => 'nullable|string',
-            'last_name'    => 'required|string',
-            'visitor_type' => 'required|exists:visitor_types,id',
+            'first_name'        => 'required|string',
+            'middle_name'       => 'nullable|string',
+            'last_name'         => 'required|string',
+            'visitor_type'      => 'required|exists:visitor_types,id',
+            'contact_number'    => ['required','min:11','max:11','regex:/^[0-9]+$/','starts_with:09'],
 
             'id_number' => [
                 'required',
@@ -281,7 +312,15 @@ class VisitorController extends Controller
                 },
             ],
 
-            'image_path' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            [
+                'contact_number.required' => 'Contact Number is required',
+                'contact_number.max' => 'Contact Number must not exceed 11 digits',
+                'contact_number.min' => 'Contact Number must be at least 11 digits',
+                'contact_number.regex' => 'Contact Number must contain only numbers',
+                'contact_number.starts_with' => 'Contact Number must start with 09',
+            ],
+
+            'image_path' => 'nullable|',
         ]);
 
 
@@ -289,31 +328,54 @@ class VisitorController extends Controller
         try {
             // Handle image upload
             $imagePath = null;
-            if ($request->hasFile('image_path')) {
-                $imagePath = $request->file('image_path')->store('visitors', 'public');
-            }
-            $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
-            // $location = collect(session('all_location'));
-            // foreach ($location as $record) {
-            //     $data[] = [
-            //         'id'   => $record['id'], // Ensure 'id' exists in your session array
-            //         'text' => $record['name']
-            //     ];
-            // }
-            // Save visitor
+
+        if ($request->image_path) {
+            $image = $request->image_path;
+
+            // Remove metadata (data:image/png;base64,)
+            $image = preg_replace('/^data:image\/\w+;base64,/', '', $image);
+
+            // Decode base64
+            $image = base64_decode($image);
+
+            // Generate filename
+            $fileName = 'visitors/' . Str::random(20) . '.png';
+
+            // Save to public disk
+            Storage::disk('public')->put($fileName, $image);
+
+            $imagePath = $fileName;
+        }
+            $middleInitial = collect(preg_split('/\s+/', trim($request->middle_name)))
+                ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
+                ->implode('');
+
+            $userLocations = []; 
+
+                foreach ((array) Auth::user()->location as $loc) {
+                    $userLocations[] = (int) $loc;
+                }
             $visitor = new Visitor();
-            $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
+            // clint - remove dot when there is no middle name
+            if (!empty($middleInitial)) {
+                $visitor->full_name = $request->first_name . ' ' . $middleInitial . '. ' . $request->last_name;
+            } else {
+                $visitor->full_name = $request->first_name . ' ' . $request->last_name;
+            }
+            // original code - kardo
+            // $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
             $visitor->first_name   = $request->first_name;
             $visitor->middle_name  = $request->middle_name;
             $visitor->last_name    = $request->last_name;
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = Auth::user()->location_id;
+            $visitor->location     = $userLocations[0];
             $visitor->address     = $request->address;
-            $visitor->created_by   = Auth::id();
+            $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
+            $visitor->status       = 0;
             $visitor->save();
 
 

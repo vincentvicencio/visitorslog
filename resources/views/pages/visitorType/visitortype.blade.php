@@ -1,7 +1,9 @@
 @extends('layout')
 
 @section('content')
+
 <div class="user-types-container mt-4">
+    {{-- header --}}
     <div class="page-header">
         <div class="header-content">
             <div class="page-title fs-2">Visitor Type</div>
@@ -12,30 +14,18 @@
             Add Visitor Type
         </div>
     </div>
-    <!-- table.scss -->
+    <!-- table holder -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
         <!-- search and filter -->
         <x-table-filter/>
-
         <!-- table -->
-        <table class="table table-bordered align-middle" id="visitorsTable">
-            <thead></thead>
-        </table>
-
-        <!-- Pagination -->
-        <x-table-pagination/>
+        <table class="table table-bordered align-middle" id="visitorsTable"><thead></thead></table>
     </div>
-
-    
-
-    
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
-@push('scripts')
-    @vite(['resources/js/visitortypeClass.js', 'resources/js/visitortype.js'])
-@endpush
-
+@include('components.triggers.visitorTypeModal')
 @endsection
 
+@push('scripts')
+@vite(['resources/js/visitortype.js'])
+@endpush

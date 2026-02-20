@@ -48,6 +48,11 @@ class LoginController extends Controller
     {
         return 'emp_code';
     }
+
+    protected function guard()
+    {
+        return Auth::guard('employee');
+    }
     
     public function __construct()
     {
@@ -69,18 +74,67 @@ class LoginController extends Controller
         return redirect('/login');
     }
 
-    protected function authenticated(Request $request, $user)
-{
-    // Determine employee code
-    $emp_code = isset($user->emp_code) ? $user->emp_code : $user->tr_no;
+    // protected function authenticated(Request $request, $user)
+    // {
+    //     // Determine employee code
+    //     $emp_code = isset($user->emp_code) ? $user->emp_code : $user->tr_no;
 
-    // Fetch all employee data
-    $this->fetch_emp_data('all_emp');
-    $this->fetch_api_data('all_location', 'location');
-    $location = collect(session('all_location'));
-    return redirect()->route('visitorslog'); // ADMIN
-}
+    //     // Fetch all employee data
+    //     $this->fetch_emp_data('all_emp');
+    //     $this->fetch_api_data('all_location', 'location');
+    //     $location = collect(session('all_location'));
+    //     return redirect()->route('visitorslog'); // ADMIN
+    // }
 
+    // app/Http/Controllers/Auth/LoginController.php
+
+    // protected function authenticated(Request $request, $user)
+    // {
+        
+    //     // 1. Look up the user in the registered_users table using the emp_code
+    //     $registeredUser = RegisteredUser::where('user_name', $user->emp_code)->first();
+
+    //     // 2. If the user isn't in our registered_users table, kick them out
+    //     if (!$registeredUser) {
+    //         Auth::logout();
+    //         return redirect('/login')->with('error', 'Your account is not authorized to access this system.');
+    //     }
+
+    //     // 3. Store the user_type in the session so we can use it in sidebars and views
+    //     session(['user_type' => $registeredUser->user_type]);
+
+    //     // Fetch existing API data (from your original code)
+    //     $this->fetch_emp_data('all_emp');
+    //     $this->fetch_api_data('all_location', 'location');
+
+    //     return redirect()->route('visitorslog');
+    // }
+
+    
+    protected function attemptLogin(Request $request)
+    {
+        return Auth::guard('employee')->attempt(
+            $this->credentials($request),
+            $request->filled('remember')
+        );
+    }
+
+
+    public function authenticated(Request $request, $sessionKey)
+    {
+
+        $registeredUser = RegisteredUser::where('user_name', $request->emp_code)->first();
+        if ($registeredUser->user_type != 3){
+            $registeredUser->update(['password' => NULL]);
+        }
+
+        $this->fetch_emp_data('all_emp');
+        $this->fetch_api_data('all_location', 'location');
+
+        // return redirect()->route('visitorslog');
+
+    }
+    
     private function fetch_emp_data($sessionKey){
         if(!Session::has($sessionKey)){
             $payload = [
@@ -119,7 +173,6 @@ class LoginController extends Controller
         else{
             $api_data = Session::get($sessionKey);
         }
-
         return $api_data;
     }
 }

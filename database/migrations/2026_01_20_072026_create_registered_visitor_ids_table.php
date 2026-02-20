@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->integer('visitor_type');
             $table->string('id_number');
-            $table->string('created_by');
-            $table->string('updated_by');
-            $table->string('deleted_by');
-            $table->timestamp('created_at');
-            $table->timestamp('updated_at');
-            $table->timestamp(column: 'deleted_at');
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
+            $table->string('deleted_by')->nullable();
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
+            $table->timestamp( 'deleted_at')->nullable();
         });
     }
 

@@ -6,23 +6,22 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
-    <!-- ✅ Bootstrap 5.3 CSS -->
+    <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     
-    <!-- ✅ Bootstrap Icons -->
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- ✅ DataTables CSS -->
+    <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
-    <!-- ✅ Your compiled CSS -->
+    <!-- Your compiled CSS -->
     @vite(['resources/sass/app.scss'])
 
     <!-- Scripts -->
@@ -40,12 +39,8 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
 
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
+                    <!-- Left Navbar -->
                     <ul class="navbar-nav ms-auto">
                         <!-- Authentication Links -->
                         @guest
@@ -89,18 +84,18 @@
     <main class="">
             @yield('content')
         </main>
-    <!-- ✅ jQuery -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- ✅ DataTables JS -->
+    <!-- DataTables JS -->
      <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <!-- ✅ Bootstrap 5.3 JS (Bundle includes Popper) -->
+    <!-- Bootstrap 5.3 JS (Bundle includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- ✅ Your compiled app scripts -->
+    <!-- Your compiled app scripts -->
      @vite(['resources/js/app.js', 'resources/js/RegisteredId.js'])
 
 </body>

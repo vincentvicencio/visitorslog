@@ -3,14 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\User_types;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class RegisteredUser extends Model
+class RegisteredUser extends Authenticatable
 {
     use SoftDeletes;
     protected $table = 'registered_users';
-    protected $fillable = ['user_name',
+    protected $fillable = [
+    'user_name',
     'first_name',
     'last_name',
     'password',
@@ -20,6 +22,10 @@ class RegisteredUser extends Model
     'deleted_by',
     'deleted_at',
     'location',
+    ];
+
+    protected $casts = [
+        'location' => 'array',
     ];
 
     public function userType()

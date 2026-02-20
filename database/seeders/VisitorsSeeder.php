@@ -16,14 +16,14 @@ public function run(): void
     DB::table('visitors')->insert([
         [
             // Varchars (Strings)
+            'full_name'    => 'Charle B. Loreto',
             'first_name'   => 'Charle',
-            'middle_name'  => 'N/A', 
+            'middle_name'  => 'B', 
             'last_name'    => 'Loreto',
             'phone_number' => '09123456789',
             'image_path'   => 'default.png',
-            'created_by'   => 'System',
-            'updated_by'   => 'System',
-            'deleted_by'   => 'None',
+            'created_by'   => 1,
+            'updated_by'   => 1,
 
             // Integers (Numbers only - NO strings like 'Summit One')
             'visitor_type' => 1, 
@@ -33,10 +33,8 @@ public function run(): void
 
             // Timestamps
             'time_in'      => now(),
-            'time_out'     => now()->addHours(2),
             'created_at'   => now(),
             'updated_at'   => now(),
-            'deleted_at'   => now(), // Your DB says this cannot be null!
         ]
     ]);
 }

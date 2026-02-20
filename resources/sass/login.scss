@@ -6,75 +6,73 @@
     width: 800px;
     
     .main-card-panel{
-        width: 50%;
-        height: 600px;
-        border-radius: 10px;
+      width: 50%;
+      height: 600px;
+      border-radius: 10px;
 
-        &#panel-01{
-            background-image: linear-gradient(135deg,#0F4383 , #145AB0, #3492E9);
-            box-sizing: border-box;
+      &#panel-01{
+        background-image: linear-gradient(135deg,#0F4383 , #145AB0, #3492E9);
+        box-sizing: border-box;
 
-            .background-logo{
-              opacity: 0.05;
-              transform: translate(-50%, 0);
-            }
+        .background-logo{
+            opacity: 0.05;
+            transform: translate(-50%, 0);
         }
-        &#panel-02{
-            form{
-              .form-header{
-                position: relative;
-                height: 60px;
-                
-                img{
-                  filter: invert(100%);
-                  opacity: 0.1;
-                }
-                .form-mainheader{
-                  color: #0F4383;
-                }
-                .form-subheader{
-                  margin-top: -10px;
-                  color: gray;
-                }
-              }
-              .input-holder{
-                margin-bottom: 10px;
-                
-                label{
-                  color: #0F4383;
-                  font-weight: bold;
-                }
-                input{
-                  border: none;
-                  border-radius: 10px;
-                  padding: 10px;
-                  background-color: #0f438318;
-                  width: 100%;
-                }
-              }
-              .login-button{
-                a{
-                  color: rgba(128, 128, 128, 0.5);
-                }
-                a:hover{
-                  color: gray;
-                }
-                button{
-                  background-color: #0F4383;
-                  width: 120px;
-                }
-                button:hover{
-                  background-color: #0f438381;
-                  transition: 0.2s;
-                }
-              }
-
-              
+      }
+      &#panel-02{
+        form{
+          .form-header{
+            position: relative;
+            height: 60px;
+            
+            img{
+              filter: invert(100%);
+              opacity: 0.1;
             }
-
+            .form-mainheader{
+              color: #0F4383;
+            }
+            .form-subheader{
+              margin-top: -10px;
+              color: gray;
+            }
+          }
+          .input-holder{
+            margin-bottom: 10px;
+            
+            label{
+              color: #0F4383;
+              font-weight: bold;
+            }
+            input{
+              border: none;
+              border-radius: 10px;
+              padding: 10px;
+              background-color: #0f438318;
+              width: 100%;
+            }
+          }
+          .login-button{
+            a{
+              color: rgba(128, 128, 128, 0.5);
+            }
+            a:hover{
+              color: gray;
+            }
+            button{
+              background-color: #0F4383;
+              width: 120px;
+            }
+            button:hover{
+              background-color: #0f438381;
+              transition: 0.2s;
+            }
+          }
         }
+      }
     }
   }
+
   .center-card {
     position: fixed;
     width: 100%;
@@ -104,7 +102,6 @@
         display: flex !important;
       }
     }
-
   }
 }
 

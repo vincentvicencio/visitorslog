@@ -19,7 +19,6 @@
         color: inherit;
         cursor: pointer;
     }
-
     .side-menu-icon-1{
         box-sizing: border-box;
         height: 120px;
@@ -46,10 +45,6 @@
         color: rgba(128, 128, 128, 0.6);
         letter-spacing: 2px;
         font-size: 16px;
-
-    }
-    .side-menu-icon-bg{
-        z-index: 0;
     }
     .sidebar-menu{
         padding: 2px;
@@ -65,8 +60,8 @@
         display: flex;
         cursor: pointer;
         transition: 0.2s;
-
-    }.logout-button{
+    }
+    .logout-button{
         border-radius: 8px;
         padding:5px;
         box-sizing: border-box;
@@ -89,7 +84,6 @@
         height: 40%;
         padding: 5px;
         z-index: 1;
-        
     }
     .user{
         width: 100%;
@@ -146,6 +140,7 @@ body {
     transition: margin-left 0.3s ease;
     padding: 20px 60px 60px 60px;
 }
+
 @media (max-width: 880px) {
     body {
         margin-left: 0;
