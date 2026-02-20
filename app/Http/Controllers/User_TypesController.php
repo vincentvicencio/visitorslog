@@ -20,8 +20,8 @@ class User_TypesController extends Controller
                 'name'              => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
             ],
             [
-                'name.required'              => 'Name is Required',
-                'name.regex'        => 'Role Name must contain letters only'
+                'name.required'     => 'User Type is Required',
+                'name.regex'        => 'User Type must contain letters only'
             ]
         );
 
@@ -43,7 +43,7 @@ class User_TypesController extends Controller
         if($duplicateQuery->exists()){
             return response()->json([
                 'status'    => 1,
-                'message'   => 'Name Already Exists'
+                'message'   => 'User Type Already Exists'
             ]);
 
         }
@@ -57,10 +57,10 @@ class User_TypesController extends Controller
             $oldData    = $status->getOriginal();
 
             $status     = $status->update(['updated_by' => $emp_code] + $data);
-            $message    = 'UserType Successfully Updated';
+            $message    = 'User Type Successfully Updated';
         } else {
             $status     = User_types::create(['created_by' => $emp_code] + $data);
-            $message    = 'UserType Status Successfully Created';
+            $message    = 'User Type Successfully Created';
         }
         return response()->json([
             'status'    => 0,

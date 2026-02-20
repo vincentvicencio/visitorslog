@@ -28,11 +28,11 @@ class RegisterIDController extends Controller
                 'visitorType'        => 'required|exists:visitor_types,id',
             ],
             [
-                'name.required'     => 'Name is Required',
-                'name.regex'        => 'Name must contain only numbers',
-                'name.max'          => 'Name must not exceed 4 digits',
-                'name.min'          => 'Name must be at least 4 digits',
-                'visitorType'       => 'required|exists:visitor_types,id',
+                'name.required'           => 'Visitor ID is Required',
+                'name.regex'              => 'Visitor ID must contain only numbers',
+                'name.max'                => 'Visitor ID must not exceed 4 digits',
+                'name.min'                => 'Visitor ID must be at least 4 digits',
+                'visitorType.required'    => 'Visitor Type is Required',
             ]
         );
 
@@ -54,7 +54,7 @@ class RegisterIDController extends Controller
         if($duplicateQuery->exists()){
             return response()->json([
                 'status'    => 1,
-                'message'   => 'Name Already Exists'
+                'message'   => 'Visitor ID Already Exists'
             ]);
 
         }
@@ -69,10 +69,10 @@ class RegisterIDController extends Controller
             $oldData    = $status->getOriginal();
 
             $status     = $status->update(['updated_by' => $emp_code] + $data);
-            $message    = 'Registered ID Successfully Updated';
+            $message    = 'Visitor ID Successfully Updated';
         } else {
             $status     = RegisteredID::create(['created_by' => $emp_code] + $data);
-            $message    = 'Registered ID Successfully Created';
+            $message    = 'Visitor ID Successfully Created';
         }
         return response()->json([
             'status'    => 0,

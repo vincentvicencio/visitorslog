@@ -22,10 +22,11 @@ class VisitorTypeController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name'              => 'required',
+                'name'              => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
             ],
             [
-                'name'              => 'Name is Required'
+                'name.required'     => 'Visitor Type is Required',
+                'name.regex'        => 'Visitor Type must contain letters only'
             ]
         );
 
@@ -47,7 +48,7 @@ class VisitorTypeController extends Controller
         if($duplicateQuery->exists()){
             return response()->json([
                 'status'    => 1,
-                'message'   => 'Name Already Exists'
+                'message'   => 'Visitor Type Already Exists'
             ]);
 
         }
