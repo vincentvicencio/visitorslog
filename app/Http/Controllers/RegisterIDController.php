@@ -28,11 +28,11 @@ class RegisterIDController extends Controller
                 'visitorType'        => 'required|exists:visitor_types,id',
             ],
             [
-                'name.required'     => 'Name is Required',
-                'name.regex'        => 'Name must contain only numbers',
-                'name.max'          => 'Name must not exceed 4 digits',
-                'name.min'          => 'Name must be at least 4 digits',
-                'visitorType'       => 'required|exists:visitor_types,id',
+                'name.required'           => 'Visitor ID is Required',
+                'name.regex'              => 'Visitor ID must contain only numbers',
+                'name.max'                => 'Visitor ID must not exceed 4 digits',
+                'name.min'                => 'Visitor ID must be at least 4 digits',
+                'visitorType.required'    => 'Visitor Type is Required',
             ]
         );
 
@@ -54,7 +54,6 @@ class RegisterIDController extends Controller
         if($duplicateQuery->exists()){
             return response()->json([
                 'status'    => 1,
-                'title'     => 'Error',
                 'message'   => 'Visitor ID Already Exists'
             ]);
 
