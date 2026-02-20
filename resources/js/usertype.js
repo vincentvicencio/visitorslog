@@ -7,15 +7,10 @@ import component from './common/component';
 class UserTypeTable {
     constructor() {
         this.defaultFields  = []
-        // first parameter of your route
         this.url            = "/userTypes/"
-        // id name of your table listing in user
         this.table          = "#userTypeTable"
-        // module
         this.module         = "usertype"
-        // form id
         this.form           = "#add_type_form"
-        // offCanvas
         this.modal          = "#addTypeModal"
     }
 
@@ -50,8 +45,8 @@ class UserTypeTable {
             self.url,
             columnDefs,
             self.module,
-            10,          // pagination
-            {},           // data
+            10,
+            {},
             false
         );
 
@@ -59,7 +54,7 @@ class UserTypeTable {
 
             const tableApi = $(self.table).DataTable();
 
-            // FORCE DRAW
+            // Redraw table after initialization to ensure proper rendering
             tableApi.draw();
 
             // =========================================
@@ -73,7 +68,7 @@ class UserTypeTable {
 
             // =========================================
             // ENTRIES PER PAGE
-            // =================================
+            // =========================================
             $('#entriesPerPage')
                 .off('change')
                 .on('change', function () {

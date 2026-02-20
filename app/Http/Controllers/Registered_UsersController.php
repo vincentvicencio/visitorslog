@@ -5,18 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\RegisteredUser;
 use App\Models\User_types;
-use App\Models\VisitorType;
-use App\Models\Visitor;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class Registered_UsersController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
          return view('pages.registerUser.users');
     }
@@ -443,7 +439,6 @@ public function edit(Request $request, $id)
     
     // Placeholder
     $data[] = ['id' => '', 'text' => 'Choose Location/Site'];
-    // dd($data);
         foreach ($location as $record) {
         $data[] = [
             'id'   => $record['id'], // Ensure 'id' exists in your session array
@@ -491,10 +486,11 @@ public function list(Request $request){
         $limit    = $request->input('length');
 
         $rawquery = RegisteredUser::with('userType')
-                    ->withoutTrashed()
-                    ->where('deleted_at', null)
+                    ->whereNull('deleted_at')
                     ->when($keywords, function ($query) use ($keywords) {
                         $query->where('user_name', 'LIKE', "%{$keywords}%")
+                            ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+                            ->orWhere('last_name', 'LIKE', "%{$keywords}%")
                             ->orWhereHas('userType', function ($q) use ($keywords) {
                                 $q->where('name', 'LIKE', "%{$keywords}%");
                             });
@@ -510,12 +506,12 @@ public function list(Request $request){
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
             $totalFiltered = count($temp);
        
         } else { 
        
-            $data          = $rawquery->orderby("id", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
      
             $totalFiltered = $totalRecords;
         }
@@ -528,10 +524,10 @@ public function list(Request $request){
             $newData[$i] = [
                 'user_name'  => $d->first_name . ' ' . $d->last_name, // show emp_code in first column
                 'user_type'  => $d->userType->name ?? '-',
-                'created_by' => user_name($d->created_by) ?? '-',
-                'updated_by' => user_name($d->updated_by) ?? '-',
-                'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
-                'updated_at' => $d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l'),
+                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
+                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
+                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l')) : '-',
+                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l')) : '-',
                 'action'            => '<div class="dropdown text-center">
                                         <button class="btn btn-sm btn-primary dropdown-toggle" 
                                                 type="button" 
@@ -541,7 +537,7 @@ public function list(Request $request){
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
-                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
+                                            <li><a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
                                         </ul>
                                     </div>' 
             ];
@@ -578,7 +574,7 @@ public function list(Request $request){
         $record->update(['deleted_by' => Auth::user()->id]);
         $record->delete();
 
-        $message    = 'Registered ID Successfully Deleted';
+        $message    = 'Registered User Successfully Deleted';
             return response()->json([
                 'status'    => 0,
                 'message'   => $message
@@ -595,7 +591,7 @@ public function list(Request $request){
         } catch (\Exception $e) {
             return response()->json(['message' => 'An error occurred while deleting the Registered User.'], 500);
         }
-    } 
+    }   
 
     public function update(Request $request, $id)
     {

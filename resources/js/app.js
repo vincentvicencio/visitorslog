@@ -9,6 +9,6 @@ import select2 from 'select2';
 // Important: Initialize the plugin
 select2(); 
 
-// Make jQuery global so the plugin can find it in the window scope
+// Make jQuery available globally
 window.$ = window.jQuery = $;
 window.bootstrap = bootstrap;

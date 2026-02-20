@@ -5,7 +5,7 @@
             <img src="/images/Magellan_pure_white_logo.png" class="logo d-flex me-3" alt="">
         </div>   
         <div class="side-menu-icon-2 position-relative text-white d-flex flex-column justify-content-between align-items-center w-100">
-            <img src="/images/bgg.png" class="side-menu-icon-bg position-absolute top-0 start-0 w-100" alt="">
+            <img src="/images/bgg.png" class="position-absolute top-0 start-0 w-100" alt="" style="z-index: 0">
             <div id="live-clock" class="d-flex flex-column">
                 <div class="d-flex justify-content-between fw-bold fs-6 align-items-start">
                     <div id="clock-day" class="mt-n2"></div>
@@ -82,30 +82,30 @@
 function updateClock() {
     const now = new Date();
 
-    // Day (Monday)
+    // Day
     const day = now.toLocaleDateString('en-US', { weekday: 'long' });
 
-    // Date (January 12, 2004)
+    // Date
     const date = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    // Time (hour:minute)
+    // Time hh:mm
     let hours = now.getHours();
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
-    hours = hours ? hours : 12; // Convert 0 to 12 for 12AM
+    hours = hours ? hours : 12;
 
     const time = `${hours}:${minutes}`;
 
-    // Update HTML
+    // Update 
     document.getElementById('clock-day').textContent = day;
     document.getElementById('clock-date').textContent = date;
     document.getElementById('clock-time').textContent = time + ampm;
 }
 
-// Update every second to keep minutes accurate
+// 1s refresh
 setInterval(updateClock, 1000);
 
-// Initial call
+// Update clock
 updateClock();
 </script>

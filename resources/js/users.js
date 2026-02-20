@@ -9,7 +9,6 @@ import component from './common/component';
 const URL = '/registerUser/';
 
 class UsersTable {
-
     constructor() {
         this.defaultFields  = []
         this.url            = "/registerUser/"
@@ -67,7 +66,6 @@ class UsersTable {
             data: { q: empCode },
             timeout: 10000,
             success: function (response) {
-                console.log('Employee search response:', response); // Debug log
                 const results = response.results || [];
                 const exactMatch = results.find(emp => emp.id.toLowerCase() === empCode.toLowerCase());
 
@@ -110,8 +108,6 @@ class UsersTable {
         this.initializeButtons();
         this.initializeEmployeeSearchButton();
         component.createDropdown(self.url + 'get-user-type', '#reg_user_type',  null, self.modal);
-        // Removed undefined selectedValue usage
-        // component.createDropdown(URL + 'get-user-type', '#edit_location', selectedValue, '#editPopupContainer');
         this.location_dropdown();
         this.handleRoleChange();
     }
@@ -125,7 +121,6 @@ class UsersTable {
             const nameContainer = $('#employee_name_container');
             const empCodeContainer = $('#emp_code_container');
             const fieldsContainer = $('#reg_fields_container');
-            // Detect if editing by checking if reg_user_db_id has a value
             const isEditing = Boolean($('#reg_user_db_id').val());
 
             // Use role IDs: 1 = admin, 2 = receptionist, 3 = guard
@@ -133,7 +128,6 @@ class UsersTable {
             const isReceptionist = selectedRoleNum === 2;
             const isGuard = selectedRoleNum === 3;
 
-            // Destroy existing Select2 instances if they exist
             if (locationSelect.hasClass('select2-hidden-accessible')) {
                 locationSelect.select2('destroy');
             }
@@ -298,8 +292,8 @@ class UsersTable {
             self.url,
             columnDefs,
             self.module,
-            10,          //  pagination
-            {},          //  data
+            10,
+            {},
             false
         );
 
@@ -320,7 +314,7 @@ class UsersTable {
 
             // =========================================
             // ENTRIES PER PAGE
-            // =================================
+            // =========================================
             $('#entriesPerPage')
                 .off('change')
                 .on('change', function () {
@@ -332,7 +326,7 @@ class UsersTable {
 
     async initializeButtons(){
         const self = this;
-        // Show register user modal (for add)
+        // Add new user
         $('#reg_user').off('click').on('click', async function (e) {
             e.preventDefault();
             datahandling.clearForm(self.form);
@@ -340,12 +334,11 @@ class UsersTable {
             container.showModal(self.modal);
         });
 
-        // Submit user form
+        // Save
         $('#submit_user_btn').off('click').on('click', async function(e) {
             e.preventDefault();
             const formid    = self.form;
             const formdata  = new FormData($(formid)[0]);
-            // Ensure record_id is included (from hidden input or dataset)
             const idInput = document.getElementById('reg_user_db_id');
             const recordId = idInput?.value || idInput?.dataset?.id || '';
             if (recordId) {
@@ -355,7 +348,6 @@ class UsersTable {
             await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata);
         });
 
-        // Show edit modal (for edit, reuse add modal) using onLoadForm like usertype.js
         $(document).off('click', '.btn-edit').on('click', '.btn-edit', async function(e) {
             e.preventDefault();
             const userId = $(this).attr('data-id');
@@ -379,7 +371,10 @@ class UsersTable {
                 // Trigger change event on user type to update UI (after all values set)
                 $('#reg_user_type').trigger('change');
 
-                // Wait for location dropdown to be populated, then set value
+                // Fill usertype
+                $('#reg_user_type').trigger('change');
+
+                // Fill location
                 await self.location_dropdown(response.location_id);
                 if (Array.isArray(response.location_id)) {
                     $('#reg_location').val(response.location_id).trigger('change');
@@ -389,14 +384,12 @@ class UsersTable {
                     $('#reg_location').val('').trigger('change');
                 }
 
-                
-
-                // Always show and fill first/last name fields after role change
+                // Fill name
                 $('#employee_name_container').removeClass('d-none');
                 $('#reg_first_name').val(response.first_name || '');
                 $('#reg_last_name').val(response.last_name || '');
 
-                // Set readonly for admin/receptionist, editable for guard
+                // Fill user type
                 const roleName = (response.role_name || '').toLowerCase();
                 if (roleName === 'guard') {
                     $('#reg_first_name, #reg_last_name').prop('readonly', false);
@@ -404,7 +397,7 @@ class UsersTable {
                     $('#reg_first_name, #reg_last_name').prop('readonly', true);
                 }
 
-                // Show modal using container helper (like usertype.js)
+                // Show modal
                 container.showModal(self.modal);
             }
         } catch (error) {
@@ -416,7 +409,7 @@ class UsersTable {
     async location_dropdown(selectedValue = null) {
         const self = this;
 
-        // Destroy existing Select2 instance before re-initializing
+        // Destroy existing Select2
         if ($('#reg_location').hasClass('select2-hidden-accessible')) {
             $('#reg_location').select2('destroy');
         }

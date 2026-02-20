@@ -15,16 +15,15 @@ class User_TypesController extends Controller
     public function save(Request $request)
     {
         $validator = Validator::make(
-                $request->all(),
-                [
-                    'name' => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s]+$/'],
-                ],
-                [
-                    'name.required' => 'This Field is Required',
-                    'name.regex'    => 'Role Name must contain letters only',
-                ]
-            );
-
+            $request->all(),
+            [
+                'name'              => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
+            ],
+            [
+                'name.required'     => 'User Type is Required',
+                'name.regex'        => 'User Type must contain letters only'
+            ]
+        );
 
         if($validator->fails()){
             return response()->json(['status' => 1,'errors' => $validator->errors()]);
@@ -44,7 +43,7 @@ class User_TypesController extends Controller
         if($duplicateQuery->exists()){
             return response()->json([
                 'status'    => 1,
-                'message'   => 'Name Already Exists'
+                'message'   => 'User Type Already Exists'
             ]);
 
         }
@@ -58,10 +57,10 @@ class User_TypesController extends Controller
             $oldData    = $status->getOriginal();
 
             $status     = $status->update(['updated_by' => $emp_code] + $data);
-            $message    = 'UserType Successfully Updated';
+            $message    = 'User Type Successfully Updated';
         } else {
             $status     = User_types::create(['created_by' => $emp_code] + $data);
-            $message    = 'UserType Status Successfully Created';
+            $message    = 'User Type Successfully Created';
         }
         return response()->json([
             'status'    => 0,
@@ -108,9 +107,9 @@ class User_TypesController extends Controller
        
             $newData[$i] = [
                 'name'          => '<div class="text-center">' . $d->name . '</div>', // show emp_code in first column
-                'created_by' => user_name($d->created_by) ?? '-',
-                'updated_by' => user_name($d->updated_by) ?? '-',
-                'created_at' => '<div class="text-center">' . $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') . '</div>',
+                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
+                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
+                'created_at' => '<div class="text-center">' . ($d->created_at ? $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') : '-')  . '</div>',
                 'action'            => '<div class="dropdown text-center">
                                         <button class="btn btn-sm btn-primary dropdown-toggle" 
                                                 type="button" 
@@ -120,7 +119,7 @@ class User_TypesController extends Controller
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
-                                            <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
+                                            <li><a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
                                         </ul>
                                     </div>' 
             ];
@@ -154,7 +153,7 @@ class User_TypesController extends Controller
     public function delete(Request $request){
         $record  = User_types::find($request->id);
         $details = $record->name;
-        $record->update(['deleted_by' => Auth::user()->emp_code]);
+        $record->update(['deleted_by' => Auth::user()->id]);
         $record->delete();
 
         $message    = 'User Type Successfully Deleted';

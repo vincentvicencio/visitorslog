@@ -33,9 +33,8 @@ public function run(): void
 
             // Timestamps
             'time_in'      => now(),
-            'time_out'     => now()->addHours(2),
             'created_at'   => now(),
-            'updated_at'   => now(), // Your DB says this cannot be null!
+            'updated_at'   => now(),
         ]
     ]);
 }

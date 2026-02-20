@@ -5,12 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\VisitorType;
-use App\Models\UserType;
-use App\Models\RegisteredUser;
-use App\Models\RegisteredID;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -22,15 +16,12 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $visitorlogs = Visitor::where('status', 0)
-            ->withoutTrashed()
-            ->orderBy('id', 'asc')
-            ->get();
         $visitorTypes = VisitorType::all();
-        $allEmployeesFromSession = session('all_emp', []);
 
-        return view('pages.reports.report', compact('visitorlogs', 'visitorTypes', 'allEmployeesFromSession'));
+        return view('pages.reports.report', compact('visitorTypes'));
     }
+
+    
 
 
     public function destroy($id)
@@ -151,6 +142,10 @@ class ReportController extends Controller
             $time_in = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            
+            $createdby = $d->created_by ? user_name($d->created_by) : '-';
+            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
                     
             if ($status === 'Timed Out') {
                 $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger"> '. $status .'</div></div>';
@@ -180,14 +175,14 @@ class ReportController extends Controller
                                 <strong>Out:</strong>
                                 '. $time_out .'
                             </small>',
-                'creator' => '<small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
-                            <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>',
+                'creator' => '<small><strong>Created: </strong>'. $createdby .'</small><br>
+                                <small><strong>Updated: </strong>'. $updatedby .'</small>',
                 
                 'status' => $statuslayout,
 
-                'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
+                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
 
-                'updated_at' => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
 
                 'action' => '<div class="dropdown">
                                 <button 
@@ -208,7 +203,7 @@ class ReportController extends Controller
                                         <i class="bi bi-eye me-2"></i> View
                                     </button>
                                 </li>
-                                        <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li>
+                                        <li><a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li>
                             </ul>
                         </div>',
             ];
@@ -240,7 +235,7 @@ class ReportController extends Controller
     public function delete(Request $request){
         $record  = Visitor::find($request->id);
         $details = $record->name;
-        $record->update(['deleted_by' => Auth::user()->emp_code]);
+        $record->update(['deleted_by' => Auth::user()->id]);
         $record->delete();
 
         $message    = 'Report Log Successfully Deleted';

@@ -16,8 +16,9 @@
     </div>
     <!-- table holder -->
     <div class="visitor-log-sheet-table table-responsive ">
-        <!-- search and filter - calling table filter component -->
+        <!-- search and filter -->
         <x-table-filter/>
+
         <!-- table -->
         <table class="table table-bordered align-middle" id="visitorsLogTable"><thead></thead></table>
     </div>

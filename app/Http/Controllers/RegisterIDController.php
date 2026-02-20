@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\RegisteredID\visitorsLogs;
 use App\Models\RegisteredID;
 use App\Models\VisitorType;
-use App\Models\Visitor;
 use Carbon\Carbon;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -27,12 +24,15 @@ class RegisterIDController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name'              => 'required',
+                'name'               => ['required','regex:/^[0-9]+$/', 'max:4', 'min:4'],
                 'visitorType'        => 'required|exists:visitor_types,id',
             ],
             [
-                'name'              => 'Name is Required',  
-                'visitorType'        => 'required|exists:visitor_types,id',
+                'name.required'           => 'Visitor ID is Required',
+                'name.regex'              => 'Visitor ID must contain only numbers',
+                'name.max'                => 'Visitor ID must not exceed 4 digits',
+                'name.min'                => 'Visitor ID must be at least 4 digits',
+                'visitorType.required'    => 'Visitor Type is Required',
             ]
         );
 
@@ -54,7 +54,7 @@ class RegisterIDController extends Controller
         if($duplicateQuery->exists()){
             return response()->json([
                 'status'    => 1,
-                'message'   => 'Name Already Exists'
+                'message'   => 'Visitor ID Already Exists'
             ]);
 
         }
@@ -69,10 +69,10 @@ class RegisterIDController extends Controller
             $oldData    = $status->getOriginal();
 
             $status     = $status->update(['updated_by' => $emp_code] + $data);
-            $message    = 'Registered ID Successfully Updated';
+            $message    = 'Visitor ID Successfully Updated';
         } else {
             $status     = RegisteredID::create(['created_by' => $emp_code] + $data);
-            $message    = 'Registered ID Successfully Created';
+            $message    = 'Visitor ID Successfully Created';
         }
         return response()->json([
             'status'    => 0,
@@ -87,8 +87,7 @@ class RegisterIDController extends Controller
         $limit    = $request->input('length');
 
         $rawquery = RegisteredID::with('visitorType')
-                    ->withoutTrashed()
-                    ->where('deleted_at', null)
+                    ->whereNull('deleted_at')
                     ->when($keywords, function ($query) use ($keywords) {
                         $query->where('id_number', 'LIKE', "%{$keywords}%")
                             ->orWhereHas('visitorType', function ($q) use ($keywords) {
@@ -134,7 +133,7 @@ class RegisterIDController extends Controller
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
-                                    <li><a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
+                                    <li><a class=" text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
                                 </ul>
                             </div>';
             } else {
@@ -148,12 +147,12 @@ class RegisterIDController extends Controller
 
                 'id_number' => $d->id_number,
 
-                'created_by' => user_name($d->created_by) ?? '-',
-                'updated_by' => user_name($d->updated_by) ?? '-',
+                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
+                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
 
-                'created_at' => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
+                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
 
-                'updated_at' => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
 
                 'action' => $action
             ];

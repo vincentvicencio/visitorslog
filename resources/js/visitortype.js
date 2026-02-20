@@ -6,15 +6,10 @@ import Triggers from './common/triggers';
     class VisitorTypeTable {
         constructor() {
             this.defaultFields  = []
-            // first parameter of your route
             this.url            = "/visitortype/"
-            // id name of your table listing in user
             this.table          = "#visitorsTable"
-            // module
             this.module         = "visitortype"
-            // form id
             this.form           = "#textInputForm"
-            // offCanvas
             this.modal          = "#textInputModal"
 
         }
@@ -51,8 +46,8 @@ import Triggers from './common/triggers';
                 self.url,
                 columnDefs,
                 self.module,
-                10,          // pagination
-                {},          // data
+                10,
+                {},
                 false
             );
 
@@ -73,7 +68,7 @@ import Triggers from './common/triggers';
 
                 // =========================================
                 // ENTRIES PER PAGE
-                // =================================
+                // =========================================
                 $('#entriesPerPage')
                     .off('change')
                     .on('change', function () {
@@ -82,15 +77,18 @@ import Triggers from './common/triggers';
             });
         }
 
+        // Initialize buttons and their event listeners
         async initializeButtons() {
             const self = this
             
+            // Add Button
             $('#addBtn').off('click').on('click', async function (e) {
                 e.preventDefault()
-                 datahandling.clearForm(self.form)
+                datahandling.clearForm(self.form)
                 container.showModal(self.modal)
             })
                     
+            // Save Button
             $(document).off('click', '#textInputSubmit').on('click', '#textInputSubmit', async function(e) {
                 e.preventDefault();
                 
@@ -101,7 +99,9 @@ import Triggers from './common/triggers';
                 await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
             });
         }
-    async onLoadForm(record_id) {
+
+        // Load form data for editing
+        async onLoadForm(record_id) {
             const self = this;
     
             const url = `${self.url}search`;
@@ -115,7 +115,7 @@ import Triggers from './common/triggers';
             $("#name").val(response.data.name);
     
             container.showModal(self.modal);
-    }
+        }
 
 
 }

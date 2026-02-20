@@ -23,9 +23,11 @@
             </div>
         </div>
     </div>
+    <!-- table holder -->
     <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
-        <!-- search and filter - calling table filter component -->
+        <!-- search and filter -->
         <x-table-filter/>
+
         <!-- table -->
         <table class="table table-bordered align-middle" id="reportTable"><thead></thead></table>
     </div>

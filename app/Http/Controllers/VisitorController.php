@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\VisitorType;
 use App\Models\RegisteredID;
-use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -16,18 +15,7 @@ class VisitorController extends Controller
 {
     public function index()
     {
-        
-        $visitors = Visitor::where(function ($query) {
-                $query->where('status', 0)->orWhereNull('status');
-               })
-               ->whereNull('time_out')
-               ->orderBy('updated_at', 'desc')
-               ->get();
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'desc')
-                   ->get();
-        $empMap = collect(session('all_emp'))->keyBy('emp_code');
-        return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+         return view('pages.visitorslog.visitorlog');
     }
     public function form()
     {
@@ -82,7 +70,7 @@ class VisitorController extends Controller
             $order         = $request->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get(); 
             $totalFiltered = count($temp);
        
         } else { 
@@ -131,6 +119,9 @@ class VisitorController extends Controller
             $time_in = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            $createdby = $d->created_by ? user_name($d->created_by) : '-';
+            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
             $fullName = '<div class="text-center">
                 <strong>' . $d->full_name . '</strong>';
 
@@ -164,8 +155,8 @@ class VisitorController extends Controller
                                 </small>
                             </div>',
                 'creator' => '<div class="text-center">
-                                <small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
-                                <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>
+                                <small><strong>Created: </strong>'. $createdby .'</small><br>
+                                <small><strong>Updated: </strong>'. $updatedby .'</small>
                             </div>',
                 
                 'status' => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
@@ -251,7 +242,6 @@ class VisitorController extends Controller
         ]);
 
         $visitor = Visitor::where('id', $request->id)
-            // ->where('status', 0)
             ->latest('id')
             ->first();
 
@@ -290,10 +280,11 @@ class VisitorController extends Controller
     {
        
         $request->validate([
-            'first_name'   => 'required|string',
-            'middle_name'  => 'nullable|string',
-            'last_name'    => 'required|string',
-            'visitor_type' => 'required|exists:visitor_types,id',
+            'first_name'        => 'required|string',
+            'middle_name'       => 'nullable|string',
+            'last_name'         => 'required|string',
+            'visitor_type'      => 'required|exists:visitor_types,id',
+            'contact_number'    => ['required','min:11','max:11','regex:/^[0-9]+$/','starts_with:09'],
 
             'id_number' => [
                 'required',
@@ -316,6 +307,14 @@ class VisitorController extends Controller
                         $fail('This Visitor ID is registered under a different visitor type.');
                     }
                 },
+            ],
+
+            [
+                'contact_number.required' => 'Contact Number is required',
+                'contact_number.max' => 'Contact Number must not exceed 11 digits',
+                'contact_number.min' => 'Contact Number must be at least 11 digits',
+                'contact_number.regex' => 'Contact Number must contain only numbers',
+                'contact_number.starts_with' => 'Contact Number must start with 09',
             ],
 
             'image_path' => 'nullable|',
@@ -344,7 +343,9 @@ class VisitorController extends Controller
 
             $imagePath = $fileName;
         }
-            $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
+            $middleInitial = collect(preg_split('/\s+/', trim($request->middle_name)))
+                ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
+                ->implode('');
 
             $userLocations = []; 
 
