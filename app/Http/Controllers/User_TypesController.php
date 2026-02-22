@@ -60,7 +60,7 @@ class User_TypesController extends Controller
             $message    = 'User Type Successfully Updated';
         } else {
             $status     = User_types::create(['created_by' => $emp_code] + $data);
-            $message    = 'User Type Successfully Created';
+            $message    = 'User Type Status Successfully Created';
         }
         return response()->json([
             'status'    => 0,
@@ -152,7 +152,6 @@ class User_TypesController extends Controller
             'data'       => $record
         ]);
     }
-
 
     public function delete(Request $request){
         $record  = User_types::find($request->id);
