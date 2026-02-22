@@ -74,13 +74,27 @@ class LoginController extends Controller
         return redirect('/login');
     }
 
-    protected function attemptLogin(Request $request)
-    {
-        return Auth::guard('employee')->attempt(
-            $this->credentials($request),
-            $request->filled('remember')
-        );
-    }
+    // protected function attemptLogin(Request $request)
+    // {
+    //     return Auth::guard('employee')->attempt(
+    //         $this->credentials($request),
+    //         $request->filled('remember')
+    //     );
+    // }
+        protected function attemptLogin(Request $request)
+        {
+            $attempt = Auth::guard('employee')->attempt(
+                $this->credentials($request),
+                $request->filled('remember')
+            );
+
+            if (!$attempt) {
+                // Set a session error message
+                session()->flash('login_error', 'Invalid credentials or account not registered.');
+            }
+
+            return $attempt;
+        }
 
     public function authenticated(Request $request, $sessionKey)
     {
