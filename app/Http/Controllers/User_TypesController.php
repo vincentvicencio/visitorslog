@@ -57,10 +57,10 @@ class User_TypesController extends Controller
             $oldData    = $status->getOriginal();
 
             $status     = $status->update(['updated_by' => $emp_code] + $data);
-            $message    = 'UserType Successfully Updated';
+            $message    = 'User Type Successfully Updated';
         } else {
             $status     = User_types::create(['created_by' => $emp_code] + $data);
-            $message    = 'UserType Status Successfully Created';
+            $message    = 'User Type Status Successfully Created';
         }
         return response()->json([
             'status'    => 0,
@@ -74,13 +74,11 @@ class User_TypesController extends Controller
         $keywords = strtolower($request->search);
         $limit    = $request->input('length');
 
-
         $rawquery = User_types::withoutTrashed()->where(function($query) use ($keywords) {
                         $query->where('name', 'LIKE', "%$keywords%")
                             ->where('deleted_at', null);
                     });
 
-        
         $totalRecords = $rawquery->get()->count();
         
         if ($request->input('draw') > 1) { 
@@ -154,7 +152,6 @@ class User_TypesController extends Controller
             'data'       => $record
         ]);
     }
-
 
     public function delete(Request $request){
         $record  = User_types::find($request->id);

@@ -18,7 +18,7 @@ Route::get('/', function () {
 Auth::routes();
 
 // middleware
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'single.session'])->group(function () {
 
     // VISITORSLOG
     Route::prefix('visitorslog')
