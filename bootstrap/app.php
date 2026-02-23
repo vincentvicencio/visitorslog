@@ -3,6 +3,9 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\UsertypeMiddleware;
+use App\Http\Middleware\PreventBackHistory;
+use App\Http\Middleware\SingleSessionMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -11,22 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Register your alias here inside the main chain
+        // Consolidate ALL aliases into one array
         $middleware->alias([
-            'prevent-back' => \App\Http\Middleware\PreventBackHistory::class,
+            'prevent-back'   => PreventBackHistory::class,
+            'user_type'      => UsertypeMiddleware::class,
+            'single.session' => SingleSessionMiddleware::class,
         ]);
-    })
-    ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias([
-            'user_type' => \App\Http\Middleware\UsertypeMiddleware::class,
-        ]);
-        $middleware->alias([
-        'single.session' => \App\Http\Middleware\SingleSessionMiddleware::class, // Replace with your actual class name
-    ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
-
-    
-    

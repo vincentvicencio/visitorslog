@@ -264,15 +264,18 @@ class ReportClassTable {
         const self = this;
 
         const tableHeader = [
-            { id: "full_name",       label: "Personal Details"},
-            { id: "visitor_type",    label: "Visitor Type"    },
-            { id: "visitor_id",      label: "ID No."          },
-            { id: "image",           label: "Image"           },
-            { id: "visit",           label: "Visit"           },
-            { id: "time",            label: "Time"            },
-            { id: "creator",         label: "By"              },
-            { id: "status",          label: "Status"          },
-            { id: "action",          label: "Action"          },
+            { id: "full_name", label: "Name" },
+            { id: "location", label: "Location" },
+            { id: 'contact_number', label: 'Contact No.' },
+            { id: "visitor_type",       label: "Visitor Type" },
+            { id: "visitor_id",       label: "ID No." },
+            { id: "visit",   label: "Visit Date" },
+            { id: "time_in", label: "Time In" },
+            { id: "time_out", label: "Time Out" },
+            { id: "logged_by", label: "Logged by" },
+            { id: "updated_by", label: "Updated by" },
+            { id: "status",   label: "Status" },
+            { id: "action",         label: "Action" },
         ];
 
         const columns = tableHeader.map(col => ({

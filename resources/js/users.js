@@ -164,22 +164,28 @@ class UsersTable {
                 }
 
                 // Remove the empty placeholder option for multi-select location
-                locationSelect.find('option[value=""]').remove();
+                // locationSelect.find('option[value=""]').remove();
 
                 // Clear any existing selection before enabling multi-select
                 locationSelect.val(null);
 
                 // Enable multiple selection with Select2 tags UI
-                locationSelect.attr('multiple', 'multiple');
+                // locationSelect.attr('multiple', 'multiple');
+                
+                locationSelect.removeAttr('multiple');
+
+                if (locationSelect.find('option[value=""]').length === 0) {
+                    locationSelect.prepend('<option value="">Select Location</option>');
+                }
 
                 // Initialize Select2 with tag-based UI
-                locationSelect.select2({
-                    placeholder: 'Select locations...',
-                    allowClear: true,
-                    width: '100%',
-                    dropdownParent: $('#registerUserModal'),
-                    closeOnSelect: false
-                });
+                // locationSelect.select2({
+                //     placeholder: 'Select locations...',
+                //     allowClear: true,
+                //     width: '100%',
+                //     dropdownParent: $('#registerUserModal'),
+                //     closeOnSelect: false
+                // });
 
                 // Ensure no options are selected after init
                 locationSelect.val(null).trigger('change.select2');

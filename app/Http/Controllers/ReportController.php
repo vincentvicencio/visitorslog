@@ -139,6 +139,9 @@ class ReportController extends Controller
             $time_in    = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out   = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            $createdby = $d->created_by ? user_name($d->created_by) : '-';
+            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
                     
             if ($status === 'Timed Out') {
                 $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger"> '. $status .'</div></div>';
@@ -148,60 +151,52 @@ class ReportController extends Controller
             }
 
             $newData[$i] = [
-                'full_name' => '
-                    <strong>' .    $d->full_name . '</strong>
-                    <br><small>' . $locationLabel . '</small>
-                    <br><small>' . $d->phone_number . '</small>
-                ',
+                
+
+                'full_name' => $d->full_name,
+
+                'location' => '<div class="text-center">' . $locationLabel . '</div>',
+
+                'contact_number' => '<div class="text-center">' . $d->phone_number . '</div>',
 
                 'visitor_type' =>  $d->visitorType?->name ?? '-',
 
                 'visitor_id'   =>  $d->visitor_id,
 
-                'image'        =>  $image,
+                'visit' =>  $d->created_at->format("F d, Y") .'<br>
+                        '. $d->created_at->format('l'),
 
-                'visit'        =>  $d->created_at->format("F d, Y") .'<br>
-                                '. $d->created_at->format('l'),
+                'time_in' => '<div class="text-center">
+                                <small> '. $time_in .'</small><br>
+                            </div>',
+                'time_out' => '<div class="text-center">
+                                <small> '. $time_out .'</small><br>
+                            </div>',
 
-                'time'         => '<small><strong>In:</strong> '. $time_in .'</small><br>
-                            <small>
-                                <strong>Out:</strong>
-                                '. $time_out .'
-                            </small>',
-                'creator'      => '<small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
-                            <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>',
-                
-                'status'       => $statuslayout,
+                'logged_by' => '<div class="text-center">
+                                '. $createdby .'
+                            </div>',
+
+                'updated_by' => '<div class="text-center">
+                                '. $updatedby .'
+                            </div>',
+            
+                'status' => $statuslayout,
 
                 'created_at'   => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
 
                 'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
-                'action'       => '<div class="dropdown">
-                                <button 
-                                    class="btn btn-sm btn-primary dropdown-toggle"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    Action
-                                </button>
-
-                            <ul class="dropdown-menu">
-                                <li>
+                'action' => '<div class="dropdown text-center">
                                     <button 
                                         class="dropdown-item"
                                         id="viewBtn"
                                         data-id="'. $d->id .'"
                                         data-type="reports">
-                                        <i class="bi bi-eye me-2"></i> View
+                                        View
                                     </button>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '">
-                                    <i class="bi bi-trash me-2"> </i> Delete </a>
-                                </li>
-                            </ul>
-                        </div>',
+                                    <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '">Delete</button>
+                            </div>',
             ];
             $i++;
         }

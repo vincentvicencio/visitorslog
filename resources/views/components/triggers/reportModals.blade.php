@@ -24,17 +24,17 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Date From</label>
-                            <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
+                            <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}" autocomplete="off">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Date To</label>
-                            <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
+                            <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}" autocomplete="off">
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Visitor Type</label>
-                        <select name="visitor_type" class="form-select">
+                        <select name="visitor_type" class="form-select"  autocomplete="off">
                             <option value="">All Types</option>
                             @foreach ($visitorTypes as $type)
                                 <option value="{{ $type->id }}" {{ request('visitor_type') == $type->id ? 'selected' : '' }}>

@@ -23,10 +23,8 @@
                         <label for="emp_code" class="">{{ __('Username') }}</label>
 
                         <div class="">
-                            <input id="emp_code" type="text" class="form-control" name="emp_code" required autocomplete="off" autofocus>
-                            <span class="error-span error-name text-danger">
-                                {{ session('login_error') }}
-                            </span>
+                            <input id="emp_code" type="text" class="form-control" name="emp_code" required autocomplete="off" autofocus >
+
                             @error('emp_code')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
