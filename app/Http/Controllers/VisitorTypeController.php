@@ -46,13 +46,8 @@ class VisitorTypeController extends Controller
         
         if($duplicateQuery->exists()){
             return response()->json([
-<<<<<<< HEAD
-                'status'    => 1,
-                'message'   => 'Visitor Type Already Exists'
-=======
                 'status'     => 1,
                 'message'    => 'Name Already Exists'
->>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
             ]);
 
         }

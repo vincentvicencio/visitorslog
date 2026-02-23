@@ -107,10 +107,7 @@ class UsersTable {
         this.initializeButtons();
         this.initializeEmployeeSearchButton();
         component.createDropdown(self.url + 'get-user-type', '#reg_user_type',  null, self.modal);
-<<<<<<< HEAD
-=======
         // Removed undefined selectedValue usage
->>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
         this.location_dropdown();
         this.handleRoleChange();
     }
@@ -370,13 +367,8 @@ class UsersTable {
                 $('#reg_user_db_id').val(response.id);
                 $('#reg_emp_code').val(response.emp_code || '');
                 $('#reg_user_type').val(response.role_id || '');
-<<<<<<< HEAD
-                
-                // Trigger change event on user type to update UI (after all values set)
-=======
 
                 // Trigger change event on user type to update UI (before setting location)
->>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
                 $('#reg_user_type').trigger('change');
 
                 // Fill usertype

@@ -382,11 +382,7 @@ class VisitorController extends Controller
             return response()->json([
                 'message' => 'Visitor successfully added'
             ], 200);
-<<<<<<< HEAD
-
-=======
             
->>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error saving visitor: ' . $e->getMessage(),

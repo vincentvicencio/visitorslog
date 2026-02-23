@@ -20,21 +20,9 @@ import datahandling from './common/datahandling';
         this.initializeButtons();
     }
 
-<<<<<<< HEAD
     // List of Register ID
     async list() {
         const self = this;
-=======
-            const tableHeader = [
-                { id: "visitor_type",    label: "Name"         },
-                { id: "id_number",       label: "ID Number"    },
-                { id: "created_by",      label: "Created By"   },
-                { id: "updated_by",      label: "Updated By"   },
-                { id: "created_at",      label: "Created Date" },
-                { id: "updated_at",      label: "Updated Date" },
-                { id: "action",          label: "Action"       },
-            ];
->>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
 
         const tableHeader = [
             { id: "visitor_type",       label: "Name" },
@@ -72,26 +60,6 @@ import datahandling from './common/datahandling';
 
             tableApi.draw();
 
-<<<<<<< HEAD
-            // =========================================
-            // CUSTOM SEARCH
-            // =========================================
-            $('#typeSearch')
-                .off('keyup')
-                .on('keyup', function () {
-                    tableApi.search(this.value).draw();
-                });
-
-            // =========================================
-            // ENTRIES PER PAGE
-            // =========================================
-            $('#entriesPerPage')
-                .off('change')
-                .on('change', function () {
-                    tableApi.page.len(this.value).draw();
-                });
-        });
-=======
                 // =========================================
                 // ENTRIES PER PAGE
                 // =========================================
@@ -139,8 +107,7 @@ import datahandling from './common/datahandling';
         
             container.showModal(self.modal);
         }
->>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
-    }
+
 
     // DataTable Initialization
     async initializeButtons(){

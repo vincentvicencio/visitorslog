@@ -60,11 +60,7 @@ class User_TypesController extends Controller
             $message    = 'User Type Successfully Updated';
         } else {
             $status     = User_types::create(['created_by' => $emp_code] + $data);
-<<<<<<< HEAD
-            $message    = 'User Type Successfully Created';
-=======
             $message    = 'User Type Status Successfully Created';
->>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
         }
         return response()->json([
             'status'    => 0,

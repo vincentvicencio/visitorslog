@@ -28,16 +28,8 @@ class RegisterIDController extends Controller
                 'visitorType'       => 'required|exists:visitor_types,id',
             ],
             [
-<<<<<<< HEAD
-                'name.required'           => 'Visitor ID is Required',
-                'name.regex'              => 'Visitor ID must contain only numbers',
-                'name.max'                => 'Visitor ID must not exceed 4 digits',
-                'name.min'                => 'Visitor ID must be at least 4 digits',
-                'visitorType.required'    => 'Visitor Type is Required',
-=======
                 'name'              => 'Name is Required',  
                 'visitorType'       => 'required|exists:visitor_types,id',
->>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
             ]
         );
 

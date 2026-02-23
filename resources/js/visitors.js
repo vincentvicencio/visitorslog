@@ -295,11 +295,7 @@ $(document).ready(function () {
                 {},
                 false 
             );
-<<<<<<< HEAD
-
-=======
             
->>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
             // =====================================================
             //  INIT COMPLETE (SAFE API ACCESS)
             // =====================================================
@@ -373,9 +369,5 @@ $(document).ready(function () {
         video.style.display = 'block'; 
         imageInput.value = ""; 
     });
-<<<<<<< HEAD
-=======
-
->>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
     startWebcam();
 });
