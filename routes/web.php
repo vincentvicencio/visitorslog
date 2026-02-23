@@ -40,6 +40,8 @@ Route::middleware(['auth', 'single.session'])->group(function () {
             })->where('any', '.*');
         });
         
+    Route::middleware(['auth', 'user_type:1'])->group(function () {
+        // ADMIN ONLY ROUTES HERE
          // USER TYPE
         Route::prefix('userTypes')
             ->controller(User_TypesController::class)
@@ -97,4 +99,5 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                 Route::post('/delete',      'delete')->name('registerId.delete');
                 Route::post('/search',      'search')->name('registerId.search');
             });
+    });
 });

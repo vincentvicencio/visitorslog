@@ -122,25 +122,8 @@ class RegisterIDController extends Controller
 
             if (!$exists) {
                 $action = '<div class="dropdown">
-                                <button 
-                                    class="btn btn-sm btn-primary dropdown-toggle"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    Action
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
-                                    <li><a class=" text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
-                                    <li>
-                                        <a class="dropdown-item btn-edit" data-id="'. $d->id .'">
-                                        <i class="bi bi-pencil-square me-2"></i> Edit</a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '">
-                                        <i class="bi bi-trash me-2"></i> Delete</a>
-                                    </li>
-                                </ul>
+                                <button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>
+                                <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '"> Delete</button>
                             </div>';
             } else {
             $action = '<span class="badge bg-success">Currently Used</span>';

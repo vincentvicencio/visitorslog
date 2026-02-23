@@ -142,30 +142,30 @@ class VisitorController extends Controller
             $newData[$i] = [
                 
 
-                'full_name'    => $fullName,
+                'full_name' => $d->full_name,
+
+                'location' => '<div class="text-center">' . $locationLabel . '</div>',
+
+                'contact_number' => '<div class="text-center">' . $d->phone_number . '</div>',
 
                 'visitor_type' => '<div class="text-center">' . ($d->visitorType?->name ?? '-') . '</div>',
 
                 'visitor_id'   => '<div class="text-center">' . $d->visitor_id . '</div>',
 
-                'image'        => '<div class="text-center">' . $image . '</div>',
-
-                'visit'        =>  '<div class="text-center">' . 
+                'visit' =>  '<div class="text-center">' . 
                                     $d->created_at->format("F d, Y") .'<br>
                                     '. $d->created_at->format('l')
                                  . '</div>',
 
-                'time'         => '<div class="text-center">
-                                    <small><strong>In:</strong> '. $time_in .'</small><br>
-                                    <small>
-                                        <strong>Out:</strong>
-                                        '. $time_out .'
-                                    </small>
-                                  </div>',
-                'creator'      => '<div class="text-center">
-                                    <small><strong>Created: </strong>'. user_name($d->created_by) ?? '-' .'</small><br>
-                                    <small><strong>Updated: </strong>'. user_name($d->updated_by) ?? '-' .'</small>
-                                  </div>',
+                'time_in' => '<div class="text-center">
+                                <small> '. $time_in .'</small><br>
+                            </div>',
+                'time_out' => '<div class="text-center">
+                                <small> '. $time_out .'</small><br>
+                            </div>',
+                'creator' => '<div class="text-center">
+                                '. $createdby .'
+                            </div>',
                 
                 'status'       => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
 
@@ -173,37 +173,23 @@ class VisitorController extends Controller
 
                 'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
-                'action'       => '<div class="dropdown text-center">
-                                    <button 
-                                        class="btn btn-sm btn-primary dropdown-toggle"
-                                        type="button"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false">
-                                        Action
-                                    </button>
-
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <button 
-                                                class="dropdown-item"
-                                                id="viewBtn"
-                                                data-id="'. $d->id .'"
-                                                data-type="visitorslog">
-                                                <i class="bi bi-eye me-2"></i> View
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button 
-                                                type="button"
-                                                class="dropdown-item text-danger"
-                                                id="timeoutBtn"
-                                                data-id="'. $d->id .'">
-                                                <i class="bi bi-clock-history me-2"></i> Timeout
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>',
-                ];
+                'action' => '<div class="dropdown">
+                                        <button 
+                                            class="dropdown-item"
+                                            id="viewBtn"
+                                            data-id="'. $d->id .'"
+                                            data-type="visitorslog">
+                                            View
+                                        </button>
+                                        <button 
+                                            type="button"
+                                            class="dropdown-item text-danger"
+                                            id="timeoutBtn"
+                                            data-id="'. $d->id .'">
+                                            Timeout
+                                        </button>
+                            </div>',
+            ];
             $i++;
                                             // <i class="bi bi-clock-history"></i>
                                             // <i class="bi bi-eye"></i>

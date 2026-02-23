@@ -31,6 +31,7 @@
                 <i class="bi bi-person-lines-fill fs-6 p-2"></i>
                 Visitor Log Sheets
             </a>
+            <div id="app" data-type="{{ Auth::user()->user_type == 1 ? 1 : 0 }}"></div>
             @if(Auth::user()->user_type == 1)
                 <a href="{{ url('userTypes') }}"
                 class="sidebar-menu-button {{ Request::is('userTypes') ? 'selected' : '' }}">
@@ -77,6 +78,10 @@
 
     </div>
 </div>
+
+@push('scripts')
+@vite(['resources/js/visitors.js'])
+@endpush
 
 <script>
 function updateClock() {
