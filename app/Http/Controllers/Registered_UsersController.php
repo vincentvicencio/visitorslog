@@ -370,7 +370,7 @@ public function edit(Request $request, $id)
             
             $baseUsername = strtolower(preg_replace('/\s+/', '', $updateData['first_name'])) . '.' . strtolower(preg_replace('/\s+/', '', $updateData['last_name']));
             $username = $baseUsername;
-            $counter = 2;
+            $counter  = 2;
             
             // Ensure username is unique, ignoring current user
             while (RegisteredUser::where('user_name', $username)->where('id', '!=', $user->id)->exists()) {
@@ -405,14 +405,14 @@ public function edit(Request $request, $id)
 
             if (count($locations) === 0) {
                 return response()->json([
-                    'status' => 'error',
+                    'status'  => 'error',
                     'message' => 'Please select at least one location.'
                 ], 422);
             }
 
             if ($roleName === 'receptionist' && count($locations) > 1) {
                 return response()->json([
-                    'status' => 'error',
+                    'status'  => 'error',
                     'message' => 'Receptionist can only have one location.'
                 ], 422);
             }
@@ -441,8 +441,8 @@ public function edit(Request $request, $id)
     $data[] = ['id' => '', 'text' => 'Choose Location/Site'];
         foreach ($location as $record) {
         $data[] = [
-            'id'   => $record['id'], // Ensure 'id' exists in your session array
-            'text' => $record['name']
+            'id'    => $record['id'], // Ensure 'id' exists in your session array
+            'text'  => $record['name']
         ];
     }
 
@@ -451,16 +451,16 @@ public function edit(Request $request, $id)
 
     public function searchEmployees(Request $request)
     {
-        $search = strtolower($request->input('q', ''));
+        $search    = strtolower($request->input('q', ''));
         $employees = collect(session('all_emp', []));
         
         // Filter employees based on search term
         $filtered = $employees->filter(function ($emp) use ($search) {
             if (empty($search)) return true;
             
-            $empCode = strtolower($emp['emp_code'] ?? '');
+            $empCode   = strtolower($emp['emp_code'] ?? '');
             $firstName = strtolower($emp['first_name'] ?? '');
-            $lastName = strtolower($emp['last_name'] ?? '');
+            $lastName  = strtolower($emp['last_name'] ?? '');
             
             return str_contains($empCode, $search) || 
                    str_contains($firstName, $search) || 
@@ -469,10 +469,10 @@ public function edit(Request $request, $id)
         
         $results = $filtered->map(function ($emp) {
             return [
-                'id' => $emp['emp_code'],
-                'text' => $emp['emp_code'] . ' - ' . ($emp['first_name'] ?? '') . ' ' . ($emp['last_name'] ?? ''),
+                'id'         => $emp['emp_code'],
+                'text'       => $emp['emp_code'] . ' - ' . ($emp['first_name'] ?? '') . ' ' . ($emp['last_name'] ?? ''),
                 'first_name' => $emp['first_name'] ?? '',
-                'last_name' => $emp['last_name'] ?? ''
+                'last_name'  => $emp['last_name'] ?? ''
             ];
         })->values()->toArray();
         
@@ -489,8 +489,10 @@ public function list(Request $request){
                     ->whereNull('deleted_at')
                     ->when($keywords, function ($query) use ($keywords) {
                         $query->where('user_name', 'LIKE', "%{$keywords}%")
-                            ->orWhere('first_name', 'LIKE', "%{$keywords}%")
-                            ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+                              ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+                              ->orWhere('last_name', 'LIKE', "%{$keywords}%")
+                              ->orWhere('first_name', 'LIKE', "%{$keywords}%")
+                              ->orWhere('last_name', 'LIKE', "%{$keywords}%")
                             ->orWhereHas('userType', function ($q) use ($keywords) {
                                 $q->where('name', 'LIKE', "%{$keywords}%");
                             });
@@ -538,10 +540,17 @@ public function list(Request $request){
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
                                             <li><a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
+                                            <li>
+                                                <a class="dropdown-item btn-edit" data-id="'. $d->id .'">
+                                                <i class="bi bi-pencil-square me-2"></i> Edit</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '">
+                                                <i class="bi bi-trash me-2"></i> Delete</a>
+                                            </li>
                                         </ul>
                                     </div>' 
             ];
-
             $i++;
         } 
  
@@ -557,14 +566,14 @@ public function list(Request $request){
         $record = RegisteredUser::find($request->id);
         if(!$record){
             return response()->json([
-                'status'    => 1,
-                'message'   => 'No Data Found'
+                'status'     => 1,
+                'message'    => 'No Data Found'
             ]);
         }
 
         return response()->json([
-            'status'    => 0,
-            'data'      => $record
+            'status'     => 0,
+            'data'       => $record
         ]);
     }
 
@@ -576,8 +585,8 @@ public function list(Request $request){
 
         $message    = 'Registered User Successfully Deleted';
             return response()->json([
-                'status'    => 0,
-                'message'   => $message
+                'status'     => 0,
+                'message'    => $message
             ]);
     }
 
@@ -601,8 +610,8 @@ public function list(Request $request){
 
         $role = RegisteredUser::findOrFail($id);
         $role->update([
-            'name' => $request->RegisteredID,
-            'updated_by' => Auth::user()->id,
+            'name'        => $request->RegisteredID,
+            'updated_by'  => Auth::user()->id,
         ]);
     }
 }

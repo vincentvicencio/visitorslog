@@ -16,7 +16,6 @@
                 @include('layouts.header')
             @endif  
             
-
             @yield('content')
 
             <!-- Notification -->
