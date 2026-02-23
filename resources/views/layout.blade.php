@@ -3,8 +3,8 @@
 
     @include('layouts.head')
 
-    <body>
-        @if (!View::hasSection('hideSidebar'))
+    <body class="{{ Auth::check() && Auth::user()->user_type != 1 ? 'non-admin-body' : '' }}">
+        @if (!View::hasSection('hideSidebar') && Auth::user()->user_type == 1)
                 @include('layouts.sidebar')
         @endif
         @if(! page_name('main') || page_name('main') == 'login' ) @yield('content')
