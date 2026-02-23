@@ -60,25 +60,54 @@ import datahandling from './common/datahandling';
 
             tableApi.draw();
 
-            // =========================================
-            // CUSTOM SEARCH
-            // =========================================
-            $('#typeSearch')
-                .off('keyup')
-                .on('keyup', function () {
-                    tableApi.search(this.value).draw();
-                });
+                // =========================================
+                // ENTRIES PER PAGE
+                // =========================================
+                $('#entriesPerPage')
+                    .off('change')
+                    .on('change', function () {
+                        tableApi.page.len(this.value).draw();
+                    });
+            });
 
-            // =========================================
-            // ENTRIES PER PAGE
-            // =========================================
-            $('#entriesPerPage')
-                .off('change')
-                .on('change', function () {
-                    tableApi.page.len(this.value).draw();
-                });
-        });
-    }
+        }
+        async initializeButtons(){
+            const self = this
+            $('#addBtn').off('click').on('click', async function (e) {
+                e.preventDefault()
+                    datahandling.clearForm(self.form)
+                    container.showModal(self.modal)
+            })
+            
+            $(document).off('click', '#registerIDSubmit').on('click', '#registerIDSubmit', async function(e) {
+                e.preventDefault();
+                
+                const formid    = self.form;
+                const formdata  = new FormData($(formid)[0]);
+    
+                
+                await Triggers.removeErrorOnInput(formid);
+                await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
+    
+            });
+        }
+        async onLoadForm(record_id) {
+            const self = this;
+        
+            const url = `${self.url}search`;
+            const response = await datahandling.processData(
+                url,
+                'POST',
+                { id: record_id }
+            );
+        
+            $("#record_id").val(record_id);
+            $("#name").val(response.data.id_number);
+            $("#visitortype").val(response.data.visitor_type);
+        
+            container.showModal(self.modal);
+        }
+
 
     // DataTable Initialization
     async initializeButtons(){

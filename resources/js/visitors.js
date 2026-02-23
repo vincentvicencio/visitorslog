@@ -368,6 +368,5 @@ $(document).ready(function () {
         video.style.display = 'block'; 
         imageInput.value = ""; 
     });
-
     startWebcam();
 });
