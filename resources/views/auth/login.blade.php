@@ -23,7 +23,7 @@
                         <label for="emp_code" class="">{{ __('Username') }}</label>
 
                         <div class="">
-                            <input id="emp_code" type="text" class="form-control" name="emp_code" required autocomplete="emp_code" autofocus>
+                            <input id="emp_code" type="text" class="form-control" name="emp_code" required autocomplete="off" autofocus >
 
                             @error('emp_code')
                                 <span class="invalid-feedback" role="alert">
@@ -37,7 +37,7 @@
                         <label for="password" class="">{{ __('Password') }}</label>
 
                         <div class="">
-                            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+                            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="off">
 
                             @error('password')
                                 <span class="invalid-feedback" role="alert">

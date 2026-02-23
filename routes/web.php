@@ -37,7 +37,8 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/view',            'view')->name('visitorslog.view');
         });
         
-    // Route::middleware('user_type:1')->group( function(){
+    Route::middleware(['auth', 'user_type:1'])->group(function () {
+        // ADMIN ONLY ROUTES HERE
          // USER TYPE
         Route::prefix('userTypes')
             ->controller(User_TypesController::class)
@@ -95,5 +96,5 @@ Route::middleware(['auth'])->group(function () {
                 Route::post('/delete',      'delete')->name('registerId.delete');
                 Route::post('/search',        'search')->name('registerId.search');
             });
-    // });
+    });
 });

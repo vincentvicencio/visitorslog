@@ -10,9 +10,11 @@
         <div class="addvisitormodal">
             <div class="panel">
             {{-- header --}}
+            {{-- @if(Auth::user()->user_type == 1)
                 <a class="btn-close" href="{{ route('visitorslog') }}" id="detailsBtn">
                 </a>
-                <div class="header fs-3">Add Visitor</div>
+            @endif --}}
+                <div class="header fs-3">Log Visitor</div>
                 <div class="subheader mb-2">Register and record a new visitor entry</div>
                 <form id="addVisitorForm" enctype="multipart/form-data">
                     @csrf 
@@ -20,12 +22,12 @@
                         <div class="details">
                             {{-- ID Number --}}
                             <div class="input-holder floating">
-                                <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " required>
+                                <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " required autocomplete="off">
                                 <label for="id_number">ID Number</label>
                             </div>
                             {{-- Visitor Type --}}
                             <div class="input-holder floating">
-                                <select name="visitor_type" id="visitor_type" class="form-control" required>
+                                <select name="visitor_type" id="visitor_type" class="form-control" required autocomplete="off">
                                     <option value="" disabled selected>Select Visitor Type</option> 
                                     @foreach ($visitorTypes as $type)
                                         <option value="{{ $type->id }}">{{ $type->name }}</option>
@@ -36,27 +38,27 @@
                             {{-- Visitor Type --}}
                             </select><br>
                             <div class="input-holder floating">
-                                <input type="text" name="first_name" id="first_name" class="form-control" placeholder=" " required>
+                                <input type="text" name="first_name" id="first_name" class="form-control" placeholder=" " required autocomplete="off">
                                 <label for="first_name">first name</label>
                             </div>
                             {{-- Middle Name --}}
                             <div class="input-holder floating">
-                                <input type="text" name="middle_name" id="middle_name" class="form-control" placeholder=" " >
+                                <input type="text" name="middle_name" id="middle_name" class="form-control" placeholder=" " autocomplete="off">
                                 <label for="middle_name">middle name</label>
                             </div>
                             {{-- Last Name --}}
                             <div class="input-holder floating">
-                                <input type="text" name="last_name" id="last_name" class="form-control" placeholder=" " required>
+                                <input type="text" name="last_name" id="last_name" class="form-control" placeholder=" " required autocomplete="off">
                                 <label for="last_name">last name</label>
                             </div>
                             {{-- Contact Number --}}
                             <div class="input-holder floating">
-                                <input type="text" name="contact_number" id="contact_number" class="form-control" placeholder=" " required> 
+                                <input type="text" name="contact_number" id="contact_number" class="form-control" placeholder=" " required autocomplete="off"> 
                                 <label for="contact_number">contact number</label>
                             </div>
                             {{-- Address --}}
                             <div class="input-holder floating w-100">
-                                <textarea name="address" id="address" class="form-control" placeholder=" " rows="3" required></textarea>
+                                <textarea name="address" id="address" class="form-control" placeholder=" " rows="3" required autocomplete="off"></textarea>
                                 <label for="address">Address</label>
                             </div>
                         </div>

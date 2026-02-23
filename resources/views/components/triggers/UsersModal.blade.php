@@ -12,7 +12,7 @@
                 
                 <div class="mb-3">
                     <label class="form-label">Select Role</label>
-                    <select id="reg_user_type" name="user_type" class="form-control" required>
+                    <select id="reg_user_type" name="user_type" class="form-control" required  autocomplete="off">
     
                     </select>
                 </div>
@@ -20,7 +20,7 @@
                 <div id="reg_fields_container" style="display: none;">
                     <div class="mb-3">
                         <label class="form-label">Select Location</label>
-                        <select id="reg_location" name="locations[]" class="form-control" required>
+                        <select id="reg_location" name="locations[]" class="form-control" required autocomplete="off">
                             <option value="">Select Location</option>
                         </select>
                     </div>
@@ -37,17 +37,17 @@
                         <div class="row">
                             <div class="col-6">
                                 <label class="form-label">First Name</label>
-                                <input type="text" id="reg_first_name" name="first_name" class="form-control">
+                                <input type="text" id="reg_first_name" name="first_name" class="form-control" autocomplete="off">
                             </div>
                             <div class="col-6">
                                 <label class="form-label">Last Name</label>
-                                <input type="text" id="reg_last_name" name="last_name" class="form-control">
+                                <input type="text" id="reg_last_name" name="last_name" class="form-control" autocomplete="off">
                             </div>
                         </div>
                     </div>
                     <div class="mb-3" id="password_container">
                         <label class="form-label">Password</label>
-                        <input type="password" id="reg_password" name="password" class="form-control" placeholder="Password">
+                        <input type="password" id="reg_password" name="password" class="form-control" placeholder="Password" required autocomplete="off">
                         <small class="text-muted edit-only-text" style="display:none;">Leave blank to keep current password</small>
                     </div>
                 </div>

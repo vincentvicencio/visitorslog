@@ -14,7 +14,7 @@
                 <form id="textInputForm">
                     <div class="mb-3">
                         <label for="visitorType" class="form-label">Visitor Type</label>
-                        <select name="visitorType" required class="form-control" id="visitortype" required>
+                        <select name="visitorType" required class="form-control" id="visitortype" required autocomplete="off">
                             <option value="" disabled selected>Select Visitor Type</option>
                             @foreach ($visitorTypes as $type)
                                 <option value="{{ $type->id }}">
@@ -26,7 +26,7 @@
                     <div class="mb-3">
                         <input hidden="hidden" name="record_id" id="record_id">
                         <label for="visitorID" class="form-label">Visitor ID</label>
-                        <input type="text" class="form-control" id="name" name="name"
+                        <input type="text" class="form-control" id="name" name="name"  autocomplete="off"
                             placeholder="Enter Visitor ID" autocomplete="off" required>
                         <span class="error-span error-name text-danger"></span>
                     </div>
