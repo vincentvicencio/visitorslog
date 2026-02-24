@@ -20,9 +20,13 @@ class Registered_UsersController extends Controller
 {
     // Get the user type to check role
     $userType = User_types::find($request->user_type);
+    $roleId = $userType ? $userType->id : null;
     $roleName = $userType ? strtolower($userType->name) : '';
-    $isAdminOrReceptionist = in_array($roleName, ['admin', 'receptionist']);
-    $isGuard = $roleName === 'guard';
+    // Use roleId for role checks
+    $isAdmin = $roleId === 1;
+    $isReceptionist = $roleId === 2;
+    $isGuard = $roleId === 3;
+    $isAdminOrReceptionist = $isAdmin || $isReceptionist;
     
     // 1. Validation - different rules based on role
     $validationRules = [
@@ -36,8 +40,8 @@ class Registered_UsersController extends Controller
     
     if ($isGuard) {
         // Guard requires first_name, last_name, password (only required when creating)
-        $validationRules['first_name'] = 'required|string';
-        $validationRules['last_name'] = 'required|string';
+        $validationRules['first_name'] = ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'];
+        $validationRules['last_name'] = ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'];
         if (!$isEditing) {
             $validationRules['password'] = 'required|string|min:6';
         }
@@ -47,15 +51,12 @@ class Registered_UsersController extends Controller
             'required',
             'string',
             function ($attribute, $value, $fail) use ($recordId) {
-                
                 $query = RegisteredUser::where('user_name', $value)
                     ->whereNull('deleted_at');
-                
                 // Exclude current record when editing (cast to int for comparison)
                 if (!empty($recordId)) {
                     $query->where('id', '!=', (int) $recordId);
                 }
-                
                 if ($query->exists()) {
                     $fail('Employee Code already exists.');
                 }
@@ -67,6 +68,8 @@ class Registered_UsersController extends Controller
         'user_type.required' => 'User type is required.',
         'locations.required' => 'Location is required.',
         'first_name.required' => 'First name is required.',
+        'first_name.regex' => 'First name must contain letters only.',
+        'last_name.regex' => 'Last name must contain letters only.',
         'last_name.required' => 'Last name is required.',
         'password.required' => 'Password is required.',
         'password.min' => 'Password must be at least 6 characters.',
@@ -104,13 +107,15 @@ class Registered_UsersController extends Controller
     if (count($locations) === 0) {
         return response()->json([
             'status' => 1,
+            'title' => 'Select Location',
             'message' => 'Please select at least one location.'
         ], 422);
     }
 
-    if ($roleName === 'receptionist' && count($locations) > 1) {
+    if ($roleId === 2 && count($locations) > 1) { // Receptionist
         return response()->json([
             'status' => 1,
+            'title' => 'Select Location',
             'message' => 'Receptionist can only have one location.'
         ], 422);
     }
@@ -197,8 +202,8 @@ class Registered_UsersController extends Controller
         $apiUrl = "http://192.168.200.185:1924/api/employee_details/" . $empCode;
         $response = Http::timeout(5)->get($apiUrl);
         
-        if ($response->successful()) {
-            $apiData = $response->json();
+        if ($response  ->successful()) {
+            $apiData   = $response->json();
             $firstName = $apiData['FirstName'] ?? $firstName;
             $lastName  = $apiData['LastName'] ?? $lastName;
         }
@@ -254,12 +259,12 @@ class Registered_UsersController extends Controller
         ]);
 
         return response()->json([
-            'status' => 'success', 
+            'status'  => 'success', 
             'message' => 'User deactivated successfully.'
         ]);
     } catch (\Exception $e) {
         return response()->json([
-            'status' => 'error', 
+            'status'  => 'error', 
             'message' => 'Failed to remove user.'
         ], 500);
     }
@@ -267,7 +272,6 @@ class Registered_UsersController extends Controller
 
     public function getUserTypes()
     {
-
         $user_type = User_types::get(['id', 'name']);
         $data = [];
     
@@ -280,7 +284,6 @@ class Registered_UsersController extends Controller
                 'text' => $record['name']
             ];
         }
-
         return response()->json($data);
     }
 
@@ -321,7 +324,7 @@ class Registered_UsersController extends Controller
         'role_id'       => $user->user_type,
         'role_name'     => $roleName,
         'location_id'   => $locationIds, // Return as array of IDs for multi-select
-        'location_names' => $locationNames // Display names
+        'location_names'=> $locationNames // Display names
     ]);
 }
 public function edit(Request $request, $id) 
@@ -332,8 +335,13 @@ public function edit(Request $request, $id)
         
         // Get the user type to check role
         $userType = User_types::find($request->user_type);
+        $roleId = $userType ? $userType->id : null;
         $roleName = $userType ? strtolower($userType->name) : '';
-        $isGuard = $roleName === 'guard';
+        // Use roleId for role checks
+        $isAdmin = $roleId === 1;
+        $isReceptionist = $roleId === 2;
+        $isGuard = $roleId === 3;
+        $isAdminOrReceptionist = $isAdmin || $isReceptionist;
         
         // Validation based on role
         $validationRules = ['user_type' => 'required'];
@@ -407,7 +415,7 @@ public function edit(Request $request, $id)
                 ], 422);
             }
 
-            if ($roleName === 'receptionist' && count($locations) > 1) {
+            if ($roleId === 2 && count($locations) > 1) { // Receptionist
                 return response()->json([
                     'status'  => 'error',
                     'message' => 'Receptionist can only have one location.'

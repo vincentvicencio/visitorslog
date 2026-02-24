@@ -15,7 +15,7 @@
     <div id="DELETE" class="toast position-fixed top-0 end-0 my-4 mx-3 text-black bg-success border-0 " role="alert" aria-live="assertive" aria-atomic="true"
         data-bs-delay="1000">
         <div class="toast-header">
-            <strong class="me-auto"><i class="bi bi-bell-fill"></i> &nbsp; <span class="toast-title"></span></strong>
+            <strong class="me-auto"><i class="bi bi-bell-fill"></i> <span class="toast-title"></span></strong>
             <small>&nbsp;</small>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>

@@ -139,6 +139,9 @@ class ReportController extends Controller
             $time_in    = Carbon::parse($d->time_in)->format('h:i A');
 
             $time_out   = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            $createdby = $d->created_by ? user_name($d->created_by) : '-';
+            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
                     
             if ($status === 'Timed Out') {
                 $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger"> '. $status .'</div></div>';
@@ -228,8 +231,9 @@ class ReportController extends Controller
 
         $message    = 'Report Log Successfully Deleted';
             return response()->json([
-                'status'    => 0,
-                'message'   => $message
-            ]);
+            'status' => 0,
+            'title' => 'Success',
+            'message' => $message
+        ]);
     }
 }

@@ -28,13 +28,21 @@
             @stack('scripts')
             @yield('footer-scripts')
 
+            
+            <div type="hidden" id="usertypeCheck" data-type="{{ Auth::user()->user_type == 1 ? 1 : 0 }}"></div>
+
         </div>
         @endif
 
         @include('layouts.footer')
+        
     </body>
 </html>
 
+
+@push('scripts')
+@vite(['resources/js/visitors.js'])
+@endpush
 
 <script>
     window.Laravel = {

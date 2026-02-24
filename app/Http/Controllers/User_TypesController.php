@@ -116,7 +116,7 @@ class User_TypesController extends Controller
             $i++;
         } 
  
-        return response()->json([
+        return response()->json([   
             'draw'              => intval($request->input('draw')),
             'recordsTotal'      => $totalRecords,
             'recordsFiltered'   => $totalFiltered,

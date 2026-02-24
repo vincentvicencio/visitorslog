@@ -58,12 +58,11 @@ class Datahandling {
                     // Show toast for validation errors
                     const firstError = Object.values(errors)[0];
                     const errorMsg = Array.isArray(firstError) ? firstError[0] : firstError;
-                    triggers.showToast(errorMsg, 1);
+                    triggers.showToast(errorMsg, data.title || 'Validation Error', 1);
                 }
 
                 if (!errors) {
-
-                    triggers.showToast(data.message, data.status);
+                    triggers.showToast(data.message, data.title || (data.status === 0 ? 'Success' : 'Notice'), data.status);
 
                     if (config.module) datatable.createTable(config.table, config.columns, config.url, config.targets)
                     else $(table).DataTable().ajax.reload()
@@ -74,14 +73,32 @@ class Datahandling {
                     }, 1000);
                 }
             },
-            error: function () {
+            error: function (xhr) {
                 $submitBtn.prop('disabled', false);
                 if ($spinner.length > 0) $spinner.addClass('d-none');
                 if ($btnText.length > 0) $btnText.removeClass('d-none');
 
-                alert("Oooo Something went wrong.");
+                let errorMsg = "Oooo Something went wrong.";
+                let errorTitle = 'Error';
+                if (xhr && xhr.responseJSON) {
+                    if (xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    if (xhr.responseJSON.title) {
+                        errorTitle = xhr.responseJSON.title;
+                    }
+                    if (xhr.responseJSON.errors) {
+                        // Show first error if available
+                        const firstError = Object.values(xhr.responseJSON.errors)[0];
+                        errorMsg = Array.isArray(firstError) ? firstError[0] : firstError;
+                    }
+                }
+                if (typeof triggers !== 'undefined' && triggers.showToast) {
+                    triggers.showToast(errorMsg, errorTitle, 1);
+                } else {
+                    alert(errorMsg);
+                }
             }
-
         });
     }
 

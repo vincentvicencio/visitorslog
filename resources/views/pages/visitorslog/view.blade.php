@@ -4,8 +4,12 @@
 @endsection
 
 @section('content')
-
-    <div class="container-background position-fixed top-0 start-0 vw-100 vh-100" style="background-color: rgb(0,0,0,0.5)"><img src="/images/bgg.png" alt="" class="w-100 h-100 d-block opacity-75 object-fit-cover"></div>
+    <div class="loginbackground1 container-background position-fixed top-0 start-0 vw-100 vh-100">
+        <img src="/images/login-background-1.png" alt="" class="background-image-1 w-100 h-100 object-fit-cover">
+        <img src="/images/login-background-2.png" alt="" class="background-image-2 object-fit-cover">
+        <div class="shadow"></div>
+        <div class="background-image-4"><img src="/images/Magellan-Logo-w-Tagline.png" alt="" class=""></div>
+    </div>
     <div class="addvisitor" id="addVisitorModal">
         <div class="addvisitormodal">
             <div class="panel">
@@ -39,7 +43,7 @@
                         </div>
                         {{-- Middle Name --}}
                         <div class="input-holder floating">
-                            <input type="text" name="middle_name" id="middle_name" class="form-control" readonly placeholder=" " value="{{ $visitor->middle_name }}">
+                            <input type="text" name="middle_name" id="middle_name" class="form-control" readonly placeholder=" " value="{{ $visitor->middle_name ? $visitor->middle_name : '--'}}">
                             <label for="middle_name">Middle name</label>
                         </div>
                         {{-- Last Name --}}
@@ -70,6 +74,7 @@
                         </div>
                     </div>
                 </div>
+                <br><br><br><br>
             </div>
         </div>
     </div>
