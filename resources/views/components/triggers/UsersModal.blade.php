@@ -33,6 +33,10 @@
                             </button>
                         </div>
                     </div>
+                    <div class="mb-3" id="searched_emp_code_container" style="display:none;">
+                        <label class="form-label">Searched Employee Code</label>
+                        <input type="text" id="searched_emp_code" class="form-control" readonly>
+                    </div>
                     <div class="mb-3 d-none" id="employee_name_container">
                         <div class="row">
                             <div class="col-6">
