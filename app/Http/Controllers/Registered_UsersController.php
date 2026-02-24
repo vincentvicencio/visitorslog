@@ -269,13 +269,11 @@ class Registered_UsersController extends Controller
 
         return response()->json([
             'status'  => 'success', 
-            'title'   => 'Success',
             'message' => 'User deactivated successfully.'
         ]);
     } catch (\Exception $e) {
         return response()->json([
             'status'  => 'error', 
-            'title'   => 'Error',
             'message' => 'Failed to remove user.'
         ], 500);
     }

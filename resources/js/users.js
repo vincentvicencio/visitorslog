@@ -387,8 +387,8 @@ class UsersTable {
                 } else {
                     $('#reg_location').val('').trigger('change');
                 }
-
-                // Fill name
+                
+                // Always show and fill first/last name fields after role change
                 $('#employee_name_container').removeClass('d-none');
                 $('#reg_first_name').val(response.first_name || '');
                 $('#reg_last_name').val(response.last_name || '');
