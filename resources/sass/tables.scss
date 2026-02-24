@@ -23,7 +23,9 @@
       }
     }
     th{
-      background-color: #0F4383 !important;
+      background-color: #007ea7 !important;
+      border: none;
+
       color: white !important;
       text-align: center !important;
     }
@@ -52,12 +54,12 @@
 }
 .top-button {
   right: 20px;
-  background-color: #0F4383;
+  background-color: #145AB0;
   cursor: pointer;
   transition: 0.2s ease;
 }
 .top-button:hover{
-  background-color: #0f43837f;
+  background-color: #145ab07c;
 }
 .pagination-first, .pagination-prev,
 .pagination-next, .pagination-last{

@@ -170,7 +170,7 @@ let URL = '/visitorslog/';
         );
     });
 
-    $(document).on('click', '#btn_ok', function () {
+    $(document).on('click', '#timeout_btn', function () {
         let Id = $('#record_id').val();
         
         if (!Id) {
