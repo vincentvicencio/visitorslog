@@ -274,9 +274,9 @@ class VisitorController extends Controller
     public function save(Request $request)
     {
         $request->validate([
-            'first_name'        => 'required|string',
-            'middle_name'       => 'nullable|string',
-            'last_name'         => 'required|string',
+            'first_name'        => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
+            'middle_name'       => ['nullable', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
+            'last_name'         => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
             'visitor_type'      => 'required|exists:visitor_types,id',
             'contact_number'    => ['required','min:11','max:11','regex:/^[0-9]+$/','starts_with:09'],
 
@@ -304,6 +304,12 @@ class VisitorController extends Controller
             ],
 
             [
+                'first_name.required' => 'First Name is required',
+                'first_name.regex' => 'First Name must contain letters only',
+                'middle_name.regex' => 'Middle Name must contain letters only',
+                'last_name.required' => 'Last Name is required',
+                'last_name.regex' => 'Last Name must contain letters only',
+                'visitor_type.required' => 'Visitor Type is required',
                 'contact_number.required' => 'Contact Number is required',
                 'contact_number.max' => 'Contact Number must not exceed 11 digits',
                 'contact_number.min' => 'Contact Number must be at least 11 digits',
