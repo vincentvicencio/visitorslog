@@ -16,7 +16,6 @@ class VisitorTypeController extends Controller
         return view('pages.visitorType.visitortype');
     }
 
-
     public function save(Request $request)
     {
         $validator = Validator::make(
@@ -47,14 +46,19 @@ class VisitorTypeController extends Controller
         
         if($duplicateQuery->exists()){
             return response()->json([
+<<<<<<< HEAD
                 'status'    => 1,
                 'message'   => 'Visitor Type Already Exists'
+=======
+                'status'     => 1,
+                'message'    => 'Name Already Exists'
+>>>>>>> 75c44668e6d6ef9ac1cfee5591451d7eb505707e
             ]);
 
         }
 
-        $data       = [
-            'name'               => $request->name,
+        $data           = [
+            'name'           => $request->name,
         ];
 
         if ($record_id > 0) {
@@ -62,10 +66,10 @@ class VisitorTypeController extends Controller
             $oldData    = $status->getOriginal();
 
             $status     = $status->update(['updated_by' => $emp_code] + $data);
-            $message    = 'VisitorType Successfully Updated';
+            $message    = 'Visitor Type Successfully Updated';
         } else {
             $status     = VisitorType::create(['created_by' => $emp_code] + $data);
-            $message    = 'VisitorType Successfully Created';
+            $message    = 'Visitor Type Successfully Created';
         }
         return response()->json([
             'status'    => 0,
@@ -87,22 +91,22 @@ class VisitorTypeController extends Controller
         
         $totalRecords = $rawquery->get()->count();
         
-if ($request->input('draw') > 1) { 
-    $start         = $request->input('start'); 
-    $column        = $request->input('order.0.column');
-    $direction     = $request->input('order.0.dir');
-    $order         = $request->input('columns')[$column]['data']; 
-    $temp          = $rawquery->get(); 
-    $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-    $data          = $rawquery->orderBy("updated_at", "desc")->take($limit)->get();
-    $totalFiltered = count($temp);
-
-} else { 
-
-    $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
-
-    $totalFiltered = $totalRecords;
-}
+        if ($request->input('draw') > 1) { 
+             $start        = $request->input('start'); 
+            $column        = $request->input('order.0.column');
+            $direction     = $request->input('order.0.dir');
+            $order         = $request->input('columns')[$column]['data']; 
+            $temp          = $rawquery->get(); 
+            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
+            $data          = $rawquery->orderBy("updated_at", "desc")->take($limit)->get();
+            $totalFiltered = count($temp);
+       
+        } else { 
+       
+            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
+     
+            $totalFiltered = $totalRecords;
+        }
  
         $newData = [];
         $i       = 0;
@@ -110,16 +114,15 @@ if ($request->input('draw') > 1) {
         foreach ($data as $d) { 
        
             $newData[$i] = [
-                'name'          => $d->name, // show emp_code in first column
-                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
-                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
+                'name'       => $d->name, // show emp_code in first column
+                'created_by' => user_name($d->created_by) ?? '-',
+                'updated_by' => user_name($d->updated_by) ?? '-',
                 'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
                 'action'            => '<div class="dropdown">
                                             <button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>
                                             <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"> Delete</button>
                                         </div>', 
             ];
-
             $i++;
         } 
  
@@ -131,22 +134,20 @@ if ($request->input('draw') > 1) {
         ]);
     }
 
-
     public function search(Request $request){
         $record = VisitorType::find($request->id);
         if(!$record){
             return response()->json([
-                'status'    => 1,
-                'message'   => 'No Data Found'
+                'status'     => 1,
+                'message'    => 'No Data Found'
             ]);
         }
 
         return response()->json([
-            'status'    => 0,
-            'data'      => $record
+            'status'     => 0,
+            'data'       => $record
         ]);
     }
-
 
     public function delete(Request $request){
         $record  = VisitorType::find($request->id);
@@ -154,14 +155,12 @@ if ($request->input('draw') > 1) {
         $record->update(['deleted_by' => Auth::user()->id]);
         $record->delete();
 
-        $message    = 'Visitor Type Successfully Deleted';
+        $message = 'Visitor Type Successfully Deleted';
             return response()->json([
-                'status'    => 0,
-                'message'   => $message
+                'status'     => 0,
+                'message'    => $message
             ]);
     }
-
-
 
     public function destroy($id) 
     {

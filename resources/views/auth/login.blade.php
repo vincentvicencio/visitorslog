@@ -24,7 +24,9 @@
 
                         <div class="">
                         <input id="emp_code" type="text" class="form-control" name="emp_code" placeholder="enter username" required autocomplete="off" autofocus>
-
+                            <span class="error-span error-name text-danger">
+                                {{ session('login_error') }}
+                            </span>
                             @error('emp_code')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>

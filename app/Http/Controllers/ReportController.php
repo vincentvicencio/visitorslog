@@ -16,40 +16,36 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
+        $visitorlogs = Visitor::where('status', 0)
+            ->withoutTrashed()
+            ->orderBy('id', 'asc')
+            ->get();
         $visitorTypes = VisitorType::all();
 
         return view('pages.reports.report', compact('visitorTypes'));
     }
 
-    
-
-
     public function destroy($id)
-
     {
     try {
             $visitor = Visitor::findOrFail($id);
 
-            // Instead of $user->delete(), we update the column
             $visitor->update([
                 'deleted_at' => NOW(),
-                'deleted_by' => Auth::user()->id // Optional: track who deleted it
+                'deleted_by' => Auth::user() -> id // Optional: track who deleted it
             ]);
-
         } catch (\Exception $e) {
         }
-
     }
-
 
     // In your UserController.php
     public function getUser($id) {
         $user = User::find($id);
         return response()->json([
-            'id'        => $user->id,
-            'emp_code'  => $user->emp_code,
-            'role_id'   => $user->user_type, // Ensure this matches your column name
-            'location_id' => $user->location_id 
+            'id'          => $user -> id,
+            'emp_code'    => $user -> emp_code,
+            'role_id'     => $user -> user_type, // Ensure this matches your column name
+            'location_id' => $user -> location_id 
         ]);
     }
 
@@ -63,12 +59,12 @@ class ReportController extends Controller
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
                 ->when($keywords, function ($query) use ($keywords) {
-                    $query->where(function ($q) use ($keywords) {
-                        $q->where('full_name', 'LIKE', "%{$keywords}%")
-                        ->orWhere('visitor_id', 'LIKE', "%{$keywords}%")
-                        ->orWhere('phone_number', 'LIKE', "%{$keywords}%")
-                        ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-                            $qt->where('name', 'LIKE', "%{$keywords}%");
+                    $query -> where(function ($q) use ($keywords) {
+                        $q -> where('full_name', 'LIKE', "%{$keywords}%")
+                        -> orWhere('visitor_id', 'LIKE', "%{$keywords}%")
+                        -> orWhere('phone_number', 'LIKE', "%{$keywords}%")
+                        -> orWhereHas('visitorType', function ($qt) use ($keywords) {
+                            $qt -> where('name', 'LIKE', "%{$keywords}%");
                         });
                     });
                 })
@@ -140,13 +136,9 @@ class ReportController extends Controller
                 $status = 'Timed Out';
             }
 
-            $time_in = Carbon::parse($d->time_in)->format('h:i A');
+            $time_in    = Carbon::parse($d->time_in)->format('h:i A');
 
-            $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
-
-            
-            $createdby = $d->created_by ? user_name($d->created_by) : '-';
-            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
+            $time_out   = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
                     
             if ($status === 'Timed Out') {
                 $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger"> '. $status .'</div></div>';
@@ -164,9 +156,9 @@ class ReportController extends Controller
 
                 'contact_number' => '<div class="text-center">' . $d->phone_number . '</div>',
 
-                'visitor_type' => $d->visitorType?->name ?? '-',
+                'visitor_type' =>  $d->visitorType?->name ?? '-',
 
-                'visitor_id' => $d->visitor_id,
+                'visitor_id'   =>  $d->visitor_id,
 
                 'visit' =>  $d->created_at->format("F d, Y") .'<br>
                         '. $d->created_at->format('l'),
@@ -188,9 +180,9 @@ class ReportController extends Controller
             
                 'status' => $statuslayout,
 
-                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
+                'created_at'   => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
 
-                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
+                'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
                 'action' => '<div class="dropdown text-center">
                                     <button 
@@ -217,10 +209,10 @@ class ReportController extends Controller
     public function exportReport(Request $request)
     {
         $filters = [
-            'search' => $request->input('search', ''),
-            'date_from' => $request->input('date_from', ''),
-            'date_to' => $request->input('date_to', ''),
-            'visitor_type' => $request->input('visitor_type', ''),
+            'search'            => $request->input('search', ''),
+            'date_from'         => $request->input('date_from', ''),
+            'date_to'           => $request->input('date_to', ''),
+            'visitor_type'      => $request->input('visitor_type', ''),
         ];
 
         $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';

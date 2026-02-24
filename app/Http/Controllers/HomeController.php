@@ -39,10 +39,10 @@ public function index(Request $request)
 
     $allEmployeesFromSession = session('all_emp', []); 
 
-    $visitors = Visitor::where('status', 0)
-                   ->whereNull('time_out')
-                   ->orderBy('id', 'asc')
-                   ->get();
+    $visitors     =  Visitor::where('status', 0)
+                    ->whereNull('time_out')
+                    ->orderBy('id', 'asc')
+                    ->get();
     $visitorTypes = VisitorType::where('deleted_at', null)
                     ->orderBy('id', 'asc')
                     ->get();

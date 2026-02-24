@@ -1,6 +1,4 @@
-import { Modal, Dropdown } from 'bootstrap';
 import triggers from './common/triggers';
-import component from './common/component';
 import * as bootstrap from 'bootstrap';
 import $ from 'jquery';
 import container from './common/container';
@@ -94,7 +92,6 @@ $(document).ready(function(){
             date_to: '',
             visitor_type: ''
         });
-
 
         const filterModal = document.getElementById('filterModal');
         const modalInstance = bootstrap.Modal.getInstance(filterModal);
@@ -236,7 +233,6 @@ document.getElementById('btn_ok').addEventListener('click', function() {
                 new bootstrap.Modal(modalEl);
 
             modalInstance.hide();
-
         },
         error: function (xhr) {
             // Re-enable button on error
@@ -332,14 +328,12 @@ class ReportClassTable {
                     });
             });
 
-
         setTimeout(() => {
             const searchInput = document.getElementById('dt-search-0');             
                 if (searchInput) {
                     searchInput.setAttribute('placeholder', 'Search here...');
                 }
-            }, 100);
-
+        },  100);
     }
 
     async initializeButtons(){
@@ -358,8 +352,6 @@ class ReportClassTable {
             await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
         });
     }
-
-
 }
 const instance = new ReportClassTable();
 instance.initializePage();

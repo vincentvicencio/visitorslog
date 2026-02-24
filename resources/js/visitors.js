@@ -2,9 +2,6 @@ import { Modal } from 'bootstrap';
 import Triggers from './common/triggers.js';
 import settable from './common/settable';
 import $ from 'jquery';
-import container from './common/container';
-import datahandling from './common/datahandling';
-import component from './common/component';
 
 const deleteModalEl = document.getElementById('notificationContainer');
 const deleteModal = new Modal(deleteModalEl);
@@ -305,7 +302,6 @@ let URL = '/visitorslog/';
                 {},
                 false 
             );
-
             // =====================================================
             //  INIT COMPLETE (SAFE API ACCESS)
             // =====================================================
@@ -333,9 +329,9 @@ let URL = '/visitorslog/';
                         tableApi.page.len(this.value).draw();
                     });
             });
-
         }
     }
+
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();
 
@@ -379,7 +375,6 @@ let URL = '/visitorslog/';
         video.style.display = 'block'; 
         imageInput.value = ""; 
     });
-
 
     startWebcam();
 // });
