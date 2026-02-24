@@ -60,7 +60,7 @@ class User_TypesController extends Controller
             $message    = 'User Type Successfully Updated';
         } else {
             $status     = User_types::create(['created_by' => $emp_code] + $data);
-            $message    = 'User Type Status Successfully Created';
+            $message    = 'User Type Successfully Created';
         }
         return response()->json([
             'status'    => 0,
@@ -105,12 +105,16 @@ class User_TypesController extends Controller
        
             $newData[$i] = [
                 'name'          => '<div class="text-center">' . $d->name . '</div>', // show emp_code in first column
-                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
-                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
-                'created_at' => '<div class="text-center">' . ($d->created_at ? $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') : '-')  . '</div>',
-                'action'            => '<div class="dropdown text-center">
-                                            <button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>
-                                            <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"> Delete</button>
+                'created_by'    => user_name($d->created_by) ?? '-',
+                'updated_by'    => user_name($d->updated_by) ?? '-',
+                'created_at'    => '<div class="text-center">' . $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') . '</div>',
+                'action'        => '<div class="dropdown text-center">
+                                        <a class="dropdown-item btn-edit" data-id="'. $d->id .'">
+                                            Edit
+                                        </a>
+                                        <a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '">
+                                            Delete
+                                        </a>
                                     </div>',
             ];
             $i++;

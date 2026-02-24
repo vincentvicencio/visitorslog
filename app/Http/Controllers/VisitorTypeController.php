@@ -114,10 +114,14 @@ class VisitorTypeController extends Controller
                 'created_by' => user_name($d->created_by) ?? '-',
                 'updated_by' => user_name($d->updated_by) ?? '-',
                 'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
-                'action'            => '<div class="dropdown">
-                                            <button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>
-                                            <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '"> Delete</button>
-                                        </div>', 
+                'action'     => '<div class="dropdown text-center">
+                                    <a class="dropdown-item btn-edit" data-id="'. $d->id .'">
+                                        <i class="bi bi-pencil-square me-2"></i> Edit
+                                    </a>
+                                    <a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '">
+                                        <i class="bi bi-trash me-2"></i> Delete
+                                    </a>
+                                </div>',
             ];
             $i++;
         } 
