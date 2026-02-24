@@ -60,7 +60,7 @@ class User_TypesController extends Controller
             $message    = 'User Type Successfully Updated';
         } else {
             $status     = User_types::create(['created_by' => $emp_code] + $data);
-            $message    = 'User Type Status Successfully Created';
+            $message    = 'User Type Successfully Created';
         }
         return response()->json([
             'status'    => 0,
@@ -109,28 +109,18 @@ class User_TypesController extends Controller
                 'updated_by'    => user_name($d->updated_by) ?? '-',
                 'created_at'    => '<div class="text-center">' . $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l') . '</div>',
                 'action'        => '<div class="dropdown text-center">
-                                        <button class="btn btn-sm btn-primary dropdown-toggle" 
-                                                type="button" 
-                                                data-bs-toggle="dropdown" 
-                                                data-bs-boundary="viewport" aria-expanded="false">
-                                            Action
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li>   
-                                                <a class="dropdown-item btn-edit" data-id="'. $d->id .'">
-                                                <i class="bi bi-pencil-square me-2"> </i> Edit</a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '">
-                                                <i class="bi bi-trash me-2"> </i> Delete</a>
-                                            </li>
-                                        </ul>
-                                    </div>' 
+                                        <a class="dropdown-item btn-edit" data-id="'. $d->id .'">
+                                            Edit
+                                        </a>
+                                        <a class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->name. '">
+                                            Delete
+                                        </a>
+                                    </div>',
             ];
             $i++;
         } 
  
-        return response()->json([
+        return response()->json([   
             'draw'              => intval($request->input('draw')),
             'recordsTotal'      => $totalRecords,
             'recordsFiltered'   => $totalFiltered,
