@@ -24,12 +24,15 @@ class RegisterIDController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name'              => 'required',
+                'name'              => ['required','regex:/^[0-9]+$/', 'max:4', 'min:4'],
                 'visitorType'       => 'required|exists:visitor_types,id',
             ],
             [
-                'name'              => 'Name is Required',  
-                'visitorType'       => 'required|exists:visitor_types,id',
+                'name.required'           => 'Visitor ID is Required',
+                'name.regex'              => 'Visitor ID must contain only numbers',
+                'name.max'                => 'Visitor ID must not exceed 4 digits',
+                'name.min'                => 'Visitor ID must be 4 digits',
+                'visitorType.required'    => 'Visitor Type is Required',
             ]
         );
 
@@ -51,6 +54,7 @@ class RegisterIDController extends Controller
         if($duplicateQuery->exists()){
             return response()->json([
                 'status'    => 1,
+                'title'     => 'Error',
                 'message'   => 'Visitor ID Already Exists'
             ]);
 
@@ -73,6 +77,7 @@ class RegisterIDController extends Controller
         }
         return response()->json([
             'status'    => 0,
+            'title'     => 'Success',
             'message'   => $message
         ]);
 
@@ -141,12 +146,6 @@ class RegisterIDController extends Controller
                 'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
 
                 'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
-                'created_by'   => user_name($d->created_by) ?? '-',
-                'updated_by'   => user_name($d->updated_by) ?? '-',
-
-                'created_at'   => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
-
-                'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
                 'action'       => $action
             ];
@@ -167,6 +166,7 @@ class RegisterIDController extends Controller
         if(!$record){
             return response()->json([
                 'status'    => 1,
+                'title'     => 'Error',
                 'message'   => 'No Data Found'
             ]);
         }
@@ -186,6 +186,7 @@ class RegisterIDController extends Controller
         $message    = 'Registered ID Successfully Deleted';
             return response()->json([
                 'status'    => 0,
+                'title'     => 'Success',
                 'message'   => $message
             ]);
     }

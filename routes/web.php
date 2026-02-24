@@ -35,6 +35,9 @@ Route::middleware(['auth', 'single.session'])->group(function () {
             Route::post('/save',            'save')->name('visitorslog.save');
             Route::post('/timeout',         'timeout')->name('visitorslog.timeout');
             Route::post('/view',            'view')->name('visitorslog.view');
+            Route::any('{any}', function () {
+                return redirect()->route('visitorslog.form');
+            })->where('any', '.*');
         });
         
     Route::middleware(['auth', 'user_type:1'])->group(function () {

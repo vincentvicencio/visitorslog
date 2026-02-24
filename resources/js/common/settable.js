@@ -1,3 +1,4 @@
+
 class Datatable {
      /**
      * Create Table  = it will pullout all data
@@ -8,11 +9,12 @@ class Datatable {
      * @param module = method name (e.g window.forecasting  )
      * @param pagination= how many rows will display
      */
+    
     async createTable(table, theads, url, tbodies = "", module, enableSearch = true, pagination = 10) {
         const self = this
 
         const data = await datahandling.processData(url + 'list', 'GET')
-
+        $.fn.dataTable.ext.pager.numbers_length = 3;
         $(table).DataTable().clear().destroy()
         $(table).DataTable({
             pageLength:     pagination,
@@ -23,9 +25,17 @@ class Datatable {
             responsive:     false,
             stateSave:      true,
             paging:         true,
+            layout: {
+                bottomEnd: {
+                    paging: {
+                        type: 'simple_numbers',
+                        numbers: 3
+                    }
+                }
+            },
             ordering:       true,
             info:           true,
-            pagingType: 'simple',
+            pagingType: 'simple_numbers',
             language: {
                 'paginate': {
                     next:     '<span aria-hidden="true">&gt;</span>',
@@ -136,7 +146,7 @@ class Datatable {
             stateSave       :     true,
             searching       :     enableSearch,
             search          :     { return: true },
-            pagingType      :     'simple',
+            pagingType      :     'simple_numbers',
             language: {
                 'paginate': {
                     next:     '<span aria-hidden="true">&gt;</span>',

@@ -21,6 +21,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'single.session' => SingleSessionMiddleware::class,
         ]);
     })
+
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'user_type' => UsertypeMiddleware::class,
+        'single.session' => \App\Http\Middleware\SingleSessionMiddleware::class,
+        ]);
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

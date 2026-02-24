@@ -4,8 +4,12 @@
 @endsection
 
 @section('content')
-
-    <div class="container-background position-fixed top-0 start-0 vw-100 vh-100 bg-black"><img src="/images/bgg.png" alt="" class="w-100 h-100 d-block opacity-75 object-fit-cover"></div>
+    <div class="loginbackground1 container-background position-fixed top-0 start-0 vw-100 vh-100">
+        <img src="/images/login-background-1.png" alt="" class="background-image-1 w-100 h-100 object-fit-cover">
+        <img src="/images/login-background-2.png" alt="" class="background-image-2 object-fit-cover">
+        <div class="shadow"></div>
+        <div class="background-image-4"><img src="/images/Magellan-Logo-w-Tagline.png" alt="" class=""></div>
+    </div>
     <div class="addvisitor" id="addVisitorModal">
         <div class="addvisitormodal">
             <div class="panel">
@@ -61,9 +65,16 @@
                                 <textarea name="address" id="address" class="form-control" placeholder=" " rows="3" required autocomplete="off"></textarea>
                                 <label for="address">Address</label>
                             </div>
+                            {{-- buttons --}}
+                            <div class="panel-buttons">
+                                <button type="submit" class="save" id="saveBtn">save</button>
+                                <button type="button" class="clear" id="clrBtn">clear</button>
+                            </div>
+
+
                         </div>
                         {{-- For capturing image --}}
-                        <div class="capture">
+                        {{-- <div class="capture">
                             <div class="header">Capture Image</div>
                             <div class="imgholder" style="overflow: hidden">
                                 <video id="webcam" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
@@ -75,14 +86,22 @@
                             <button type="button" class="capture-button" id="recaptureBtn">ReCapture</button>
                             
                             <input type="hidden" id="image_path" name="image_path">
+                        </div> --}}
+
+                        <div class="capture">
+                            <div class="header">Capture Image</div>
+                            <div class="imgholder" style="overflow: hidden">
+                                <input type="file" name="imageInput" id="imageInput" accepts="image/*" capture="user" hidden>
+                                <img id="photoPreview" src="" style="display:none; width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+
+                            <button type="button" class="capture-button" id="captureBtn">Capture</button>
+                            <button type="button" class="capture-button" id="recaptureBtn">ReCapture</button>
+                        
                         </div>
 
                     </div>
-                    {{-- buttons --}}
-                    <div class="panel-buttons">
-                        <button type="submit" class="save" id="saveBtn">save</button>
-                        <button type="button" class="clear" id="clrBtn">clear</button>
-                    </div>
+                    
                 </form>
             </div>
         </div>

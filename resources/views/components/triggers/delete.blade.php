@@ -24,8 +24,8 @@
                                     <div class="d-flex justify-content-center">
                                         <button type="button" class="btn btn-secondary btn-cancel col-3 me-2"
                                             data-bs-dismiss="modal" aria-label="Close" id="cancel">Cancel</button>
-                                            @if(!Request::is('visitorslog'))
-                                            <button type="button" class="btn btn-danger col-3" id="btn_ok">Yes</button>
+                                        @if(!Request::is('visitorslog'))
+                                        <button type="button" class="btn btn-danger col-3" id="btn_ok">Yes</button>
                                         @else
                                             <button type="button" class="btn btn-danger col-3" id="timeout_btn">Yes</button>
                                         @endif

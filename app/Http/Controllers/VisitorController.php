@@ -9,8 +9,8 @@ use App\Models\RegisteredID;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-
 use Illuminate\Support\Str;
+
 class VisitorController extends Controller
 {
     public function index()
@@ -104,20 +104,6 @@ class VisitorController extends Controller
                 }
             }
 
-            $image = '';
-
-            if ($d->image_path == null) {
-                $image = 'No Image Provided';
-            }else{
-                $image ='<button 
-                    class="btn-sm view-button text-white border-0 rounded-2 px-3 py-1"
-                        id="viewImageBtn"
-                        data-id="'. $d->id .'"
-                        data-image="'. Storage::url($d->image_path) .'">
-                        View
-                    </button>';
-            }
-
             $status = '';
 
             if($d->status == 0){
@@ -132,15 +118,8 @@ class VisitorController extends Controller
 
             $createdby = $d->created_by ? user_name($d->created_by) : '-';
             $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
-            $fullName = '<div class="text-center">
-                <strong>' . $d->full_name . '</strong>';
+            
 
-                if (Auth::user()->user_type != 3) {
-                    $fullName .= '<br><small>' . $locationLabel . '</small>';
-                }
-
-                $fullName .= '<br><small>' . $d->phone_number . '</small>
-                            </div>';
             $newData[$i] = [
                 
 
@@ -276,11 +255,12 @@ class VisitorController extends Controller
     public function save(Request $request)
     {
         $request->validate([
-            'first_name'        => 'required|string',
-            'middle_name'       => 'nullable|string',
-            'last_name'         => 'required|string',
+            'first_name'        => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
+            'middle_name'       => ['nullable', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
+            'last_name'         => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
             'visitor_type'      => 'required|exists:visitor_types,id',
-            'contact_number'    => ['required','min:11','max:11','regex:/^[0-9]+$/','starts_with:09'],
+            'contact_number'    => ['required','min:11','max:11','regex:/^[0-9]+$/','starts_with:09'],            
+            'image_path'        => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
 
             'id_number'    => [
                 'required',
@@ -306,6 +286,12 @@ class VisitorController extends Controller
             ],
 
             [
+                'first_name.required' => 'First Name is required',
+                'first_name.regex' => 'First Name must contain letters only',
+                'middle_name.regex' => 'Middle Name must contain letters only',
+                'last_name.required' => 'Last Name is required',
+                'last_name.regex' => 'Last Name must contain letters only',
+                'visitor_type.required' => 'Visitor Type is required',
                 'contact_number.required' => 'Contact Number is required',
                 'contact_number.max' => 'Contact Number must not exceed 11 digits',
                 'contact_number.min' => 'Contact Number must be at least 11 digits',
@@ -313,39 +299,37 @@ class VisitorController extends Controller
                 'contact_number.starts_with' => 'Contact Number must start with 09',
             ],
 
-            'image_path' => 'nullable|',
         ]);
 
 
 
         try {
-            // Handle image upload
+            // $image     = $request->image_path;
+
+            // // Remove metadata (data:image/png;base64,)
+            // $image     = preg_replace('/^data:image\/\w+;base64,/', '', $image);
+
+            // // Decode base64
+            // $image     = base64_decode($image);
+
+            // // Generate filename
+
+
+            // // Save to public disk
+            // Storage::disk('public')->put($fileName, $image);
+
+            // $imagePath = $fileName;
+
             $imagePath = null;
+            if ($request->hasFile('imageInput') && $request->file('imageInput')->isValid()) {
+                $fileName  = 'visitors/' . Str::random(20) . '.png';
+                $imagePath = $request->file('imageInput')->storeAs('visitors', $fileName, 'public');
+            }
 
-        if ($request->image_path) {
-            $image     = $request->image_path;
-
-            // Remove metadata (data:image/png;base64,)
-            $image     = preg_replace('/^data:image\/\w+;base64,/', '', $image);
-
-            // Decode base64
-            $image     = base64_decode($image);
-
-            // Generate filename
-            $fileName  = 'visitors/' . Str::random(20) . '.png';
-
-            // Save to public disk
-            Storage::disk('public')->put($fileName, $image);
-
-            $imagePath = $fileName;
-        }
             $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
 
-            $userLocations = []; 
+            $userLocations = (array) Auth::user()->location;
 
-                foreach ((array) Auth::user()->location as $loc) {
-                    $userLocations[] = (int) $loc;
-                }
             $visitor = new Visitor();
             // clint - remove dot when there is no middle name
             if (!empty($middleInitial)) {
@@ -359,7 +343,7 @@ class VisitorController extends Controller
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $userLocations[0];
+            $visitor->location     = $userLocations[0] ?? null;
             $visitor->address      = $request->address;
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;

@@ -5,16 +5,10 @@ import $ from 'jquery';
 
 const deleteModalEl = document.getElementById('notificationContainer');
 const deleteModal = new Modal(deleteModalEl);
-const video = document.getElementById('webcam');
-const canvas = document.getElementById('canvas');
-const captureBtn = document.getElementById('captureBtn');
-const recaptureBtn = document.getElementById('recaptureBtn');
-const photoPreview = document.getElementById('photoPreview');
-const imageInput = document.getElementById('image_path');
 
 let URL = '/visitorslog/';
 
-// $(document).ready(function () {
+$(document).ready(function () {
 
     $('#addVisitorForm').on('submit', function (e) {
         e.preventDefault();
@@ -37,20 +31,19 @@ let URL = '/visitorslog/';
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
-                Triggers.showToast(response.message, 0);
+                Triggers.showToast(response.message, 'Success', 0);
                 setTimeout(() => {
                     $('.toast').fadeOut('slow');
                 }, 2000);
                 $('#addVisitorForm')[0].reset();
-                photoPreview.src = "";
-                photoPreview.style.display = 'none';
-                video.style.display = 'block'; 
-                imageInput.value = ""; 
+                $('#image_path').val(''); 
+                $('#photoPreview').css('display', 'none');
+                $('#photoPreview').attr('src', '');
             },
             error: function (xhr, status, error) {
                 console.error('Save error:', error, xhr);
                 let msg = 'Save failed.';
-                
+                let title = 'Error';
                 if (status === 'timeout') {
                     msg = 'Request timeout. Please check your connection.';
                 } else if (xhr.responseJSON?.message) {
@@ -61,7 +54,7 @@ let URL = '/visitorslog/';
                     msg = 'Server error. Please try again later.';
                 }
                 
-                Triggers.showToast(msg, 1);
+                Triggers.showToast(msg, title, 1);
             },
             complete: function () {
                 submitBtn.prop('disabled', false).text(originalText);
@@ -71,46 +64,20 @@ let URL = '/visitorslog/';
 
     $(document).on('click', '#clrBtn', function () {
         $('#addVisitorForm')[0].reset();
-        photoPreview.src = "";
-        photoPreview.style.display = 'none';
-        video.style.display = 'block'; 
-        imageInput.value = ""; 
+        $('#photoPreview').css('display', 'none');
+        $('#photoPreview').attr('src', '');
+        $('#imageInput').val(''); 
     });
 
     $('#captureBtn').on('click', function () {
         $('#imageInput').click();
     });
 
-    $('#imageInput').on('change', function (e) {
-        const file = e.target.files[0];
-        if (file) {
-            // Validate file type
-            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                Triggers.showToast('Invalid file type. Please upload an image.', 1);
-                return;
-            }
-            
-            // Validate file size
-            const maxSize = 5 * 1024 * 1024;
-            if (file.size > maxSize) {
-                Triggers.showToast('File size exceeds 5MB limit.', 1);
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                $('.imgholder').html(`<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`);
-            };
-            reader.onerror = function (error) {
-                console.error('FileReader error:', error);
-                Triggers.showToast('Failed to read image file.', 1);
-            };
-            reader.onabort = function () {
-                Triggers.showToast('Image read was cancelled.', 1);
-            };
-            reader.readAsDataURL(file);
-        }
+    $('#recaptureBtn').on('click', function () {
+        $('#photoPreview').css('display', 'none');
+        $('#photoPreview').attr('src', '');
+        $('#imageInput').val(''); 
+
     });
 
     $(document).on('click', '#viewBtn', function () {
@@ -156,6 +123,41 @@ let URL = '/visitorslog/';
         });
     });
 
+
+    $('#imageInput').on('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (!validTypes.includes(file.type)) {
+                Triggers.showToast('Invalid file type. Please upload an image.', 'Invalid', 1);
+                return;
+            }
+            
+            // Validate file size
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                Triggers.showToast('File size exceeds 5MB limit.', 'Size Limit Exceeded', 1);
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                $('#photoPreview').css('display', 'block');
+                $('#photoPreview').attr('src', event.target.result);
+
+            };
+            reader.onerror = function (error) {
+                console.error('FileReader error:', error);
+                Triggers.showToast('Failed to read image file.', 'Error', 1);
+            };
+            reader.onabort = function () {
+                Triggers.showToast('Image read was cancelled.', 'Cancelled', 1);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     $(document).on('click', '#timeoutBtn', function () {
         let Id = $(this).data('id');
         Triggers.showNotification(
@@ -170,7 +172,7 @@ let URL = '/visitorslog/';
         let Id = $('#record_id').val();
         
         if (!Id) {
-            Triggers.showToast('Invalid record ID.', 1);
+            Triggers.showToast('Invalid record ID.', 'Invalid', 1);
             return;
         }
         $.ajax({
@@ -182,7 +184,7 @@ let URL = '/visitorslog/';
             },
             timeout: 15000,
             success: function (response) {
-                Triggers.showToast(response.message, 0);
+                Triggers.showToast(response.message, 'Success', 0);
                 setTimeout(() => {
                     $('.toast').fadeOut('slow');
                     try {
@@ -209,42 +211,9 @@ let URL = '/visitorslog/';
                     msg = 'Server error. Please try again later.';
                 }
                 
-                Triggers.showToast(msg, 1);
+                Triggers.showToast(msg, 'Error', 1);
             }
         });
-    });
-
-    let imageModal;
-    try {
-        const imageModalEl = document.getElementById('imageModal');
-        if (imageModalEl) {
-            imageModal = new Modal(imageModalEl);
-        } else {
-            console.warn('Image modal element not found');
-        }
-    } catch (e) {
-        console.error('Error initializing image modal:', e);
-    }
-
-    $(document).on('click', '#viewImageBtn', function () {
-        const imageUrl = $(this).data('image');
-
-        if (!imageUrl) {
-            Triggers.showToast('Image URL not found.', 1);
-            return;
-        }
-        
-        if (imageModal) {
-            $('#modalImage').attr('src', imageUrl);
-            try {
-                imageModal.show();
-            } catch (e) {
-                console.error('Error showing image modal:', e);
-                Triggers.showToast('Failed to display image.', 1);
-            }
-        } else {
-            Triggers.showToast('Image modal not available.', 1);
-        }
     });
 
     class VisitorsLogTable {
@@ -265,8 +234,7 @@ let URL = '/visitorslog/';
         async list() {
             const self = this;
 
-            
-            const appEl = document.getElementById('app');
+            const appEl = document.getElementById('usertypeCheck');
             const isAdmin = appEl.dataset.type == 1;
 
             const tableHeader = [
@@ -301,7 +269,6 @@ let URL = '/visitorslog/';
                 {},
                 false 
             );
-            
             // =====================================================
             //  INIT COMPLETE (SAFE API ACCESS)
             // =====================================================
@@ -336,44 +303,45 @@ let URL = '/visitorslog/';
     visitorsLog.onLoadPage();
 
     // 1. Start the webcam
-    async function startWebcam() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: "user" }, 
-                audio: false 
-            });
-            video.srcObject = stream;
-        } catch (err) {
-            console.error("Error accessing webcam: ", err);
-            alert("Webcam access denied or not available.");
-        }
-    }
+    // async function startWebcam() {
+    //     try {
+    //         const stream = await navigator.mediaDevices.getUserMedia({ 
+    //             video: { facingMode: "user" }, 
+    //             audio: false 
+    //         });
+    //         video.srcObject = stream;
+    //     } catch (err) {
+    //         console.error("Error accessing webcam: ", err);
+    //         alert("Webcam access denied or not available.");
+    //     }
+    // }
 
-    // 2. Capture photo
-    captureBtn.addEventListener('click', () => {
-        const context = canvas.getContext('2d');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+    // // 2. Capture photo
+    // captureBtn.addEventListener('click', () => {
+    //     const context = canvas.getContext('2d');
+    //     canvas.width = video.videoWidth;
+    //     canvas.height = video.videoHeight;
         
-        // Draw the current video frame to the canvas
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    //     // Draw the current video frame to the canvas
+    //     context.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-        // Convert the canvas image to a data URL
-        const imageData = canvas.toDataURL('image/png');    
+    //     // Convert the canvas image to a data URL
+    //     const imageData = canvas.toDataURL('image/png');    
         
-        // Display the captured image
-        photoPreview.src = imageData;
-        photoPreview.style.display = 'block';
-        video.style.display = 'none'; 
-        imageInput.value = imageData; 
-    });
+    //     // Display the captured image
+    //     photoPreview.src = imageData;
+    //     photoPreview.style.display = 'block';
+    //     video.style.display = 'none'; 
+    //     imageInput.value = imageData; 
+    // });
 
-    // 3. Recapture photo
-    recaptureBtn.addEventListener('click', () => {
-        photoPreview.src = "";
-        photoPreview.style.display = 'none';
-        video.style.display = 'block'; 
-        imageInput.value = ""; 
-    });
-    startWebcam();
-// });
+    // // 3. Recapture photo
+    // recaptureBtn.addEventListener('click', () => {
+    //     photoPreview.src = "";
+    //     photoPreview.style.display = 'none';
+    //     video.style.display = 'block'; 
+    //     imageInput.value = ""; 
+    // });
+
+    // startWebcam();
+});

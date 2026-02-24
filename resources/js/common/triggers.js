@@ -5,8 +5,9 @@ class Triggers {
      * @param msg = notification message
      * @param err = 1=Error, 0/null = Success
      */
-    async showToast(msg, err = 0) {
+    async showToast(msg, title, err = 0) {
         $('.toast-body strong').text(msg);
+        $('.toast-title').text(title);
         $('.toast').css('z-index', 10000);
         $('.toast').removeClass('bg-danger bg-success');
         $('.toast').addClass(err > 0 ? 'bg-danger' : 'bg-success');
@@ -41,7 +42,7 @@ class Triggers {
             const response = await datahandling.processData(url, 'POST', data)
 
             if (response) {
-                self.showToast(response.message)
+                self.showToast(response.message, response.title, response.status)
                 setTimeout(() => { location.reload() }, 2000)
             }
         })

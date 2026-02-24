@@ -231,8 +231,9 @@ class ReportController extends Controller
 
         $message    = 'Report Log Successfully Deleted';
             return response()->json([
-                'status'    => 0,
-                'message'   => $message
-            ]);
+            'status' => 0,
+            'title' => 'Success',
+            'message' => $message
+        ]);
     }
 }

@@ -50,9 +50,13 @@ class UsersTable {
 
     async handleEmployeeSearchClick(event) {
         const empCode = $('#reg_emp_code').val().trim();
-
+        // Require minimum length for employee code (e.g., 4 digits)
         if (!empCode) {
-            Triggers.showToast('Please enter an employee code.', 1);
+            Triggers.showToast('Please enter an employee code.', 'Employee Search', 1);
+            return;
+        }
+        if (empCode.length < 3) { // Change 4 to your required employee code length
+            Triggers.showToast('Please enter the full employee code.','Employee Search', 1);
             return;
         }
 
@@ -66,29 +70,24 @@ class UsersTable {
             timeout: 10000,
             success: function (response) {
                 const results = response.results || [];
+                // Only allow exact match
                 const exactMatch = results.find(emp => emp.id.toLowerCase() === empCode.toLowerCase());
 
                 if (exactMatch) {
                     $('#reg_first_name').val(exactMatch.first_name || '');
                     $('#reg_last_name').val(exactMatch.last_name || '');
                     $('#employee_name_container').removeClass('d-none');
-                    Triggers.showToast('Employee found!', 0);
-                } else if (results.length > 0) {
-                    $('#reg_first_name').val(results[0].first_name || '');
-                    $('#reg_last_name').val(results[0].last_name || '');
-                    $('#reg_emp_code').val(results[0].id);
-                    $('#employee_name_container').removeClass('d-none');
-                    Triggers.showToast('Employee found!', 0);
+                    Triggers.showToast('Employee found!','Employee Search', 0);
                 } else {
                     $('#reg_first_name').val('');
                     $('#reg_last_name').val('');
                     $('#employee_name_container').addClass('d-none');
-                    Triggers.showToast('Employee code not found.', 1);
+                    Triggers.showToast('Employee code not found.','Employee Search', 1);
                 }
                 $btn.prop('disabled', false).html('<i class="bi bi-search"></i>');
             },
             error: function () {
-                Triggers.showToast('Failed to search employee.', 1);
+                Triggers.showToast('Failed to search employee.','Employee Search', 1);
                 $btn.prop('disabled', false).html('<i class="bi bi-search"></i>');
             }
         });
@@ -107,7 +106,6 @@ class UsersTable {
         this.initializeButtons();
         this.initializeEmployeeSearchButton();
         component.createDropdown(self.url + 'get-user-type', '#reg_user_type',  null, self.modal);
-        // Removed undefined selectedValue usage
         this.location_dropdown();
         this.handleRoleChange();
     }
@@ -327,7 +325,6 @@ class UsersTable {
                     tableApi.page.len(this.value).draw();
                 });
         });
-        
     }
 
     async initializeButtons(){
@@ -374,9 +371,6 @@ class UsersTable {
                 $('#reg_emp_code').val(response.emp_code || '');
                 $('#reg_user_type').val(response.role_id || '');
 
-                // Trigger change event on user type to update UI (before setting location)
-                $('#reg_user_type').trigger('change');
-
                 // Fill usertype
                 $('#reg_user_type').trigger('change');
 
@@ -408,7 +402,7 @@ class UsersTable {
             }
         } catch (error) {
             console.error('Failed to load user data:', error);
-            Triggers.showToast('Failed to load user data.', 1);
+            Triggers.showToast('Failed to load user data.','User Data', 1);
         }
     }
 
