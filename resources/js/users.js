@@ -324,7 +324,6 @@ class UsersTable {
                     tableApi.page.len(this.value).draw();
                 });
         });
-        
     }
 
     async initializeButtons(){
@@ -385,7 +384,7 @@ class UsersTable {
                 } else {
                     $('#reg_location').val('').trigger('change');
                 }
-
+                
                 // Always show and fill first/last name fields after role change
                 $('#employee_name_container').removeClass('d-none');
                 $('#reg_first_name').val(response.first_name || '');

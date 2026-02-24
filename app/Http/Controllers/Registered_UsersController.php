@@ -202,8 +202,8 @@ class Registered_UsersController extends Controller
         $apiUrl = "http://192.168.200.185:1924/api/employee_details/" . $empCode;
         $response = Http::timeout(5)->get($apiUrl);
         
-        if ($response->successful()) {
-            $apiData = $response->json();
+        if ($response  ->successful()) {
+            $apiData   = $response->json();
             $firstName = $apiData['FirstName'] ?? $firstName;
             $lastName  = $apiData['LastName'] ?? $lastName;
         }
@@ -259,12 +259,12 @@ class Registered_UsersController extends Controller
         ]);
 
         return response()->json([
-            'status' => 'success', 
+            'status'  => 'success', 
             'message' => 'User deactivated successfully.'
         ]);
     } catch (\Exception $e) {
         return response()->json([
-            'status' => 'error', 
+            'status'  => 'error', 
             'message' => 'Failed to remove user.'
         ], 500);
     }
@@ -272,7 +272,6 @@ class Registered_UsersController extends Controller
 
     public function getUserTypes()
     {
-
         $user_type = User_types::get(['id', 'name']);
         $data = [];
     
@@ -285,7 +284,6 @@ class Registered_UsersController extends Controller
                 'text' => $record['name']
             ];
         }
-
         return response()->json($data);
     }
 
@@ -326,7 +324,7 @@ class Registered_UsersController extends Controller
         'role_id'       => $user->user_type,
         'role_name'     => $roleName,
         'location_id'   => $locationIds, // Return as array of IDs for multi-select
-        'location_names' => $locationNames // Display names
+        'location_names'=> $locationNames // Display names
     ]);
 }
 public function edit(Request $request, $id) 

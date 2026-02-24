@@ -59,7 +59,7 @@ $(document).ready(function(){
             window.location.href = exportUrl;
             
             // Show success toast
-            triggers.showToast('Exporting report to Excel...', 0);
+            triggers.showToast('Exporting report to Excel...', 'Exporting', 0);
         } catch (error) {
             console.error('Export error:', error);
             triggers.showToast('Failed to export report. Please try again.', 1);

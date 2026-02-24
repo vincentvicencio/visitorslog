@@ -21,7 +21,7 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
     public function collection()
     {
         $query = Visitor::with('visitorType')
-            ->where('status', 0)
+            ->where('status', 1)
             ->withoutTrashed();
 
         // Apply search filter
@@ -66,7 +66,7 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
                 }
             }
 
-            $status = $visitor->status == 0 ? 'Active' : 'Timed Out';
+            $status = $visitor->status == 1 ? 'Timed Out' : 'Active';
 
             $fullName = trim(implode(' ', array_filter([
                 $visitor->first_name,
@@ -88,8 +88,8 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
                 'Time In'      =>     $timeIn,
                 'Time Out'     =>     $timeOut,
                 'Status'       =>     $status,
-                'Created By'   =>     $visitor->getEmpName($visitor->created_by),
-                'Updated By'   =>     $visitor->getEmpName($visitor->updated_by) ?? '-',
+                'Created By'   =>     user_name($visitor->created_by) ?? '-',
+                'Updated By'   =>     user_name($visitor->updated_by) ?? '-',
                 'Created At'   =>     $visitor->created_at->format('F j, Y H:i A'),
             ];
         });
