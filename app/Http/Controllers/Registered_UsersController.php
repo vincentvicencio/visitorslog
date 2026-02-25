@@ -80,7 +80,7 @@ class Registered_UsersController extends Controller
         'emp_code.unique' => 'Employee code already exists.',
     ];
 
-    $validator = Validator::make($request->all(), $validationRules, $messages);
+    $validator = Validator::make($request->all(), $validationRules,'Error', $messages);
 
     if ($validator->fails()) {
         return response()->json([
@@ -269,11 +269,13 @@ class Registered_UsersController extends Controller
 
         return response()->json([
             'status'  => 'success', 
+            'title'   => 'Success',
             'message' => 'User deactivated successfully.'
         ]);
     } catch (\Exception $e) {
         return response()->json([
             'status'  => 'error', 
+            'title'   => 'Error',
             'message' => 'Failed to remove user.'
         ], 500);
     }
@@ -421,6 +423,7 @@ public function edit(Request $request, $id)
             if (count($locations) === 0) {
                 return response()->json([
                     'status'  => 'error',
+                    'title'   => 'Select Location',
                     'message' => 'Please select at least one location.'
                 ], 422);
             }
@@ -428,6 +431,7 @@ public function edit(Request $request, $id)
             if ($roleId === 2 && count($locations) > 1) { // Receptionist
                 return response()->json([
                     'status'  => 'error',
+                    'title'   => 'Select Location',
                     'message' => 'Receptionist can only have one location.'
                 ], 422);
             }
@@ -567,12 +571,14 @@ public function list(Request $request){
         if(!$record){
             return response()->json([
                 'status'     => 1,
+                'title'      => 'Error',
                 'message'    => 'No Data Found'
             ]);
         }
 
         return response()->json([
             'status'     => 0,
+            'title'      => 'Success',
             'data'       => $record
         ]);
     }
@@ -586,6 +592,7 @@ public function list(Request $request){
         $message    = 'Registered User Successfully Deleted';
             return response()->json([
                 'status'     => 0,
+                'title'      => 'Success',
                 'message'    => $message
             ]);
     }

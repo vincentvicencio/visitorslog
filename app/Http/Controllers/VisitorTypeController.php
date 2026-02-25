@@ -46,8 +46,9 @@ class VisitorTypeController extends Controller
         
         if($duplicateQuery->exists()){
             return response()->json([
-                'status'     => 1,
-                'message'    => 'Name Already Exists'
+                'status'    => 1,
+                'title'     => 'Invalid',
+                'message'   => 'Visitor Type Already Exists'
             ]);
 
         }
@@ -139,12 +140,14 @@ class VisitorTypeController extends Controller
         if(!$record){
             return response()->json([
                 'status'     => 1,
+                'title'      => 'Error',
                 'message'    => 'No Data Found'
             ]);
         }
 
         return response()->json([
             'status'     => 0,
+            'title'      => 'Success',
             'data'       => $record
         ]);
     }
@@ -158,6 +161,7 @@ class VisitorTypeController extends Controller
         $message = 'Visitor Type Successfully Deleted';
             return response()->json([
                 'status'     => 0,
+                'title'      => 'Success',
                 'message'    => $message
             ]);
     }
