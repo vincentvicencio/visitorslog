@@ -59,6 +59,11 @@ import datahandling from './common/datahandling';
             const tableApi = $(self.table).DataTable();
 
             tableApi.draw();
+            
+            setInterval(() => {
+                    tableApi.ajax.reload(null, false); 
+                }, 5000); 
+
 
             // =========================================
             // CUSTOM SEARCH

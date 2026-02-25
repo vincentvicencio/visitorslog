@@ -345,13 +345,19 @@ class UsersTable {
         // Save
         $('#submit_user_btn').off('click').on('click', async function(e) {
             e.preventDefault();
-            // Always set reg_emp_code to the searched value before saving
+            // Only require searched emp code for roles that use it
+            const selectedRoleNum = Number($('#reg_user_type').val());
             const searchedEmpCode = $('#searched_emp_code').val();
-            if (!searchedEmpCode) {
-                Triggers.showToast('Please search and confirm a valid employee code before saving.', 'Register User', 1);
-                return;
+            if (selectedRoleNum === 3) {
+                // Guard: clear emp code before saving
+                $('#reg_emp_code').val('');
+            } else {
+                if (!searchedEmpCode) {
+                    Triggers.showToast('Please search and confirm a valid employee code before saving.', 'Register User', 1);
+                    return;
+                }
+                $('#reg_emp_code').val(searchedEmpCode);
             }
-            $('#reg_emp_code').val(searchedEmpCode);
             const formid    = self.form;
             const formdata  = new FormData($(formid)[0]);
             const idInput = document.getElementById('reg_user_db_id');

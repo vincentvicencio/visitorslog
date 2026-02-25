@@ -140,12 +140,12 @@ class RegisterIDController extends Controller
 
                 'id_number'    => $d->id_number,
 
-                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
-                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
+                'created_by'   => $d->created_by ? user_name($d->created_by) : '-',
+                'updated_by'   => $d->updated_by ? user_name($d->updated_by) : '-',
 
-                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
+                'created_at'   => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
 
-                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
+                'updated_at'   => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
 
                 'action'       => $action
             ];
@@ -165,15 +165,15 @@ class RegisterIDController extends Controller
         $record = RegisteredID::find($request->id);
         if(!$record){
             return response()->json([
-                'status'    => 1,
-                'title'     => 'Error',
-                'message'   => 'No Data Found'
+                'status'     => 1,
+                'title'      => 'Error',
+                'message'    => 'No Data Found'
             ]);
         }
 
         return response()->json([
-            'status'    => 0,
-            'data'      => $record
+            'status'     => 0,
+            'data'       => $record
         ]);
     }
 
@@ -185,9 +185,9 @@ class RegisterIDController extends Controller
 
         $message    = 'Registered ID Successfully Deleted';
             return response()->json([
-                'status'    => 0,
-                'title'     => 'Success',
-                'message'   => $message
+                'status'     => 0,
+                'title'      => 'Success',
+                'message'    => $message
             ]);
     }
 
