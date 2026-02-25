@@ -362,6 +362,8 @@ class VisitorController extends Controller
             
         } catch (\Exception $e) {
             return response()->json([
+                    'status' => 1,
+                    'title' => 'Invalid',
                 'message' => 'Error saving visitor: ' . $e->getMessage(),
             ], 500);
         }

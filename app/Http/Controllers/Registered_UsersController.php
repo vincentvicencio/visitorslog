@@ -287,7 +287,6 @@ class Registered_UsersController extends Controller
         return response()->json($data);
     }
 
-
     public function getUser($id)
 {
     // 1. Find the registered user in the database
