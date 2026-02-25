@@ -142,6 +142,9 @@ class UsersTable {
                 empCodeContainer.show();
                 nameContainer.addClass('d-none');
                 $('#reg_password, #reg_emp_code, #reg_first_name, #reg_last_name').val('');
+                    // Hide searched employee code field
+                    $('#searched_emp_code').val('');
+                    $('#searched_emp_code_container').hide();
                 locationSelect.val(null).removeAttr('multiple');
                 if (locationSelect.find('option[value=""]').length === 0) {
                     locationSelect.prepend('<option value="">Select Location</option>');
@@ -164,6 +167,9 @@ class UsersTable {
                 } else {
                     nameContainer.addClass('d-none');
                     $('#reg_first_name, #reg_last_name').val('').prop('readonly', true);
+                        // Hide searched employee code field
+                        $('#searched_emp_code').val('');
+                        $('#searched_emp_code_container').hide();
                 }
 
                 // Remove the empty placeholder option for multi-select location
@@ -205,6 +211,9 @@ class UsersTable {
                 } else {
                     nameContainer.addClass('d-none');
                     $('#reg_first_name, #reg_last_name').val('').prop('readonly', true);
+                        // Hide searched employee code field
+                        $('#searched_emp_code').val('');
+                        $('#searched_emp_code_container').hide();
                 }
 
                 // Disable multiple selection for location
@@ -227,6 +236,9 @@ class UsersTable {
 
                 empCodeContainer.hide();
                 $('#reg_emp_code').val('');
+                    // Hide searched employee code field
+                    $('#searched_emp_code').val('');
+                    $('#searched_emp_code_container').hide();
 
                 nameContainer.removeClass('d-none');
                 $('#reg_first_name, #reg_last_name').prop('readonly', false);
@@ -255,6 +267,9 @@ class UsersTable {
                 empCodeContainer.show();
                 nameContainer.addClass('d-none');
                 $('#reg_first_name, #reg_last_name').val('');
+                    // Hide searched employee code field
+                    $('#searched_emp_code').val('');
+                    $('#searched_emp_code_container').hide();
 
                 // Disable multiple selection for location
                 locationSelect.removeAttr('multiple');
