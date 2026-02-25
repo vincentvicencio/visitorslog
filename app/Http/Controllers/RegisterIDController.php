@@ -17,7 +17,7 @@ class RegisterIDController extends Controller
         $visitorTypes = VisitorType::where('deleted_at', null)
                    ->orderBy('id', 'desc')
                    ->get();
-        return view('pages.registerID.id', compact('visitorTypes'));
+        return view('pages.registerid.id', compact('visitorTypes'));
     }
     public function save(Request $request)
     {
