@@ -21,18 +21,18 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
     public function collection()
     {
         $query = Visitor::with('visitorType')
-            ->where('status', 0)
+            ->where('status', 1)
             ->withoutTrashed();
 
         // Apply search filter
         if (!empty($this->filters['search'])) {
             $keywords = strtolower($this->filters['search']);
             $query->where(function ($q) use ($keywords) {
-                $q->where('first_name', 'LIKE', "%{$keywords}%")
+                $q->where('first_name',      'LIKE', "%{$keywords}%")
                     ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
-                    ->orWhere('last_name', 'LIKE', "%{$keywords}%")
-                    ->orWhere('visitor_id', 'LIKE', "%{$keywords}%")
-                    ->orWhere('phone_number', 'LIKE', "%{$keywords}%")
+                    ->orWhere('last_name',   'LIKE', "%{$keywords}%")
+                    ->orWhere('visitor_id',  'LIKE', "%{$keywords}%")
+                    ->orWhere('phone_number','LIKE', "%{$keywords}%")
                     ->orWhereHas('visitorType', function ($qt) use ($keywords) {
                         $qt->where('name', 'LIKE', "%{$keywords}%");
                     });
@@ -66,7 +66,7 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
                 }
             }
 
-            $status = $visitor->status == 0 ? 'Active' : 'Timed Out';
+            $status = $visitor->status == 1 ? 'Timed Out' : 'Active';
 
             $fullName = trim(implode(' ', array_filter([
                 $visitor->first_name,
@@ -78,19 +78,19 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
             $timeOut = $visitor->time_out ? \Carbon\Carbon::parse($visitor->time_out)->format('h:i A') : '-';
 
             return [
-                'Name' => $fullName,
-                'Location' => $locationLabel,
-                'Phone' => $visitor->phone_number,
-                'Visitor Type' => $visitor->visitorType?->name ?? '-',
-                'ID Number' => $visitor->visitor_id,
-                'Date Visited' => $visitor->created_at->format('F d, Y'),
-                'Day' => $visitor->created_at->format('l'),
-                'Time In' => $timeIn,
-                'Time Out' => $timeOut,
-                'Status' => $status,
-                'Created By' => $visitor->getEmpName($visitor->created_by),
-                'Updated By' => $visitor->getEmpName($visitor->updated_by) ?? '-',
-                'Created At' => $visitor->created_at->format('F j, Y H:i A'),
+                'Name'         =>     $fullName,
+                'Location'     =>     $locationLabel,
+                'Phone'        =>     $visitor->phone_number,
+                'Visitor Type' =>     $visitor->visitorType?->name ?? '-',
+                'ID Number'    =>     $visitor->visitor_id,
+                'Date Visited' =>     $visitor->created_at->format('F d, Y'),
+                'Day'          =>     $visitor->created_at->format('l'),
+                'Time In'      =>     $timeIn,
+                'Time Out'     =>     $timeOut,
+                'Status'       =>     $status,
+                'Created By'   =>     user_name($visitor->created_by) ?? '-',
+                'Updated By'   =>     user_name($visitor->updated_by) ?? '-',
+                'Created At'   =>     $visitor->created_at->format('F j, Y H:i A'),
             ];
         });
     }

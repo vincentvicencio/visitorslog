@@ -16,8 +16,7 @@ window.jQuery = $;
 // ------------------------------------
 // Bootstrap Sortable
 // ------------------------------------
-// import Sortable from 'sortablejs';
-// window.Sortable = Sortable;
+
 
 
 // ------------------------------------

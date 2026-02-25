@@ -1,6 +1,4 @@
-import { Modal, Dropdown } from 'bootstrap';
 import triggers from './common/triggers';
-import component from './common/component';
 import * as bootstrap from 'bootstrap';
 import $ from 'jquery';
 import container from './common/container';
@@ -53,7 +51,7 @@ $(document).ready(function(){
             window.location.href = exportUrl;
             
             // Show success toast
-            triggers.showToast('Exporting report to Excel...', 0);
+            triggers.showToast('Exporting report to Excel...', 'Exporting', 0);
         } catch (error) {
             console.error('Export error:', error);
             triggers.showToast('Failed to export report. Please try again.', 1);
@@ -95,7 +93,6 @@ $(document).ready(function(){
             visitor_type: ''
         });
 
-
         const filterModal = document.getElementById('filterModal');
         const modalInstance = bootstrap.Modal.getInstance(filterModal);
 
@@ -110,24 +107,6 @@ $(document).ready(function(){
 
 
 }); 
-
-    $(document).on('click', '.view-button', function(e) {
-        // Prevent default action
-        e.preventDefault();
-        
-        // Get the image URL from the data attribute
-        const imageUrl = $(this).data('image');
-        
-        // Set the image source in the modal
-        $('#modalImage').attr('src', imageUrl);
-        
-        // Show the modal
-        $('#View_imageModal').modal('show');
-    });
-
-    $('#View_imageModal').on('hidden.bs.modal', function () {
-        $('#modalImage').attr('src', ''); 
-    });
 
 
 
@@ -165,90 +144,6 @@ $(document).ready(function(){
         }
     });
 
-// Initialize Modal
-const notificationModalEl = document.getElementById('notificationContainer');
-const notificationModal = new bootstrap.Modal(notificationModalEl);
-
-// --- OPEN DELETE MODAL FUNCTION ---
-
-export function openDeleteModal(id, name = "this record") {
-    const recordInput = document.getElementById('record_id');
-    const messageTitle = document.getElementById('notification-title');
-    const messageBody = document.getElementById('notification-message');
-
-    // Set Data
-    recordInput.value = id; 
-    
-    // UI Updates
-    messageTitle.innerText = "Confirm Deletion";
-    messageBody.innerText = `Are you sure you want to delete ${name}?`;
-    
-    // Reset button state in case it was disabled previously
-    $('#btn_ok').prop('disabled', false).text('Yes');
-
-    notificationModal.show();
-}
-
-// --- HANDLE DELETE SUBMIT ---
-
-document.getElementById('btn_ok').addEventListener('click', function() {
-    const id = document.getElementById('record_id').value;
-    const $btn = $(this);
-
-    if (!id) {
-        Triggers.showToast('Invalid record ID.', 1);
-        return;
-    }
-
-    $btn.prop('disabled', true).text('Processing...');
-
-    // AJAX request to delete the record
-    $.ajax({
-        url:URL+'delete-visitor/' + id,
-        type: 'DELETE',
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function (response) {
-
-            // Hide the confirmation modal
-            notificationModal.hide();
-
-            // Set the text and show the manual Bootstrap Toast (#DELETE)
-            $('#DeletetoastMessage').text(response.success || "Report Log Deleted Successfully!");
-            
-            const toastElement = document.getElementById('DELETE');
-            if (toastElement) {
-                const toast = new bootstrap.Toast(toastElement);
-                toast.show();
-            }
-
-            // refresh the datatable only
-            if ($.fn.DataTable.isDataTable('#reportTable')) {
-                $('#reportTable').DataTable().draw(false);
-            }
-
-            // Re-enable the button
-            $btn.prop('disabled', false).text('Yes');
-            const modalEl = document.getElementById('filterModal');
-            const modalInstance =
-                bootstrap.Modal.getInstance(modalEl) ||
-                new bootstrap.Modal(modalEl);
-
-            modalInstance.hide();
-
-        },
-        error: function (xhr) {
-            // Re-enable button on error
-            $btn.prop('disabled', false).text('Yes');
-            
-            const errorMsg = xhr.responseJSON?.message ?? 'Delete failed.';
-            Triggers.showToast(errorMsg, 1);
-        }
-    });
-});
-
-
 class ReportClassTable {
     constructor() {
         this.defaultFields  = []
@@ -268,13 +163,16 @@ class ReportClassTable {
         const self = this;
 
         const tableHeader = [
-            { id: "full_name",       label: "Personal Details" },
+            { id: "full_name", label: "Name" },
+            { id: "location", label: "Location" },
+            { id: 'contact_number', label: 'Contact No.' },
             { id: "visitor_type",       label: "Visitor Type" },
             { id: "visitor_id",       label: "ID No." },
-            { id: "image",      label: "Image" },
-            { id: "visit",   label: "Visit" },
-            { id: "time",   label: "Time" },
-            { id: "creator",   label: "By" },
+            { id: "visit",   label: "Visit Date" },
+            { id: "time_in", label: "Time In" },
+            { id: "time_out", label: "Time Out" },
+            { id: "logged_by", label: "Logged by" },
+            { id: "updated_by", label: "Updated by" },
             { id: "status",   label: "Status" },
             { id: "action",         label: "Action" },
         ];
@@ -329,14 +227,12 @@ class ReportClassTable {
                     });
             });
 
-
         setTimeout(() => {
             const searchInput = document.getElementById('dt-search-0');             
                 if (searchInput) {
                     searchInput.setAttribute('placeholder', 'Search here...');
                 }
-            }, 100);
-
+        },  100);
     }
 
     async initializeButtons(){
@@ -355,8 +251,6 @@ class ReportClassTable {
             await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
         });
     }
-
-
 }
 const instance = new ReportClassTable();
 instance.initializePage();

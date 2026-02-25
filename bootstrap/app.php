@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\UsertypeMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,12 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'prevent-back' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
     })
+
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'user_type' => \App\Http\Middleware\UsertypeMiddleware::class,
+            'user_type' => UsertypeMiddleware::class,
+        'single.session' => \App\Http\Middleware\SingleSessionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
+
+    
     

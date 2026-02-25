@@ -8,23 +8,42 @@ use App\Models\VisitorType;
 use App\Models\RegisteredID;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
-use Illuminate\Support\Str;
 class VisitorController extends Controller
 {
     public function index()
     {
-         return view('pages.visitorslog.visitorlog');
+        $visitors = Visitor::where(function ($query) {
+            $query->where('status', 0)->orWhereNull('status');
+            })
+                -> whereNull('time_out')
+                -> orderBy('id', 'desc')
+                -> get();
+
+        $visitorTypes = VisitorType::where('deleted_at', null)
+                -> orderBy('id', 'desc')
+                -> get();
+
+        $empMap = collect(session('all_emp'))->keyBy('emp_code');
+
+        // if (session('from_form')) {
+        //     session()->forget('from_form');
+        //     return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
+        // }else{
+            return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+        // }
     }
     public function form()
     {
+        // session(['from_form' => true]);
         $visitorTypes = VisitorType::where('deleted_at', null)
-                   ->orderBy('id', 'asc')
-                   ->get();
-        $visitors = Visitor::where('status', 0)
-                   ->orderBy('id', 'asc')
-                   ->get();
+                -> orderBy('id', 'asc')
+                -> get();
+        $visitors     = Visitor::where('status', 0)
+                -> orderBy('id', 'asc')
+                -> get();
         return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
     }
 
@@ -34,27 +53,32 @@ class VisitorController extends Controller
 
 
         $rawquery = Visitor::with('visitorType')
-                ->withoutTrashed()
+                -> withoutTrashed()
                 ->where(function ($query) {
-                    $userLocations = []; 
 
-                    foreach ((array) Auth::user()->location as $loc) {
-                        $userLocations[] = (int) $loc;
-                    }
+                    $user = Auth::user();
+                    $userLocations = array_map('intval', (array) $user->location);
+
+                    // First filter by location
+                    $query->whereIn('location', $userLocations);
+
+                    // Then filter active / not timed out
                     $query->where(function ($q) {
                         $q->where('status', 0)
-                        ->orWhereNull('status');
-                    })->whereIn('location', $userLocations);
+                        ->where('time_out', null);
+                    });
 
+                    // Then restrict to creator if NOT admin
+                    if (Auth::user()->user_type != 1) {
+                        $query->where('created_by', Auth::user()->id);
+                    }
                 })
 
-
-
-                ->when($keywords, function ($query) use ($keywords) {
+                -> when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
-                        $q->where('full_name', 'LIKE', "%{$keywords}%")
-                        ->orWhere('visitor_id', 'LIKE', "%{$keywords}%")
-                        ->orWhere('phone_number', 'LIKE', "%{$keywords}%")
+                        $q->where   ('full_name', 'LIKE', "%{$keywords}%")
+                        ->orWhere   ('visitor_id', 'LIKE', "%{$keywords}%")
+                        ->orWhere   ('phone_number', 'LIKE', "%{$keywords}%")
                         ->orWhereHas('visitorType', function ($qt) use ($keywords) {
                             $qt->where('name', 'LIKE', "%{$keywords}%");
                         });
@@ -64,10 +88,10 @@ class VisitorController extends Controller
         $totalRecords = $rawquery->get()->count();
         
         if ($request->input('draw') > 1) { 
-            $start         = $request->input('start'); 
-            $column        = $request->input('order.0.column');
-            $direction     = $request->input('order.0.dir');
-            $order         = $request->input('columns')[$column]['data']; 
+            $start         = $request ->input('start'); 
+            $column        = $request ->input('order.0.column');
+            $direction     = $request ->input('order.0.dir');
+            $order         = $request ->input('columns')[$column]['data']; 
             $temp          = $rawquery->get(); 
             $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
             $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get(); 
@@ -95,21 +119,6 @@ class VisitorController extends Controller
 
             }
 
-
-            $image = '';
-
-            if ($d->image_path == null) {
-                $image = 'No Image Provided';
-            }else{
-                $image ='<button 
-                    class="btn-sm view-button text-white border-0 rounded-2 px-3 py-1"
-                        id="viewImageBtn"
-                        data-id="'. $d->id .'"
-                        data-image="'. Storage::url($d->image_path) .'">
-                        View
-                    </button>';
-            }
-
             $status = '';
 
             if($d->status == 0){
@@ -124,90 +133,70 @@ class VisitorController extends Controller
 
             $createdby = $d->created_by ? user_name($d->created_by) : '-';
             $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
-            $fullName = '<div class="text-center">
-                <strong>' . $d->full_name . '</strong>';
+            
 
-                if (Auth::user()->user_type != 3) {
-                    $fullName .= '<br><small>' . $locationLabel . '</small>';
-                }
-
-                $fullName .= '<br><small>' . $d->phone_number . '</small>
-                            </div>';
             $newData[$i] = [
                 
 
-                'full_name' => $fullName,
+                'full_name' => $d->full_name,
+
+                'location' => '<div class="text-center">' . $locationLabel . '</div>',
+
+                'contact_number' => '<div class="text-center">' . $d->phone_number . '</div>',
 
                 'visitor_type' => '<div class="text-center">' . ($d->visitorType?->name ?? '-') . '</div>',
 
-                'visitor_id' => '<div class="text-center">' . $d->visitor_id . '</div>',
-
-                'image' => '<div class="text-center">' . $image . '</div>',
+                'visitor_id'   => '<div class="text-center">' . $d->visitor_id . '</div>',
 
                 'visit' =>  '<div class="text-center">' . 
                                     $d->created_at->format("F d, Y") .'<br>
                                     '. $d->created_at->format('l')
-                        . '</div>',
+                                 . '</div>',
 
-                'time' => '<div class="text-center">
-                                <small><strong>In:</strong> '. $time_in .'</small><br>
-                                <small>
-                                    <strong>Out:</strong>
-                                    '. $time_out .'
-                                </small>
+                'time_in' => '<div class="text-center">
+                                <small> '. $time_in .'</small><br>
+                            </div>',
+                'time_out' => '<div class="text-center">
+                                <small> '. $time_out .'</small><br>
                             </div>',
                 'creator' => '<div class="text-center">
-                                <small><strong>Created: </strong>'. $createdby .'</small><br>
-                                <small><strong>Updated: </strong>'. $updatedby .'</small>
+                                '. $createdby .'
                             </div>',
                 
-                'status' => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
+                'status'       => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
 
-                'created_at' => '<div class="text-center">' . $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l') . '</div>',
+                'created_at'   => '<div class="text-center">' . $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l') . '</div>',
 
-                'updated_at' => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+                'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
-                'action' => '<div class="dropdown text-center">
-                                <button 
-                                    class="btn btn-sm btn-primary dropdown-toggle"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    Action
-                                </button>
-
-                                <ul class="dropdown-menu">
-                                    <li>
+                'action' => '<div class="dropdown">
                                         <button 
                                             class="dropdown-item"
                                             id="viewBtn"
                                             data-id="'. $d->id .'"
                                             data-type="visitorslog">
-                                            <i class="bi bi-eye me-2"></i> View
+                                            View
                                         </button>
-
-                                    </li>
-                                    <li>
                                         <button 
                                             type="button"
                                             class="dropdown-item text-danger"
                                             id="timeoutBtn"
                                             data-id="'. $d->id .'">
-                                            <i class="bi bi-clock-history me-2"></i> Timeout
+                                            Timeout
                                         </button>
-
-                                    </li>
-                                </ul>
                             </div>',
             ];
             $i++;
+                                            // <i class="bi bi-clock-history"></i>
+                                            // <i class="bi bi-eye"></i>
         }
  
         return response()->json([
             'draw'              => intval($request->input('draw')),
             'recordsTotal'      => $totalRecords,
             'recordsFiltered'   => $totalFiltered,
-            'data'              => $newData            
+            'data'              => $newData
+
         ]);
     }
 
@@ -217,24 +206,30 @@ class VisitorController extends Controller
 
         if (!$visitor) {
             return response()->json([
+                'status'  => 1,
+                'title'   => 'Error',
                 'message' => 'Visitor not found'
             ], 404);
         }
 
         if ($visitor->status == 1) {
             return response()->json([
+                'status'  => 1,
+                'title'   => 'Error',
                 'message' => 'Visitor already timed out'
             ], 400);
         }
 
         $visitor->update([
-            'time_out' => Carbon::now(),
-            'status'   => 1,
+            'time_out'   => Carbon::now(),
+            'status'     => 1,
             'updated_by' => Auth::user()->id,
         ]);
 
         return response()->json([
-            'message' => 'Visitor successfully timed out'
+            'status'     => 0,
+            'title'      => 'Success',
+            'message'    => 'Visitor successfully timed out'
         ]);
     }
     public function view(Request $request)
@@ -253,9 +248,9 @@ class VisitorController extends Controller
             ], 404);
         }
         return response()->json([
-            'redirect' => route('view.page', [
-                'id'   => $visitor->id,
-                'type' => $request->type,
+            'redirect'   => route('view.page', [
+                'id'     => $visitor->id,
+                'type'   => $request->type,
             ])
         ]);
 
@@ -263,7 +258,7 @@ class VisitorController extends Controller
 
     public function search(Request $request)
     {
-        $id = $request->input('id'); // make sure this is numeric
+        $id   = $request->input('id'); // make sure this is numeric
         $user = Visitor::find($id);
 
         if ($user) {
@@ -281,15 +276,15 @@ class VisitorController extends Controller
 
     public function save(Request $request)
     {
-       
         $request->validate([
-            'first_name'        => 'required|string',
-            'middle_name'       => 'nullable|string',
-            'last_name'         => 'required|string',
+            'first_name'        => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
+            'middle_name'       => ['nullable', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
+            'last_name'         => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
             'visitor_type'      => 'required|exists:visitor_types,id',
-            'contact_number'    => ['required','min:11','max:11','regex:/^[0-9]+$/','starts_with:09'],
+            'contact_number'    => ['required','min:11','max:11','regex:/^[0-9]+$/','starts_with:09'],            
+            'image_path'        => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
 
-            'id_number' => [
+            'id_number'    => [
                 'required',
                 'string',
                 function ($attribute, $value, $fail) use ($request) {
@@ -313,6 +308,12 @@ class VisitorController extends Controller
             ],
 
             [
+                'first_name.required' => 'First Name is required',
+                'first_name.regex' => 'First Name must contain letters only',
+                'middle_name.regex' => 'Middle Name must contain letters only',
+                'last_name.required' => 'Last Name is required',
+                'last_name.regex' => 'Last Name must contain letters only',
+                'visitor_type.required' => 'Visitor Type is required',
                 'contact_number.required' => 'Contact Number is required',
                 'contact_number.max' => 'Contact Number must not exceed 11 digits',
                 'contact_number.min' => 'Contact Number must be at least 11 digits',
@@ -320,41 +321,41 @@ class VisitorController extends Controller
                 'contact_number.starts_with' => 'Contact Number must start with 09',
             ],
 
-            'image_path' => 'nullable|',
         ]);
 
 
 
         try {
-            // Handle image upload
             $imagePath = null;
+            if(!empty($request->image_path)) {
+                
+                $image     = $request->image_path;
 
-        if ($request->image_path) {
-            $image = $request->image_path;
+                // Remove metadata (data:image/png;base64,)
+                $image     = preg_replace('/^data:image\/\w+;base64,/', '', $image);
 
-            // Remove metadata (data:image/png;base64,)
-            $image = preg_replace('/^data:image\/\w+;base64,/', '', $image);
+                // Decode base64
+                $image     = base64_decode($image);
 
-            // Decode base64
-            $image = base64_decode($image);
+                // Generate filename
 
-            // Generate filename
-            $fileName = 'visitors/' . Str::random(20) . '.png';
 
-            // Save to public disk
-            Storage::disk('public')->put($fileName, $image);
+                // Save to public disk
+                Storage::disk('public')->put($fileName, $image);
 
             $imagePath = $fileName;
-        }
-            $middleInitial = collect(preg_split('/\s+/', trim($request->middle_name)))
-                ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
-                ->implode('');
-
-            $userLocations = []; 
-
-                foreach ((array) Auth::user()->location as $loc) {
-                    $userLocations[] = (int) $loc;
+            }else{
+                if ($request->hasFile('imageInput') && $request->file('imageInput')->isValid()) {
+                    $fileName  = 'visitors/' . Str::random(20) . '.png';
+                    $imagePath = $request->file('imageInput')->storeAs('visitors', $fileName, 'public');
                 }
+            }
+            
+
+            $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
+
+            $userLocations = (array) Auth::user()->location;
+
             $visitor = new Visitor();
             // clint - remove dot when there is no middle name
             if (!empty($middleInitial)) {
@@ -370,8 +371,8 @@ class VisitorController extends Controller
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $userLocations[0];
-            $visitor->address     = $request->address;
+            $visitor->location     = $userLocations[0] ?? null;
+            $visitor->address      = $request->address;
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
@@ -380,13 +381,15 @@ class VisitorController extends Controller
 
 
             return response()->json([
+                'status' => 0,
+                'title' => 'Success',
                 'message' => 'Visitor successfully added'
             ], 200);
-
-
-
+            
         } catch (\Exception $e) {
             return response()->json([
+                    'status' => 1,
+                    'title' => 'Invalid',
                 'message' => 'Error saving visitor: ' . $e->getMessage(),
             ], 500);
         }

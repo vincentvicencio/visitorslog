@@ -75,7 +75,8 @@
         margin-right: 5px;
     }
     .selected{
-        background-color: #0F4383 !important; 
+        // background-color: #3492E9 !important; 
+        background-image: linear-gradient(to bottom right, #0F4383 , #145AB0, #3492E9);
         border-radius: 8px;
         color: white;
     }
@@ -119,6 +120,9 @@
         .side-menu-icon-2{
             display: none !important;
         }
+        .menu{
+            margin-top: 20px !important;
+        }
     }
 }
 .sidebar-menu-button:hover{
@@ -138,7 +142,7 @@
 body {
     margin-left: 240px;
     transition: margin-left 0.3s ease;
-    padding: 20px 60px 60px 60px;
+    padding: 30px 60px 60px 60px;
 }
 
 @media (max-width: 880px) {

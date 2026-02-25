@@ -1,10 +1,8 @@
-import { Modal } from 'bootstrap';
 import $ from 'jquery';
 import Triggers from './common/triggers';
 import settable from './common/settable';
 import container from './common/container';
 import datahandling from './common/datahandling';
-import component from './common/component';
 
     // RegisterIdTable
     class RegisterIdTable {
@@ -61,6 +59,11 @@ import component from './common/component';
             const tableApi = $(self.table).DataTable();
 
             tableApi.draw();
+            
+            setInterval(() => {
+                    tableApi.ajax.reload(null, false); 
+                }, 5000); 
+
 
             // =========================================
             // CUSTOM SEARCH

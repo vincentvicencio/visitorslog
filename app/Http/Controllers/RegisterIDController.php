@@ -24,14 +24,14 @@ class RegisterIDController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name'               => ['required','regex:/^[0-9]+$/', 'max:4', 'min:4'],
-                'visitorType'        => 'required|exists:visitor_types,id',
+                'name'              => ['required','regex:/^[0-9]+$/', 'max:4', 'min:4'],
+                'visitorType'       => 'required|exists:visitor_types,id',
             ],
             [
                 'name.required'           => 'Visitor ID is Required',
                 'name.regex'              => 'Visitor ID must contain only numbers',
                 'name.max'                => 'Visitor ID must not exceed 4 digits',
-                'name.min'                => 'Visitor ID must be at least 4 digits',
+                'name.min'                => 'Visitor ID must be 4 digits',
                 'visitorType.required'    => 'Visitor Type is Required',
             ]
         );
@@ -54,14 +54,15 @@ class RegisterIDController extends Controller
         if($duplicateQuery->exists()){
             return response()->json([
                 'status'    => 1,
+                'title'     => 'Error',
                 'message'   => 'Visitor ID Already Exists'
             ]);
 
         }
 
         $data       = [
-            'id_number'          => $request->name,
-            'visitor_type'       => $request->visitorType,
+            'id_number'       => $request->name,
+            'visitor_type'    => $request->visitorType,
         ];
 
         if ($record_id > 0) {
@@ -76,6 +77,7 @@ class RegisterIDController extends Controller
         }
         return response()->json([
             'status'    => 0,
+            'title'     => 'Success',
             'message'   => $message
         ]);
 
@@ -120,21 +122,12 @@ class RegisterIDController extends Controller
         $i       = 0;
 
         foreach ($data as $d) { 
-            $exists = $d->visitorsLogs()->exists();
+            $exists     = $d->visitorsLogs()->exists();
 
             if (!$exists) {
                 $action = '<div class="dropdown">
-                                <button 
-                                    class="btn btn-sm btn-primary dropdown-toggle"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    Action
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item btn-edit" data-id="'. $d->id .'"><i class="bi bi-pencil-square me-2"></i> Edit</a></li>
-                                    <li><a class=" text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '"><i class="bi bi-trash me-2"></i> Delete</a></li></li>
-                                </ul>
+                                <button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>
+                                <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->id_number. '"> Delete</button>
                             </div>';
             } else {
             $action = '<span class="badge bg-success">Currently Used</span>';
@@ -145,16 +138,16 @@ class RegisterIDController extends Controller
             $newData[$i] = [
                 'visitor_type' => $d->visitorType?->name ?? '-',
 
-                'id_number' => $d->id_number,
+                'id_number'    => $d->id_number,
 
-                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
-                'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
+                'created_by'   => $d->created_by ? user_name($d->created_by) : '-',
+                'updated_by'   => $d->updated_by ? user_name($d->updated_by) : '-',
 
-                'created_at' => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
+                'created_at'   => $d->created_at ? ($d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')) : '-',
 
-                'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
+                'updated_at'   => $d->updated_at ? ($d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')) : '-',
 
-                'action' => $action
+                'action'       => $action
             ];
             $i++;
         }
@@ -172,27 +165,29 @@ class RegisterIDController extends Controller
         $record = RegisteredID::find($request->id);
         if(!$record){
             return response()->json([
-                'status'    => 1,
-                'message'   => 'No Data Found'
+                'status'     => 1,
+                'title'      => 'Error',
+                'message'    => 'No Data Found'
             ]);
         }
 
         return response()->json([
-            'status'    => 0,
-            'data'      => $record
+            'status'     => 0,
+            'data'       => $record
         ]);
     }
 
     public function delete(Request $request){
         $record  = RegisteredID::find($request->id);
         $details = $record->id_number;
-        $record->update(['deleted_by' => Auth::user()->id]);
-        $record->delete();
+        $record  -> update(['deleted_by' => Auth::user() -> id]);
+        $record  -> delete();
 
         $message    = 'Registered ID Successfully Deleted';
             return response()->json([
-                'status'    => 0,
-                'message'   => $message
+                'status'     => 0,
+                'title'      => 'Success',
+                'message'    => $message
             ]);
     }
 
@@ -204,13 +199,13 @@ class RegisterIDController extends Controller
             $role->delete();
             
         } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurred while deleting the Registered ID.'], 500);
+            return response() -> json(['message' => 'An error occurred while deleting the Registered ID.'], 500);
         }
     }   
     public function edit($id)
     {
         $role = RegisteredID::findOrFail($id); 
-        return response()->json($role);
+        return response() -> json($role);
     }
 
     public function update(Request $request, $id)
@@ -221,8 +216,8 @@ class RegisterIDController extends Controller
 
         $role = RegisteredID::findOrFail($id);
         $role->update([
-            'name' => $request->RegisteredID,
-            'updated_by' => Auth::user()->id,
+            'name'       => $request->RegisteredID,
+            'updated_by' => Auth::user() -> id,
         ]);
     }
 

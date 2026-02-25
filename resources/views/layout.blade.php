@@ -3,8 +3,8 @@
 
     @include('layouts.head')
 
-    <body>
-        @if (!View::hasSection('hideSidebar'))
+    <body class="{{ Auth::check() && Auth::user()->user_type != 1 ? 'non-admin-body' : '' }}">
+        @if (!View::hasSection('hideSidebar') && Auth::user()->user_type == 1)
                 @include('layouts.sidebar')
         @endif
         @if(! page_name('main') || page_name('main') == 'login' ) @yield('content')
@@ -16,7 +16,6 @@
                 @include('layouts.header')
             @endif  
             
-
             @yield('content')
 
             <!-- Notification -->
@@ -29,13 +28,21 @@
             @stack('scripts')
             @yield('footer-scripts')
 
+            
+            <div type="hidden" id="usertypeCheck" data-type="{{ Auth::user()->user_type == 1 ? 1 : 0 }}"></div>
+
         </div>
         @endif
 
         @include('layouts.footer')
+        
     </body>
 </html>
 
+
+@push('scripts')
+@vite(['resources/js/visitors.js'])
+@endpush
 
 <script>
     window.Laravel = {

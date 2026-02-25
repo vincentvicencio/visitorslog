@@ -1,5 +1,5 @@
-class Datatable {
 
+class Datatable {
      /**
      * Create Table  = it will pullout all data
      * @param table  = table id/class
@@ -9,35 +9,44 @@ class Datatable {
      * @param module = method name (e.g window.forecasting  )
      * @param pagination= how many rows will display
      */
+    
     async createTable(table, theads, url, tbodies = "", module, enableSearch = true, pagination = 10) {
         const self = this
 
         const data = await datahandling.processData(url + 'list', 'GET')
-
+        $.fn.dataTable.ext.pager.numbers_length = 3;
         $(table).DataTable().clear().destroy()
         $(table).DataTable({
-            pageLength: pagination,
-            autoWidth: false,
-            scrollX: true,
+            pageLength:     pagination,
+            autoWidth:      false,
+            scrollX:        true,
             scrollCollapse: true,
-            searching: enableSearch,
-            responsive: false,
-            stateSave: true,
-            paging: true,
-            ordering: true,
-            info: true,
-            pagingType: 'simple',
+            searching:      enableSearch,
+            responsive:     false,
+            stateSave:      true,
+            paging:         true,
+            layout: {
+                bottomEnd: {
+                    paging: {
+                        type: 'simple_numbers',
+                        numbers: 3
+                    }
+                }
+            },
+            ordering:       true,
+            info:           true,
+            pagingType: 'simple_numbers',
             language: {
                 'paginate': {
-                    next: '<span aria-hidden="true">&gt;</span>',
+                    next:     '<span aria-hidden="true">&gt;</span>',
                     previous: '<span aria-hidden="true">&lt;</span>'
                 },
                 lengthMenu: "Rows:  _MENU_",
-                info: "_START_ to _END_ of _TOTAL_"
+                info:       "_START_ to _END_ of _TOTAL_"
             },
-            dom: '<"top">rt<"bottom"pi><"clear">',
-            data: data, 
-            columns: theads,
+            dom:        '<"top">rt<"bottom"pi><"clear">',
+            data:       data, 
+            columns:    theads,
             columnDefs: tbodies,
             drawCallback: function () {
                 component.initializeButtons(table, url, module)
@@ -61,16 +70,16 @@ class Datatable {
 
         $(table).DataTable().clear().destroy()
         $(table).DataTable({
-            pageLength: pagination,
-            autoWidth: false,
-            scrollX: true,
+            pageLength:     pagination,
+            autoWidth:      false,
+            scrollX:        true,
             scrollCollapse: true,
-            processing: true,
-            serverSide: true,
-            stateSave: true,
-            searching: enableSearch,
-            dom: '<"top">rt<"bottom"ip><"clear">',
-            search: { return: true },
+            processing:     true,
+            serverSide:     true,
+            stateSave:      true,
+            searching:      enableSearch,
+            dom:            '<"top">rt<"bottom"ip><"clear">',
+            search:         { return: true },
             stateLoadParams: function (settings, data) {
                 data.length = pagination
             },
@@ -84,8 +93,8 @@ class Datatable {
                     if (!d.start) d.start = 0;
                 },
                 beforeSend: function () { },
-                complete: function (data) { },
-                error: function (error) { }
+                complete:   function (data) { },
+                error:      function (error) { }
             },
             language: {
                 paginate: {
@@ -96,7 +105,6 @@ class Datatable {
                 },
                 lengthMenu: "_MENU_",
                 search: ""
-
             },
             columns: theads,
             columnDefs: tbodies,
@@ -104,16 +112,15 @@ class Datatable {
             // Make bottom row flex container
                 const $bottom = $(this.api().table().container()).find('div.bottom');
                 $bottom.css({
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
+                    display:        'flex',
+                    alignItems:     'center',
+                    justifyContent: 'space-between' // info left, pagination right
                 });
             },
             drawCallback: function () { component.initializeButtons(table, url,module) }
         });
 
        // $('.dt-scroll-head').remove();
-
     }
     
     /**
@@ -130,23 +137,23 @@ class Datatable {
         
         $(table).DataTable().clear().destroy()
         $(table).DataTable({
-            pageLength: pagination,
-            autoWidth: false,
-            scrollX: true,
-            scrollCollapse: true,
-            processing: true,
-            serverSide: true,
-            stateSave: true,
-            searching: enableSearch,
-            search: { return: true },
-            pagingType: 'simple',
+            pageLength      :     pagination,
+            autoWidth       :     false,
+            scrollX         :     true,
+            scrollCollapse  :     true,
+            processing      :     true,
+            serverSide      :     true,
+            stateSave       :     true,
+            searching       :     enableSearch,
+            search          :     { return: true },
+            pagingType      :     'simple_numbers',
             language: {
                 'paginate': {
-                    next: '<span aria-hidden="true">&gt;</span>',
+                    next:     '<span aria-hidden="true">&gt;</span>',
                     previous: '<span aria-hidden="true">&lt;</span>'
                 },
                 lengthMenu: "Rows:  _MENU_",
-                info: "_START_ to _END_ of _TOTAL_"
+                info:       "_START_ to _END_ of _TOTAL_"
 
             },
             dom: '<"top">rt<"bottom"ip><"clear">',
@@ -160,11 +167,11 @@ class Datatable {
                     if (!d.start) d.start = 0;
                 },
                 beforeSend: function () { },
-                complete: function (data) { },
-                error: function (error) { }
+                complete:   function (data) { },
+                error:      function (error) { }
             },
-            columns: theads,
-            columnDefs: tbodies,
+            columns:      theads,
+            columnDefs:   tbodies,
             drawCallback: function () { component.initializeButtons(table, url, useModal) }
         });
 
@@ -176,9 +183,9 @@ class Datatable {
 
         let dropdownId = 'dropdown_' + Math.random().toString(36).substr(2, 9);
 
-        let $dropdown = $('<div>').addClass('dropdown')
+        let $dropdown  = $('<div>').addClass('dropdown')
 
-        let $toggle = $('<i>', {
+        let $toggle    = $('<i>', {
             'class'         : 'bi bi-filter-left dropdown-toggle menu-list',
             'role'          : 'button',
             'id'            : dropdownId,

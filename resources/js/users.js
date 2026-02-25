@@ -1,10 +1,9 @@
-import { Modal, Dropdown } from 'bootstrap';
+import { Modal } from 'bootstrap';
 import container from './common/container';
 import datahandling from './common/datahandling';
 import Triggers from './common/triggers';
 import settable from './common/settable';
 import component from './common/component';
-
 
 const URL = '/registerUser/';
 
@@ -51,9 +50,13 @@ class UsersTable {
 
     async handleEmployeeSearchClick(event) {
         const empCode = $('#reg_emp_code').val().trim();
-
+        // Require minimum length for employee code (e.g., 4 digits)
         if (!empCode) {
-            Triggers.showToast('Please enter an employee code.', 1);
+            Triggers.showToast('Please enter an employee code.', 'Employee Search', 1);
+            return;
+        }
+        if (empCode.length < 3) { // Change 4 to your required employee code length
+            Triggers.showToast('Please enter the full employee code.','Employee Search', 1);
             return;
         }
 
@@ -67,29 +70,29 @@ class UsersTable {
             timeout: 10000,
             success: function (response) {
                 const results = response.results || [];
+                // Only allow exact match
                 const exactMatch = results.find(emp => emp.id.toLowerCase() === empCode.toLowerCase());
 
                 if (exactMatch) {
                     $('#reg_first_name').val(exactMatch.first_name || '');
                     $('#reg_last_name').val(exactMatch.last_name || '');
                     $('#employee_name_container').removeClass('d-none');
-                    Triggers.showToast('Employee found!', 0);
-                } else if (results.length > 0) {
-                    $('#reg_first_name').val(results[0].first_name || '');
-                    $('#reg_last_name').val(results[0].last_name || '');
-                    $('#reg_emp_code').val(results[0].id);
-                    $('#employee_name_container').removeClass('d-none');
-                    Triggers.showToast('Employee found!', 0);
+                    // Set searched emp code field
+                    $('#searched_emp_code').val(empCode);
+                    $('#searched_emp_code_container').show();
+                    Triggers.showToast('Employee found!','Employee Search', 0);
                 } else {
                     $('#reg_first_name').val('');
                     $('#reg_last_name').val('');
                     $('#employee_name_container').addClass('d-none');
-                    Triggers.showToast('Employee code not found.', 1);
+                    $('#searched_emp_code').val('');
+                    $('#searched_emp_code_container').hide();
+                    Triggers.showToast('Employee code not found.','Employee Search', 1);
                 }
                 $btn.prop('disabled', false).html('<i class="bi bi-search"></i>');
             },
             error: function () {
-                Triggers.showToast('Failed to search employee.', 1);
+                Triggers.showToast('Failed to search employee.','Employee Search', 1);
                 $btn.prop('disabled', false).html('<i class="bi bi-search"></i>');
             }
         });
@@ -139,6 +142,9 @@ class UsersTable {
                 empCodeContainer.show();
                 nameContainer.addClass('d-none');
                 $('#reg_password, #reg_emp_code, #reg_first_name, #reg_last_name').val('');
+                    // Hide searched employee code field
+                    $('#searched_emp_code').val('');
+                    $('#searched_emp_code_container').hide();
                 locationSelect.val(null).removeAttr('multiple');
                 if (locationSelect.find('option[value=""]').length === 0) {
                     locationSelect.prepend('<option value="">Select Location</option>');
@@ -161,25 +167,34 @@ class UsersTable {
                 } else {
                     nameContainer.addClass('d-none');
                     $('#reg_first_name, #reg_last_name').val('').prop('readonly', true);
+                        // Hide searched employee code field
+                        $('#searched_emp_code').val('');
+                        $('#searched_emp_code_container').hide();
                 }
 
                 // Remove the empty placeholder option for multi-select location
-                locationSelect.find('option[value=""]').remove();
+                // locationSelect.find('option[value=""]').remove();
 
                 // Clear any existing selection before enabling multi-select
                 locationSelect.val(null);
 
                 // Enable multiple selection with Select2 tags UI
-                locationSelect.attr('multiple', 'multiple');
+                // locationSelect.attr('multiple', 'multiple');
+                
+                locationSelect.removeAttr('multiple');
+
+                if (locationSelect.find('option[value=""]').length === 0) {
+                    locationSelect.prepend('<option value="">Select Location</option>');
+                }
 
                 // Initialize Select2 with tag-based UI
-                locationSelect.select2({
-                    placeholder: 'Select locations...',
-                    allowClear: true,
-                    width: '100%',
-                    dropdownParent: $('#registerUserModal'),
-                    closeOnSelect: false
-                });
+                // locationSelect.select2({
+                //     placeholder: 'Select locations...',
+                //     allowClear: true,
+                //     width: '100%',
+                //     dropdownParent: $('#registerUserModal'),
+                //     closeOnSelect: false
+                // });
 
                 // Ensure no options are selected after init
                 locationSelect.val(null).trigger('change.select2');
@@ -196,6 +211,9 @@ class UsersTable {
                 } else {
                     nameContainer.addClass('d-none');
                     $('#reg_first_name, #reg_last_name').val('').prop('readonly', true);
+                        // Hide searched employee code field
+                        $('#searched_emp_code').val('');
+                        $('#searched_emp_code_container').hide();
                 }
 
                 // Disable multiple selection for location
@@ -218,6 +236,9 @@ class UsersTable {
 
                 empCodeContainer.hide();
                 $('#reg_emp_code').val('');
+                    // Hide searched employee code field
+                    $('#searched_emp_code').val('');
+                    $('#searched_emp_code_container').hide();
 
                 nameContainer.removeClass('d-none');
                 $('#reg_first_name, #reg_last_name').prop('readonly', false);
@@ -246,6 +267,9 @@ class UsersTable {
                 empCodeContainer.show();
                 nameContainer.addClass('d-none');
                 $('#reg_first_name, #reg_last_name').val('');
+                    // Hide searched employee code field
+                    $('#searched_emp_code').val('');
+                    $('#searched_emp_code_container').hide();
 
                 // Disable multiple selection for location
                 locationSelect.removeAttr('multiple');
@@ -268,13 +292,13 @@ class UsersTable {
         const self = this;
 
         const tableHeader = [
-            { id: "user_name",       label: "Username" },
-            { id: "user_type",       label: "Role" },
-            { id: "created_by",       label: "Created By" },
-            { id: "updated_by",      label: "Updated By" },
-            { id: "created_at",   label: "Created Date" },
-            { id: "updated_at",   label: "Updated Date" },
-            { id: "action",         label: "Action" },
+            { id: "user_name",       label: "Username"     },
+            { id: "user_type",       label: "Role"         },
+            { id: "created_by",      label: "Created By"   },
+            { id: "updated_by",      label: "Updated By"   },
+            { id: "created_at",      label: "Created Date" },
+            { id: "updated_at",      label: "Updated Date" },
+            { id: "action",          label: "Action"       },
         ];
 
         const columns = tableHeader.map(col => ({
@@ -321,7 +345,6 @@ class UsersTable {
                     tableApi.page.len(this.value).draw();
                 });
         });
-        
     }
 
     async initializeButtons(){
@@ -337,6 +360,19 @@ class UsersTable {
         // Save
         $('#submit_user_btn').off('click').on('click', async function(e) {
             e.preventDefault();
+            // Only require searched emp code for roles that use it
+            const selectedRoleNum = Number($('#reg_user_type').val());
+            const searchedEmpCode = $('#searched_emp_code').val();
+            if (selectedRoleNum === 3) {
+                // Guard: clear emp code before saving
+                $('#reg_emp_code').val('');
+            } else {
+                if (!searchedEmpCode) {
+                    Triggers.showToast('Please search and confirm a valid employee code before saving.', 'Register User', 1);
+                    return;
+                }
+                $('#reg_emp_code').val(searchedEmpCode);
+            }
             const formid    = self.form;
             const formdata  = new FormData($(formid)[0]);
             const idInput = document.getElementById('reg_user_db_id');
@@ -399,7 +435,7 @@ class UsersTable {
             }
         } catch (error) {
             console.error('Failed to load user data:', error);
-            Triggers.showToast('Failed to load user data.', 1);
+            Triggers.showToast('Failed to load user data.','User Data', 1);
         }
     }
 
@@ -412,10 +448,9 @@ class UsersTable {
         }
 
         component.createDropdown(URL + 'getlocation', '#reg_location', selectedValue, '#registerUserModal');
-        
     }
-
 }
 const instance = new UsersTable();
 instance.InitializePage();
+
 export default instance;

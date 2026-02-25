@@ -2,7 +2,6 @@ import container from './common/container';
 import datahandling from './common/datahandling';
 import Triggers from './common/triggers';
 import settable from './common/settable';
-import component from './common/component';
 
 class UserTypeTable {
     constructor() {
@@ -23,11 +22,11 @@ class UserTypeTable {
         const self = this;
 
         const tableHeader = [
-            { id: "name",       label: "Name" },
-            { id: "created_by", label: "Created By" },
-            { id: "updated_by", label: "Updated By" },
+            { id: "name",       label: "Name"         },
+            { id: "created_by", label: "Created By"   },
+            { id: "updated_by", label: "Updated By"   },
             { id: "created_at", label: "Created Date" },
-            { id: "action",     label: "Action" },
+            { id: "action",     label: "Action"       },
         ];
 
         const columns = tableHeader.map(col => ({
@@ -75,9 +74,6 @@ class UserTypeTable {
                     tableApi.page.len(this.value).draw();
                 });
         });
-
-
-
     }
 
     async initializeButtons(){
@@ -94,7 +90,6 @@ class UserTypeTable {
             const formid    = self.form;
             const formdata  = new FormData($(formid)[0]);
 
-            
             await Triggers.removeErrorOnInput(formid);
             await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
 
@@ -117,7 +112,6 @@ class UserTypeTable {
 
         container.showModal(self.modal);
     }
-
 }
 
 const instance = new UserTypeTable();

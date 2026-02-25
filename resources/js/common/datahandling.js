@@ -9,11 +9,11 @@ class Datahandling {
      */
     async processData(url, method, data) {
         const response = await $.ajax({
-            url: window.location.origin + url,
-            type: method,
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            data: data,
-            dataType: 'json',
+            url     :   window.location.origin + url,
+            type    :   method,
+            headers :   { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            data    :   data,
+            dataType:   'json',
         });
         return response;
     }
@@ -26,11 +26,11 @@ class Datahandling {
      * @param formdata = formdata // new FormData($(this)[0])
      */
     async saveForm(url, table, formid, formdata, config = []) {
-        const self = this
+        const self       = this
 
         const $submitBtn = $(formid).find('button[type="submit"]');
-        const $spinner = $submitBtn.find('.spinner-border');
-        const $btnText = $submitBtn.find('.btn-text');
+        const $spinner   = $submitBtn.find('.spinner-border');
+        const $btnText   = $submitBtn.find('.btn-text');
 
         $submitBtn.prop('disabled', true);
 
@@ -39,12 +39,12 @@ class Datahandling {
 
         $.ajax({
             url: window.location.origin + url,
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            type: 'POST',
-            data: formdata,
+            headers:     { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            type:        'POST',
+            data:        formdata,
             processData: false,
             contentType: false,
-            success: function (data) {
+            success:     function (data) {
                 $submitBtn.prop('disabled', false);
                 if ($spinner.length > 0) $spinner.addClass('d-none');
                 if ($btnText.length > 0) $btnText.removeClass('d-none');
@@ -58,12 +58,11 @@ class Datahandling {
                     // Show toast for validation errors
                     const firstError = Object.values(errors)[0];
                     const errorMsg = Array.isArray(firstError) ? firstError[0] : firstError;
-                    triggers.showToast(errorMsg, 1);
+                    triggers.showToast(errorMsg, data.title || 'Invalid', 1);
                 }
 
                 if (!errors) {
-
-                    triggers.showToast(data.message, data.status);
+                    triggers.showToast(data.message, data.title || (data.status === 0 ? 'Success' : 'Notice'), data.status);
 
                     if (config.module) datatable.createTable(config.table, config.columns, config.url, config.targets)
                     else $(table).DataTable().ajax.reload()
@@ -74,14 +73,32 @@ class Datahandling {
                     }, 1000);
                 }
             },
-            error: function () {
+            error: function (xhr) {
                 $submitBtn.prop('disabled', false);
                 if ($spinner.length > 0) $spinner.addClass('d-none');
                 if ($btnText.length > 0) $btnText.removeClass('d-none');
 
-                alert("Oooo Something went wrong.");
+                let errorMsg = "Oooo Something went wrong.";
+                let errorTitle = 'Error';
+                if (xhr && xhr.responseJSON) {
+                    if (xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    if (xhr.responseJSON.title) {
+                        errorTitle = xhr.responseJSON.title;
+                    }
+                    if (xhr.responseJSON.errors) {
+                        // Show first error if available
+                        const firstError = Object.values(xhr.responseJSON.errors)[0];
+                        errorMsg = Array.isArray(firstError) ? firstError[0] : firstError;
+                    }
+                }
+                if (typeof triggers !== 'undefined' && triggers.showToast) {
+                    triggers.showToast(errorMsg, errorTitle, 1);
+                } else {
+                    alert(errorMsg);
+                }
             }
-
         });
     }
 
@@ -110,7 +127,7 @@ class Datahandling {
         }
 
         let ajaxOptions = {
-            url: window.location.origin + url,
+            url:  window.location.origin + url,
             type: type,
             data: formdata,
             success: function (data) {
@@ -138,7 +155,7 @@ class Datahandling {
                 ajaxOptions.contentType = false;
             } else {
                 ajaxOptions.contentType = "application/json; charset=UTF-8";
-                ajaxOptions.data = JSON.stringify(formdata);
+                ajaxOptions.data        = JSON.stringify(formdata);
             }
         }
 
@@ -155,22 +172,22 @@ class Datahandling {
 
         datastorage.setItem(self.editFormParam, JSON.stringify({
             'defaultFields': fields,
-            'layout': container,
-            'container_id': container_id,
-            'form': form,
-            'url': url
+            'layout'       : container,
+            'container_id' : container_id,
+            'form'         : form,
+            'url'          : url
         }))
     }
 
     async getFields(formId) {
-        let fields = {};
+        let fields    = {};
 
         $(formId + " :input:not([type*='hidden'])").each(function () {
-            let name = $(this).attr("name");
+            let name  = $(this).attr("name");
 
             if (!name) return;
 
-            name = name.replace(/\[.*?\]/g, "");
+            name      = name.replace(/\[.*?\]/g, "");
 
             let title = name.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 

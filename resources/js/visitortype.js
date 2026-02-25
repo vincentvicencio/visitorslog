@@ -14,31 +14,31 @@ import Triggers from './common/triggers';
 
         }
 
-        async initializePage(){
-            this.list();
-            this.initializeButtons();
-        }
+    async initializePage(){
+        this.list();
+        this.initializeButtons();
+    }
 
 
-        async list() {
-            const self = this;
+    async list() {
+        const self = this;
 
-            const tableHeader = [
-                { id: "name",        label: "Name" },
-                { id: "created_by",  label: "Created By" },
-                { id: "updated_by",  label: "Updated By" },
-                { id: "created_at",  label: "Created Date" },
-                { id: "action",      label: "Action" },
-            ];
+        const tableHeader = [
+            { id: "name",        label: "Name"         },
+            { id: "created_by",  label: "Created By"   },
+            { id: "updated_by",  label: "Updated By"   },
+            { id: "created_at",  label: "Created Date" },
+            { id: "action",      label: "Action"       },
+        ];
 
-            const columns = tableHeader.map(col => ({
-                data: col.id, 
-                title: col.label
-            }));
+        const columns = tableHeader.map(col => ({
+            data: col.id, 
+            title: col.label
+        }));
 
-            const columnDefs = [
-                { targets: [0, 1, 2, 3], orderable: false }
-            ]; 
+        const columnDefs = [
+            { targets: [0, 1, 2, 3], orderable: false }
+        ]; 
 
             settable.createTableAjax(
                 self.table,
@@ -51,20 +51,20 @@ import Triggers from './common/triggers';
                 false
             );
 
-            $(self.table).on('init.dt', function () {
+        $(self.table).on('init.dt', function () {
 
-                const tableApi = $(self.table).DataTable();
+            const tableApi = $(self.table).DataTable();
 
-                tableApi.draw();
+            tableApi.draw();
 
-                // =========================================
-                // CUSTOM SEARCH
-                // =========================================
-                $('#typeSearch')
-                    .off('keyup')
-                    .on('keyup', function () {
-                        tableApi.search(this.value).draw();
-                    });
+            // =========================================
+            // CUSTOM SEARCH
+            // =========================================
+            $('#typeSearch')
+                .off('keyup')
+                .on('keyup', function () {
+                    tableApi.search(this.value).draw();
+                });
 
                 // =========================================
                 // ENTRIES PER PAGE
@@ -86,14 +86,14 @@ import Triggers from './common/triggers';
                 e.preventDefault()
                 datahandling.clearForm(self.form)
                 container.showModal(self.modal)
-            })
+        })
                     
             // Save Button
             $(document).off('click', '#textInputSubmit').on('click', '#textInputSubmit', async function(e) {
                 e.preventDefault();
                 
-                const formid    = self.form;
-                const formdata  = new FormData($(formid)[0]);
+            const formid    = self.form;
+            const formdata  = new FormData($(formid)[0]);
         
                 await Triggers.removeErrorOnInput(formid);
                 await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
@@ -119,6 +119,7 @@ import Triggers from './common/triggers';
 
 
 }
+
 const instance = new VisitorTypeTable();
 instance.initializePage();
 
