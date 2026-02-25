@@ -31,6 +31,8 @@
                             @foreach ($visitorTypes as $type)
                                 @if ($visitor->visitor_type == $type->id)
                                     <input type="text" name="visitor_type" class="form-control" readonly value="{{ $type->name }} " required>
+                                @else
+                                    <input type="text" name="visitor_type" class="form-control" readonly value="--" required>
                                 @endif
                             @endforeach
                             <label for="visitor_type">Visitor Type</label>

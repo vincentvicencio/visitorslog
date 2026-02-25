@@ -4,7 +4,7 @@
     <div class="page-header">
         <div class="header-content">
             <div class="page-title fs-2">Users</div>
-            <div class="page-subtitle mb-3">Manage and organize user accounts and their details</div>
+            <div class="page-subtitle mb-3">Manage user accounts and their details</div>
         </div>
         <button type="button" class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
         text-white rounded-2 border-0 cursor-pointer px-3 py-2" id="reg_user">Register User</button>

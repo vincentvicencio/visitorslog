@@ -7,7 +7,7 @@
     <div class="page-header">
         <div class="header-content">
             <div class="page-title fs-2">Reports</div>
-            <div class="page-subtitle mb-3">Monitor and track every logged visitor</div>
+            <div class="page-subtitle mb-3">Track every logged visitor</div>
         </div>
         <div class="d-flex gap-4 position-absolute top-50 end-0 translate-middle-y">
             <button id="exportReportBtn"
