@@ -77,11 +77,16 @@ class UsersTable {
                     $('#reg_first_name').val(exactMatch.first_name || '');
                     $('#reg_last_name').val(exactMatch.last_name || '');
                     $('#employee_name_container').removeClass('d-none');
+                    // Set searched emp code field
+                    $('#searched_emp_code').val(empCode);
+                    $('#searched_emp_code_container').show();
                     Triggers.showToast('Employee found!','Employee Search', 0);
                 } else {
                     $('#reg_first_name').val('');
                     $('#reg_last_name').val('');
                     $('#employee_name_container').addClass('d-none');
+                    $('#searched_emp_code').val('');
+                    $('#searched_emp_code_container').hide();
                     Triggers.showToast('Employee code not found.','Employee Search', 1);
                 }
                 $btn.prop('disabled', false).html('<i class="bi bi-search"></i>');
@@ -340,6 +345,19 @@ class UsersTable {
         // Save
         $('#submit_user_btn').off('click').on('click', async function(e) {
             e.preventDefault();
+            // Only require searched emp code for roles that use it
+            const selectedRoleNum = Number($('#reg_user_type').val());
+            const searchedEmpCode = $('#searched_emp_code').val();
+            if (selectedRoleNum === 3) {
+                // Guard: clear emp code before saving
+                $('#reg_emp_code').val('');
+            } else {
+                if (!searchedEmpCode) {
+                    Triggers.showToast('Please search and confirm a valid employee code before saving.', 'Register User', 1);
+                    return;
+                }
+                $('#reg_emp_code').val(searchedEmpCode);
+            }
             const formid    = self.form;
             const formdata  = new FormData($(formid)[0]);
             const idInput = document.getElementById('reg_user_db_id');
