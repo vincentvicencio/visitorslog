@@ -30,7 +30,7 @@ class VisitorTypeController extends Controller
         );
 
         if($validator->fails()){
-            return response()->json(['status' => 1,'errors' => $validator->errors()]);
+            return response()->json(['status' => 1, 'title' => 'Invalid', 'errors' => $validator->errors()]);
         }
 
         $record_id      = $request->record_id;
@@ -47,6 +47,7 @@ class VisitorTypeController extends Controller
         if($duplicateQuery->exists()){
             return response()->json([
                 'status'    => 1,
+                'title'     => 'Invalid',
                 'message'   => 'Visitor Type Already Exists'
             ]);
 
@@ -68,6 +69,7 @@ class VisitorTypeController extends Controller
         }
         return response()->json([
             'status'    => 0,
+            'title'     => 'Success',
             'message'   => $message
         ]);
 
@@ -134,12 +136,14 @@ class VisitorTypeController extends Controller
         if(!$record){
             return response()->json([
                 'status'     => 1,
+                'title'      => 'Error',
                 'message'    => 'No Data Found'
             ]);
         }
 
         return response()->json([
             'status'     => 0,
+            'title'      => 'Success',
             'data'       => $record
         ]);
     }
@@ -153,6 +157,7 @@ class VisitorTypeController extends Controller
         $message = 'Visitor Type Successfully Deleted';
             return response()->json([
                 'status'     => 0,
+                'title'      => 'Success',
                 'message'    => $message
             ]);
     }
@@ -166,7 +171,7 @@ class VisitorTypeController extends Controller
                 'deleted_by' => Auth::user()->id, 
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Failed to delete role.'], 500);
+            return response()->json(['status' => 1, 'title' => 'Error', 'message' => 'Failed to delete visitor type.'], 500);
         }
     }
 

@@ -35,6 +35,7 @@ class ReportController extends Controller
                 'deleted_by' => Auth::user() -> id // Optional: track who deleted it
             ]);
         } catch (\Exception $e) {
+            return response()->json(['status' => 1, 'title' => 'Error', 'message' => 'An error occurred while deleting the report log.', 'error' => $e], 500);
         }
     }
 
@@ -211,16 +212,20 @@ class ReportController extends Controller
 
     public function exportReport(Request $request)
     {
-        $filters = [
-            'search'            => $request->input('search', ''),
-            'date_from'         => $request->input('date_from', ''),
-            'date_to'           => $request->input('date_to', ''),
-            'visitor_type'      => $request->input('visitor_type', ''),
-        ];
+        try {
+            $filters = [
+                'search'            => $request->input('search', ''),
+                'date_from'         => $request->input('date_from', ''),
+                'date_to'           => $request->input('date_to', ''),
+                'visitor_type'      => $request->input('visitor_type', ''),
+            ];
 
-        $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-        
-        return Excel::download(new ReportsExport($filters), $fileName);
+            $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+            
+            return Excel::download(new ReportsExport($filters), $fileName);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 1, 'title' => 'Error', 'message' => 'An error occurred while exporting the report.', 'error' => $e], 500);
+        }
     }
 
     public function delete(Request $request){

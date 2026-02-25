@@ -80,11 +80,12 @@ class Registered_UsersController extends Controller
         'emp_code.unique' => 'Employee code already exists.',
     ];
 
-    $validator = Validator::make($request->all(), $validationRules, $messages);
+    $validator = Validator::make($request->all(), $validationRules,'Error', $messages);
 
     if ($validator->fails()) {
         return response()->json([
             'status' => 1,
+            'title' => 'Invalid',
             'errors' => $validator->errors(),
         ]);
     }
@@ -173,6 +174,7 @@ class Registered_UsersController extends Controller
             
             return response()->json([
                 'status' => 0,
+                'title' => 'Success',
                 'message' => $message
             ]);
         }
@@ -194,6 +196,7 @@ class Registered_UsersController extends Controller
             if (!$employeeData) {
                 return response()->json([
                     'status' => 1,
+                    'title' => 'Employee Not Found',
                     'message' => 'Employee Code not found in session records.'
                 ], 422);
             }
@@ -238,12 +241,14 @@ class Registered_UsersController extends Controller
 
         return response()->json([
             'status' => 0,
+            'title' => 'Success',
             'message' => $message
         ]);
 
     } catch (\Exception $e) {
         return response()->json([
             'status' => 1,
+            'title' => 'Error',
             'message' => 'System Error: ' . $e->getMessage()
         ], 500);
     }
@@ -263,11 +268,13 @@ class Registered_UsersController extends Controller
 
         return response()->json([
             'status'  => 'success', 
+            'title'   => 'Success',
             'message' => 'User deactivated successfully.'
         ]);
     } catch (\Exception $e) {
         return response()->json([
             'status'  => 'error', 
+            'title'   => 'Error',
             'message' => 'Failed to remove user.'
         ], 500);
     }
@@ -361,7 +368,8 @@ public function edit(Request $request, $id)
         // For non-Guard roles, verify emp_code matches
         if (!$isGuard && $request->emp_code !== $user->user_name) {
             return response()->json([
-                'status' => 'error', 
+                'status' => 'error',
+                'title' => 'Employee Code Mismatch',
                 'message' => 'The Entered Employee Code Does not Match'
             ], 422);
         }
@@ -414,6 +422,7 @@ public function edit(Request $request, $id)
             if (count($locations) === 0) {
                 return response()->json([
                     'status'  => 'error',
+                    'title'   => 'Select Location',
                     'message' => 'Please select at least one location.'
                 ], 422);
             }
@@ -421,6 +430,7 @@ public function edit(Request $request, $id)
             if ($roleId === 2 && count($locations) > 1) { // Receptionist
                 return response()->json([
                     'status'  => 'error',
+                    'title'   => 'Select Location',
                     'message' => 'Receptionist can only have one location.'
                 ], 422);
             }
@@ -434,9 +444,9 @@ public function edit(Request $request, $id)
 
         $user->update($updateData);
 
-        return response()->json(['status' => 'success', 'message' => 'User updated successfully!']);
+        return response()->json(['status' => 'success', 'title' => 'Success', 'message' => 'User updated successfully!']);
     } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()], 500);
+        return response()->json(['status' => 'error', 'title' => 'Error', 'message' => 'Update failed: ' . $e->getMessage()], 500);
     }
 }
 
@@ -560,12 +570,14 @@ public function list(Request $request){
         if(!$record){
             return response()->json([
                 'status'     => 1,
+                'title'      => 'Error',
                 'message'    => 'No Data Found'
             ]);
         }
 
         return response()->json([
             'status'     => 0,
+            'title'      => 'Success',
             'data'       => $record
         ]);
     }
@@ -579,6 +591,7 @@ public function list(Request $request){
         $message    = 'Registered User Successfully Deleted';
             return response()->json([
                 'status'     => 0,
+                'title'      => 'Success',
                 'message'    => $message
             ]);
     }
@@ -591,7 +604,7 @@ public function list(Request $request){
             $role->delete();
             
         } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurred while deleting the Registered User.'], 500);
+            return response()->json(['status' => 1, 'title' => 'Error', 'message' => 'An error occurred while deleting the Registered User.', 'error' => $e], 500);
         }
     }   
 

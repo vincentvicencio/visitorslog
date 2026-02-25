@@ -26,7 +26,7 @@ class User_TypesController extends Controller
         );
 
         if($validator->fails()){
-            return response()->json(['status' => 1,'errors' => $validator->errors()]);
+            return response()->json(['status' => 1, 'title' => 'Invalid','errors' => $validator->errors()]);
         }
 
         $record_id      = $request->record_id;
