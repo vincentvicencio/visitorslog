@@ -8,7 +8,6 @@ use App\Models\VisitorType;
 use App\Models\RegisteredID;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class VisitorController extends Controller
@@ -27,10 +26,17 @@ class VisitorController extends Controller
                 -> get();
 
         $empMap = collect(session('all_emp'))->keyBy('emp_code');
-        return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+
+        // if (session('from_form')) {
+        //     session()->forget('from_form');
+        //     return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
+        // }else{
+            return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+        // }
     }
     public function form()
     {
+        // session(['from_form' => true]);
         $visitorTypes = VisitorType::where('deleted_at', null)
                 -> orderBy('id', 'asc')
                 -> get();
@@ -47,17 +53,24 @@ class VisitorController extends Controller
 
         $rawquery = Visitor::with('visitorType')
                 -> withoutTrashed()
-                -> where(function ($query) {
-                $userLocations = []; 
+                ->where(function ($query) {
 
-                    foreach ((array) Auth::user()->location as $loc) {
-                        $userLocations[] = (int) $loc;
-                    }
+                    $user = Auth::user();
+                    $userLocations = array_map('intval', (array) $user->location);
+
+                    // First filter by location
+                    $query->whereIn('location', $userLocations);
+
+                    // Then filter active / not timed out
                     $query->where(function ($q) {
                         $q->where('status', 0)
-                        ->orWhereNull('status');
-                    })->whereIn('location', $userLocations);
+                        ->orWhereNull('time_out');
+                    });
 
+                    // Then restrict to creator if NOT admin
+                    if (Auth::user()->user_type != 1) {
+                        $query->where('created_by', Auth::user()->id);
+                    }
                 })
 
                 -> when($keywords, function ($query) use ($keywords) {
@@ -192,12 +205,16 @@ class VisitorController extends Controller
 
         if (!$visitor) {
             return response()->json([
+                'status'  => 1,
+                'title'   => 'Error',
                 'message' => 'Visitor not found'
             ], 404);
         }
 
         if ($visitor->status == 1) {
             return response()->json([
+                'status'  => 1,
+                'title'   => 'Error',
                 'message' => 'Visitor already timed out'
             ], 400);
         }
@@ -209,6 +226,8 @@ class VisitorController extends Controller
         ]);
 
         return response()->json([
+            'status'     => 0,
+            'title'      => 'Success',
             'message'    => 'Visitor successfully timed out'
         ]);
     }
@@ -357,6 +376,8 @@ class VisitorController extends Controller
 
 
             return response()->json([
+                'status' => 0,
+                'title' => 'Success',
                 'message' => 'Visitor successfully added'
             ], 200);
             

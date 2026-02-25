@@ -211,16 +211,26 @@ class ReportController extends Controller
 
     public function exportReport(Request $request)
     {
-        $filters = [
-            'search'            => $request->input('search', ''),
-            'date_from'         => $request->input('date_from', ''),
-            'date_to'           => $request->input('date_to', ''),
-            'visitor_type'      => $request->input('visitor_type', ''),
-        ];
+        try{
+            $filters = [
+                'search'            => $request->input('search', ''),
+                'date_from'         => $request->input('date_from', ''),
+                'date_to'           => $request->input('date_to', ''),
+                'visitor_type'      => $request->input('visitor_type', ''),
+            ];
 
-        $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+            $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+            
+            return Excel::download(new ReportsExport($filters), $fileName);
+    
+        }catch(\Exception $e){
+            return response()->json([
+                'status' => 1,
+                'title' => 'Error',
+                'message' => $e->getMessage()
+            ]); 
+        }
         
-        return Excel::download(new ReportsExport($filters), $fileName);
     }
 
     public function delete(Request $request){

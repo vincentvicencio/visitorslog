@@ -62,24 +62,7 @@ $(document).ready(function () {
         });
     });
 
-    $(document).on('click', '#clrBtn', function () {
-        $('#addVisitorForm')[0].reset();
-        $('#photoPreview').css('display', 'none');
-        $('#photoPreview').attr('src', '');
-        $('#imageInput').val(''); 
-    });
-
-    $('#captureBtn').on('click', function () {
-        $('#imageInput').click();
-    });
-
-    $('#recaptureBtn').on('click', function () {
-        $('#photoPreview').css('display', 'none');
-        $('#photoPreview').attr('src', '');
-        $('#imageInput').val(''); 
-
-    });
-
+    
     $(document).on('click', '#viewBtn', function () {
         let visitorId = $(this).data('id');
         let type = $(this).data('type');
@@ -123,6 +106,114 @@ $(document).ready(function () {
             }
         });
     });
+
+    $(document).on('click', '#clrBtn', function () {
+        $('#addVisitorForm')[0].reset();
+        $('#photoPreview').css('display', 'none');
+        $('#photoPreview').attr('src', '');
+        $('#imageInput').val(''); 
+    });
+
+    // $('#captureBtn').on('click', function () {
+    //     $('#imageInput').click();
+
+    //     $('#canvas').attr('width', $('#webcam').videoWidth);
+    //     $('#canvas').attr('height', $('#webcam').videoHeight);
+
+    //     $('#canvas').getContext('2d').drawImage($('#webcam'), 0, 0, $('#canvas').width(), $('#canvas').height());
+        
+    //     // Convert the canvas image to a data URL
+    //     const imageData = $('#canvas').toDataURL('image/png');    
+
+    //     $('#photoPreview').css('display', 'block');
+    //     $('#photoPreview').attr('src', imageData);
+    //     $('#webcam').css('display', 'none');
+    //     $('#image_path').val(imageData);
+    // });
+
+    // $('#recaptureBtn').on('click', function () {
+    //     $('#photoPreview').css('display', 'none');
+    //     $('#photoPreview').attr('src', '');
+    //     $('#imageInput').val(''); 
+    //     $('#webcam').css('display', 'block');
+    //     $('#image_path').val('');
+
+    // });
+
+    $('#captureBtn').on('click', function () {
+
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('canvas');
+
+        if (video && video.srcObject) {
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = canvas.toDataURL('image/png');    
+
+            $('#photoPreview').css('display', 'block');
+            $('#photoPreview').attr('src', imageData);
+            $('#webcam').css('display', 'none');
+            $('#image_path').val(imageData);
+
+        } else {
+            $('#imageInput').click();
+        }
+
+    });
+
+    $('#recaptureBtn').on('click', function () {
+
+        $('#photoPreview').css('display', 'none');
+        $('#photoPreview').attr('src', '');
+        $('#imageInput').val('');
+        $('#image_path').val('');
+
+        const video = document.getElementById('webcam');
+        if (video && video.srcObject) {
+            $('#webcam').css('display', 'block');
+        }
+
+    });
+
+    // 1. Start webcam
+    async function startWebcam() {
+
+        const video = document.getElementById('webcam');
+        const imageInput = document.getElementById('imageInput');
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            if (imageInput) imageInput.style.display = 'block';
+            if (video) video.style.display = 'none';
+            return;
+        }
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "user" }, 
+                audio: false 
+            });
+
+            if (video) {
+                video.srcObject = stream;
+                video.style.display = 'block';
+            }
+
+            if (imageInput) imageInput.style.display = 'none';
+
+        } catch (err) {
+            console.error("Webcam not available: ", err);
+
+            if (imageInput) imageInput.style.display = 'block';
+            if (video) video.style.display = 'none';
+        }
+    }
+
+    startWebcam();
 
 
     $('#imageInput').on('change', function (e) {
@@ -303,46 +394,4 @@ $(document).ready(function () {
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();
 
-    // 1. Start the webcam
-    // async function startWebcam() {
-    //     try {
-    //         const stream = await navigator.mediaDevices.getUserMedia({ 
-    //             video: { facingMode: "user" }, 
-    //             audio: false 
-    //         });
-    //         video.srcObject = stream;
-    //     } catch (err) {
-    //         console.error("Error accessing webcam: ", err);
-    //         alert("Webcam access denied or not available.");
-    //     }
-    // }
-
-    // // 2. Capture photo
-    // captureBtn.addEventListener('click', () => {
-    //     const context = canvas.getContext('2d');
-    //     canvas.width = video.videoWidth;
-    //     canvas.height = video.videoHeight;
-        
-    //     // Draw the current video frame to the canvas
-    //     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-    //     // Convert the canvas image to a data URL
-    //     const imageData = canvas.toDataURL('image/png');    
-        
-    //     // Display the captured image
-    //     photoPreview.src = imageData;
-    //     photoPreview.style.display = 'block';
-    //     video.style.display = 'none'; 
-    //     imageInput.value = imageData; 
-    // });
-
-    // // 3. Recapture photo
-    // recaptureBtn.addEventListener('click', () => {
-    //     photoPreview.src = "";
-    //     photoPreview.style.display = 'none';
-    //     video.style.display = 'block'; 
-    //     imageInput.value = ""; 
-    // });
-
-    // startWebcam();
 });

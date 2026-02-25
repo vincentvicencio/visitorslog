@@ -74,26 +74,16 @@
 
                         </div>
                         {{-- For capturing image --}}
-                        {{-- <div class="capture">
-                            <div class="header">Capture Image</div>
-                            <div class="imgholder" style="overflow: hidden">
-                                <video id="webcam" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-                                <canvas id="canvas" style="display:none;"></canvas>
-                                <img id="photoPreview" src="" style="display:none; width: 100%; height: auto;">
-                            </div>
-
-                            <button type="button" class="capture-button" id="captureBtn">Capture</button>
-                            <button type="button" class="capture-button" id="recaptureBtn">ReCapture</button>
-                            
-                            <input type="hidden" id="image_path" name="image_path">
-                        </div> --}}
 
                         <div class="capture">
                             <div class="header">Capture Image</div>
-                            <div class="imgholder" style="overflow: hidden">
-                                <input type="file" name="imageInput" id="imageInput" accepts="image/*" capture="user" hidden>
-                                <img id="photoPreview" src="" style="display:none; width: 100%; height: 100%; object-fit: cover;">
-                            </div>
+                                <div class="imgholder" style="overflow: hidden">
+                                    <video id="webcam" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+                                    <canvas id="canvas" style="display:none;"></canvas>
+                                    <input type="file" name="imageInput" id="imageInput" accepts="image/*" capture="user" hidden>
+                                    <img id="photoPreview" src="" style="display:none; width: 100%; height: 100%; object-fit: cover;">
+                                    <input type="hidden" id="image_path" name="image_path">
+                                </div>
 
                             <button type="button" class="capture-button" id="captureBtn">Capture</button>
                             <button type="button" class="capture-button" id="recaptureBtn">ReCapture</button>

@@ -109,8 +109,8 @@ class VisitorTypeController extends Controller
         foreach ($data as $d) { 
        
             $newData[$i] = [
-                'name'       => $d->name, // show emp_code in first column
-                'created_by' => user_name($d->created_by) ?? '-',
+                'name'       => $d->name, 
+                'created_by' => $d->created_by ? user_name($d->created_by) : '-',
                 'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
                 'created_at' => $d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l'),
                 'action'            => '<div class="dropdown">

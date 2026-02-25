@@ -58,7 +58,7 @@ class Datahandling {
                     // Show toast for validation errors
                     const firstError = Object.values(errors)[0];
                     const errorMsg = Array.isArray(firstError) ? firstError[0] : firstError;
-                    triggers.showToast(errorMsg, data.title || 'Validation Error', 1);
+                    triggers.showToast(errorMsg, data.title || 'Invalid', 1);
                 }
 
                 if (!errors) {
