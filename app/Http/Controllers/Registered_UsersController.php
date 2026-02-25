@@ -80,7 +80,7 @@ class Registered_UsersController extends Controller
         'emp_code.unique' => 'Employee code already exists.',
     ];
 
-    $validator = Validator::make($request->all(), $validationRules,'Error', $messages);
+    $validator = Validator::make($request->all(), $validationRules, $messages);
 
     if ($validator->fails()) {
         return response()->json([
