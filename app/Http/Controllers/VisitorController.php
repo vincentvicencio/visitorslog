@@ -9,6 +9,7 @@ use App\Models\RegisteredID;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class VisitorController extends Controller
 {
@@ -64,7 +65,7 @@ class VisitorController extends Controller
                     // Then filter active / not timed out
                     $query->where(function ($q) {
                         $q->where('status', 0)
-                        ->orWhereNull('time_out');
+                        ->where('time_out', null);
                     });
 
                     // Then restrict to creator if NOT admin
@@ -325,27 +326,31 @@ class VisitorController extends Controller
 
 
         try {
-            // $image     = $request->image_path;
-
-            // // Remove metadata (data:image/png;base64,)
-            // $image     = preg_replace('/^data:image\/\w+;base64,/', '', $image);
-
-            // // Decode base64
-            // $image     = base64_decode($image);
-
-            // // Generate filename
-
-
-            // // Save to public disk
-            // Storage::disk('public')->put($fileName, $image);
-
-            // $imagePath = $fileName;
-
             $imagePath = null;
-            if ($request->hasFile('imageInput') && $request->file('imageInput')->isValid()) {
-                $fileName  = 'visitors/' . Str::random(20) . '.png';
-                $imagePath = $request->file('imageInput')->storeAs('visitors', $fileName, 'public');
+            if(!empty($request->image_path)) {
+                
+                $image     = $request->image_path;
+
+                // Remove metadata (data:image/png;base64,)
+                $image     = preg_replace('/^data:image\/\w+;base64,/', '', $image);
+
+                // Decode base64
+                $image     = base64_decode($image);
+
+                // Generate filename
+
+
+                // Save to public disk
+                Storage::disk('public')->put($fileName, $image);
+
+            $imagePath = $fileName;
+            }else{
+                if ($request->hasFile('imageInput') && $request->file('imageInput')->isValid()) {
+                    $fileName  = 'visitors/' . Str::random(20) . '.png';
+                    $imagePath = $request->file('imageInput')->storeAs('visitors', $fileName, 'public');
+                }
             }
+            
 
             $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
 
