@@ -80,7 +80,7 @@ class Registered_UsersController extends Controller
         'emp_code.unique' => 'Employee code already exists.',
     ];
 
-    $validator = Validator::make($request->all(), $validationRules,'Error', $messages);
+    $validator = Validator::make($request->all(), $validationRules, $messages);
 
     if ($validator->fails()) {
         return response()->json([
@@ -137,6 +137,7 @@ class Registered_UsersController extends Controller
             $usernameQuery = RegisteredUser::where('user_name', $username);
             if ($isEditing) {
                 $usernameQuery->where('id', '!=', $recordId);
+                $userData['updated_by'] = Auth::id();
             }
             while ($usernameQuery->exists()) {
                 $username = $baseUsername . '.' . $counter;
@@ -153,7 +154,7 @@ class Registered_UsersController extends Controller
                 'last_name'  => $lastName,
                 'location'   => $locations,
                 'user_type'  => $request->user_type,
-                'updated_by' => Auth::user()->id,
+                'emp_code'   => $request->emp_code
             ];
             
             // Only hash password if provided
@@ -162,12 +163,12 @@ class Registered_UsersController extends Controller
             }
             
             if ($isEditing) {
+                $guardData['created_by'] = Auth::user()->id;
                 $user = RegisteredUser::findOrFail($recordId);
                 $user->update($guardData);
                 $message = 'Guard updated successfully!';
             } else {
                 $guardData['password'] = Hash::make($request->password);
-                $guardData['created_by'] = Auth::user()->id;
                 RegisteredUser::create($guardData);
                 $message = 'Guard registered successfully!';
             }
@@ -220,7 +221,6 @@ class Registered_UsersController extends Controller
             'last_name'  => $lastName,
             'location'   => $locations,
             'user_type'  => $request->user_type,
-            'updated_by' => Auth::id(),
         ];
         
         // Only hash password if provided
@@ -230,6 +230,7 @@ class Registered_UsersController extends Controller
         
         if ($isEditing) {
             $user = RegisteredUser::findOrFail($recordId);
+            $userData['updated_by'] = Auth::id();
             $user->update($userData);
             $message = 'User updated successfully!';
         } else {
