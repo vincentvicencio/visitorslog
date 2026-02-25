@@ -32,7 +32,19 @@ class Registered_UsersController extends Controller
     $validationRules = [
         'user_type' => 'required',
         'locations' => 'required',
-        'emp_code' => ['required', 'numeric', 'max:999999'],
+        'emp_code' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $exists = RegisteredUser::where('user_name', $value)
+                        ->whereNull('deleted_at')
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('Employee Code already exists.');
+                    }
+                },
+            ],    
     ];
     
     // Check if editing (record_id present)
@@ -40,10 +52,40 @@ class Registered_UsersController extends Controller
     $isEditing = !empty($recordId);
     
     if ($isGuard) {
-        // Guard requires first_name, last_name, password (only required when creating)
-        $validationRules['first_name'] = ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'];
-        $validationRules['last_name'] = ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'];
-        if (!$isEditing) {
+        // $validationRules['emp_code'] = 'required|string|unique:registered_users,user_name';
+        $validationRules['emp_code'] = [
+        'required',
+        'string',
+        function ($attribute, $value, $fail) {
+            $exists = RegisteredUser::where('user_name', $value)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if ($exists) {
+                $fail('Employee Code already exists.');
+            }
+        },
+    ];
+
+
+        // original code
+        $validationRules['emp_code'] = 'required|string|unique:registered_users,user_name';
+        // charle - changes
+            // $validationRules['emp_code'] = [
+            //     'required',
+            //     'string',
+            //     function ($attribute, $value, $fail) {
+            //         $exist = RegisteredUser::where('user_name', $value)
+            //             ->whereNull('deleted_at')
+            //             ->exists();
+            //         if ($exist) {
+            //             $fail('Employee Code already exists.');
+            //         }
+            //     }
+
+            // ];        
+        // Only require password for non-Admin/Receptionist roles
+        if (!$isAdminOrReceptionist) {
             $validationRules['password'] = 'required|string|min:6';
         }
     } else {
@@ -281,22 +323,22 @@ class Registered_UsersController extends Controller
     }
 }
 
-    public function getUserTypes()
-    {
-        $user_type = User_types::get(['id', 'name']);
-        $data = [];
+public function getUserTypes()
+{
+    // Assuming your model is named User_types based on your use statements
+    // return response()->json(User_types::all());
+    $types = \App\Models\User_types::all();
     
-        // Placeholder
-        $data[] = ['id' => '', 'text' => 'Choose User Type'];
+    $data = $types->map(function ($type) {
+        return [
+            'id'   => $type->id,
+            'text' => $type->name // Mapping 'name' to 'text'
+        ];
+    });
 
-        foreach ($user_type as $record) {
-            $data[] = [
-                'id'   => $record['id'], 
-                'text' => $record['name']
-            ];
-        }
-        return response()->json($data);
-    }
+    return response()->json($data);
+}
+
 
 
     public function getUser($id)

@@ -10,6 +10,9 @@ let URL = '/visitorslog/';
 
 // $(document).ready(function () {
 
+    
+
+
     $('#addVisitorForm').on('submit', function (e) {
         e.preventDefault();
 
