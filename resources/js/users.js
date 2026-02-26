@@ -19,6 +19,11 @@ class UsersTable {
         this.initModal()
     }
 
+    // Hide the edit-only-text when adding a new user
+    resetEditOnlyText() {
+        $('.edit-only-text').hide();
+    }
+
     initModal() {
         try {
             const userModalEl = document.getElementById('registerUserModal');
@@ -50,13 +55,9 @@ class UsersTable {
 
     async handleEmployeeSearchClick(event) {
         const empCode = $('#reg_emp_code').val().trim();
-        // Require minimum length for employee code (e.g., 4 digits)
+        // Require non-empty employee code
         if (!empCode) {
             Triggers.showToast('Please enter an employee code.', 'Employee Search', 1);
-            return;
-        }
-        if (empCode.length < 3) { // Change 4 to your required employee code length
-            Triggers.showToast('Please enter the full employee code.','Employee Search', 1);
             return;
         }
 
@@ -113,6 +114,7 @@ class UsersTable {
         component.createDropdown(self.url + 'get-user-type', '#reg_user_type',  null, self.modal);
         this.location_dropdown();
         this.handleRoleChange();
+        this.keylistener();
     }
 
     async handleRoleChange() {
@@ -126,10 +128,30 @@ class UsersTable {
             const fieldsContainer = $('#reg_fields_container');
             const isEditing = Boolean($('#reg_user_db_id').val());
 
+            // --- Error clearing logic for role field ---
+            const roleInput = document.getElementById('reg_user_type');
+            const roleFeedback = document.getElementById('roleFeedback');
+            if (roleInput && roleFeedback) {
+                if (selectedRoleId && selectedRoleId !== '') {
+                    roleInput.classList.remove('is-invalid');
+                    roleFeedback.style.display = '';
+                    roleFeedback.textContent = '';
+                }
+            }
+            // --- End error clearing logic ---
+
             // Use role IDs: 1 = admin, 2 = receptionist, 3 = guard
             const isMultiLocationRole = selectedRoleNum === 1;
             const isReceptionist = selectedRoleNum === 2;
             const isGuard = selectedRoleNum === 3;
+
+            // Remove WFH option for Guard and Receptionist
+            if (isGuard || isReceptionist) {
+                // Remove all options with value or text containing 'WFH' (case-insensitive)
+                locationSelect.find('option').filter(function() {
+                    return $(this).val().toLowerCase().includes('wfh') || $(this).text().toLowerCase().includes('wfh');
+                }).remove();
+            }
 
             if (locationSelect.hasClass('select2-hidden-accessible')) {
                 locationSelect.select2('destroy');
@@ -348,24 +370,177 @@ class UsersTable {
     }
 
     async initializeButtons(){
+                // Clear error on input/change for all validated fields including role
+                const clearOnInputFields = [
+                    {input: 'reg_user_type', feedback: 'roleFeedback', event: 'change'},
+                    {input: 'reg_location', feedback: 'locationFeedback', event: 'change'},
+                    {input: 'reg_emp_code', feedback: 'empCodeFeedback', event: 'input'},
+                    {input: 'reg_first_name', feedback: 'firstNameFeedback', event: 'input'},
+                    {input: 'reg_last_name', feedback: 'lastNameFeedback', event: 'input'},
+                    {input: 'reg_password', feedback: 'passwordFeedback', event: 'input'}
+                ];
+                // Use event delegation for select fields to handle dynamic options
+                $(document).on('change', '#reg_user_type', function() {
+                    const input = this;
+                    const feedback = document.getElementById('roleFeedback');
+                    if (input.value && input.value !== '') {
+                        input.classList.remove('is-invalid');
+                        feedback.style.display = '';
+                        feedback.textContent = '';
+                    }
+                });
+                $(document).on('change', '#reg_location', function() {
+                    const input = this;
+                    const feedback = document.getElementById('locationFeedback');
+                    if (input.value && input.value !== '') {
+                        input.classList.remove('is-invalid');
+                        feedback.style.display = '';
+                        feedback.textContent = '';
+                    }
+                });
+                clearOnInputFields.forEach(f => {
+                    const input = document.getElementById(f.input);
+                    const feedback = document.getElementById(f.feedback);
+                    if (input && feedback) {
+                        input.addEventListener(f.event, function() {
+                            if (input.value.trim()) {
+                                input.classList.remove('is-invalid');
+                                feedback.style.display = '';
+                                feedback.textContent = '';
+                            }
+                        });
+                    }
+                });
         const self = this;
         // Add new user
         $('#reg_user').off('click').on('click', async function (e) {
             e.preventDefault();
             datahandling.clearForm(self.form);
             $('#reg_user_db_id').val('');
+            self.resetEditOnlyText();
+            // Enable role selection when adding
+            $('#reg_user_type').prop('disabled', false);
+            // Make Employee Code editable when adding
+            $('#reg_emp_code').prop('readonly', false);
+            // Always show employee code search button when adding
+            $('#search_emp_btn').show();
+            $('#searched_emp_code_container').hide();
+            // Reset all error states except role
+            const fields = [
+                {input: 'reg_location', feedback: 'locationFeedback'},
+                {input: 'reg_emp_code', feedback: 'empCodeFeedback'},
+                {input: 'reg_first_name', feedback: 'firstNameFeedback'},
+                {input: 'reg_last_name', feedback: 'lastNameFeedback'},
+                {input: 'reg_password', feedback: 'passwordFeedback'}
+            ];
+            fields.forEach(f => {
+                const input = document.getElementById(f.input);
+                const feedback = document.getElementById(f.feedback);
+                if (input) input.classList.remove('is-invalid');
+                if (feedback) {
+                    feedback.style.display = '';
+                    feedback.textContent = '';
+                }
+            });
             container.showModal(self.modal);
         });
 
         // Save
         $('#submit_user_btn').off('click').on('click', async function(e) {
+            // Enable user_type field before submit so its value is sent
+            $('#reg_user_type').prop('disabled', false);
             e.preventDefault();
-            // Only require searched emp code for roles that use it
+            // Only require searched emp code for roles that use it, but skip for Admin/Receptionist on edit
             const selectedRoleNum = Number($('#reg_user_type').val());
             const searchedEmpCode = $('#searched_emp_code').val();
+            const isEditing = Boolean($('#reg_user_db_id').val());
+            let hasError = false;
+            // Validate Role
+            const roleInput = document.getElementById('reg_user_type');
+            const roleFeedback = document.getElementById('roleFeedback');
+            if (roleInput && !roleInput.value) {
+                roleInput.classList.add('is-invalid');
+                roleFeedback.style.display = 'block';
+                roleFeedback.textContent = 'Role is required';
+                hasError = true;
+            } else if (roleInput) {
+                roleInput.classList.remove('is-invalid');
+                roleFeedback.style.display = '';
+                roleFeedback.textContent = '';
+            }
+            // Validate Location
+            const locationInput = document.getElementById('reg_location');
+            const locationFeedback = document.getElementById('locationFeedback');
+            if (locationInput && !locationInput.value) {
+                locationInput.classList.add('is-invalid');
+                locationFeedback.style.display = 'block';
+                locationFeedback.textContent = 'Location is required';
+                hasError = true;
+            } else if (locationInput) {
+                locationInput.classList.remove('is-invalid');
+                locationFeedback.style.display = '';
+                locationFeedback.textContent = '';
+            }
+            // Validate Employee Code (if shown)
+            const empCodeInput = document.getElementById('reg_emp_code');
+            const empCodeFeedback = document.getElementById('empCodeFeedback');
+            if ($('#emp_code_container').is(':visible') && empCodeInput && !empCodeInput.value.trim()) {
+                empCodeInput.classList.add('is-invalid');
+                empCodeFeedback.style.display = 'block';
+                empCodeFeedback.textContent = 'Employee Code is required';
+                hasError = true;
+            } else if (empCodeInput) {
+                empCodeInput.classList.remove('is-invalid');
+                empCodeFeedback.style.display = '';
+                empCodeFeedback.textContent = '';
+            }
+            // Validate First Name (if shown)
+            const firstNameInput = document.getElementById('reg_first_name');
+            const firstNameFeedback = document.getElementById('firstNameFeedback');
+            if ($('#employee_name_container').is(':visible') && firstNameInput && !firstNameInput.value.trim()) {
+                firstNameInput.classList.add('is-invalid');
+                firstNameFeedback.style.display = 'block';
+                firstNameFeedback.textContent = 'First Name is required';
+                hasError = true;
+            } else if (firstNameInput) {
+                firstNameInput.classList.remove('is-invalid');
+                firstNameFeedback.style.display = '';
+                firstNameFeedback.textContent = '';
+            }
+            // Validate Last Name (if shown)
+            const lastNameInput = document.getElementById('reg_last_name');
+            const lastNameFeedback = document.getElementById('lastNameFeedback');
+            if ($('#employee_name_container').is(':visible') && lastNameInput && !lastNameInput.value.trim()) {
+                lastNameInput.classList.add('is-invalid');
+                lastNameFeedback.style.display = 'block';
+                lastNameFeedback.textContent = 'Last Name is required';
+                hasError = true;
+            } else if (lastNameInput) {
+                lastNameInput.classList.remove('is-invalid');
+                lastNameFeedback.style.display = '';
+                lastNameFeedback.textContent = '';
+            }
+            // Validate Password (if shown)
+            const passwordInput = document.getElementById('reg_password');
+            const passwordFeedback = document.getElementById('passwordFeedback');
+            if ($('#password_container').is(':visible') && passwordInput && !passwordInput.value.trim() && !isEditing) {
+                passwordInput.classList.add('is-invalid');
+                passwordFeedback.style.display = 'block';
+                passwordFeedback.textContent = 'Password is required';
+                hasError = true;
+            } else if (passwordInput) {
+                passwordInput.classList.remove('is-invalid');
+                passwordFeedback.style.display = '';
+                passwordFeedback.textContent = '';
+            }
+            if (hasError) return;
+            // Only require searched emp code for roles that use it, but skip for Admin/Receptionist on edit
             if (selectedRoleNum === 3) {
                 // Guard: clear emp code before saving
                 $('#reg_emp_code').val('');
+            } else if ((selectedRoleNum === 1 || selectedRoleNum === 2) && isEditing) {
+                // Admin/Receptionist on edit: use current value, no search required
+                // Do nothing, keep current value
             } else {
                 if (!searchedEmpCode) {
                     Triggers.showToast('Please search and confirm a valid employee code before saving.', 'Register User', 1);
@@ -403,16 +578,30 @@ class UsersTable {
                 $('#reg_user_db_id').val(response.id);
                 $('#reg_emp_code').val(response.emp_code || '');
                 $('#reg_user_type').val(response.role_id || '');
+                // Disable role selection when editing
+                $('#reg_user_type').prop('disabled', true);
+                // Make Employee Code readonly when editing
+                $('#reg_emp_code').prop('readonly', true);
+                // Hide employee code search for Admin and Receptionist on edit
+                const roleId = Number(response.role_id);
+                if (roleId === 1 || roleId === 2) {
+                    $('#search_emp_btn').hide();
+                    $('#searched_emp_code_container').hide();
+                } else {
+                    $('#search_emp_btn').show();
+                }
 
                 // Fill usertype
                 $('#reg_user_type').trigger('change');
 
                 // Fill location
-                await self.location_dropdown(response.location_id);
-                if (Array.isArray(response.location_id)) {
-                    $('#reg_location').val(response.location_id).trigger('change');
-                } else if (response.location_id) {
-                    $('#reg_location').val([response.location_id]).trigger('change');
+                // Always use 'locations' for consistency
+                const locations = response.location_id || response.locations || [];
+                await self.location_dropdown(locations);
+                if (Array.isArray(locations)) {
+                    $('#reg_location').val(locations).trigger('change');
+                } else if (locations) {
+                    $('#reg_location').val([locations]).trigger('change');
                 } else {
                     $('#reg_location').val('').trigger('change');
                 }
@@ -426,9 +615,41 @@ class UsersTable {
                 const roleName = (response.role_name || '').toLowerCase();
                 if (roleName === 'guard') {
                     $('#reg_first_name, #reg_last_name').prop('readonly', false);
+                    // Remove WFH option for Guard
+                    $('#reg_location').find('option').filter(function() {
+                        return $(this).val().toLowerCase().includes('wfh') || $(this).text().toLowerCase().includes('wfh');
+                    }).remove();
                 } else {
                     $('#reg_first_name, #reg_last_name').prop('readonly', true);
+                    // Remove WFH option for Receptionist
+                    if (roleName === 'receptionist') {
+                        $('#reg_location').find('option').filter(function() {
+                            return $(this).val().toLowerCase().includes('wfh') || $(this).text().toLowerCase().includes('wfh');
+                        }).remove();
+                    }
                 }
+
+                // Reset all error states including role
+                const fields = [
+                    {input: 'reg_user_type', feedback: 'roleFeedback'},
+                    {input: 'reg_location', feedback: 'locationFeedback'},
+                    {input: 'reg_emp_code', feedback: 'empCodeFeedback'},
+                    {input: 'reg_first_name', feedback: 'firstNameFeedback'},
+                    {input: 'reg_last_name', feedback: 'lastNameFeedback'},
+                    {input: 'reg_password', feedback: 'passwordFeedback'}
+                ];
+                fields.forEach(f => {
+                    const input = document.getElementById(f.input);
+                    const feedback = document.getElementById(f.feedback);
+                    if (input) input.classList.remove('is-invalid');
+                    if (feedback) {
+                        feedback.style.display = '';
+                        feedback.textContent = '';
+                    }
+                });
+
+                // Show the 'Leave blank to keep current password' message in edit mode
+                $('.edit-only-text').show();
 
                 // Show modal
                 container.showModal(self.modal);
@@ -449,6 +670,27 @@ class UsersTable {
 
         component.createDropdown(URL + 'getlocation', '#reg_location', selectedValue, '#registerUserModal');
     }
+
+    async keylistener() {
+        const input = document.getElementById("reg_emp_code");
+
+            input.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+            });
+            input.addEventListener("input", () => {
+            input.value = input.value.replace(/\D/g, "");
+            });
+    }
+
 }
 const instance = new UsersTable();
 instance.InitializePage();

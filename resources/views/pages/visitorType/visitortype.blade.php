@@ -4,7 +4,7 @@
 
 <div class="user-types-container mt-4">
     {{-- header --}}
-    <div class="page-header">
+    <div class="page-header visitortype">
         <div class="header-content">
             <div class="page-title fs-2">Visitor Type</div>
             <div class="page-subtitle mb-3">Manage and organize different visitor categories</div>

@@ -4,7 +4,7 @@
 
 <div class="user-types-container mt-4">
     {{-- header --}}
-    <div class="page-header">
+    <div class="page-header visitorlog">
         <div class="header-content">
             <div class="page-title fs-2">Visitor Log Sheets</div>
             <div class="page-subtitle mb-3">Manage and track all visitor entries</div>
@@ -15,12 +15,12 @@
         </a>
     </div>
     <!-- table holder -->
-    <div class="visitor-log-sheet-table table-responsive ">
+    <div class="visitor-log-sheet-table">
         <!-- search and filter -->
         <x-table-filter/>
 
         <!-- table -->
-        <table class="table table-bordered align-middle" id="visitorsLogTable"><thead></thead></table>
+        <table class="table table-bordered align-middle w-100" id="visitorsLogTable"><thead></thead></table>
     </div>
 </div>
 

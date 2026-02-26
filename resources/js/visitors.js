@@ -36,9 +36,13 @@ $(document).ready(function () {
                     $('.toast').fadeOut('slow');
                 }, 2000);
                 $('#addVisitorForm')[0].reset();
-                $('#image_path').val(''); 
                 $('#photoPreview').css('display', 'none');
                 $('#photoPreview').attr('src', '');
+                $('#imageInput').val(''); 
+                $('#image_path').val('');
+                
+                startWebcam();
+                
             },
             error: function (xhr, status, error) {
                 console.error('Save error:', error, xhr);
@@ -112,6 +116,8 @@ $(document).ready(function () {
         $('#photoPreview').css('display', 'none');
         $('#photoPreview').attr('src', '');
         $('#imageInput').val(''); 
+        $('#image_path').val('');
+        startWebcam();
     });
 
     // $('#captureBtn').on('click', function () {
@@ -213,7 +219,18 @@ $(document).ready(function () {
         }
     }
 
-    startWebcam();
+    let webcamActive = false;
+
+    setInterval(() => {
+        if ($('#webcamUse').val() == "0") {
+            if (!webcamActive) {
+                startWebcam();
+                webcamActive = true;
+            }
+        } else {
+            webcamActive = false;
+        }
+    }, 100);
 
 
     $('#imageInput').on('change', function (e) {
@@ -321,6 +338,7 @@ $(document).ready(function () {
 
         async onLoadPage(){
             this.list();
+            this.keylistener();
         }
 
         async list() {
@@ -389,7 +407,107 @@ $(document).ready(function () {
                     });
             });
         }
+
+        async keylistener() {
+        const input_id_num = document.getElementById("id_number");
+        const input_fname = document.getElementById("first_name");
+        const input_mname = document.getElementById("middle_name");
+        const input_lname = document.getElementById("last_name");
+        const input_contact = document.getElementById("contact_number");
+
+        input_id_num.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+            });
+            input_id_num.addEventListener("input", () => {
+            input_id_num.value = input_id_num.value.replace(/\D/g, "");
+            });
+
+        input_fname.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[a-zA-Z-.\s]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        input_mname.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        input_lname.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+                input_contact.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"];
+            if (allowedKeys.includes(e.key)) return;
+
+            // Allow only digits
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+
+            // Prevent typing more than 11 digits
+            if (input_contact.value.length >= 11) {
+                e.preventDefault();
+            }
+        });
+
+        input_contact.addEventListener("input", () => {
+            // Remove non-digit characters
+            input_contact.value = input_contact.value.replace(/\D/g, "");
+
+            // Limit max length to 11
+            if (input_contact.value.length > 11) {
+                input_contact.value = input_contact.value.slice(0, 11);
+            }
+
+            // Set validation for minimum length (7 digits)
+            if (input_contact.value.length > 0 && input_contact.value.length < 7) {
+                input_contact.setCustomValidity("Minimum 7 digits required");
+            } else {
+                input_contact.setCustomValidity(""); // clear error
+            }
+        });
     }
+}
 
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();
