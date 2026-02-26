@@ -7,12 +7,13 @@ import datahandling from './common/datahandling';
     // RegisterIdTable
     class RegisterIdTable {
         constructor() {
-            this.defaultFields  = []
-            this.url            = "/registerId/"
-            this.table          = "#registerIdTable"
-            this.module         = "registeredid"
-            this.form           = "#textInputForm"
-            this.modal          = "#registerIDModal"
+            this.defaultFields  = [];
+            this.url            = "/registerId/";
+            this.table          = "#registerIdTable";
+            this.module         = "registeredid";
+            this.form           = "#textInputForm";
+            this.modal          = "#registerIDModal";
+            this.reloadInterval = null;
         }
         
     async initializePage(){
@@ -56,15 +57,16 @@ import datahandling from './common/datahandling';
         );
 
         $(self.table).on('init.dt', function () {
-
             const tableApi = $(self.table).DataTable();
-
             tableApi.draw();
-            
-            setInterval(() => {
-                    tableApi.ajax.reload(null, false); 
-                }, 5000); 
 
+            // Prevent multiple intervals
+            if (self.reloadInterval) {
+                clearInterval(self.reloadInterval);
+            }
+            self.reloadInterval = setInterval(() => {
+                tableApi.ajax.reload(null, false);
+            }, 5000);
 
             // =========================================
             // CUSTOM SEARCH
@@ -88,42 +90,116 @@ import datahandling from './common/datahandling';
 
     // DataTable Initialization
     async initializeButtons(){
+                // Clear Visitor Type error on change
+                const visitorTypeInput = document.getElementById('visitortype');
+                const visitorTypeFeedback = document.getElementById('visitorTypeFeedback');
+                if (visitorTypeInput && visitorTypeFeedback) {
+                    visitorTypeInput.addEventListener('change', function() {
+                        if (visitorTypeInput.value) {
+                            visitorTypeInput.classList.remove('is-invalid');
+                            visitorTypeFeedback.style.display = '';
+                            visitorTypeFeedback.textContent = '';
+                        }
+                    });
+                }
         const self = this
         $('#addBtn').off('click').on('click', async function (e) {
             e.preventDefault()
-                datahandling.clearForm(self.form)
-                container.showModal(self.modal)
+            datahandling.clearForm(self.form)
+            // Reset Visitor ID error state
+            const visitorIdInput = document.getElementById('name');
+            const visitorIdFeedback = document.getElementById('nameFeedback');
+            if (visitorIdInput) visitorIdInput.classList.remove('is-invalid');
+            if (visitorIdFeedback) {
+                visitorIdFeedback.style.display = '';
+                visitorIdFeedback.textContent = '';
+            }
+            // Reset Visitor Type error state
+            const visitorTypeInput = document.getElementById('visitortype');
+            const visitorTypeFeedback = document.getElementById('visitorTypeFeedback');
+            if (visitorTypeInput) visitorTypeInput.classList.remove('is-invalid');
+            if (visitorTypeFeedback) {
+                visitorTypeFeedback.style.display = '';
+                visitorTypeFeedback.textContent = '';
+            }
+            container.showModal(self.modal)
         })
-        
+
         $(document).off('click', '#registerIDSubmit').on('click', '#registerIDSubmit', async function(e) {
             e.preventDefault();
-            
+
             const formid    = self.form;
             const formdata  = new FormData($(formid)[0]);
 
-            
+            // Bootstrap validation for Visitor ID
+            const visitorIdInput = document.getElementById('name');
+            const visitorIdFeedback = document.getElementById('nameFeedback');
+            let hasError = false;
+            if (!visitorIdInput.value.match(/^\d+$/)) {
+                visitorIdInput.classList.add('is-invalid');
+                visitorIdFeedback.style.display = 'block';
+                visitorIdFeedback.textContent = 'Visitor ID Is Required';
+                hasError = true;
+            } else {
+                visitorIdInput.classList.remove('is-invalid');
+                visitorIdFeedback.style.display = '';
+                visitorIdFeedback.textContent = '';
+            }
+
+            // Bootstrap validation for Visitor Type
+            const visitorTypeInput = document.getElementById('visitortype');
+            const visitorTypeFeedback = document.getElementById('visitorTypeFeedback');
+            if (!visitorTypeInput.value) {
+                visitorTypeInput.classList.add('is-invalid');
+                visitorTypeFeedback.style.display = 'block';
+                visitorTypeFeedback.textContent = 'Visitor Type Is Required';
+                hasError = true;
+            } else {
+                visitorTypeInput.classList.remove('is-invalid');
+                visitorTypeFeedback.style.display = '';
+                visitorTypeFeedback.textContent = '';
+            }
+
+            if (hasError) return;
+
             await Triggers.removeErrorOnInput(formid);
             await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
-
         });
     }
 
     // for Edit Button
     async onLoadForm(record_id) {
-            const self = this;
-    
-            const url = `${self.url}search`;
-            const response = await datahandling.processData(
-                url,
-                'POST',
-                { id: record_id }
-            );
-    
-            $("#record_id").val(record_id);
-            $("#name").val(response.data.id_number);
-            $("#visitortype").val(response.data.visitor_type);
-    
-            container.showModal(self.modal);
+        const self = this;
+
+        const url = `${self.url}search`;
+        const response = await datahandling.processData(
+            url,
+            'POST',
+            { id: record_id }
+        );
+
+        $("#record_id").val(record_id);
+        $("#name").val(response.data.id_number);
+        $("#visitortype").val(response.data.visitor_type);
+
+        // Reset Visitor ID error state
+        const visitorIdInput = document.getElementById('name');
+        const visitorIdFeedback = document.getElementById('nameFeedback');
+        if (visitorIdInput) visitorIdInput.classList.remove('is-invalid');
+        if (visitorIdFeedback) {
+            visitorIdFeedback.style.display = '';
+            visitorIdFeedback.textContent = '';
+        }
+        // Reset Visitor Type error state
+        const visitorTypeInput = document.getElementById('visitortype');
+        const visitorTypeFeedback = document.getElementById('visitorTypeFeedback');
+        if (visitorTypeInput) visitorTypeInput.classList.remove('is-invalid');
+        if (visitorTypeFeedback) {
+            visitorTypeFeedback.style.display = '';
+            visitorTypeFeedback.textContent = '';
+        }
+
+        container.showModal(self.modal);
     }
 
 

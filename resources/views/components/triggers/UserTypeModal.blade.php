@@ -8,10 +8,10 @@
             <div class="modal-body">
                 <form id="add_type_form">
                     <div class="mb-3">
-                        <input hidden="hidden" name="record_id" id="record_id">
+                        <input type="hidden" name="record_id" id="record_id">
                         <label class="form-label">Role Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="e.g. Administrator" required id='name' autocomplete="off">
-                        <span class="error-span error-name text-danger"></span>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Administrator" required id='name' autocomplete="off" aria-describedby="userTypeNameFeedback">
+                        <div class="invalid-feedback" id="userTypeNameFeedback">Role Name is required</div>
                     </div>
                 </form>
             </div>

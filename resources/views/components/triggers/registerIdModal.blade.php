@@ -14,7 +14,7 @@
                 <form id="textInputForm">
                     <div class="mb-3">
                         <label for="visitorType" class="form-label">Visitor Type</label>
-                        <select name="visitorType" required class="form-control" id="visitortype" required autocomplete="off">
+                        <select name="visitorType" required class="form-control" id="visitortype" required autocomplete="off" aria-describedby="visitorTypeFeedback">
                             <option value="" disabled selected>Select Visitor Type</option>
                             @foreach ($visitorTypes as $type)
                                 <option value="{{ $type->id }}">
@@ -22,13 +22,14 @@
                                 </option>
                             @endforeach
                         </select>
+                        <div class="invalid-feedback" id="visitorTypeFeedback">Visitor Type Is Required</div>
                     </div>
                     <div class="mb-3">
-                        <input hidden="hidden" name="record_id" id="record_id">
+                        <input type="hidden" name="record_id" id="record_id">
                         <label for="visitorID" class="form-label">Visitor ID</label>
-                        <input type="text" class="form-control" id="name" name="name"  autocomplete="off"
-                            placeholder="Enter Visitor ID" autocomplete="off" required>
-                        <span class="error-span error-name text-danger"></span>
+                        <input type="text" class="form-control" id="name" name="name"
+                            placeholder="Enter Visitor ID" autocomplete="off" aria-describedby="nameFeedback" required>
+                        <div class="invalid-feedback" id="nameFeedback">Visitor ID Is Required</div>
                     </div>
                 </form>
             </div>

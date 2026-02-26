@@ -81,19 +81,53 @@ class UserTypeTable {
         const self = this
         $('#btn_add').off('click').on('click', async function (e) {
             e.preventDefault()
-                datahandling.clearForm(self.form)
-                container.showModal('#addTypeModal')
+            datahandling.clearForm(self.form)
+            // Reset Role Name error state
+            const nameInput = document.getElementById('name');
+            const nameFeedback = document.getElementById('userTypeNameFeedback');
+            if (nameInput) nameInput.classList.remove('is-invalid');
+            if (nameFeedback) {
+                nameFeedback.style.display = '';
+                nameFeedback.textContent = '';
+            }
+            container.showModal('#addTypeModal')
         })
-        
+
+        // Clear Role Name error on input
+        const nameInput = document.getElementById('name');
+        const nameFeedback = document.getElementById('userTypeNameFeedback');
+        if (nameInput && nameFeedback) {
+            nameInput.addEventListener('input', function() {
+                if (nameInput.value.trim()) {
+                    nameInput.classList.remove('is-invalid');
+                    nameFeedback.style.display = '';
+                    nameFeedback.textContent = '';
+                }
+            });
+        }
+
         $(document).off('click', '#btn_submit').on('click', '#btn_submit', async function(e) {
             e.preventDefault();
-            
+
             const formid    = self.form;
             const formdata  = new FormData($(formid)[0]);
 
+            // Bootstrap validation for Role Name
+            const nameInput = document.getElementById('name');
+            const nameFeedback = document.getElementById('userTypeNameFeedback');
+            if (!nameInput.value.trim()) {
+                nameInput.classList.add('is-invalid');
+                nameFeedback.style.display = 'block';
+                nameFeedback.textContent = 'Role Name is required';
+                return;
+            } else {
+                nameInput.classList.remove('is-invalid');
+                nameFeedback.style.display = '';
+                nameFeedback.textContent = '';
+            }
+
             await Triggers.removeErrorOnInput(formid);
             await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
-
         });
 
     }
@@ -110,6 +144,15 @@ class UserTypeTable {
 
         $("#record_id").val(record_id);
         $("#name").val(response.data.name);
+
+        // Reset Role Name error state
+        const nameInput = document.getElementById('name');
+        const nameFeedback = document.getElementById('userTypeNameFeedback');
+        if (nameInput) nameInput.classList.remove('is-invalid');
+        if (nameFeedback) {
+            nameFeedback.style.display = '';
+            nameFeedback.textContent = '';
+        }
 
         container.showModal(self.modal);
     }
