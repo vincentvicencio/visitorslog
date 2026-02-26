@@ -18,6 +18,7 @@ import datahandling from './common/datahandling';
     async initializePage(){
         this.list();
         this.initializeButtons();
+        this.keylistener();
     }
 
     // List of Register ID
@@ -123,6 +124,27 @@ import datahandling from './common/datahandling';
             $("#visitortype").val(response.data.visitor_type);
     
             container.showModal(self.modal);
+    }
+
+
+    async keylistener() {
+        const input = document.getElementById("name");
+
+            input.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+            });
+            input.addEventListener("input", () => {
+            input.value = input.value.replace(/\D/g, "");
+            });
     }
 
 }

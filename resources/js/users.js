@@ -19,6 +19,11 @@ class UsersTable {
         this.initModal()
     }
 
+    // Hide the edit-only-text when adding a new user
+    resetEditOnlyText() {
+        $('.edit-only-text').hide();
+    }
+
     initModal() {
         try {
             const userModalEl = document.getElementById('registerUserModal');
@@ -50,13 +55,9 @@ class UsersTable {
 
     async handleEmployeeSearchClick(event) {
         const empCode = $('#reg_emp_code').val().trim();
-        // Require minimum length for employee code (e.g., 4 digits)
+        // Require non-empty employee code
         if (!empCode) {
             Triggers.showToast('Please enter an employee code.', 'Employee Search', 1);
-            return;
-        }
-        if (empCode.length < 3) { // Change 4 to your required employee code length
-            Triggers.showToast('Please enter the full employee code.','Employee Search', 1);
             return;
         }
 
@@ -130,6 +131,14 @@ class UsersTable {
             const isMultiLocationRole = selectedRoleNum === 1;
             const isReceptionist = selectedRoleNum === 2;
             const isGuard = selectedRoleNum === 3;
+
+            // Remove WFH option for Guard and Receptionist
+            if (isGuard || isReceptionist) {
+                // Remove all options with value or text containing 'WFH' (case-insensitive)
+                locationSelect.find('option').filter(function() {
+                    return $(this).val().toLowerCase().includes('wfh') || $(this).text().toLowerCase().includes('wfh');
+                }).remove();
+            }
 
             if (locationSelect.hasClass('select2-hidden-accessible')) {
                 locationSelect.select2('destroy');
@@ -354,18 +363,32 @@ class UsersTable {
             e.preventDefault();
             datahandling.clearForm(self.form);
             $('#reg_user_db_id').val('');
+            self.resetEditOnlyText();
+            // Enable role selection when adding
+            $('#reg_user_type').prop('disabled', false);
+            // Make Employee Code editable when adding
+            $('#reg_emp_code').prop('readonly', false);
+            // Always show employee code search button when adding
+            $('#search_emp_btn').show();
+            $('#searched_emp_code_container').hide();
             container.showModal(self.modal);
         });
 
         // Save
         $('#submit_user_btn').off('click').on('click', async function(e) {
+                        // Enable user_type field before submit so its value is sent
+                        $('#reg_user_type').prop('disabled', false);
             e.preventDefault();
-            // Only require searched emp code for roles that use it
+            // Only require searched emp code for roles that use it, but skip for Admin/Receptionist on edit
             const selectedRoleNum = Number($('#reg_user_type').val());
             const searchedEmpCode = $('#searched_emp_code').val();
+            const isEditing = Boolean($('#reg_user_db_id').val());
             if (selectedRoleNum === 3) {
                 // Guard: clear emp code before saving
                 $('#reg_emp_code').val('');
+            } else if ((selectedRoleNum === 1 || selectedRoleNum === 2) && isEditing) {
+                // Admin/Receptionist on edit: use current value, no search required
+                // Do nothing, keep current value
             } else {
                 if (!searchedEmpCode) {
                     Triggers.showToast('Please search and confirm a valid employee code before saving.', 'Register User', 1);
@@ -403,16 +426,30 @@ class UsersTable {
                 $('#reg_user_db_id').val(response.id);
                 $('#reg_emp_code').val(response.emp_code || '');
                 $('#reg_user_type').val(response.role_id || '');
+                // Disable role selection when editing
+                $('#reg_user_type').prop('disabled', true);
+                // Make Employee Code readonly when editing
+                $('#reg_emp_code').prop('readonly', true);
+                // Hide employee code search for Admin and Receptionist on edit
+                const roleId = Number(response.role_id);
+                if (roleId === 1 || roleId === 2) {
+                    $('#search_emp_btn').hide();
+                    $('#searched_emp_code_container').hide();
+                } else {
+                    $('#search_emp_btn').show();
+                }
 
                 // Fill usertype
                 $('#reg_user_type').trigger('change');
 
                 // Fill location
-                await self.location_dropdown(response.location_id);
-                if (Array.isArray(response.location_id)) {
-                    $('#reg_location').val(response.location_id).trigger('change');
-                } else if (response.location_id) {
-                    $('#reg_location').val([response.location_id]).trigger('change');
+                // Always use 'locations' for consistency
+                const locations = response.location_id || response.locations || [];
+                await self.location_dropdown(locations);
+                if (Array.isArray(locations)) {
+                    $('#reg_location').val(locations).trigger('change');
+                } else if (locations) {
+                    $('#reg_location').val([locations]).trigger('change');
                 } else {
                     $('#reg_location').val('').trigger('change');
                 }
@@ -426,9 +463,22 @@ class UsersTable {
                 const roleName = (response.role_name || '').toLowerCase();
                 if (roleName === 'guard') {
                     $('#reg_first_name, #reg_last_name').prop('readonly', false);
+                    // Remove WFH option for Guard
+                    $('#reg_location').find('option').filter(function() {
+                        return $(this).val().toLowerCase().includes('wfh') || $(this).text().toLowerCase().includes('wfh');
+                    }).remove();
                 } else {
                     $('#reg_first_name, #reg_last_name').prop('readonly', true);
+                    // Remove WFH option for Receptionist
+                    if (roleName === 'receptionist') {
+                        $('#reg_location').find('option').filter(function() {
+                            return $(this).val().toLowerCase().includes('wfh') || $(this).text().toLowerCase().includes('wfh');
+                        }).remove();
+                    }
                 }
+
+                // Show the 'Leave blank to keep current password' message in edit mode
+                $('.edit-only-text').show();
 
                 // Show modal
                 container.showModal(self.modal);
@@ -449,6 +499,7 @@ class UsersTable {
 
         component.createDropdown(URL + 'getlocation', '#reg_location', selectedValue, '#registerUserModal');
     }
+
 }
 const instance = new UsersTable();
 instance.InitializePage();

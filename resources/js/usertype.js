@@ -17,6 +17,7 @@ class UserTypeTable {
 
         this.list();
         this.initializeButtons();
+        this.keylistener();
     }
     async list() {
         const self = this;
@@ -111,6 +112,28 @@ class UserTypeTable {
         $("#name").val(response.data.name);
 
         container.showModal(self.modal);
+    }
+    async keylistener() {
+        const input = document.getElementById("name");
+
+        input.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // Catch paste, drag-drop, autofill, etc.
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/[^a-zA-Z\s]/g, "");
+        });
     }
 }
 

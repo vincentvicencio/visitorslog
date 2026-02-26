@@ -127,12 +127,19 @@ $(document).ready(function(){
             success: function (response) {
                 window.location.href = response.redirect;
             },
-            error: function (xhr) {
-                let msg = 'Unable to load visitor details.';
-                if (xhr.responseJSON?.message) {
-                    msg = xhr.responseJSON.message;
+            error: function (xhr, status, error) {
+                let msg = 'Something went wrong.';
+                let title = 'Error';
+                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                    const m = xhr.responseJSON.message.toLowerCase();
+                    if (m.includes('csrf')) {
+                        msg = 'Please refresh the page and log in again.';
+                        title = 'Session Expired';
+                    } else {
+                        msg = xhr.responseJSON.message;
+                    }
                 }
-                Triggers.showToast(msg, 1);
+                Triggers.showToast(msg, title, 1);
             }
         });
     });

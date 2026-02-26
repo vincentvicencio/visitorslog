@@ -51,8 +51,9 @@
                     </div>
                     <div class="mb-3" id="password_container">
                         <label class="form-label">Password</label>
+                        
                         <input type="password" id="reg_password" name="password" class="form-control" placeholder="Password" required autocomplete="off">
-                        <small class="text-muted edit-only-text" style="display:none;">Leave blank to keep current password</small>
+                        <small class="text-muted edit-only-text" style="display:none;"> Leave blank to keep current password </small>
                     </div>
                 </div>
             </div>
