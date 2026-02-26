@@ -36,9 +36,13 @@ $(document).ready(function () {
                     $('.toast').fadeOut('slow');
                 }, 2000);
                 $('#addVisitorForm')[0].reset();
-                $('#image_path').val(''); 
                 $('#photoPreview').css('display', 'none');
                 $('#photoPreview').attr('src', '');
+                $('#imageInput').val(''); 
+                $('#image_path').val('');
+                
+                startWebcam();
+                
             },
             error: function (xhr, status, error) {
                 console.error('Save error:', error, xhr);
@@ -112,6 +116,8 @@ $(document).ready(function () {
         $('#photoPreview').css('display', 'none');
         $('#photoPreview').attr('src', '');
         $('#imageInput').val(''); 
+        $('#image_path').val('');
+        startWebcam();
     });
 
     // $('#captureBtn').on('click', function () {
@@ -213,7 +219,18 @@ $(document).ready(function () {
         }
     }
 
-    startWebcam();
+    let webcamActive = false;
+
+    setInterval(() => {
+        if ($('#webcamUse').val() == "0") {
+            if (!webcamActive) {
+                startWebcam();
+                webcamActive = true;
+            }
+        } else {
+            webcamActive = false;
+        }
+    }, 100);
 
 
     $('#imageInput').on('change', function (e) {

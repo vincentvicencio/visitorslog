@@ -283,7 +283,7 @@ class VisitorController extends Controller
                 'last_name'         => ['required', 'string', 'max:40'],
                 'visitor_type'      => 'required|exists:visitor_types,id',
                 'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
-                'image_path'        => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+                'image_path'        => ['required'],
 
                 'id_number'    => [
                     'required',
@@ -348,43 +348,49 @@ class VisitorController extends Controller
 
                 // Decode base64
                 $image     = base64_decode($image);
-
                 // Generate filename
-
+                $fileName  = 'visitors/' . Str::random(20) . '.png';
 
                 // Save to public disk
                 Storage::disk('public')->put($fileName, $image);
 
-            $imagePath = $fileName;
+                $imagePath = $fileName;
             }else{
                 if ($request->hasFile('imageInput') && $request->file('imageInput')->isValid()) {
                     $fileName  = 'visitors/' . Str::random(20) . '.png';
                     $imagePath = $request->file('imageInput')->storeAs('visitors', $fileName, 'public');
                 }
             }
+
+            $firstName = ucwords(strtolower($request->first_name));
+            $middleName = ucwords(strtolower($request->middle_name));
+            $lastName = ucwords(strtolower($request->last_name));
+            $address = ucwords(strtolower($request->address));
             
 
-            $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
+            $middleInitial = collect(preg_split('/\s+/', trim($middleName)))
+                ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
+                ->implode('');
 
             $userLocations = (array) Auth::user()->location;
 
             $visitor = new Visitor();
             // clint - remove dot when there is no middle name
             if (!empty($middleInitial)) {
-                $visitor->full_name = $request->first_name . ' ' . $middleInitial . '. ' . $request->last_name;
+                $visitor->full_name = $firstName . ' ' . $middleInitial . '. ' . $lastName;
             } else {
-                $visitor->full_name = $request->first_name . ' ' . $request->last_name;
+                $visitor->full_name = $firstName . ' ' . $lastName;
             }
             // original code - kardo
             // $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
-            $visitor->first_name   = $request->first_name;
-            $visitor->middle_name  = $request->middle_name;
-            $visitor->last_name    = $request->last_name;
+            $visitor->first_name   = $firstName;
+            $visitor->middle_name  = $middleName;
+            $visitor->last_name    = $lastName;
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
             $visitor->location     = $userLocations[0] ?? null;
-            $visitor->address      = $request->address;
+            $visitor->address      = $address;
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();

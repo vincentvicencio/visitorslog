@@ -1,7 +1,7 @@
 @extends('layout')
 @section('content')
 <div class="user-types-container mt-4">
-    <div class="page-header">
+    <div class="page-header user">
         <div class="header-content">
             <div class="page-title fs-2">Users</div>
             <div class="page-subtitle mb-3">Manage user accounts and their details</div>

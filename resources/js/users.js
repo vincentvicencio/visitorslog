@@ -114,6 +114,7 @@ class UsersTable {
         component.createDropdown(self.url + 'get-user-type', '#reg_user_type',  null, self.modal);
         this.location_dropdown();
         this.handleRoleChange();
+        this.keylistener();
     }
 
     async handleRoleChange() {
@@ -668,6 +669,26 @@ class UsersTable {
         }
 
         component.createDropdown(URL + 'getlocation', '#reg_location', selectedValue, '#registerUserModal');
+    }
+
+    async keylistener() {
+        const input = document.getElementById("reg_emp_code");
+
+            input.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+            });
+            input.addEventListener("input", () => {
+            input.value = input.value.replace(/\D/g, "");
+            });
     }
 
 }

@@ -28,13 +28,23 @@
                         </div>
                         {{-- Visitor Type --}}
                         <div class="input-holder floating">
-                            @foreach ($visitorTypes as $type)
+                            @php
+                                $matchedType = $visitorTypes->firstWhere('id', $visitor->visitor_type);
+                            @endphp
+
+                            <input type="text"
+                                name="visitor_type"
+                                class="form-control"
+                                readonly
+                                value="{{ $matchedType ? $matchedType->name : '--' }}"
+                                required>
+                            {{-- @foreach ($visitorTypes as $type)
                                 @if ($visitor->visitor_type == $type->id)
                                     <input type="text" name="visitor_type" class="form-control" readonly value="{{ $type->name }} " required>
                                 @else
                                     <input type="text" name="visitor_type" class="form-control" readonly value="--" required>
                                 @endif
-                            @endforeach
+                            @endforeach --}}
                             <label for="visitor_type">Visitor Type</label>
                         </div>
                         {{-- Visitor Type --}}
@@ -69,7 +79,7 @@
                         <div class="header">Capture Image</div>
                         <div class="imgholder">
                             @if ( $visitor->image_path == null)
-                                No Image Provided
+                                <span style="color: rgba(128, 128, 128, 0.568); font-weight: bold;">No Image Provided</span> 
                             @else
                                 <img src="{{ Storage::url($visitor->image_path) }}" alt="" class="w-100 h-100 object-fit-cover">
                             @endif 

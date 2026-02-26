@@ -90,7 +90,19 @@ import datahandling from './common/datahandling';
 
     // DataTable Initialization
     async initializeButtons(){
-                // Clear Visitor Type error on change
+            // Clear Visitor ID error on input
+            const visitorIdInput = document.getElementById('name');
+            const visitorIdFeedback = document.getElementById('nameFeedback');
+            if (visitorIdInput && visitorIdFeedback) {
+                visitorIdInput.addEventListener('input', function() {
+                    if (visitorIdInput.value.trim()) {
+                        visitorIdInput.classList.remove('is-invalid');
+                        visitorIdFeedback.style.display = '';
+                        visitorIdFeedback.textContent = '';
+                    }
+                });
+            }
+            // Clear Visitor Type error on change
                 const visitorTypeInput = document.getElementById('visitortype');
                 const visitorTypeFeedback = document.getElementById('visitorTypeFeedback');
                 if (visitorTypeInput && visitorTypeFeedback) {

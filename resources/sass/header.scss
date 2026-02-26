@@ -93,7 +93,15 @@
     &.always-show .navbar {
         display: flex !important;
     }
-
+    @media (max-width: 425px) {
+        .logo{
+            display: none;
+        }
+        .name-holder{
+            max-width:100px !important;
+            color: white;
+        }
+    }
     @media (max-width: 880px) {
         .navbar {
             display: flex;
