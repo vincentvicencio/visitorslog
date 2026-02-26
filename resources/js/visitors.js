@@ -474,21 +474,37 @@ $(document).ready(function () {
             }
         });
 
-        input_contact.addEventListener("keydown", (e) => {
+                input_contact.addEventListener("keydown", (e) => {
             // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
-
+            const allowedKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"];
             if (allowedKeys.includes(e.key)) return;
 
-            // Block anything that's not a letter or space
+            // Allow only digits
             if (!/^[0-9]$/.test(e.key)) {
                 e.preventDefault();
             }
+
+            // Prevent typing more than 11 digits
+            if (input_contact.value.length >= 11) {
+                e.preventDefault();
+            }
         });
+
         input_contact.addEventListener("input", () => {
+            // Remove non-digit characters
             input_contact.value = input_contact.value.replace(/\D/g, "");
+
+            // Limit max length to 11
+            if (input_contact.value.length > 11) {
+                input_contact.value = input_contact.value.slice(0, 11);
+            }
+
+            // Set validation for minimum length (7 digits)
+            if (input_contact.value.length > 0 && input_contact.value.length < 7) {
+                input_contact.setCustomValidity("Minimum 7 digits required");
+            } else {
+                input_contact.setCustomValidity(""); // clear error
+            }
         });
     }
 }

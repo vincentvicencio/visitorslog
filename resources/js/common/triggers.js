@@ -6,6 +6,7 @@ class Triggers {
      * @param err = 1=Error, 0/null = Success
      */
     async showToast(msg, title, err = 0) {
+        
         $('.toast-body strong').text(msg);
         $('.toast-title').text(title);
         $('.toast').css('z-index', 10000);
