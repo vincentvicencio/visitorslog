@@ -17,6 +17,7 @@ import Triggers from './common/triggers';
     async initializePage(){
         this.list();
         this.initializeButtons();
+        this.keylistener();
     }
 
 
@@ -80,21 +81,56 @@ import Triggers from './common/triggers';
         // Initialize buttons and their event listeners
         async initializeButtons() {
             const self = this
-            
+
             // Add Button
             $('#addBtn').off('click').on('click', async function (e) {
                 e.preventDefault()
                 datahandling.clearForm(self.form)
+                // Reset Visitor Type error state
+                const nameInput = document.getElementById('name');
+                const nameFeedback = document.getElementById('visitorTypeNameFeedback');
+                if (nameInput) nameInput.classList.remove('is-invalid');
+                if (nameFeedback) {
+                    nameFeedback.style.display = '';
+                    nameFeedback.textContent = '';
+                }
                 container.showModal(self.modal)
-        })
-                    
+            })
+
+            // Clear Visitor Type error on input
+            const nameInput = document.getElementById('name');
+            const nameFeedback = document.getElementById('visitorTypeNameFeedback');
+            if (nameInput && nameFeedback) {
+                nameInput.addEventListener('input', function() {
+                    if (nameInput.value.trim()) {
+                        nameInput.classList.remove('is-invalid');
+                        nameFeedback.style.display = '';
+                        nameFeedback.textContent = '';
+                    }
+                });
+            }
+
             // Save Button
             $(document).off('click', '#textInputSubmit').on('click', '#textInputSubmit', async function(e) {
                 e.preventDefault();
-                
-            const formid    = self.form;
-            const formdata  = new FormData($(formid)[0]);
-        
+
+                const formid    = self.form;
+                const formdata  = new FormData($(formid)[0]);
+
+                // Bootstrap validation for Visitor Type
+                const nameInput = document.getElementById('name');
+                const nameFeedback = document.getElementById('visitorTypeNameFeedback');
+                if (!nameInput.value.trim()) {
+                    nameInput.classList.add('is-invalid');
+                    nameFeedback.style.display = 'block';
+                    nameFeedback.textContent = 'Visitor Type is required';
+                    return;
+                } else {
+                    nameInput.classList.remove('is-invalid');
+                    nameFeedback.style.display = '';
+                    nameFeedback.textContent = '';
+                }
+
                 await Triggers.removeErrorOnInput(formid);
                 await datahandling.saveForm(self.url + 'save', self.table, self.form, formdata)
             });
@@ -113,9 +149,41 @@ import Triggers from './common/triggers';
     
             $("#record_id").val(record_id);
             $("#name").val(response.data.name);
-    
+
+            // Reset Visitor Type error state
+            const nameInput = document.getElementById('name');
+            const nameFeedback = document.getElementById('visitorTypeNameFeedback');
+            if (nameInput) nameInput.classList.remove('is-invalid');
+            if (nameFeedback) {
+                nameFeedback.style.display = '';
+                nameFeedback.textContent = '';
+            }
+
             container.showModal(self.modal);
         }
+
+        async keylistener() {
+        const input = document.getElementById("name");
+
+        input.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // Catch paste, drag-drop, autofill, etc.
+        input.addEventListener("input", () => {
+            input.value = input.value.replace(/[^a-zA-Z\s]/g, "");
+        });
+    }
 
 
 }

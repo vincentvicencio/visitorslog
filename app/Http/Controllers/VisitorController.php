@@ -276,52 +276,64 @@ class VisitorController extends Controller
 
     public function save(Request $request)
     {
-        $request->validate([
-            'first_name'        => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
-            'middle_name'       => ['nullable', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
-            'last_name'         => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
-            'visitor_type'      => 'required|exists:visitor_types,id',
-            'contact_number'    => ['required','min:11','max:11','regex:/^[0-9]+$/','starts_with:09'],            
-            'image_path'        => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+        try {
+            $request->validate([
+                'first_name'        => ['required', 'string', 'max:40'],
+                'middle_name'       => ['nullable', 'string', 'max:40'],
+                'last_name'         => ['required', 'string', 'max:40'],
+                'visitor_type'      => 'required|exists:visitor_types,id',
+                'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
+                'image_path'        => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
 
-            'id_number'    => [
-                'required',
-                'string',
-                function ($attribute, $value, $fail) use ($request) {
-                    // Check if visitor ID exists in the registered IDs table
-                    $existing = RegisteredID::where('id_number', $value)->first();
-                    $timein = Visitor::where('visitor_id', $value)
-                                ->whereNull('time_out')
-                                ->first();
-                    if ($timein) {
-                        $fail('This Visitor ID is already checked in and has not timed out.');
-                    }
+                'id_number'    => [
+                    'required',
+                    'string',
+                    function ($attribute, $value, $fail) use ($request) {
+                        $existing = RegisteredID::where('id_number', $value)->first();
+                        $timein = Visitor::where('visitor_id', $value)
+                                    ->whereNull('time_out')
+                                    ->first();
+                        if ($timein) {
+                            $fail('This Visitor ID is already checked in and has not timed out.');
+                        }
 
-                    if (!$existing) {
-                        // ID does not exist in registered IDs
-                        $fail('This Visitor ID is not registered.');
-                    } elseif ($existing->visitor_type != $request->visitor_type) {
-                        // ID exists but visitor type does not match
-                        $fail('This Visitor ID is registered under a different visitor type.');
-                    }
-                },
-            ],
+                        if (!$existing) {
+                            $fail('This Visitor ID is not registered.');
+                        } elseif ($existing->visitor_type != $request->visitor_type) {
+                            $fail('This Visitor ID is registered under a different visitor type.');
+                        }
+                    },
+                ],
 
-            [
-                'first_name.required' => 'First Name is required',
-                'first_name.regex' => 'First Name must contain letters only',
-                'middle_name.regex' => 'Middle Name must contain letters only',
-                'last_name.required' => 'Last Name is required',
-                'last_name.regex' => 'Last Name must contain letters only',
-                'visitor_type.required' => 'Visitor Type is required',
-                'contact_number.required' => 'Contact Number is required',
-                'contact_number.max' => 'Contact Number must not exceed 11 digits',
-                'contact_number.min' => 'Contact Number must be at least 11 digits',
-                'contact_number.regex' => 'Contact Number must contain only numbers',
+            ], [
+                'first_name.required'        => 'First Name is required',
+                'last_name.required'         => 'Last Name is required',
+                'visitor_type.required'      => 'Visitor Type is required',
+                'contact_number.required'    => 'Contact Number is required',
+                'contact_number.max'         => 'Contact Number must not exceed 11 digits',
+                'contact_number.min'         => 'Contact Number must be at least 11 digits',
                 'contact_number.starts_with' => 'Contact Number must start with 09',
-            ],
+            ]);
 
-        ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Error hierarchy
+            $priority = ['id_number', 'visitor_type', 'first_name', 'last_name', 'contact_number', 'image_path', 'middle_name'];
+            $errors = $e->errors();
+            $firstError = null;
+            foreach ($priority as $field) {
+                if (isset($errors[$field])) {
+                    $firstError = $errors[$field][0];
+                    break;
+                }
+            }
+            if (!$firstError) {
+                $firstError = collect($errors)->flatten()->first();
+            }
+            return response()->json([
+                'status' => 1,
+                'message' => $firstError,
+            ], 422);
+        }
 
 
 

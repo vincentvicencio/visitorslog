@@ -321,6 +321,7 @@ $(document).ready(function () {
 
         async onLoadPage(){
             this.list();
+            this.keylistener();
         }
 
         async list() {
@@ -389,7 +390,91 @@ $(document).ready(function () {
                     });
             });
         }
+
+        async keylistener() {
+        const input_id_num = document.getElementById("id_number");
+        const input_fname = document.getElementById("first_name");
+        const input_mname = document.getElementById("middle_name");
+        const input_lname = document.getElementById("last_name");
+        const input_contact = document.getElementById("contact_number");
+
+        input_id_num.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+            });
+            input_id_num.addEventListener("input", () => {
+            input_id_num.value = input_id_num.value.replace(/\D/g, "");
+            });
+
+        input_fname.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[a-zA-Z-.\s]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        input_mname.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        input_lname.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        input_contact.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+        input_contact.addEventListener("input", () => {
+            input_contact.value = input_contact.value.replace(/\D/g, "");
+        });
     }
+}
 
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();

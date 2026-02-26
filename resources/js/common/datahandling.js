@@ -82,10 +82,23 @@ class Datahandling {
                 let errorTitle = 'Error';
                 if (xhr && xhr.responseJSON) {
                     if (xhr.responseJSON.message) {
-                        errorMsg = xhr.responseJSON.message;
+                        const msg = xhr.responseJSON.message.toLowerCase();
+                        if (msg.includes('csrf')) {
+                            errorMsg = 'Please refresh the page and log in again.';
+                            errorTitle = 'Session Expired';
+                        } else {
+                            errorMsg = 'Something Went Wrong';
+                            errorTitle = 'Error';
+                        }
                     }
                     if (xhr.responseJSON.title) {
-                        errorTitle = xhr.responseJSON.title;
+                        const title = xhr.responseJSON.title.toLowerCase();
+                        if (title.includes('csrf')) {
+                            errorTitle = 'Session Expired';
+                        } else {
+                            errorTitle = 'Error';
+                        }
+
                     }
                     if (xhr.responseJSON.errors) {
                         // Show first error if available
