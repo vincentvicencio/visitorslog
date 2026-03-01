@@ -67,6 +67,7 @@ class Datatable {
      */
     async createTableAjax(table, theads, url, tbodies = "", module, pagination = 10, data = {}, enableSearch = true) {
         const self = this
+        $.fn.dataTable.ext.pager.numbers_length = 1;
 
         $(table).DataTable().clear().destroy()
         $(table).DataTable({
@@ -82,6 +83,14 @@ class Datatable {
             search:         { return: true },
             stateLoadParams: function (settings, data) {
                 data.length = pagination
+            },
+            layout: {
+                bottomEnd: {
+                    paging: {
+                        type: 'simple_numbers',
+                        numbers: 1
+                    }
+                }
             },
             ajax: {
                 headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
@@ -109,6 +118,15 @@ class Datatable {
             columns: theads,
             columnDefs: tbodies,
             initComplete: function () {
+                const tableApi = this.api();
+
+                // Recalculate columns on window resize
+                $(window)
+                    .off('resize.visitorsLogTable')
+                    .on('resize.visitorsLogTable', function () {
+                        tableApi.columns.adjust().responsive.recalc();
+                    });
+
             // Make bottom row flex container
                 const $bottom = $(this.api().table().container()).find('div.bottom');
                 $bottom.css({

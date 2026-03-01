@@ -24,12 +24,11 @@ class RegisterIDController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name'              => ['required','regex:/^[0-9]+$/', 'max:4', 'min:4'],
+                'name'              => ['required', 'max:4', 'min:4'],
                 'visitorType'       => 'required|exists:visitor_types,id',
             ],
             [
-                'name.required'           => 'Visitor ID is Required',
-                'name.regex'              => 'Visitor ID must contain only numbers',
+                'name.required'           => 'Visitor ID is eto Required',
                 'name.max'                => 'Visitor ID must not exceed 4 digits',
                 'name.min'                => 'Visitor ID must be 4 digits',
                 'visitorType.required'    => 'Visitor Type is Required',

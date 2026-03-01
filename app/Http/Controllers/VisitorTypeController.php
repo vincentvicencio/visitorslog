@@ -21,11 +21,10 @@ class VisitorTypeController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name'              => ['required', 'string', 'max:40','regex:/^[a-zA-Z\s]+$/'],
+                'name'              => ['required', 'string', 'max:40'],
             ],
             [
                 'name.required'     => 'Visitor Type is Required',
-                'name.regex'        => 'Visitor Type must contain letters only'
             ]
         );
 

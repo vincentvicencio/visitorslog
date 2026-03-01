@@ -83,6 +83,7 @@
                                     <input type="file" name="imageInput" id="imageInput" accepts="image/*" capture="user" hidden>
                                     <img id="photoPreview" src="" style="display:none; width: 100%; height: 100%; object-fit: cover;">
                                     <input type="hidden" id="image_path" name="image_path">
+                                    <input type='hidden' id="webcamUse" value="0">
                                 </div>
 
                             <button type="button" class="capture-button" id="captureBtn">Capture</button>

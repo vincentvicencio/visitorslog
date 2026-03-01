@@ -431,9 +431,9 @@ public function edit(Request $request, $id)
 
         $user->update($updateData);
 
-        return response()->json(['status' => 'success', 'message' => 'User updated successfully!']);
+        return response()->json(['status' => 0, 'message' => 'User updated successfully!']);
     } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => 'Update failed: ' . $e->getMessage()], 500);
+        return response()->json(['status' => 1, 'message' => 'Update failed: ' . $e->getMessage()], 500);
     }
 }
 

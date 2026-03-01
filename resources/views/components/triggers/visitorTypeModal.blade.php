@@ -16,8 +16,8 @@
                         <input type="hidden" id="record_id" name="record_id">
                         <label for="name" class="form-label">Visitor Type</label>
                         <input type="text" class="form-control" id="name" name="name"
-                            placeholder="Enter Visitor Type" autocomplete="off" required>
-                        <span class="error-span error-name text-danger"></span>
+                            placeholder="Enter Visitor Type" autocomplete="off" required aria-describedby="visitorTypeNameFeedback">
+                        <div class="invalid-feedback" id="visitorTypeNameFeedback">Visitor Type is required</div>
                     </div>
                 </form>
             </div>

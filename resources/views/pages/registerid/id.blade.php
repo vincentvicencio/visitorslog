@@ -4,7 +4,7 @@
 
 <div class="user-types-container mt-4">
     {{-- header --}}
-    <div class="page-header">
+    <div class="page-header registerid">
         <div class="header-content">
             <div class="page-title fs-2">Registered IDs</div>
             <div class="page-subtitle mb-3">Manage and monitor all registered ID entries</div>

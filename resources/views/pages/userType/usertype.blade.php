@@ -4,7 +4,7 @@
 
 <div class="user-types-container mt-4">
     {{-- header --}}
-    <div class="page-header">
+    <div class="page-header usertype">
         <div class="header-content">
             <div class="page-title fs-2">User Types</div>
             <div class="page-subtitle mb-3">Manage and organize different user roles</div>
@@ -23,7 +23,6 @@
     </div>
 </div>
 
-@include('components.triggers.users-userstype-toast')
 @include('components.triggers.UserTypeModal')
 @endsection
 
