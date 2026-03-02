@@ -12,9 +12,24 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Models\AuditLogs;
 
 class VisitorController extends Controller
 {
+
+    private function logAudit($recordId, $action, $oldData = null, $newData = null)
+    {
+        AuditLogs::create([
+            'emp_number'   => Auth::user()->emp_number ?? Auth::id(),
+            'record_id'    => $recordId,
+            'module'       => 'Visitor',
+            'sub_module'   => 'Visitor Log',
+            'action'       => $action,
+            'previous_data'=> $oldData,
+            'new_data'     => $newData,
+            'ip_address'   => request()->ip(),
+        ]);
+    }
     private function guardLocationRequired()
     {
         $user = Auth::user();
@@ -605,6 +620,8 @@ class VisitorController extends Controller
                 'message' => 'Visitor successfully added'
             ], 200);
             
+            
+
         } catch (\Exception $e) {
             return response()->json([
                     'status' => 1,
