@@ -52,17 +52,39 @@ class User_TypesController extends Controller
         ];
 
         if ($record_id > 0) {
-            $status     =  User_types::findorFail($record_id);
-            $oldData    = $status->getOriginal();
+            // fetch model and capture old values first
+            $model      = User_types::findOrFail($record_id);
+            $oldData    = $model->getOriginal();
 
-            $status     = $status->update(['updated_by' => $emp_code] + $data);
+            $model->update(['updated_by' => $emp_code] + $data);
             $message    = 'User Type Successfully Updated';
+
+            // log update, use fresh attributes from model
+            log_audit(
+                'user_types',
+                'updated',
+                $record_id,
+                $oldData,
+                $model->getAttributes(),
+                'update'
+            );
         } else {
-            $status     = User_types::create(['created_by' => $emp_code] + $data);
+            $model      = User_types::create(['created_by' => $emp_code] + $data);
             $message    = 'User Type Successfully Created';
+
+            // log creation (submodule 'save')
+            log_audit(
+                'user_types',
+                'created',
+                $model->id,
+                null,
+                $model->toArray(),
+                'save'
+            );
         }
         return response()->json([
             'status'    => 0,
+            'title'     => 'Success',
             'message'   => $message
         ]);
 
@@ -140,13 +162,26 @@ class User_TypesController extends Controller
 
     public function delete(Request $request){
         $record  = User_types::find($request->id);
-        $details = $record->name;
-        $record  -> update(['deleted_by' => Auth::user()->emp_code]);
-        $record  -> delete();
+        if ($record) {
+            $oldData = $record->toArray();
+            $record->update(['deleted_by' => Auth::user()->emp_code]);
+            $record->delete();
+
+            // log deletion (submodule 'delete')
+            log_audit(
+                'user_types',
+                'deleted',
+                $request->id,
+                $oldData,
+                null,
+                'delete'
+            );
+        }
 
         $message = 'User Type Successfully Deleted';
             return response()->json([
                 'status'     => 0,
+                'title'      => 'Success',
                 'message'    => $message
             ]);
     }

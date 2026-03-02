@@ -56,14 +56,32 @@ class VisitorTypeController extends Controller
         ];
 
         if ($record_id > 0) {
-            $status     =  VisitorType::findorFail($record_id);
-            $oldData    = $status->getOriginal();
+            $model      = VisitorType::findOrFail($record_id);
+            $oldData    = $model->getOriginal();
 
-            $status     = $status->update(['updated_by' => $emp_code] + $data);
+            $model->update(['updated_by' => $emp_code] + $data);
             $message    = 'Visitor Type Successfully Updated';
+
+            log_audit(
+                'visitor_types',
+                'updated',
+                $record_id,
+                $oldData,
+                $model->getAttributes(),
+                'update'
+            );
         } else {
-            $status     = VisitorType::create(['created_by' => $emp_code] + $data);
+            $model      = VisitorType::create(['created_by' => $emp_code] + $data);
             $message    = 'Visitor Type Successfully Created';
+
+            log_audit(
+                'visitor_types',
+                'created',
+                $model->id,
+                null,
+                $model->toArray(),
+                'save'
+            );
         }
         return response()->json([
             'status'    => 0,
@@ -145,9 +163,21 @@ class VisitorTypeController extends Controller
 
     public function delete(Request $request){
         $record  = VisitorType::find($request->id);
-        $details = $record->name;
-        $record->update(['deleted_by' => Auth::user()->id]);
-        $record->delete();
+        if ($record) {
+            $oldData = $record->toArray();
+            $details = $record->name;
+            $record->update(['deleted_by' => Auth::user()->id]);
+            $record->delete();
+
+            log_audit(
+                'visitor_types',
+                'deleted',
+                $record->id,
+                $oldData,
+                null,
+                'delete'
+            );
+        }
 
         $message = 'Visitor Type Successfully Deleted';
             return response()->json([
@@ -160,10 +190,20 @@ class VisitorTypeController extends Controller
     {
         try {
             $role = VisitorType::findOrFail($id);
+            $oldData = $role->toArray();
             $role->update([
                 'deleted_at' => now(), 
                 'deleted_by' => Auth::user()->id, 
             ]);
+
+            log_audit(
+                'visitor_types',
+                'deleted',
+                $role->id,
+                $oldData,
+                null,
+                'delete'
+            );
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to delete role.'], 500);
         }

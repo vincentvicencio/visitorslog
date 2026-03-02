@@ -328,11 +328,23 @@ class VisitorController extends Controller
             ], 400);
         }
 
+        $oldData = $visitor->getOriginal();
+
         $visitor->update([
             'time_out'   => Carbon::now(),
             'status'     => 1,
             'updated_by' => Auth::user()->id,
         ]);
+
+        // log timeout event (action set to 'timeout')
+        log_audit(
+            'visitors',
+            'timed out',
+            $visitor->id,
+            $oldData,
+            $visitor->getAttributes(),
+            'timeout'
+        );
 
         return response()->json([
             'status'     => 0,
@@ -355,6 +367,17 @@ class VisitorController extends Controller
                 'message' => 'Visitor not found or inactive'
             ], 404);
         }
+
+        // log view action before redirecting
+        log_audit(
+            'visitors',
+            'viewed',
+            $visitor->id,
+            null,
+            null,
+            'view'
+        );
+
         return response()->json([
             'redirect'   => route('view.page', [
                 'id'     => $visitor->id,
@@ -386,11 +409,6 @@ class VisitorController extends Controller
     {
         $visitorTypeId = $request->visitor_type;
         $query = $request->q;
-
-        // gather any *active* visitor IDs already logged for this type
-        // so that only fresh/available IDs are suggested.  timed-out
-        // records (status=1 or time_out not null) will not be excluded
-        // and may reappear after timeout.
         $usedIdsQuery = function ($q) use ($visitorTypeId) {
             $q->select('visitor_id')
               ->from('visitors')
@@ -409,8 +427,17 @@ class VisitorController extends Controller
             ->limit(10)
             ->get();
 
+        $results = $ids->map(fn($v) => ['id' => $v->id_number, 'text' => $v->id_number])->values();
+
+        if ($results->isEmpty()) {
+            return response()->json([
+                'results' => [],
+                'message' => 'All IDs are currently used'
+            ]);
+        }
+
         return response()->json([
-            'results' => $ids->map(fn($v) => ['id' => $v->id_number, 'text' => $v->id_number])
+            'results' => $results
         ]);
     }
 
@@ -546,7 +573,7 @@ class VisitorController extends Controller
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $userLocations[0] ?? '?';
+            $visitor->location     = $locationForSave ?? '?';
             $visitor->address      = $address;
             $visitor->id_type      = $request->id_type;
             $visitor->valid_id       = $request->id_type_number;
@@ -559,6 +586,15 @@ class VisitorController extends Controller
             $visitor->status       = 0;
             $visitor->save();
 
+            // audit log for new visitor
+            log_audit(
+                'visitors',
+                'created',
+                $visitor->id,
+                null,
+                $visitor->toArray(),
+                'save'
+            );
 
             return response()->json([
                 'status' => 0,

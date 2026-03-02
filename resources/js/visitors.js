@@ -544,6 +544,11 @@ $(document).ready(function() {
                         );
                     });
                     suggestionBox.show();
+                } else if (response.message) {
+                    suggestionBox.append(
+                        `<a href="#" class="list-group-item list-group-item-action disabled no-results" aria-disabled="true" tabindex="-1">${response.message}</a>`
+                    );
+                    suggestionBox.show();
                 }
             }
         });
