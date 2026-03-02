@@ -114,6 +114,18 @@ import datahandling from './common/datahandling';
                         }
                     });
                 }
+            // Clear ID Location error on change
+                const locationInputField = document.getElementById('visitorIDLocation');
+                const locationFeedbackField = document.getElementById('visitorIDLocationFeedback');
+                if (locationInputField && locationFeedbackField) {
+                    locationInputField.addEventListener('change', function() {
+                        if (locationInputField.value) {
+                            locationInputField.classList.remove('is-invalid');
+                            locationFeedbackField.style.display = '';
+                            locationFeedbackField.textContent = '';
+                        }
+                    });
+                }
         const self = this
         $('#addBtn').off('click').on('click', async function (e) {
             e.preventDefault()
@@ -133,6 +145,14 @@ import datahandling from './common/datahandling';
             if (visitorTypeFeedback) {
                 visitorTypeFeedback.style.display = '';
                 visitorTypeFeedback.textContent = '';
+            }
+            // Reset ID Location error state
+            const locationInput = document.getElementById('visitorIDLocation');    
+            const locationFeedback = document.getElementById('visitorIDLocationFeedback');
+            if (locationInput) locationInput.classList.remove('is-invalid');
+            if (locationFeedback) {
+                locationFeedback.style.display = '';
+                locationFeedback.textContent = '';
             }
             container.showModal(self.modal)
         })
@@ -171,7 +191,19 @@ import datahandling from './common/datahandling';
                 visitorTypeFeedback.style.display = '';
                 visitorTypeFeedback.textContent = '';
             }
-
+            // Bootstrap validation for ID Location
+            const locationInput = document.getElementById('visitorIDLocation');    
+            const locationFeedback = document.getElementById('visitorIDLocationFeedback');
+            if (!locationInput.value) {
+                locationInput.classList.add('is-invalid');
+                locationFeedback.style.display = 'block';
+                locationFeedback.textContent = 'ID Location Is Required';
+                hasError = true;
+            } else {
+                locationInput.classList.remove('is-invalid');
+                locationFeedback.style.display = '';
+                locationFeedback.textContent = '';
+            }
             if (hasError) return;
 
             await Triggers.removeErrorOnInput(formid);
@@ -193,6 +225,7 @@ import datahandling from './common/datahandling';
         $("#record_id").val(record_id);
         $("#name").val(response.data.id_number);
         $("#visitortype").val(response.data.visitor_type);
+        $("#visitorIDLocation").val(response.data.location);
 
         // Reset Visitor ID error state
         const visitorIdInput = document.getElementById('name');
@@ -209,6 +242,14 @@ import datahandling from './common/datahandling';
         if (visitorTypeFeedback) {
             visitorTypeFeedback.style.display = '';
             visitorTypeFeedback.textContent = '';
+        }
+        // Reset ID Location error state
+        const locationInput = document.getElementById('visitorIDLocation');    
+        const locationFeedback = document.getElementById('visitorIDLocationFeedback');
+        if (locationInput) locationInput.classList.remove('is-invalid');
+        if (locationFeedback) {
+            locationFeedback.style.display = '';
+            locationFeedback.textContent = '';
         }
 
         container.showModal(self.modal);
@@ -234,6 +275,7 @@ import datahandling from './common/datahandling';
             input.value = input.value.replace(/\D/g, "");
             });
     }
+    
 
 }
     

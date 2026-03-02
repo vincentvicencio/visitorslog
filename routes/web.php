@@ -3,6 +3,7 @@
 use App\Http\Controllers\RegisterIDController;
 use App\Http\Controllers\GuardLocationController;
 use App\Http\Controllers\VisitorTypeController;
+use App\Models\ValidIdType;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
 use App\Models\Visitor;
@@ -11,6 +12,7 @@ use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\User_TypesController;
 use App\Http\Controllers\Registered_UsersController;
+use App\Http\Controllers\IDTypeController;
 
 Route::get('/', function () {
     return redirect()->route('visitorslog');
@@ -30,10 +32,12 @@ Route::middleware(['auth', 'single.session'])->group(function () {
         ->group(function () {
             Route::get('/',                 'index')->name('visitorslog');
             Route::get('/form',             'form')->name('visitorslog.form');
+            Route::get('/id-suggestions',  'idSuggestions')->name('visitorslog.idSuggestions');
             Route::get('/view/{id}/{type}', function ($id, $type) {
                 $visitor = Visitor::where('id', $id)->latest('id')->firstOrFail();
                 $visitorTypes = VisitorType::whereNull('deleted_at')->orderBy('id', 'asc')->get();
-                return view('pages.visitorslog.view', compact('visitor', 'visitorTypes', 'type'));
+                $validIdTypes = ValidIdType::whereNull('deleted_at')->orderBy('id', 'asc')->get();
+                return view('pages.visitorslog.view', compact('visitor', 'visitorTypes', 'type', 'validIdTypes'));
             })->name('view.page');
             Route::post('/list',            'list')->name('visitorslog.list');
             Route::post('/save',            'save')->name('visitorslog.save');
@@ -102,6 +106,16 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                 Route::post('/save',        'save')->name('registerId.save');
                 Route::post('/delete',      'delete')->name('registerId.delete');
                 Route::post('/search',      'search')->name('registerId.search');
+            });
+
+        Route::prefix('IDtype')
+            ->controller(IDTypeController::class)
+            ->group(function () {
+                Route::get('/',             'idTypeIndex')->name('idtype');
+                Route::post('/list',        'idTypeList')->name('idtype.list');
+                Route::post('/save',        'idTypeSave')->name('idtype.save');
+                Route::post('/delete',      'idTypeDelete')->name('idtype.delete');
+                Route::post('/search',      'idTypeSearch')->name('idtype.search');
             });
     });
 });

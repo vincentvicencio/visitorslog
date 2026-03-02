@@ -146,6 +146,16 @@ $(document).ready(function () {
 
     // });
 
+    // Initialize dropdown whenever visitor type changes
+    $('#visitor_type').on('change', function() {
+        initializeVisitorIdDropdown();
+    });
+
+    // Optionally initialize if visitor type already selected
+    if ($('#visitor_type').val()) {
+        initializeVisitorIdDropdown();
+    }
+
     $('#captureBtn').on('click', function () {
 
         const video = document.getElementById('webcam');
@@ -254,7 +264,7 @@ $(document).ready(function () {
             reader.onload = function (event) {
                 $('#photoPreview').css('display', 'block');
                 $('#photoPreview').attr('src', event.target.result);
-
+                $('#image_path').val(event.target.result);
             };
             reader.onerror = function (error) {
                 console.error('FileReader error:', error);
@@ -512,4 +522,49 @@ $(document).ready(function () {
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();
 
+});
+
+$(document).ready(function() {
+    function fetchIDSuggestions() {
+        const visitorType = $('#visitor_type').val();
+        const search = $('#id_number').val(); // can be empty
+
+        const suggestionBox = $('#id_suggestions');
+        suggestionBox.empty().hide();
+
+        if (!visitorType) return; // require visitor type
+
+        $.ajax({
+            url: '/visitorslog/id-suggestions',
+            type: 'GET',
+            data: { visitor_type: visitorType, q: search },
+            success: function(response) {
+                const results = response.results || [];
+                if (results.length > 0) {
+                    results.forEach(item => {
+                        suggestionBox.append(
+                            `<a href="#" class="list-group-item list-group-item-action suggestion-item">${item.text}</a>`
+                        );
+                    });
+                    suggestionBox.show();
+                }
+            }
+        });
+    }
+
+    // Trigger fetch on input and focus
+    $('#id_number').on('input focus', fetchIDSuggestions);
+
+    // Click to select suggestion
+    $(document).on('click', '.suggestion-item', function(e) {
+        e.preventDefault();
+        $('#id_number').val($(this).text());
+        $('#id_suggestions').hide();
+    });
+
+    // Hide suggestions when visitor type changes
+    $('#visitor_type').on('change', function() {
+        $('#id_number').val('');
+        $('#id_suggestions').hide();
+    });
 });

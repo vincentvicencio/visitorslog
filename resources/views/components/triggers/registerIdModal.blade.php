@@ -25,6 +25,18 @@
                         <div class="invalid-feedback" id="visitorTypeFeedback">Visitor Type Is Required</div>
                     </div>
                     <div class="mb-3">
+                        <label for="visitorIDLocation" class="form-label">ID Location</label>
+                        <select name="visitorIDLocation" required class="form-control" id="visitorIDLocation" required autocomplete="off" aria-describedby="visitorIDLocationFeedback">
+                            <option value="" disabled selected>Select ID Location</option>
+                            @foreach ($IDLocation as $location)
+                                <option value="{{ $location['id'] }}">
+                                    {{ $location['text'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="invalid-feedback" id="visitorIDLocationFeedback">ID Location Is Required</div>
+                    </div>
+                    <div class="mb-3">
                         <input type="hidden" name="record_id" id="record_id">
                         <label for="visitorID" class="form-label">Visitor ID</label>
                         <input type="text" class="form-control" id="name" name="name"

@@ -20,11 +20,8 @@
                 <div class="form" id="addVisitorForm">
                     @csrf
                     <div class="details">
-                        {{-- ID Number --}}
-                        <div class="input-holder floating">
-                            <input type="hidden" name="id" id="id" class="form-control" placeholder="" value="{{ $visitor->id }}">
-                            <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " readonly value="{{ $visitor->visitor_id }}">
-                            <label for="id_number">ID Number</label>
+                        <div class="personaldetails w-100">
+                            Visitor Information
                         </div>
                         {{-- Visitor Type --}}
                         <div class="input-holder floating">
@@ -38,17 +35,35 @@
                                 readonly
                                 value="{{ $matchedType ? $matchedType->name : '--' }}"
                                 required>
-                            {{-- @foreach ($visitorTypes as $type)
-                                @if ($visitor->visitor_type == $type->id)
-                                    <input type="text" name="visitor_type" class="form-control" readonly value="{{ $type->name }} " required>
-                                @else
-                                    <input type="text" name="visitor_type" class="form-control" readonly value="--" required>
-                                @endif
-                            @endforeach --}}
                             <label for="visitor_type">Visitor Type</label>
                         </div>
-                        {{-- Visitor Type --}}
-                        </select><br>
+                        
+                        {{-- ID Number --}}
+                        <div class="input-holder floating">
+                            <input type="hidden" name="id" id="id" class="form-control" placeholder="" value="{{ $visitor->id }}">
+                            <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " readonly value="{{ $visitor->visitor_id }}">
+                            <label for="id_number">ID Number</label>
+                        </div>
+
+                        {{-- Contact person --}}
+                        <br>
+                        <div class="input-holder floating">
+                            <input type="text" name="contact_person" id="contact_person" class="form-control" placeholder=" " value="{{ $visitor->contact_person }}" readonly>
+                            <label for="contact_person">Contact Person</label>
+                        </div>
+                        {{-- Purpose of visit --}}
+                        <div class="input-holder floating">
+                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $visitor->purpose }}" readonly>
+                            <label for="purpose_of_visit">Purpose of Visit</label>
+                        </div>
+
+                        <br>
+                        <div class="personaldetails w-100 mt-3">
+                            personal details
+                        </div>
+
+                        {{-- first name --}}
+                        <br>
                         <div class="input-holder floating">
                             <input type="text" name="first_name" id="first_name" class="form-control" readonly placeholder=" " value="{{ $visitor->first_name }}">
                             <label for="first_name">First name</label>
@@ -68,6 +83,24 @@
                             <input type="text" name="contact_number" id="contact_number" class="form-control" readonly placeholder=" " value="{{ $visitor->phone_number }}">
                             <label for="contact_number">Contact Number</label>
                         </div>
+                        {{-- ID Type --}}
+                        <div class="input-holder floating">
+                            @php
+                                $matchedIDType = $validIdTypes->firstWhere('id', $visitor->id_type);
+                            @endphp
+
+                            <input type="text"
+                                name="id_type"
+                                class="form-control"
+                                value="{{ $matchedIDType ? $matchedIDType->id_type_name : '--' }}"
+                                readonly>
+                                <label for="id_type">Identification Card</label>
+                            </div>
+                            {{-- ID Number --}}
+                            <div class="input-holder floating">
+                                <input type="text" name="id_type_number" id="id_type_number" class="form-control" placeholder=" " value="{{ $visitor->valid_id }}" readonly>
+                                <label for="id_type_number">ID Number</label>
+                            </div>
                         {{-- Address --}}
                         <div class="input-holder floating w-100">
                             <textarea name="address" id="address" class="form-control" readonly placeholder=" " rows="3">{{ $visitor->address }}</textarea>
