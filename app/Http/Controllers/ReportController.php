@@ -51,7 +51,14 @@ class ReportController extends Controller
     }
 
     public function list(Request $request){
-        
+        // log filter operation with parameters
+        $filterData = [
+            'search'       => $request->input('search', ''),
+            'date_from'    => $request->input('date_from', ''),
+            'date_to'      => $request->input('date_to', ''),
+            'visitor_type' => $request->input('visitor_type', ''),
+        ];
+        log_audit('reports', 'filtered', null, null, $filterData, 'filter');
 
         $keywords = strtolower($request->search);
 
@@ -230,6 +237,9 @@ class ReportController extends Controller
                 'visitor_type'      => $request->input('visitor_type', ''),
             ];
 
+            // log export action
+            log_audit('reports', 'exported', null, null, $filters, 'export');
+
             $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
             
             return Excel::download(new ReportsExport($filters), $fileName);
@@ -246,9 +256,14 @@ class ReportController extends Controller
 
     public function delete(Request $request){
         $record  = Visitor::find($request->id);
-        $details = $record->name;
-        $record->update(['deleted_by' => Auth::user()->id]);
-        $record->delete();
+        if ($record) {
+            $oldData = $record->toArray();
+            $details = $record->name;
+            $record->update(['deleted_by' => Auth::user()->id]);
+            $record->delete();
+
+            log_audit('reports', 'deleted', $record->id, $oldData, null, 'delete');
+        }
 
         $message    = 'Report Log Successfully Deleted';
             return response()->json([

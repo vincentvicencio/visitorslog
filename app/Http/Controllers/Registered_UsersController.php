@@ -163,13 +163,33 @@ class Registered_UsersController extends Controller
             
             if ($isEditing) {
                 $user = RegisteredUser::findOrFail($recordId);
+                $oldData = $user->getOriginal();
+
                 $user->update($guardData);
                 $message = 'Guard updated successfully!';
+
+                log_audit(
+                    'registered_users',
+                    'updated',
+                    $user->id,
+                    $oldData,
+                    $user->getAttributes(),
+                    'update'
+                );
             } else {
                 $guardData['password'] = Hash::make($request->password);
                 $guardData['created_by'] = Auth::user()->id;
-                RegisteredUser::create($guardData);
+                $user = RegisteredUser::create($guardData);
                 $message = 'Guard registered successfully!';
+
+                log_audit(
+                    'registered_users',
+                    'created',
+                    $user->id,
+                    null,
+                    $user->toArray(),
+                    'save'
+                );
             }
             
             return response()->json([
@@ -228,13 +248,33 @@ class Registered_UsersController extends Controller
         
         if ($isEditing) {
             $user = RegisteredUser::findOrFail($recordId);
+            $oldData = $user->getOriginal();
+
             $user->update($userData);
             $message = 'User updated successfully!';
+
+            log_audit(
+                'registered_users',
+                'updated',
+                $user->id,
+                $oldData,
+                $user->getAttributes(),
+                'update'
+            );
         } else {
             $userData['password'] = Hash::make($request->password);
             $userData['created_by'] = Auth::id();
-            RegisteredUser::create($userData);
+            $user = RegisteredUser::create($userData);
             $message = 'User registered successfully!';
+
+            log_audit(
+                'registered_users',
+                'created',
+                $user->id,
+                null,
+                $user->toArray(),
+                'save'
+            );
         }
 
         return response()->json([
@@ -255,12 +295,22 @@ class Registered_UsersController extends Controller
 {
     try {
         $user = RegisteredUser::findOrFail($id);
+        $oldData = $user->toArray();
 
         // Instead of $user->delete(), we update the column
         $user->update([
             'deleted_at' => NOW(),
             'deleted_by' => Auth::user()->id // Optional: track who deleted it
         ]);
+
+        log_audit(
+            'registered_users',
+            'deleted',
+            $user->id,
+            $oldData,
+            null,
+            'delete'
+        );
 
         return response()->json([
             'status'  => 'success', 
@@ -578,9 +628,21 @@ public function list(Request $request){
 
     public function delete(Request $request){
         $record  = RegisteredUser::find($request->id);
-        $details = $record->emp_code;
-        $record->update(['deleted_by' => Auth::user()->id]);
-        $record->delete();
+        if ($record) {
+            $oldData = $record->toArray();
+            $details = $record->emp_code;
+            $record->update(['deleted_by' => Auth::user()->id]);
+            $record->delete();
+
+            log_audit(
+                'registered_users',
+                'deleted',
+                $record->id,
+                $oldData,
+                null,
+                'delete'
+            );
+        }
 
         $message    = 'Registered User Successfully Deleted';
             return response()->json([
@@ -593,9 +655,18 @@ public function list(Request $request){
     {
         try {
             $role = RegisteredUser::findOrFail($id);
+            $oldData = $role->toArray();
             $role->update(['deleted_by' => Auth::user()->id]);
             $role->delete();
-            
+
+            log_audit(
+                'registered_users',
+                'deleted',
+                $role->id,
+                $oldData,
+                null,
+                'delete'
+            );
         } catch (\Exception $e) {
             return response()->json(['message' => 'An error occurred while deleting the Registered User.'], 500);
         }

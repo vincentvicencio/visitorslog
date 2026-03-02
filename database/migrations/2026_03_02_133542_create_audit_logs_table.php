@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('valid_id_types', function (Blueprint $table) {
+        Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('id_type_name');
-            $table->string('created_by')->nullable();
-            $table->string('updated_by')->nullable();
-            $table->string('deleted_by')->nullable();
+            $table->string('emp_number');
+            $table->integer('record_id')->nullable();
+            $table->string('module');
+            $table->string('sub_module');
+            $table->string('action');
+            $table->text('previous_data')->nullable();
+            $table->text('new_data')->nullable();
+            $table->string('ip_address');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
-            $table->timestamp( 'deleted_at')->nullable();
         });
     }
 
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('valid_id_types');
+        Schema::dropIfExists('audit_logs');
     }
 };

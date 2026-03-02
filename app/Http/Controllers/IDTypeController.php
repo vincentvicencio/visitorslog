@@ -105,16 +105,37 @@ class IDTypeController extends Controller
         $data = ['id_type_name' => $name];
 
         if ($record_id > 0) {
-            $status  = ValidIdType::findOrFail($record_id);
-            $status  = $status->update(['updated_by' => $emp_code] + $data);
+            $model   = ValidIdType::findOrFail($record_id);
+            $oldData = $model->getOriginal();
+
+            $model->update(['updated_by' => $emp_code] + $data);
             $message = 'Valid ID Type Successfully Updated';
+
+            log_audit(
+                'valid_id_types',
+                'updated',
+                $record_id,
+                $oldData,
+                $model->getAttributes(),
+                'update'
+            );
         } else {
-            $status  = ValidIdType::create(['created_by' => $emp_code] + $data);
+            $model = ValidIdType::create(['created_by' => $emp_code] + $data);
             $message = 'Valid ID Type Successfully Created';
+
+            log_audit(
+                'valid_id_types',
+                'created',
+                $model->id,
+                null,
+                $model->toArray(),
+                'save'
+            );
         }
 
         return response()->json([
             'status'  => 0,
+            'title'   => 'Success',
             'message' => $message,
         ]);
     }
@@ -152,11 +173,22 @@ class IDTypeController extends Controller
         }
 
         $details = $record->id_type_name;
+        $oldData = $record->toArray();
         $record->update(['deleted_by' => Auth::user()->id]);
         $record->delete();
 
+        log_audit(
+            'valid_id_types',
+            'deleted',
+            $request->id,
+            $oldData,
+            null,
+            'delete'
+        );
+
         return response()->json([
             'status'  => 0,
+            'title'   => 'Success',
             'message' => 'Valid ID Type Successfully Deleted',
         ]);
     }

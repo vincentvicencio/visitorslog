@@ -29,6 +29,7 @@ import datahandling from './common/datahandling';
         const tableHeader = [
             { id: "visitor_type",  label: "Name"         },
             { id: "id_number",     label: "ID Number"    },
+            { id: "location",      label: "Location"     },
             { id: "created_by",    label: "Created By"   },
             { id: "updated_by",    label: "Updated By"   },
             { id: "created_at",    label: "Created Date" },

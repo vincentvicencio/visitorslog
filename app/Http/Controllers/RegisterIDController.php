@@ -77,14 +77,32 @@ class RegisterIDController extends Controller
         ];
 
         if ($record_id > 0) {
-            $status     =  RegisteredID::findorFail($record_id);
-            $oldData    = $status->getOriginal();
+            $model   = RegisteredID::findorFail($record_id);
+            $oldData = $model->getOriginal();
 
-            $status     = $status->update(['updated_by' => $emp_code] + $data);
+            $model->update(['updated_by' => $emp_code] + $data);
             $message    = 'Visitor ID Successfully Updated';
+
+            log_audit(
+                'registered_ids',
+                'updated',
+                $record_id,
+                $oldData,
+                $model->getAttributes(),
+                'update'
+            );
         } else {
-            $status     = RegisteredID::create(['created_by' => $emp_code] + $data);
+            $model   = RegisteredID::create(['created_by' => $emp_code] + $data);
             $message    = 'Visitor ID Successfully Created';
+
+            log_audit(
+                'registered_ids',
+                'created',
+                $model->id,
+                null,
+                $model->toArray(),
+                'save'
+            );
         }
         return response()->json([
             'status'    => 0,
@@ -145,11 +163,28 @@ class RegisterIDController extends Controller
 
             }
 
+            $companyLocations = collect(session('all_location'))->keyBy(function ($item) {
+                return (string) data_get($item, 'id');
+            });
+
+            $locationLabel = '';
+            $locationLabel = (string) $d->location;
+
+            if (is_numeric($locationLabel)) {
+                $companyLocation = $companyLocations->get($locationLabel);
+
+                if ($companyLocation) {
+                    $locationLabel = data_get($companyLocation, 'name', '');
+                }
+            }
+
 
             $newData[$i] = [
                 'visitor_type' => $d->visitorType?->name ?? '-',
 
                 'id_number'    => $d->id_number,
+
+                'location'     => $locationLabel,
 
                 'created_by'   => $d->created_by ? user_name($d->created_by) : '-',
                 'updated_by'   => $d->updated_by ? user_name($d->updated_by) : '-',
@@ -190,9 +225,21 @@ class RegisterIDController extends Controller
 
     public function delete(Request $request){
         $record  = RegisteredID::find($request->id);
-        $details = $record->id_number;
-        $record  -> update(['deleted_by' => Auth::user() -> id]);
-        $record  -> delete();
+        if ($record) {
+            $oldData = $record->toArray();
+            $details = $record->id_number;
+            $record  -> update(['deleted_by' => Auth::user() -> id]);
+            $record  -> delete();
+
+            log_audit(
+                'registered_ids',
+                'deleted',
+                $record->id,
+                $oldData,
+                null,
+                'delete'
+            );
+        }
 
         $message    = 'Registered ID Successfully Deleted';
             return response()->json([
@@ -206,9 +253,18 @@ class RegisterIDController extends Controller
     {
         try {
             $role = RegisteredID::findOrFail($id);
+            $oldData = $role->toArray();
             $role->update(['deleted_by' => Auth::user()->id]);
             $role->delete();
-            
+
+            log_audit(
+                'registered_ids',
+                'deleted',
+                $role->id,
+                $oldData,
+                null,
+                'delete'
+            );
         } catch (\Exception $e) {
             return response() -> json(['message' => 'An error occurred while deleting the Registered ID.'], 500);
         }

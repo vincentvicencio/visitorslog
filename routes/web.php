@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\RegisterIDController;
 use App\Http\Controllers\GuardLocationController;
 use App\Http\Controllers\VisitorTypeController;
@@ -108,6 +109,7 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                 Route::post('/search',      'search')->name('registerId.search');
             });
 
+        // ID TYPE
         Route::prefix('IDtype')
             ->controller(IDTypeController::class)
             ->group(function () {
@@ -116,6 +118,13 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                 Route::post('/save',        'idTypeSave')->name('idtype.save');
                 Route::post('/delete',      'idTypeDelete')->name('idtype.delete');
                 Route::post('/search',      'idTypeSearch')->name('idtype.search');
+            });
+
+        // ABOUT
+        Route::prefix('about')
+            ->controller(AboutController::class)
+            ->group(function () {
+                Route::get('/',             'index')->name('about');
             });
     });
 });

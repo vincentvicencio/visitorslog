@@ -11,9 +11,24 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Models\AuditLogs;
 
 class VisitorController extends Controller
 {
+
+    private function logAudit($recordId, $action, $oldData = null, $newData = null)
+    {
+        AuditLogs::create([
+            'emp_number'   => Auth::user()->emp_number ?? Auth::id(),
+            'record_id'    => $recordId,
+            'module'       => 'Visitor',
+            'sub_module'   => 'Visitor Log',
+            'action'       => $action,
+            'previous_data'=> $oldData,
+            'new_data'     => $newData,
+            'ip_address'   => request()->ip(),
+        ]);
+    }
     private function guardLocationRequired()
     {
         $user = Auth::user();
@@ -321,11 +336,23 @@ class VisitorController extends Controller
             ], 400);
         }
 
+        $oldData = $visitor->getOriginal();
+
         $visitor->update([
             'time_out'   => Carbon::now(),
             'status'     => 1,
             'updated_by' => Auth::user()->id,
         ]);
+
+        // log timeout event (action set to 'timeout')
+        log_audit(
+            'visitors',
+            'timed out',
+            $visitor->id,
+            $oldData,
+            $visitor->getAttributes(),
+            'timeout'
+        );
 
         return response()->json([
             'status'     => 0,
@@ -348,6 +375,17 @@ class VisitorController extends Controller
                 'message' => 'Visitor not found or inactive'
             ], 404);
         }
+
+        // log view action before redirecting
+        log_audit(
+            'visitors',
+            'viewed',
+            $visitor->id,
+            null,
+            null,
+            'view'
+        );
+
         return response()->json([
             'redirect'   => route('view.page', [
                 'id'     => $visitor->id,
@@ -375,6 +413,42 @@ class VisitorController extends Controller
         ]);
     }
 
+    public function idSuggestions(Request $request)
+    {
+        $visitorTypeId = $request->visitor_type;
+        $query = $request->q;
+        $usedIdsQuery = function ($q) use ($visitorTypeId) {
+            $q->select('visitor_id')
+              ->from('visitors')
+              ->where('visitor_type', $visitorTypeId)
+              ->where(function ($sub) {
+                  $sub->where('status', 0)
+                      ->orWhereNull('status');
+              });
+        };
+
+        $ids = RegisteredID::where('visitor_type', $visitorTypeId)
+            ->where('id_number', 'LIKE', "%{$query}%")
+            ->whereNotIn('id_number', $usedIdsQuery)
+            ->select('id_number')
+            ->distinct()
+            ->limit(10)
+            ->get();
+
+        $results = $ids->map(fn($v) => ['id' => $v->id_number, 'text' => $v->id_number])->values();
+
+        if ($results->isEmpty()) {
+            return response()->json([
+                'results' => [],
+                'message' => 'All IDs are currently used'
+            ]);
+        }
+
+        return response()->json([
+            'results' => $results
+        ]);
+    }
+
     public function save(Request $request)
     {
         if ($this->guardLocationRequired()) {
@@ -392,7 +466,11 @@ class VisitorController extends Controller
                 'last_name'         => ['required', 'string', 'max:40'],
                 'visitor_type'      => 'required|exists:visitor_types,id',
                 'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
-                'image_path'        => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
+                'image_path'        => ['required'],
+                'id_type'          => 'required|exists:idtypes,id',
+                'id_type_number'   => ['required'],
+                'purpose_of_visit' => ['required'],
+                'contact_person' => ['required'],
 
                 'id_number'    => [
                     'required',
@@ -472,6 +550,9 @@ class VisitorController extends Controller
                 }
             }
             
+            $contactPerson = ucwords(strtolower($request->contact_person));
+            $purposeOfVisit = ucwords(strtolower($request->purpose_of_visit));
+            
 
             $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
 
@@ -493,14 +574,28 @@ class VisitorController extends Controller
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $locationForSave;
-            $visitor->address      = $request->address;
+            $visitor->location     = $locationForSave ?? '?';
+            $visitor->address      = $address;
+            $visitor->id_type      = $request->id_type;
+            $visitor->valid_id     = $request->id_type_number;
+            $visitor->purpose      = $purposeOfVisit;
+            $visitor->contact_person = $contactPerson;
+            $visitor->created_at   = now();
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
             $visitor->status       = 0;
             $visitor->save();
 
+            // audit log for new visitor
+            log_audit(
+                'visitors',
+                'created',
+                $visitor->id,
+                null,
+                $visitor->toArray(),
+                'save'
+            );
 
             return response()->json([
                 'status' => 0,
@@ -508,6 +603,8 @@ class VisitorController extends Controller
                 'message' => 'Visitor successfully added'
             ], 200);
             
+            
+
         } catch (\Exception $e) {
             return response()->json([
                     'status' => 1,

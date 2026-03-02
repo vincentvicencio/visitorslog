@@ -152,3 +152,19 @@ body {
         padding:40px 20px 20px 20px;
     }
 }
+
+@media (max-height: 790px) {
+    .side-menu-icon-1{
+        // display: none !important;
+        height: 90px !important;
+
+        img{
+            height: 75% !important;
+        }
+    }
+}
+@media (max-height: 760px) {
+    .side-menu-icon-1{
+        display: none !important;
+    }
+}

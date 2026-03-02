@@ -1,74 +1,101 @@
 @extends('layout')
-
 @section('content')
-
 <div class="user-types-container mt-4">
-    <div class="page-header about mb-3">
+    {{-- header --}}
+    <div class="page-header visitortype">
         <div class="header-content">
             <div class="page-title fs-2">About</div>
-            <div class="page-subtitle">Meet the developers behind this project</div>
+            <div class="page-subtitle mb-3">Information about the project and its authors</div>
         </div>
     </div>
 
-    <div class="visitor-log-sheet-table bg-white p-3 p-md-4 about-wrap">
-        <div class="about-hero mb-3 mb-md-4">
-            <div class="hero-main">
-                <div>
-                    <h5 class="mb-2">Development Team</h5>
-                    <p class="mb-0">
-                        This page is dedicated to the developers who built and maintain the Visitor Log System.
-                    </p>
+
+
+    <div class="about">
+        <div class="school">
+            <div class="text">
+                <div class="main">Development Team</div>
+                <div class="sub">This page is dedicated to the developers who built the Visitor Log Sheet</div>
+            </div>
+            <div class="icon"><img src="images/bsu.png" alt=""></div>
+        </div>
+        <div class="header">Our Developers</div>
+        <div class="profiles">
+            <div class="profile-holder">
+                <div class="image"><img src="images/compass.png" alt=""></div>
+                <div class="details">
+                    <div class="name">Ricardo II M. Diño</div>
+                    <div class="subdetail">Lead Developer</div>
+                    <div class="subdetail2">Focused on backend architecture, core features, and system flow.</div>
                 </div>
-                <div class="school-logo-wrap">
-                    <img src="{{ asset('images/school-logo.png') }}" alt="School Logo" class="school-logo">
+            </div>
+            <div class="profile-holder">
+                <div class="image"><img src="images/compass.png" alt=""></div>
+                <div class="details">
+                    <div class="name">Ashley Clint B. Antonio</div>
+                    <div class="subdetail">Frontend Developer</div>
+                    <div class="subdetail2">Handled UI layout, responsive pages, and user experience details.</div>
+                </div>
+            </div>
+            <div class="profile-holder">
+                <div class="image"><img src="images/compass.png" alt=""></div>
+                <div class="details">
+                    <div class="name">Carmela S. Moya</div>
+                    <div class="subdetail">QA / Support Developer</div>
+                    <div class="subdetail2">Managed testing, issue validation, and release stability.</div>
+                </div>
+            </div>
+            <div class="profile-holder">
+                <div class="image"><img src="images/compass.png" alt=""></div>
+                <div class="details">
+                    <div class="name">Charle B. Loreto</div>
+                    <div class="subdetail">Developer</div>
+                    <div class="subdetail2">Contributed to implementation, refinements, and system improvements.</div>
                 </div>
             </div>
         </div>
 
-        <div class="row g-3 about-grid">
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="about-card developer-card h-100">
-                    <div class="dev-avatar">A</div>
-                    <div class="dev-name">Developer Name 1</div>
-                    <div class="dev-role">Lead Developer</div>
-                    <div class="dev-description">Focused on backend architecture, core features, and system flow.</div>
-                </div>
-            </div>
 
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="about-card developer-card h-100">
-                    <div class="dev-avatar">B</div>
-                    <div class="dev-name">Developer Name 2</div>
-                    <div class="dev-role">Frontend Developer</div>
-                    <div class="dev-description">Handled UI layout, responsive pages, and user experience details.</div>
+        <div class="header">Supervised by</div>
+        <div class="profiles">
+            <div class="profile-holder">
+                <div class="image"><img src="images/compass.png" alt=""></div>
+                <div class="details">
+                    <div class="name">Vincent Joseph Vicencio</div>
+                    <div class="subdetail">Supervisor</div>
                 </div>
             </div>
-
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="about-card developer-card h-100">
-                    <div class="dev-avatar">C</div>
-                    <div class="dev-name">Developer Name 3</div>
-                    <div class="dev-role">QA / Support Developer</div>
-                    <div class="dev-description">Managed testing, issue validation, and release stability.</div>
+            <div class="profile-holder">
+                <div class="image"><img src="images/compass.png" alt=""></div>
+                <div class="details">
+                    <div class="name">Harvey Del Rosario</div>
+                    <div class="subdetail">Supervisor</div>
                 </div>
             </div>
-
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="about-card developer-card h-100">
-                    <div class="dev-avatar">D</div>
-                    <div class="dev-name">Developer Name 4</div>
-                    <div class="dev-role">Developer</div>
-                    <div class="dev-description">Contributed to implementation, refinements, and system improvements.</div>
-                </div>
-            </div>
-
-            <div class="col-12">
-                <div class="about-card text-muted text-center py-3">
-                    Update the names and roles above to match your actual developer team.
-                </div>
-            </div>
+            
         </div>
+
+
+
+        <div class="header">Project Partner</div>
+        <div class="profiles-partner">
+            <div class="profile-holder">
+                <div class="image1"><img src="images/magellan logo.png" alt=""></div>
+                <div class="details">
+                    <div class="name1">Magellan Solutions</div>
+                </div>
+            </div>
+            <div class="profile-holder">
+                <div class="image2"><img src="images/bsu.png" alt=""></div>
+                <div class="details">
+                    <div class="name2">Bulacan State University</div>
+                </div>
+            </div>
+            
+        </div>
+        <br><br><br>
     </div>
 </div>
+    
 
 @endsection
