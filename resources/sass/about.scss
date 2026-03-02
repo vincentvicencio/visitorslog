@@ -1,0 +1,186 @@
+.about-wrap {
+    .about-hero {
+        background: linear-gradient(to right, #0F4383, #145AB0);
+        border-radius: 12px;
+        color: white;
+        padding: 20px;
+
+        .hero-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .school-logo-wrap {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .school-logo {
+            width: 62px;
+            height: 62px;
+            object-fit: contain;
+        }
+
+        h5 {
+            font-weight: 700;
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 780px;
+        }
+    }
+
+    .about-card {
+        border: 1px solid rgba(15, 67, 131, 0.1);
+        border-radius: 12px;
+        padding: 18px;
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .about-card-title {
+        font-weight: 700;
+        color: #0F4383;
+        margin-bottom: 12px;
+        font-size: 16px;
+    }
+
+    .about-list {
+        margin: 0;
+        padding-left: 18px;
+        color: #5d6670;
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        li:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .about-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed rgba(15, 67, 131, 0.2);
+            padding-bottom: 8px;
+
+            span {
+                color: #6c757d;
+                font-size: 14px;
+            }
+
+            strong {
+                color: #0F4383;
+                font-size: 14px;
+                text-align: right;
+            }
+        }
+
+        .meta-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+    }
+
+    .step-box {
+        border: 1px solid rgba(20, 90, 176, 0.2);
+        border-radius: 10px;
+        padding: 14px;
+        height: 100%;
+        background-color: #f9fbfe;
+
+        .step-index {
+            display: inline-block;
+            color: #145AB0;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .step-text {
+            color: #5d6670;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    }
+
+    .developer-card {
+        text-align: center;
+
+        .dev-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            background-color: #145AB0;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .dev-name {
+            color: #0F4383;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .dev-role {
+            color: #6c757d;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .dev-description {
+            color: #5d6670;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .about-wrap {
+        .about-hero {
+            padding: 16px;
+
+            .hero-main {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .school-logo-wrap {
+                width: 72px;
+                height: 72px;
+            }
+
+            .school-logo {
+                width: 54px;
+                height: 54px;
+            }
+        }
+
+        .about-card {
+            padding: 14px;
+        }
+    }
+}
