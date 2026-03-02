@@ -387,13 +387,18 @@ class VisitorController extends Controller
         $visitorTypeId = $request->visitor_type;
         $query = $request->q;
 
-        // gather any visitor IDs already logged for this type so they
-        // won't be suggested again. Limiting to same type avoids
-        // cross-type collisions.
+        // gather any *active* visitor IDs already logged for this type
+        // so that only fresh/available IDs are suggested.  timed-out
+        // records (status=1 or time_out not null) will not be excluded
+        // and may reappear after timeout.
         $usedIdsQuery = function ($q) use ($visitorTypeId) {
             $q->select('visitor_id')
               ->from('visitors')
-              ->where('visitor_type', $visitorTypeId);
+              ->where('visitor_type', $visitorTypeId)
+              ->where(function ($sub) {
+                  $sub->where('status', 0)
+                      ->orWhereNull('status');
+              });
         };
 
         $ids = RegisteredID::where('visitor_type', $visitorTypeId)
