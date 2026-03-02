@@ -328,11 +328,23 @@ class VisitorController extends Controller
             ], 400);
         }
 
+        $oldData = $visitor->getOriginal();
+
         $visitor->update([
             'time_out'   => Carbon::now(),
             'status'     => 1,
             'updated_by' => Auth::user()->id,
         ]);
+
+        // log timeout event (action set to 'timeout')
+        log_audit(
+            'visitors',
+            'timed out',
+            $visitor->id,
+            $oldData,
+            $visitor->getAttributes(),
+            'timeout'
+        );
 
         return response()->json([
             'status'     => 0,
@@ -355,6 +367,17 @@ class VisitorController extends Controller
                 'message' => 'Visitor not found or inactive'
             ], 404);
         }
+
+        // log view action before redirecting
+        log_audit(
+            'visitors',
+            'viewed',
+            $visitor->id,
+            null,
+            null,
+            'view'
+        );
+
         return response()->json([
             'redirect'   => route('view.page', [
                 'id'     => $visitor->id,
@@ -386,11 +409,6 @@ class VisitorController extends Controller
     {
         $visitorTypeId = $request->visitor_type;
         $query = $request->q;
-
-        // gather any *active* visitor IDs already logged for this type
-        // so that only fresh/available IDs are suggested.  timed-out
-        // records (status=1 or time_out not null) will not be excluded
-        // and may reappear after timeout.
         $usedIdsQuery = function ($q) use ($visitorTypeId) {
             $q->select('visitor_id')
               ->from('visitors')
@@ -571,6 +589,15 @@ class VisitorController extends Controller
             $visitor->status       = 0;
             $visitor->save();
 
+            // audit log for new visitor
+            log_audit(
+                'visitors',
+                'created',
+                $visitor->id,
+                null,
+                $visitor->toArray(),
+                'save'
+            );
 
             return response()->json([
                 'status' => 0,

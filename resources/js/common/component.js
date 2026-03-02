@@ -83,7 +83,7 @@ class Component {
             const details = $(this).attr('data-details');
             const message = `Are you sure you want to delete ${details}'s record?`;
             triggers.showNotification("#notificationContainer", "Delete Notification", message, id);
-            triggers.processButtonOk(url + "delete", { id: $("#record_id").val() });
+            triggers.processButtonOk(url + "delete", { id: id });
         });
 
 
@@ -95,7 +95,7 @@ class Component {
             const details = $(this).attr('data-details');
             const message = `Are you sure you want to copy ${details}'s record?`;
             triggers.showNotification("#notificationContainer", "Copy Notification", message, id);
-            triggers.processButtonOk(url + "copy", { id: $("#record_id").val() });
+            triggers.processButtonOk(url + "copy", { id: id });
         });
 
         // -------------------------
