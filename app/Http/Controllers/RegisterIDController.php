@@ -145,11 +145,28 @@ class RegisterIDController extends Controller
 
             }
 
+            $companyLocations = collect(session('all_location'))->keyBy(function ($item) {
+                return (string) data_get($item, 'id');
+            });
+
+            $locationLabel = '';
+            $locationLabel = (string) $d->location;
+
+            if (is_numeric($locationLabel)) {
+                $companyLocation = $companyLocations->get($locationLabel);
+
+                if ($companyLocation) {
+                    $locationLabel = data_get($companyLocation, 'name', '');
+                }
+            }
+
 
             $newData[$i] = [
                 'visitor_type' => $d->visitorType?->name ?? '-',
 
                 'id_number'    => $d->id_number,
+
+                'location'     => $locationLabel,
 
                 'created_by'   => $d->created_by ? user_name($d->created_by) : '-',
                 'updated_by'   => $d->updated_by ? user_name($d->updated_by) : '-',

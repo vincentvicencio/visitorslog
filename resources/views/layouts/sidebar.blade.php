@@ -66,6 +66,11 @@
                     <i class="bi bi-journals fs-6 p-2"></i>
                     Reports
                 </a>
+                <a href="{{ url('about') }}"
+                class="sidebar-menu-button {{ Request::is('about') ? 'selected' : '' }}">
+                    <i class="bi bi-info-circle fs-6 p-2"></i>
+                    About
+                </a>
             @endif
         </div>
         <!-- Log out -->

@@ -409,8 +409,17 @@ class VisitorController extends Controller
             ->limit(10)
             ->get();
 
+        $results = $ids->map(fn($v) => ['id' => $v->id_number, 'text' => $v->id_number])->values();
+
+        if ($results->isEmpty()) {
+            return response()->json([
+                'results' => [],
+                'message' => 'All IDs are currently used'
+            ]);
+        }
+
         return response()->json([
-            'results' => $ids->map(fn($v) => ['id' => $v->id_number, 'text' => $v->id_number])
+            'results' => $results
         ]);
     }
 
@@ -523,6 +532,9 @@ class VisitorController extends Controller
             $lastName = ucwords(strtolower($request->last_name));
             $address = ucwords(strtolower($request->address));
             
+            $contactPerson = ucwords(strtolower($request->contact_person));
+            $purposeOfVisit = ucwords(strtolower($request->purpose_of_visit));
+            
 
             $middleInitial = collect(preg_split('/\s+/', trim($middleName)))
                 ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
@@ -546,12 +558,12 @@ class VisitorController extends Controller
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $userLocations[0] ?? '?';
+            $visitor->location     = $locationForSave ?? '?';
             $visitor->address      = $address;
             $visitor->id_type      = $request->id_type;
-            $visitor->valid_id       = $request->id_type_number;
-            $visitor->purpose      = $request->purpose_of_visit;
-            $visitor->contact_person = $request->contact_person;
+            $visitor->valid_id     = $request->id_type_number;
+            $visitor->purpose      = $purposeOfVisit;
+            $visitor->contact_person = $contactPerson;
             $visitor->created_at   = now();
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
