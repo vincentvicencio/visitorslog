@@ -146,15 +146,12 @@ $(document).ready(function () {
 
     // });
 
-    // Initialize dropdown whenever visitor type changes
-    $('#visitor_type').on('change', function() {
-        initializeVisitorIdDropdown();
-    });
+    // Previous logic to initialize visitor ID dropdown was removed.  
+    // (function `initializeVisitorIdDropdown` no longer exists)
+    // Ensure id suggestions are handled in the later ready handler instead.
 
-    // Optionally initialize if visitor type already selected
-    if ($('#visitor_type').val()) {
-        initializeVisitorIdDropdown();
-    }
+    // If you need to re-enable similar behaviour, implement
+    // a named function and call it here, or use fetchIDSuggestions directly.
 
     $('#captureBtn').on('click', function () {
 
@@ -554,6 +551,27 @@ $(document).ready(function() {
 
     // Trigger fetch on input and focus
     $('#id_number').on('input focus', fetchIDSuggestions);
+
+    // Hide suggestions when pressing escape or losing focus/clicking elsewhere
+    $('#id_number').on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('#id_suggestions').hide();
+        }
+    });
+
+    // hide suggestions when the input loses focus (allow click on suggestion first)
+    $('#id_number').on('blur', function() {
+        setTimeout(function() {
+            $('#id_suggestions').hide();
+        }, 150);
+    });
+
+    // click anywhere outside of the input/suggestion box should close it
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#id_number, #id_suggestions').length) {
+            $('#id_suggestions').hide();
+        }
+    });
 
     // Click to select suggestion
     $(document).on('click', '.suggestion-item', function(e) {
