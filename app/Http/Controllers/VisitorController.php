@@ -387,8 +387,18 @@ class VisitorController extends Controller
         $visitorTypeId = $request->visitor_type;
         $query = $request->q;
 
+        // gather any visitor IDs already logged for this type so they
+        // won't be suggested again. Limiting to same type avoids
+        // cross-type collisions.
+        $usedIdsQuery = function ($q) use ($visitorTypeId) {
+            $q->select('visitor_id')
+              ->from('visitors')
+              ->where('visitor_type', $visitorTypeId);
+        };
+
         $ids = RegisteredID::where('visitor_type', $visitorTypeId)
             ->where('id_number', 'LIKE', "%{$query}%")
+            ->whereNotIn('id_number', $usedIdsQuery)
             ->select('id_number')
             ->distinct()
             ->limit(10)
@@ -417,7 +427,7 @@ class VisitorController extends Controller
                 'visitor_type'      => 'required|exists:visitor_types,id',
                 'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
                 'image_path'        => ['required'],
-                'id_type'          => 'required|exists:valid_id_types,id',
+                'id_type'          => 'required|exists:idtypes,id',
                 'id_type_number'   => ['required'],
                 'purpose_of_visit' => ['required'],
                 'contact_person' => ['required'],
