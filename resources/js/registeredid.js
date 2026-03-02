@@ -27,13 +27,13 @@ import datahandling from './common/datahandling';
         const self = this;
 
         const tableHeader = [
-            { id: "visitor_type",       label: "Name" },
-            { id: "id_number",       label: "ID Number" },
-            { id: "created_by",       label: "Created By" },
-            { id: "updated_by",      label: "Updated By" },
-            { id: "created_at",   label: "Created Date" },
-            { id: "updated_at",   label: "Updated Date" },
-            { id: "action",         label: "Action" },
+            { id: "visitor_type",  label: "Name"         },
+            { id: "id_number",     label: "ID Number"    },
+            { id: "created_by",    label: "Created By"   },
+            { id: "updated_by",    label: "Updated By"   },
+            { id: "created_at",    label: "Created Date" },
+            { id: "updated_at",    label: "Updated Date" },
+            { id: "action",        label: "Action"       },
         ];
 
         const columns = tableHeader.map(col => ({
@@ -90,19 +90,19 @@ import datahandling from './common/datahandling';
 
     // DataTable Initialization
     async initializeButtons(){
-            // Clear Visitor ID error on input
-            const visitorIdInput = document.getElementById('name');
-            const visitorIdFeedback = document.getElementById('nameFeedback');
-            if (visitorIdInput && visitorIdFeedback) {
-                visitorIdInput.addEventListener('input', function() {
-                    if (visitorIdInput.value.trim()) {
-                        visitorIdInput.classList.remove('is-invalid');
-                        visitorIdFeedback.style.display = '';
-                        visitorIdFeedback.textContent = '';
-                    }
-                });
-            }
-            // Clear Visitor Type error on change
+                        // Clear Visitor ID error on input
+                        const visitorIdInput = document.getElementById('name');
+                        const visitorIdFeedback = document.getElementById('nameFeedback');
+                        if (visitorIdInput && visitorIdFeedback) {
+                            visitorIdInput.addEventListener('input', function() {
+                                if (visitorIdInput.value.match(/^\d+$/)) {
+                                    visitorIdInput.classList.remove('is-invalid');
+                                    visitorIdFeedback.style.display = '';
+                                    visitorIdFeedback.textContent = '';
+                                }
+                            });
+                        }
+                // Clear Visitor Type error on change
                 const visitorTypeInput = document.getElementById('visitortype');
                 const visitorTypeFeedback = document.getElementById('visitorTypeFeedback');
                 if (visitorTypeInput && visitorTypeFeedback) {

@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Visitor;
+use App\Models\Location;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -55,14 +56,24 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
 
         $data = $query->orderBy('id', 'desc')->get();
 
-        $location = collect(session('all_location', []));
+        $companyLocations = collect(session('all_location', []))->keyBy(function ($item) {
+            return (string) data_get($item, 'id');
+        });
+        $guardLocations = Location::query()->get(['id', 'name'])->keyBy(function ($item) {
+            return (string) $item->id;
+        });
 
-        return $data->map(function ($visitor) use ($location) {
-            $locationLabel = '';
-            foreach ($location as $record) {
-                if ($visitor->location == $record['id']) {
-                    $locationLabel = $record['name'];
-                    break;
+        return $data->map(function ($visitor) use ($companyLocations, $guardLocations) {
+            $locationLabel = (string) $visitor->location;
+
+            if (is_numeric($locationLabel)) {
+                $companyLocation = $companyLocations->get($locationLabel);
+                $guardLocation = $guardLocations->get($locationLabel);
+
+                if ($companyLocation) {
+                    $locationLabel = data_get($companyLocation, 'name', '');
+                } elseif ($guardLocation) {
+                    $locationLabel = $guardLocation->name;
                 }
             }
 

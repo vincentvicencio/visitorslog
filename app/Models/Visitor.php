@@ -69,8 +69,19 @@ class Visitor extends Model
     }
     public function getLocationNameAttribute()
     {
-        $locations = collect(session('all_location'));
-        $match = $locations->firstWhere('id', $this->location);
-        return $match ? $match['name'] : 'N/A';
+        $locationValue = (string) $this->location;
+
+        if ($locationValue === '') {
+            return 'N/A';
+        }
+
+        if (!is_numeric($locationValue)) {
+            return $locationValue;
+        }
+
+        $locations = collect(session('all_location', []));
+        $match = $locations->firstWhere('id', $locationValue);
+
+        return $match ? $match['name'] : $locationValue;
     }
 }

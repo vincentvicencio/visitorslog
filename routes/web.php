@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\RegisterIDController;
+use App\Http\Controllers\GuardLocationController;
 use App\Http\Controllers\VisitorTypeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
@@ -19,6 +20,9 @@ Auth::routes();
 
 // middleware
 Route::middleware(['auth', 'single.session'])->group(function () {
+
+    Route::get('/guard/location', [GuardLocationController::class, 'show'])->name('guard.location.show');
+    Route::post('/guard/location', [GuardLocationController::class, 'store'])->name('guard.location.store');
 
     // VISITORSLOG
     Route::prefix('visitorslog')

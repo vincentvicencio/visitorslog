@@ -122,6 +122,7 @@ class UsersTable {
             const selectedRoleId = $(this).val();
             const selectedRoleNum = Number(selectedRoleId);
             const locationSelect = $('#reg_location');
+            const locationContainer = $('#location_container');
             const passwordContainer = $('#password_container');
             const nameContainer = $('#employee_name_container');
             const empCodeContainer = $('#emp_code_container');
@@ -160,6 +161,7 @@ class UsersTable {
             if (!selectedRoleId) {
                 // No role selected: hide all fields
                 fieldsContainer.hide();
+                locationContainer.show();
                 passwordContainer.show();
                 empCodeContainer.show();
                 nameContainer.addClass('d-none');
@@ -177,6 +179,7 @@ class UsersTable {
             fieldsContainer.show();
 
             if (isMultiLocationRole) {
+                locationContainer.show();
                 // Admin: Hide password, show emp code with search
                 passwordContainer.hide();
                 $('#reg_password').val('').removeAttr('required');
@@ -221,6 +224,7 @@ class UsersTable {
                 // Ensure no options are selected after init
                 locationSelect.val(null).trigger('change.select2');
             } else if (isReceptionist) {
+                locationContainer.show();
                 // Receptionist: Single location, hide password, show emp code with search
                 passwordContainer.hide();
                 $('#reg_password').val('').removeAttr('required');
@@ -252,6 +256,7 @@ class UsersTable {
                     locationSelect.val(currentVal[0]);
                 }
             } else if (isGuard) {
+                locationContainer.hide();
                 // Guard: Show password, show editable names, hide emp code
                 passwordContainer.show();
                 $('#reg_password').attr('required', 'required');
@@ -268,6 +273,9 @@ class UsersTable {
                     $('#reg_first_name, #reg_last_name').val('');
                 }
 
+                // Guard does not have fixed company location
+                locationSelect.val('').trigger('change');
+
                 // Disable multiple selection for location
                 locationSelect.removeAttr('multiple');
 
@@ -282,6 +290,7 @@ class UsersTable {
                     locationSelect.val(currentVal[0]);
                 }
             } else {
+                locationContainer.show();
                 // Other roles: Show password, show emp code, hide names
                 passwordContainer.show();
                 $('#reg_password').attr('required', 'required');
@@ -471,7 +480,8 @@ class UsersTable {
             // Validate Location
             const locationInput = document.getElementById('reg_location');
             const locationFeedback = document.getElementById('locationFeedback');
-            if (locationInput && !locationInput.value) {
+            const requiresFixedLocation = selectedRoleNum !== 3;
+            if (locationInput && requiresFixedLocation && !locationInput.value) {
                 locationInput.classList.add('is-invalid');
                 locationFeedback.style.display = 'block';
                 locationFeedback.textContent = 'Location is required';

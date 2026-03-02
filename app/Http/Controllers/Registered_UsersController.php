@@ -31,8 +31,11 @@ class Registered_UsersController extends Controller
     // 1. Validation - different rules based on role
     $validationRules = [
         'user_type' => 'required',
-        'locations' => 'required',
     ];
+
+    if (!$isGuard) {
+        $validationRules['locations'] = 'required';
+    }
     
     // Check if editing (record_id present)
     $recordId = $request->input('record_id');
@@ -105,7 +108,7 @@ class Registered_UsersController extends Controller
         return $value !== null && $value !== '';
     }));
 
-    if (count($locations) === 0) {
+    if (!$isGuard && count($locations) === 0) {
         return response()->json([
             'status' => 1,
             'title' => 'Select Location',
@@ -148,7 +151,7 @@ class Registered_UsersController extends Controller
                 'user_name'  => $username,
                 'first_name' => $firstName, 
                 'last_name'  => $lastName,
-                'location'   => $locations,
+                'location'   => null,
                 'user_type'  => $request->user_type,
                 'updated_by' => Auth::user()->id,
             ];
@@ -213,7 +216,7 @@ class Registered_UsersController extends Controller
             'user_name'  => $empCode,
             'first_name' => $firstName, 
             'last_name'  => $lastName,
-            'location'   => $locations,
+            'location'   => $locations[0] ?? null,
             'user_type'  => $request->user_type,
             'updated_by' => Auth::id(),
         ];
@@ -388,8 +391,12 @@ public function edit(Request $request, $id)
             $updateData['user_name'] = $request->emp_code;
         }
 
-        // Handle locations if provided
-        if ($request->has('locations')) {
+        if ($isGuard) {
+            $updateData['location'] = null;
+        }
+
+        // Handle locations for non-guard roles
+        if (!$isGuard && $request->has('locations')) {
             $locationsInput = $request->input('locations');
             
             // Handle locations - can be a single value or JSON string of array
@@ -422,7 +429,7 @@ public function edit(Request $request, $id)
                 ], 422);
             }
             
-            $updateData['location'] = $locations;
+            $updateData['location'] = $locations[0] ?? null;
         }
 
         if ($request->filled('password')) {

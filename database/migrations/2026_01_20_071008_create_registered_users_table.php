@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('password')->nullable();
             $table->unsignedBigInteger('user_type');
-            $table->json('location');
+            $table->string('location')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();

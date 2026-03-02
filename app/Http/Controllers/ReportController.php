@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\VisitorType;
+use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -102,16 +103,26 @@ class ReportController extends Controller
  
         $newData = [];
         $i       = 0;
+        $companyLocations = collect(session('all_location'))->keyBy(function ($item) {
+            return (string) data_get($item, 'id');
+        });
+        $guardLocations = Location::query()->get(['id', 'name'])->keyBy(function ($item) {
+            return (string) $item->id;
+        });
       
         foreach ($data as $d) { 
             $locationLabel = '';
+            $locationLabel = (string) $d->location;
 
-            $location = collect(session('all_location'));
-            foreach ($location as $record) {
-                if($d->location == $record['id']){
-                    $locationLabel = $record['name'];
+            if (is_numeric($locationLabel)) {
+                $companyLocation = $companyLocations->get($locationLabel);
+                $guardLocation = $guardLocations->get($locationLabel);
+
+                if ($companyLocation) {
+                    $locationLabel = data_get($companyLocation, 'name', '');
+                } elseif ($guardLocation) {
+                    $locationLabel = $guardLocation->name;
                 }
-
             }
 
             $image = '';
