@@ -15,12 +15,14 @@ return new class extends Migration
             $table->id();
             $table->integer('visitor_type');
             $table->string('id_number');
+            $table->integer('location')->nullable();
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->timestamp( 'deleted_at')->nullable();
+            
         });
     }
 

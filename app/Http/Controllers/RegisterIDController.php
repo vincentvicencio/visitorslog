@@ -17,21 +17,32 @@ class RegisterIDController extends Controller
         $visitorTypes = VisitorType::where('deleted_at', null)
                    ->orderBy('id', 'desc')
                    ->get();
-        return view('pages.registerid.id', compact('visitorTypes'));
+        $IDLocation = collect(session('all_location'))
+            ->where('id', '!=', 5)
+            ->map(fn($record) => [
+                'id'   => $record['id'],
+                'text' => $record['name']
+            ])
+            ->prepend(['id' => '', 'text' => 'Choose Location/Site'])
+            ->toArray();
+        return view('pages.registerid.id', compact('visitorTypes', 'IDLocation'));
     }
     public function save(Request $request)
     {
+        // note: form field name is visitorIDLocation so validate using that key
         $validator = Validator::make(
             $request->all(),
             [
-                'name'              => ['required', 'max:4', 'min:4'],
-                'visitorType'       => 'required|exists:visitor_types,id',
+                'name'                  => ['required', 'max:4', 'min:4'],
+                'visitorType'           => 'required|exists:visitor_types,id',
+                'visitorIDLocation'     => 'required',
             ],
             [
-                'name.required'           => 'Visitor ID is eto Required',
-                'name.max'                => 'Visitor ID must not exceed 4 digits',
-                'name.min'                => 'Visitor ID must be 4 digits',
-                'visitorType.required'    => 'Visitor Type is Required',
+                'name.required'               => 'Visitor ID is Required',
+                'name.max'                    => 'Visitor ID must not exceed 4 digits',
+                'name.min'                    => 'Visitor ID must be 4 digits',
+                'visitorType.required'        => 'Visitor Type is Required',
+                'visitorIDLocation.required'  => 'ID Location is Required',
             ]
         );
 
@@ -46,7 +57,7 @@ class RegisterIDController extends Controller
         $duplicateQuery = RegisteredID::withoutTrashed()
                             ->whereRaw('LOWER(id_number) = ?', [strtolower($name)]);
 
-        if($record_id > 0){
+        if($record_id > 0){ 
             $duplicateQuery->where('id', '!=', $record_id);
         }
         
@@ -61,6 +72,7 @@ class RegisterIDController extends Controller
 
         $data       = [
             'id_number'       => $request->name,
+            'location'        => $request->visitorIDLocation,
             'visitor_type'    => $request->visitorType,
         ];
 
@@ -219,5 +231,4 @@ class RegisterIDController extends Controller
             'updated_by' => Auth::user() -> id,
         ]);
     }
-
 }
