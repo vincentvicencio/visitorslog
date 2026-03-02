@@ -10,6 +10,7 @@ use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\User_TypesController;
 use App\Http\Controllers\Registered_UsersController;
+use App\Http\Controllers\IDTypeController;
 
 Route::get('/', function () {
     return redirect()->route('visitorslog');
@@ -98,6 +99,16 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                 Route::post('/save',        'save')->name('registerId.save');
                 Route::post('/delete',      'delete')->name('registerId.delete');
                 Route::post('/search',      'search')->name('registerId.search');
+            });
+
+        Route::prefix('IDtype')
+            ->controller(IDTypeController::class)
+            ->group(function () {
+                Route::get('/',             'idTypeIndex')->name('idtype');
+                Route::post('/list',        'idTypeList')->name('idtype.list');
+                Route::post('/save',        'idTypeSave')->name('idtype.save');
+                Route::post('/delete',      'idTypeDelete')->name('idtype.delete');
+                Route::post('/search',      'idTypeSearch')->name('idtype.search');
             });
     });
 });

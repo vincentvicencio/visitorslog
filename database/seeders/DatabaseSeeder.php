@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
             Users::class,
             UserTypes::class,
             VisitorsSeeder::class,
-            VisitorTypeSeeder::class
+            VisitorTypeSeeder::class,
+            IDTypesSeeder::class,
         ]);
     }
 }
