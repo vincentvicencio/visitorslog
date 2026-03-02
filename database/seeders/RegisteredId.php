@@ -17,7 +17,7 @@ class RegisteredId extends Seeder
         [
             'visitor_type' => 1,
             'id_number' => 1000,
-            'id_location' => 1,
+            'location' => 1,
             'created_by' => 1,
             'updated_by' => 1,
             'created_at' => now(),
@@ -26,7 +26,7 @@ class RegisteredId extends Seeder
         [
             'visitor_type' => 2,
             'id_number' => 2000,
-            'id_location' => 1,
+            'location' => 1,
             'created_by' => 1,
             'updated_by' => 1,
             'created_at' => now(),
@@ -35,7 +35,7 @@ class RegisteredId extends Seeder
         [
             'visitor_type' => 3,
             'id_number' => 3000,
-            'id_location' => 1,
+            'location' => 1,
             'created_by' => 1,
             'updated_by' => 1,
             'created_at' => now(),
