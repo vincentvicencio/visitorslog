@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ValidIdType;
 use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\VisitorType;
@@ -32,7 +33,7 @@ class VisitorController extends Controller
         //     session()->forget('from_form');
         //     return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
         // }else{
-            return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+            return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes'));
         // }
     }
     public function form()
@@ -44,7 +45,11 @@ class VisitorController extends Controller
         $visitors     = Visitor::where('status', 0)
                 -> orderBy('id', 'asc')
                 -> get();
-        return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
+        $validIdTypes = ValidIdType::where('deleted_at', null)
+                -> orderBy('id', 'desc')
+                -> get();
+
+        return view('pages.visitorslog.form', compact('visitorTypes', "visitors", "validIdTypes"));
     }
 
     public function list(Request $request){
@@ -68,10 +73,10 @@ class VisitorController extends Controller
                         ->where('time_out', null);
                     });
 
-                    // Then restrict to creator if NOT admin
-                    if (Auth::user()->user_type != 1) {
-                        $query->where('created_by', Auth::user()->id);
-                    }
+                    // // Then restrict to creator if NOT admin
+                    // if (Auth::user()->user_type != 1) {
+                    //     $query->where('created_by', Auth::user()->id);
+                    // }
                 })
 
                 -> when($keywords, function ($query) use ($keywords) {
@@ -274,6 +279,23 @@ class VisitorController extends Controller
         ]);
     }
 
+    public function idSuggestions(Request $request)
+    {
+        $visitorTypeId = $request->visitor_type;
+        $query = $request->q;
+
+        $ids = RegisteredID::where('visitor_type', $visitorTypeId)
+            ->where('id_number', 'LIKE', "%{$query}%")
+            ->select('id_number')
+            ->distinct()
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'results' => $ids->map(fn($v) => ['id' => $v->id_number, 'text' => $v->id_number])
+        ]);
+    }
+
     public function save(Request $request)
     {
         try {
@@ -284,6 +306,10 @@ class VisitorController extends Controller
                 'visitor_type'      => 'required|exists:visitor_types,id',
                 'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
                 'image_path'        => ['required'],
+                'id_type'          => 'required|exists:valid_id_types,id',
+                'id_type_number'   => ['required'],
+                'purpose_of_visit' => ['required'],
+                'contact_person' => ['required'],
 
                 'id_number'    => [
                     'required',
@@ -307,7 +333,11 @@ class VisitorController extends Controller
 
             ], [
                 'first_name.required'        => 'First Name is required',
-                'last_name.required'         => 'Last Name is required',
+                'last_name.required'         => 'Last Name is required',    
+                'id_type_number.required'    => 'ID Number is required',
+                'id_type.required'           => 'Identification Card is required',
+                'purpose_of_visit.required'  => 'Purpose of Visit is required',
+                'contact_person.required'    => 'Contact Person is required',
                 'visitor_type.required'      => 'Visitor Type is required',
                 'contact_number.required'    => 'Contact Number is required',
                 'contact_number.max'         => 'Contact Number must not exceed 11 digits',
@@ -317,7 +347,7 @@ class VisitorController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Error hierarchy
-            $priority = ['id_number', 'visitor_type', 'first_name', 'last_name', 'contact_number', 'image_path', 'middle_name'];
+            $priority = ['id_number', 'visitor_type', 'first_name', 'last_name', 'contact_number', 'image_path', 'id_type', 'id_type_number', 'purpose_of_visit', 'contact_person', 'middle_name'];
             $errors = $e->errors();
             $firstError = null;
             foreach ($priority as $field) {
@@ -389,8 +419,13 @@ class VisitorController extends Controller
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $userLocations[0] ?? null;
+            $visitor->location     = $userLocations[0] ?? '?';
             $visitor->address      = $address;
+            $visitor->id_type      = $request->id_type;
+            $visitor->valid_id       = $request->id_type_number;
+            $visitor->purpose      = $request->purpose_of_visit;
+            $visitor->contact_person = $request->contact_person;
+            $visitor->created_at   = now();
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();

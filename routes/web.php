@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\RegisterIDController;
 use App\Http\Controllers\VisitorTypeController;
+use App\Models\ValidIdType;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
 use App\Models\Visitor;
@@ -27,10 +28,12 @@ Route::middleware(['auth', 'single.session'])->group(function () {
         ->group(function () {
             Route::get('/',                 'index')->name('visitorslog');
             Route::get('/form',             'form')->name('visitorslog.form');
+            Route::get('/id-suggestions',  'idSuggestions')->name('visitorslog.idSuggestions');
             Route::get('/view/{id}/{type}', function ($id, $type) {
                 $visitor = Visitor::where('id', $id)->latest('id')->firstOrFail();
                 $visitorTypes = VisitorType::whereNull('deleted_at')->orderBy('id', 'asc')->get();
-                return view('pages.visitorslog.view', compact('visitor', 'visitorTypes', 'type'));
+                $validIdTypes = ValidIdType::whereNull('deleted_at')->orderBy('id', 'asc')->get();
+                return view('pages.visitorslog.view', compact('visitor', 'visitorTypes', 'type', 'validIdTypes'));
             })->name('view.page');
             Route::post('/list',            'list')->name('visitorslog.list');
             Route::post('/save',            'save')->name('visitorslog.save');

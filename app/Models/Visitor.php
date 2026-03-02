@@ -26,6 +26,10 @@ class Visitor extends Model
         'status',
         'time_in',
         'time_out',
+        'purpose',
+        'contact_person',
+        'valid_id',
+        'id_type',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -36,6 +40,11 @@ class Visitor extends Model
     public function visitorType()
     {
         return $this->belongsTo(VisitorType::class, 'visitor_type');
+    }
+
+    public function validIdType()
+    {
+        return $this->belongsTo(ValidIdType::class, 'id_type');
     }
 
     public function getEmpName($empCode)
