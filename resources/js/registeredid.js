@@ -27,13 +27,14 @@ import datahandling from './common/datahandling';
         const self = this;
 
         const tableHeader = [
-            { id: "visitor_type",       label: "Name" },
-            { id: "id_number",       label: "ID Number" },
-            { id: "created_by",       label: "Created By" },
-            { id: "updated_by",      label: "Updated By" },
-            { id: "created_at",   label: "Created Date" },
-            { id: "updated_at",   label: "Updated Date" },
-            { id: "action",         label: "Action" },
+            { id: "visitor_type",  label: "Name"         },
+            { id: "id_number",     label: "ID Number"    },
+            { id: "location",      label: "Location"     },
+            { id: "created_by",    label: "Created By"   },
+            { id: "updated_by",    label: "Updated By"   },
+            { id: "created_at",    label: "Created Date" },
+            { id: "updated_at",    label: "Updated Date" },
+            { id: "action",        label: "Action"       },
         ];
 
         const columns = tableHeader.map(col => ({
@@ -90,19 +91,19 @@ import datahandling from './common/datahandling';
 
     // DataTable Initialization
     async initializeButtons(){
-            // Clear Visitor ID error on input
-            const visitorIdInput = document.getElementById('name');
-            const visitorIdFeedback = document.getElementById('nameFeedback');
-            if (visitorIdInput && visitorIdFeedback) {
-                visitorIdInput.addEventListener('input', function() {
-                    if (visitorIdInput.value.trim()) {
-                        visitorIdInput.classList.remove('is-invalid');
-                        visitorIdFeedback.style.display = '';
-                        visitorIdFeedback.textContent = '';
-                    }
-                });
-            }
-            // Clear Visitor Type error on change
+                        // Clear Visitor ID error on input
+                        const visitorIdInput = document.getElementById('name');
+                        const visitorIdFeedback = document.getElementById('nameFeedback');
+                        if (visitorIdInput && visitorIdFeedback) {
+                            visitorIdInput.addEventListener('input', function() {
+                                if (visitorIdInput.value.match(/^\d+$/)) {
+                                    visitorIdInput.classList.remove('is-invalid');
+                                    visitorIdFeedback.style.display = '';
+                                    visitorIdFeedback.textContent = '';
+                                }
+                            });
+                        }
+                // Clear Visitor Type error on change
                 const visitorTypeInput = document.getElementById('visitortype');
                 const visitorTypeFeedback = document.getElementById('visitorTypeFeedback');
                 if (visitorTypeInput && visitorTypeFeedback) {
@@ -111,6 +112,18 @@ import datahandling from './common/datahandling';
                             visitorTypeInput.classList.remove('is-invalid');
                             visitorTypeFeedback.style.display = '';
                             visitorTypeFeedback.textContent = '';
+                        }
+                    });
+                }
+            // Clear ID Location error on change
+                const locationInputField = document.getElementById('visitorIDLocation');
+                const locationFeedbackField = document.getElementById('visitorIDLocationFeedback');
+                if (locationInputField && locationFeedbackField) {
+                    locationInputField.addEventListener('change', function() {
+                        if (locationInputField.value) {
+                            locationInputField.classList.remove('is-invalid');
+                            locationFeedbackField.style.display = '';
+                            locationFeedbackField.textContent = '';
                         }
                     });
                 }
@@ -133,6 +146,14 @@ import datahandling from './common/datahandling';
             if (visitorTypeFeedback) {
                 visitorTypeFeedback.style.display = '';
                 visitorTypeFeedback.textContent = '';
+            }
+            // Reset ID Location error state
+            const locationInput = document.getElementById('visitorIDLocation');    
+            const locationFeedback = document.getElementById('visitorIDLocationFeedback');
+            if (locationInput) locationInput.classList.remove('is-invalid');
+            if (locationFeedback) {
+                locationFeedback.style.display = '';
+                locationFeedback.textContent = '';
             }
             container.showModal(self.modal)
         })
@@ -171,7 +192,19 @@ import datahandling from './common/datahandling';
                 visitorTypeFeedback.style.display = '';
                 visitorTypeFeedback.textContent = '';
             }
-
+            // Bootstrap validation for ID Location
+            const locationInput = document.getElementById('visitorIDLocation');    
+            const locationFeedback = document.getElementById('visitorIDLocationFeedback');
+            if (!locationInput.value) {
+                locationInput.classList.add('is-invalid');
+                locationFeedback.style.display = 'block';
+                locationFeedback.textContent = 'ID Location Is Required';
+                hasError = true;
+            } else {
+                locationInput.classList.remove('is-invalid');
+                locationFeedback.style.display = '';
+                locationFeedback.textContent = '';
+            }
             if (hasError) return;
 
             await Triggers.removeErrorOnInput(formid);
@@ -193,6 +226,7 @@ import datahandling from './common/datahandling';
         $("#record_id").val(record_id);
         $("#name").val(response.data.id_number);
         $("#visitortype").val(response.data.visitor_type);
+        $("#visitorIDLocation").val(response.data.location);
 
         // Reset Visitor ID error state
         const visitorIdInput = document.getElementById('name');
@@ -209,6 +243,14 @@ import datahandling from './common/datahandling';
         if (visitorTypeFeedback) {
             visitorTypeFeedback.style.display = '';
             visitorTypeFeedback.textContent = '';
+        }
+        // Reset ID Location error state
+        const locationInput = document.getElementById('visitorIDLocation');    
+        const locationFeedback = document.getElementById('visitorIDLocationFeedback');
+        if (locationInput) locationInput.classList.remove('is-invalid');
+        if (locationFeedback) {
+            locationFeedback.style.display = '';
+            locationFeedback.textContent = '';
         }
 
         container.showModal(self.modal);
@@ -234,6 +276,7 @@ import datahandling from './common/datahandling';
             input.value = input.value.replace(/\D/g, "");
             });
     }
+    
 
 }
     

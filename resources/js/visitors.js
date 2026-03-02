@@ -146,6 +146,13 @@ $(document).ready(function () {
 
     // });
 
+    // Previous logic to initialize visitor ID dropdown was removed.  
+    // (function `initializeVisitorIdDropdown` no longer exists)
+    // Ensure id suggestions are handled in the later ready handler instead.
+
+    // If you need to re-enable similar behaviour, implement
+    // a named function and call it here, or use fetchIDSuggestions directly.
+
     $('#captureBtn').on('click', function () {
 
         const video = document.getElementById('webcam');
@@ -254,7 +261,7 @@ $(document).ready(function () {
             reader.onload = function (event) {
                 $('#photoPreview').css('display', 'block');
                 $('#photoPreview').attr('src', event.target.result);
-
+                $('#image_path').val(event.target.result);
             };
             reader.onerror = function (error) {
                 console.error('FileReader error:', error);
@@ -512,4 +519,75 @@ $(document).ready(function () {
     const visitorsLog = new VisitorsLogTable();
     visitorsLog.onLoadPage();
 
+});
+
+$(document).ready(function() {
+    function fetchIDSuggestions() {
+        const visitorType = $('#visitor_type').val();
+        const search = $('#id_number').val(); // can be empty
+
+        const suggestionBox = $('#id_suggestions');
+        suggestionBox.empty().hide();
+
+        if (!visitorType) return; // require visitor type
+
+        $.ajax({
+            url: '/visitorslog/id-suggestions',
+            type: 'GET',
+            data: { visitor_type: visitorType, q: search },
+            success: function(response) {
+                const results = response.results || [];
+                if (results.length > 0) {
+                    results.forEach(item => {
+                        suggestionBox.append(
+                            `<a href="#" class="list-group-item list-group-item-action suggestion-item">${item.text}</a>`
+                        );
+                    });
+                    suggestionBox.show();
+                } else if (response.message) {
+                    suggestionBox.append(
+                        `<a href="#" class="list-group-item list-group-item-action disabled no-results" aria-disabled="true" tabindex="-1">${response.message}</a>`
+                    );
+                    suggestionBox.show();
+                }
+            }
+        });
+    }
+
+    // Trigger fetch on input and focus
+    $('#id_number').on('input focus', fetchIDSuggestions);
+
+    // Hide suggestions when pressing escape or losing focus/clicking elsewhere
+    $('#id_number').on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('#id_suggestions').hide();
+        }
+    });
+
+    // hide suggestions when the input loses focus (allow click on suggestion first)
+    $('#id_number').on('blur', function() {
+        setTimeout(function() {
+            $('#id_suggestions').hide();
+        }, 150);
+    });
+
+    // click anywhere outside of the input/suggestion box should close it
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#id_number, #id_suggestions').length) {
+            $('#id_suggestions').hide();
+        }
+    });
+
+    // Click to select suggestion
+    $(document).on('click', '.suggestion-item', function(e) {
+        e.preventDefault();
+        $('#id_number').val($(this).text());
+        $('#id_suggestions').hide();
+    });
+
+    // Hide suggestions when visitor type changes
+    $('#visitor_type').on('change', function() {
+        $('#id_number').val('');
+        $('#id_suggestions').hide();
+    });
 });

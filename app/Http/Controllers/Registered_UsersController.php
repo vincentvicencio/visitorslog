@@ -31,8 +31,11 @@ class Registered_UsersController extends Controller
     // 1. Validation - different rules based on role
     $validationRules = [
         'user_type' => 'required',
-        'locations' => 'required',
     ];
+
+    if (!$isGuard) {
+        $validationRules['locations'] = 'required';
+    }
     
     // Check if editing (record_id present)
     $recordId = $request->input('record_id');
@@ -105,7 +108,7 @@ class Registered_UsersController extends Controller
         return $value !== null && $value !== '';
     }));
 
-    if (count($locations) === 0) {
+    if (!$isGuard && count($locations) === 0) {
         return response()->json([
             'status' => 1,
             'title' => 'Select Location',
@@ -148,7 +151,7 @@ class Registered_UsersController extends Controller
                 'user_name'  => $username,
                 'first_name' => $firstName, 
                 'last_name'  => $lastName,
-                'location'   => $locations,
+                'location'   => null,
                 'user_type'  => $request->user_type,
                 'updated_by' => Auth::user()->id,
             ];
@@ -160,13 +163,33 @@ class Registered_UsersController extends Controller
             
             if ($isEditing) {
                 $user = RegisteredUser::findOrFail($recordId);
+                $oldData = $user->getOriginal();
+
                 $user->update($guardData);
                 $message = 'Guard updated successfully!';
+
+                log_audit(
+                    'registered_users',
+                    'updated',
+                    $user->id,
+                    $oldData,
+                    $user->getAttributes(),
+                    'update'
+                );
             } else {
                 $guardData['password'] = Hash::make($request->password);
                 $guardData['created_by'] = Auth::user()->id;
-                RegisteredUser::create($guardData);
+                $user = RegisteredUser::create($guardData);
                 $message = 'Guard registered successfully!';
+
+                log_audit(
+                    'registered_users',
+                    'created',
+                    $user->id,
+                    null,
+                    $user->toArray(),
+                    'save'
+                );
             }
             
             return response()->json([
@@ -213,7 +236,7 @@ class Registered_UsersController extends Controller
             'user_name'  => $empCode,
             'first_name' => $firstName, 
             'last_name'  => $lastName,
-            'location'   => $locations,
+            'location'   => $locations[0] ?? null,
             'user_type'  => $request->user_type,
             'updated_by' => Auth::id(),
         ];
@@ -225,13 +248,33 @@ class Registered_UsersController extends Controller
         
         if ($isEditing) {
             $user = RegisteredUser::findOrFail($recordId);
+            $oldData = $user->getOriginal();
+
             $user->update($userData);
             $message = 'User updated successfully!';
+
+            log_audit(
+                'registered_users',
+                'updated',
+                $user->id,
+                $oldData,
+                $user->getAttributes(),
+                'update'
+            );
         } else {
             $userData['password'] = Hash::make($request->password);
             $userData['created_by'] = Auth::id();
-            RegisteredUser::create($userData);
+            $user = RegisteredUser::create($userData);
             $message = 'User registered successfully!';
+
+            log_audit(
+                'registered_users',
+                'created',
+                $user->id,
+                null,
+                $user->toArray(),
+                'save'
+            );
         }
 
         return response()->json([
@@ -252,12 +295,22 @@ class Registered_UsersController extends Controller
 {
     try {
         $user = RegisteredUser::findOrFail($id);
+        $oldData = $user->toArray();
 
         // Instead of $user->delete(), we update the column
         $user->update([
             'deleted_at' => NOW(),
             'deleted_by' => Auth::user()->id // Optional: track who deleted it
         ]);
+
+        log_audit(
+            'registered_users',
+            'deleted',
+            $user->id,
+            $oldData,
+            null,
+            'delete'
+        );
 
         return response()->json([
             'status'  => 'success', 
@@ -388,8 +441,12 @@ public function edit(Request $request, $id)
             $updateData['user_name'] = $request->emp_code;
         }
 
-        // Handle locations if provided
-        if ($request->has('locations')) {
+        if ($isGuard) {
+            $updateData['location'] = null;
+        }
+
+        // Handle locations for non-guard roles
+        if (!$isGuard && $request->has('locations')) {
             $locationsInput = $request->input('locations');
             
             // Handle locations - can be a single value or JSON string of array
@@ -422,7 +479,7 @@ public function edit(Request $request, $id)
                 ], 422);
             }
             
-            $updateData['location'] = $locations;
+            $updateData['location'] = $locations[0] ?? null;
         }
 
         if ($request->filled('password')) {
@@ -571,9 +628,21 @@ public function list(Request $request){
 
     public function delete(Request $request){
         $record  = RegisteredUser::find($request->id);
-        $details = $record->emp_code;
-        $record->update(['deleted_by' => Auth::user()->id]);
-        $record->delete();
+        if ($record) {
+            $oldData = $record->toArray();
+            $details = $record->emp_code;
+            $record->update(['deleted_by' => Auth::user()->id]);
+            $record->delete();
+
+            log_audit(
+                'registered_users',
+                'deleted',
+                $record->id,
+                $oldData,
+                null,
+                'delete'
+            );
+        }
 
         $message    = 'Registered User Successfully Deleted';
             return response()->json([
@@ -586,9 +655,18 @@ public function list(Request $request){
     {
         try {
             $role = RegisteredUser::findOrFail($id);
+            $oldData = $role->toArray();
             $role->update(['deleted_by' => Auth::user()->id]);
             $role->delete();
-            
+
+            log_audit(
+                'registered_users',
+                'deleted',
+                $role->id,
+                $oldData,
+                null,
+                'delete'
+            );
         } catch (\Exception $e) {
             return response()->json(['message' => 'An error occurred while deleting the Registered User.'], 500);
         }

@@ -14,6 +14,7 @@ class RegisteredID extends Model
     protected $fillable = [
         'visitor_type',
         'id_number',
+        'location',
         'created_by',
         'updated_by',
         'deleted_by',

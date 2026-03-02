@@ -2,19 +2,115 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ValidIdType;
 use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\VisitorType;
 use App\Models\RegisteredID;
+use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Models\AuditLogs;
 
 class VisitorController extends Controller
 {
+
+    private function logAudit($recordId, $action, $oldData = null, $newData = null)
+    {
+        AuditLogs::create([
+            'emp_number'   => Auth::user()->emp_number ?? Auth::id(),
+            'record_id'    => $recordId,
+            'module'       => 'Visitor',
+            'sub_module'   => 'Visitor Log',
+            'action'       => $action,
+            'previous_data'=> $oldData,
+            'new_data'     => $newData,
+            'ip_address'   => request()->ip(),
+        ]);
+    }
+    private function guardLocationRequired()
+    {
+        $user = Auth::user();
+
+        return $user && (int) $user->user_type === 3 && !session()->has('guard_location_id');
+    }
+
+    private function resolveUserLocationFilters($user): array
+    {
+        if ((int) $user->user_type === 3) {
+            $filters = [];
+
+            if (session()->has('guard_location_id')) {
+                $filters[] = (string) session('guard_location_id');
+            }
+
+            if (session()->has('guard_location_name')) {
+                $filters[] = (string) session('guard_location_name');
+            }
+
+            return array_values(array_unique(array_filter($filters, fn ($value) => $value !== '')));
+        }
+
+        $allLocations = collect(session('all_location', []));
+        $rawLocation = $user->location;
+        if (is_array($rawLocation)) {
+            $userLocations = $rawLocation;
+        } elseif (is_string($rawLocation)) {
+            $decoded = json_decode($rawLocation, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $userLocations = $decoded;
+            } elseif ($rawLocation !== '') {
+                $userLocations = [$rawLocation];
+            } else {
+                $userLocations = [];
+            }
+        } elseif (is_numeric($rawLocation)) {
+            $userLocations = [(string) $rawLocation];
+        } else {
+            $userLocations = [];
+        }
+        $locationFilters = [];
+
+        foreach ($userLocations as $locationValue) {
+            if ($locationValue === null || $locationValue === '') {
+                continue;
+            }
+
+            $locationFilters[] = (string) $locationValue;
+            $match = $allLocations->firstWhere('id', $locationValue);
+            if ($match && !empty($match['name'])) {
+                $locationFilters[] = (string) $match['name'];
+            }
+        }
+
+        return array_values(array_unique(array_filter($locationFilters, fn ($value) => !empty($value))));
+    }
+
+    private function resolveLocationForSave($user): ?string
+    {
+        if ((int) $user->user_type === 3) {
+            if (session()->has('guard_location_name')) {
+                return (string) session('guard_location_name');
+            }
+
+            if (session()->has('guard_location_id')) {
+                return (string) session('guard_location_id');
+            }
+        }
+
+        $filters = $this->resolveUserLocationFilters($user);
+
+        return $filters[0] ?? null;
+    }
+
     public function index()
     {
+        if ($this->guardLocationRequired()) {
+            return redirect()->route('guard.location.show');
+        }
+
         $visitors = Visitor::where(function ($query) {
             $query->where('status', 0)->orWhereNull('status');
             })
@@ -32,11 +128,15 @@ class VisitorController extends Controller
         //     session()->forget('from_form');
         //     return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
         // }else{
-            return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
+            return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes'));
         // }
     }
     public function form()
     {
+        if ($this->guardLocationRequired()) {
+            return redirect()->route('guard.location.show');
+        }
+
         // session(['from_form' => true]);
         $visitorTypes = VisitorType::where('deleted_at', null)
                 -> orderBy('id', 'asc')
@@ -44,10 +144,22 @@ class VisitorController extends Controller
         $visitors     = Visitor::where('status', 0)
                 -> orderBy('id', 'asc')
                 -> get();
-        return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
+        $validIdTypes = ValidIdType::where('deleted_at', null)
+                -> orderBy('id', 'desc')
+                -> get();
+
+        return view('pages.visitorslog.form', compact('visitorTypes', "visitors", "validIdTypes"));
     }
 
     public function list(Request $request){
+        if ($this->guardLocationRequired()) {
+            return response()->json([
+                'status' => 1,
+                'message' => 'Please select guard location first.',
+                'redirect' => route('guard.location.show'),
+            ], 422);
+        }
+
         $keywords = strtolower($request->search);
         $limit    = $request->input('length');
 
@@ -57,10 +169,12 @@ class VisitorController extends Controller
                 ->where(function ($query) {
 
                     $user = Auth::user();
-                    $userLocations = array_map('intval', (array) $user->location);
+                    if ((int) $user->user_type !== 1) {
+                        $userLocations = $this->resolveUserLocationFilters($user);
 
-                    // First filter by location
-                    $query->whereIn('location', $userLocations);
+                        // First filter by location (non-admin only)
+                        $query->whereIn('location', $userLocations);
+                    }
 
                     // Then filter active / not timed out
                     $query->where(function ($q) {
@@ -68,10 +182,10 @@ class VisitorController extends Controller
                         ->where('time_out', null);
                     });
 
-                    // Then restrict to creator if NOT admin
-                    if (Auth::user()->user_type != 1) {
-                        $query->where('created_by', Auth::user()->id);
-                    }
+                    // // Then restrict to creator if NOT admin
+                    // if (Auth::user()->user_type != 1) {
+                    //     $query->where('created_by', Auth::user()->id);
+                    // }
                 })
 
                 -> when($keywords, function ($query) use ($keywords) {
@@ -106,17 +220,26 @@ class VisitorController extends Controller
  
         $newData = [];
         $i       = 0;
+        $companyLocations = collect(session('all_location'))->keyBy(function ($item) {
+            return (string) data_get($item, 'id');
+        });
+        $guardLocations = Location::query()->get(['id', 'name'])->keyBy(function ($item) {
+            return (string) $item->id;
+        });
       
         foreach ($data as $d) { 
             $locationLabel = '';
+            $locationLabel = (string) $d->location;
 
-            $location = collect(session('all_location'));
+            if (is_numeric($locationLabel)) {
+                $companyLocation = $companyLocations->get($locationLabel);
+                $guardLocation = $guardLocations->get($locationLabel);
 
-            foreach ($location as $record) {
-                if($d->location == $record['id']){
-                    $locationLabel = $record['name'];
+                if ($companyLocation) {
+                    $locationLabel = data_get($companyLocation, 'name', '');
+                } elseif ($guardLocation) {
+                    $locationLabel = $guardLocation->name;
                 }
-
             }
 
             $status = '';
@@ -220,11 +343,23 @@ class VisitorController extends Controller
             ], 400);
         }
 
+        $oldData = $visitor->getOriginal();
+
         $visitor->update([
             'time_out'   => Carbon::now(),
             'status'     => 1,
             'updated_by' => Auth::user()->id,
         ]);
+
+        // log timeout event (action set to 'timeout')
+        log_audit(
+            'visitors',
+            'timed out',
+            $visitor->id,
+            $oldData,
+            $visitor->getAttributes(),
+            'timeout'
+        );
 
         return response()->json([
             'status'     => 0,
@@ -247,6 +382,17 @@ class VisitorController extends Controller
                 'message' => 'Visitor not found or inactive'
             ], 404);
         }
+
+        // log view action before redirecting
+        log_audit(
+            'visitors',
+            'viewed',
+            $visitor->id,
+            null,
+            null,
+            'view'
+        );
+
         return response()->json([
             'redirect'   => route('view.page', [
                 'id'     => $visitor->id,
@@ -274,8 +420,52 @@ class VisitorController extends Controller
         ]);
     }
 
+    public function idSuggestions(Request $request)
+    {
+        $visitorTypeId = $request->visitor_type;
+        $query = $request->q;
+        $usedIdsQuery = function ($q) use ($visitorTypeId) {
+            $q->select('visitor_id')
+              ->from('visitors')
+              ->where('visitor_type', $visitorTypeId)
+              ->where(function ($sub) {
+                  $sub->where('status', 0)
+                      ->orWhereNull('status');
+              });
+        };
+
+        $ids = RegisteredID::where('visitor_type', $visitorTypeId)
+            ->where('id_number', 'LIKE', "%{$query}%")
+            ->whereNotIn('id_number', $usedIdsQuery)
+            ->select('id_number')
+            ->distinct()
+            ->limit(10)
+            ->get();
+
+        $results = $ids->map(fn($v) => ['id' => $v->id_number, 'text' => $v->id_number])->values();
+
+        if ($results->isEmpty()) {
+            return response()->json([
+                'results' => [],
+                'message' => 'All IDs are currently used'
+            ]);
+        }
+
+        return response()->json([
+            'results' => $results
+        ]);
+    }
+
     public function save(Request $request)
     {
+        if ($this->guardLocationRequired()) {
+            return response()->json([
+                'status' => 1,
+                'message' => 'Please select guard location first.',
+                'redirect' => route('guard.location.show'),
+            ], 422);
+        }
+
         try {
             $request->validate([
                 'first_name'        => ['required', 'string', 'max:40'],
@@ -284,6 +474,10 @@ class VisitorController extends Controller
                 'visitor_type'      => 'required|exists:visitor_types,id',
                 'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
                 'image_path'        => ['required'],
+                'id_type'          => 'required|exists:idtypes,id',
+                'id_type_number'   => ['required'],
+                'purpose_of_visit' => ['required'],
+                'contact_person' => ['required'],
 
                 'id_number'    => [
                     'required',
@@ -307,7 +501,11 @@ class VisitorController extends Controller
 
             ], [
                 'first_name.required'        => 'First Name is required',
-                'last_name.required'         => 'Last Name is required',
+                'last_name.required'         => 'Last Name is required',    
+                'id_type_number.required'    => 'ID Number is required',
+                'id_type.required'           => 'Identification Card is required',
+                'purpose_of_visit.required'  => 'Purpose of Visit is required',
+                'contact_person.required'    => 'Contact Person is required',
                 'visitor_type.required'      => 'Visitor Type is required',
                 'contact_number.required'    => 'Contact Number is required',
                 'contact_number.max'         => 'Contact Number must not exceed 11 digits',
@@ -317,7 +515,7 @@ class VisitorController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Error hierarchy
-            $priority = ['id_number', 'visitor_type', 'first_name', 'last_name', 'contact_number', 'image_path', 'middle_name'];
+            $priority = ['id_number', 'visitor_type', 'first_name', 'last_name', 'contact_number', 'image_path', 'id_type', 'id_type_number', 'purpose_of_visit', 'contact_person', 'middle_name'];
             $errors = $e->errors();
             $firstError = null;
             foreach ($priority as $field) {
@@ -367,12 +565,16 @@ class VisitorController extends Controller
             $lastName = ucwords(strtolower($request->last_name));
             $address = ucwords(strtolower($request->address));
             
+            $contactPerson = ucwords(strtolower($request->contact_person));
+            $purposeOfVisit = ucwords(strtolower($request->purpose_of_visit));
+            
 
             $middleInitial = collect(preg_split('/\s+/', trim($middleName)))
                 ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
                 ->implode('');
 
-            $userLocations = (array) Auth::user()->location;
+            $user = Auth::user();
+            $locationForSave = $this->resolveLocationForSave($user);
 
             $visitor = new Visitor();
             // clint - remove dot when there is no middle name
@@ -389,14 +591,28 @@ class VisitorController extends Controller
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $userLocations[0] ?? null;
+            $visitor->location     = $locationForSave ?? '?';
             $visitor->address      = $address;
+            $visitor->id_type      = $request->id_type;
+            $visitor->valid_id     = $request->id_type_number;
+            $visitor->purpose      = $purposeOfVisit;
+            $visitor->contact_person = $contactPerson;
+            $visitor->created_at   = now();
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
             $visitor->status       = 0;
             $visitor->save();
 
+            // audit log for new visitor
+            log_audit(
+                'visitors',
+                'created',
+                $visitor->id,
+                null,
+                $visitor->toArray(),
+                'save'
+            );
 
             return response()->json([
                 'status' => 0,
@@ -404,6 +620,8 @@ class VisitorController extends Controller
                 'message' => 'Visitor successfully added'
             ], 200);
             
+            
+
         } catch (\Exception $e) {
             return response()->json([
                     'status' => 1,

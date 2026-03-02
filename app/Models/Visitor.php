@@ -26,6 +26,10 @@ class Visitor extends Model
         'status',
         'time_in',
         'time_out',
+        'purpose',
+        'contact_person',
+        'valid_id',
+        'id_type',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -36,6 +40,11 @@ class Visitor extends Model
     public function visitorType()
     {
         return $this->belongsTo(VisitorType::class, 'visitor_type');
+    }
+
+    public function validIdType()
+    {
+        return $this->belongsTo(ValidIdType::class, 'id_type');
     }
 
     public function getEmpName($empCode)
@@ -69,8 +78,19 @@ class Visitor extends Model
     }
     public function getLocationNameAttribute()
     {
-        $locations = collect(session('all_location'));
-        $match = $locations->firstWhere('id', $this->location);
-        return $match ? $match['name'] : 'N/A';
+        $locationValue = (string) $this->location;
+
+        if ($locationValue === '') {
+            return 'N/A';
+        }
+
+        if (!is_numeric($locationValue)) {
+            return $locationValue;
+        }
+
+        $locations = collect(session('all_location', []));
+        $match = $locations->firstWhere('id', $locationValue);
+
+        return $match ? $match['name'] : $locationValue;
     }
 }

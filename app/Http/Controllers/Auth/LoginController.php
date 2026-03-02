@@ -96,7 +96,7 @@ class LoginController extends Controller
             return $attempt;
         }
 
-    public function authenticated(Request $request, $sessionKey)
+    public function authenticated(Request $request, $user)
     {
 
         $registeredUser = RegisteredUser::where('user_name', $request->emp_code)->first();
@@ -106,6 +106,12 @@ class LoginController extends Controller
 
         $this->fetch_emp_data('all_emp');
         $this->fetch_api_data('all_location', 'location');
+
+        if ((int) $registeredUser->user_type === 3 && !session()->has('guard_location_id')) {
+            return redirect()->route('guard.location.show');
+        }
+
+        return redirect()->route('visitorslog');
 
     }
     

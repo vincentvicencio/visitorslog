@@ -18,9 +18,9 @@
                 </div>
 
                 <div id="reg_fields_container" style="display: none;">
-                    <div class="mb-3">
+                    <div class="mb-3" id="location_container">
                         <label class="form-label">Select Location</label>
-                        <select id="reg_location" name="locations[]" class="form-control" required autocomplete="off" aria-describedby="locationFeedback">
+                        <select id="reg_location" name="locations[]" class="form-control" autocomplete="off" aria-describedby="locationFeedback">
                             <option value="">Select Location</option>
                         </select>
                         <div class="invalid-feedback" id="locationFeedback">Location is required</div>

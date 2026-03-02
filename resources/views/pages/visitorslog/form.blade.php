@@ -24,10 +24,9 @@
                     @csrf 
                     <div class="form">
                         <div class="details">
-                            {{-- ID Number --}}
-                            <div class="input-holder floating">
-                                <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " required autocomplete="off">
-                                <label for="id_number">ID Number</label>
+
+                            <div class="personaldetails w-100">
+                                Visitor Information
                             </div>
                             {{-- Visitor Type --}}
                             <div class="input-holder floating">
@@ -36,11 +35,37 @@
                                     @foreach ($visitorTypes as $type)
                                         <option value="{{ $type->id }}">{{ $type->name }}</option>
                                     @endforeach
+                                    
                                 </select>
                                 <label for="visitor_type">Visitor Type</label>
                             </div>
-                            {{-- Visitor Type --}}
-                            </select><br>
+                            {{-- Visitor ID Number --}}
+                            <div class="input-holder floating">
+                                <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " required autocomplete="off">
+                                <label for="id_number">Visitor ID Number</label>
+                                <div id="id_suggestions" class="list-group position-absolute w-100" style="z-index:999; display:none;"></div>
+                            </div>
+
+                            {{-- Contact person --}}
+                            <br>
+                            <div class="input-holder floating">
+                                <input type="text" name="contact_person" id="contact_person" class="form-control" placeholder=" " required autocomplete="off">
+                                <label for="contact_person">Contact Person</label>
+                            </div>
+                            {{-- Purpose of visit --}}
+                            <div class="input-holder floating">
+                                <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " required autocomplete="off">
+                                <label for="purpose_of_visit">Purpose of Visit</label>
+                            </div>
+
+                            <br>
+                            <div class="personaldetails w-100 mt-3">
+                                personal details
+                            </div>
+
+
+                            {{-- First Name --}}
+                            <br>
                             <div class="input-holder floating">
                                 <input type="text" name="first_name" id="first_name" class="form-control" placeholder=" " required autocomplete="off">
                                 <label for="first_name">first name</label>
@@ -60,6 +85,25 @@
                                 <input type="text" name="contact_number" id="contact_number" class="form-control" placeholder=" " required autocomplete="off"> 
                                 <label for="contact_number">contact number</label>
                             </div>
+
+
+                            {{-- identification card --}}
+                            <div class="input-holder floating">
+                                <select name="id_type" id="id_type" class="form-control" required autocomplete="off">
+                                    <option value="" disabled selected>Identification Type</option> 
+                                    @foreach ($validIdTypes as $type)
+                                        <option value="{{ $type->id }}">{{ $type->id_type_name }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="id_type">Identification Card</label>
+                            </div>
+                            {{-- ID Number --}}
+                            <div class="input-holder floating">
+                                <input type="text" name="id_type_number" id="id_type_number" class="form-control" placeholder=" " required autocomplete="off">
+                                <label for="id_type_number">ID Number</label>
+                            </div>
+
+
                             {{-- Address --}}
                             <div class="input-holder floating w-100">
                                 <textarea name="address" id="address" class="form-control" placeholder=" " rows="3" required autocomplete="off"></textarea>

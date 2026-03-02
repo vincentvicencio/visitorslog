@@ -11,14 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('registered_users', function (Blueprint $table) {
+        Schema::create('idtypes', function (Blueprint $table) {
             $table->id();
-            $table->string('user_name');
-            $table->string('first_name');
-            $table->string('last_name');
-            $table->string('password')->nullable();
-            $table->unsignedBigInteger('user_type');
-            $table->string('location')->nullable();
+            $table->string('id_type_name');
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();
@@ -33,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('registered_users');
+        Schema::dropIfExists('idtypes');
     }
 };

@@ -20,9 +20,13 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->integer('visitor_type')->nullable();
             $table->string('visitor_id')->nullable();
-            $table->integer('location')->nullable();
+            $table->string('location')->nullable();
             $table->string('address')->nullable();
             $table->string('image_path')->nullable();
+            $table->string('purpose')->nullable();
+            $table->string('contact_person')->nullable();
+            $table->string('valid_id')->nullable();
+            $table->integer('id_type')->nullable();
             $table->timestamp('time_in')->nullable();
             $table->timestamp('time_out')->nullable();
             $table->tinyInteger('status')->nullable();

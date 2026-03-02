@@ -32,6 +32,11 @@
                 Visitor Log Sheets
             </a>
             @if(Auth::user()->user_type == 1)
+                <a href="{{ url('IDtype') }}"
+                class="sidebar-menu-button {{ Request::is('IDtype') ? 'selected' : '' }}">
+                    <i class="bi bi-credit-card-2-front fs-6 p-2"></i>
+                    ID type
+                </a>
                 <a href="{{ url('userTypes') }}"
                 class="sidebar-menu-button {{ Request::is('userTypes') ? 'selected' : '' }}">
                     <i class="bi bi-people-fill fs-6 p-2"></i>
@@ -60,6 +65,11 @@
                 class="sidebar-menu-button {{ Request::is('reports') ? 'selected' : '' }}">
                     <i class="bi bi-journals fs-6 p-2"></i>
                     Reports
+                </a>
+                <a href="{{ url('about') }}"
+                class="sidebar-menu-button {{ Request::is('about') ? 'selected' : '' }}">
+                    <i class="bi bi-info-circle fs-6 p-2"></i>
+                    About
                 </a>
             @endif
         </div>
