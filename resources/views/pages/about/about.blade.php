@@ -12,17 +12,15 @@
 
 
     <div class="about">
-        <div class="school">
-            <div class="text">
-                <div class="main">Development Team</div>
+        <div class="school position-relative">
+            <div class="text d-flex h-100 align-items-start justify-content-center flex-column">
+                <div class="fw-bold fs-5">Development Team</div>
                 <div class="sub">This page is dedicated to the developers who built the Visitor Log Sheet</div>
             </div>
-            <div class="icon"><img src="images/bsu.png" alt=""></div>
         </div>
         <div class="header">Our Developers</div>
         <div class="profiles">
             <div class="profile-holder">
-                <div class="image"><img src="images/compass.png" alt=""></div>
                 <div class="details">
                     <div class="name">Ricardo II M. Diño</div>
                     <div class="subdetail">Lead Developer</div>
@@ -30,7 +28,6 @@
                 </div>
             </div>
             <div class="profile-holder">
-                <div class="image"><img src="images/compass.png" alt=""></div>
                 <div class="details">
                     <div class="name">Ashley Clint B. Antonio</div>
                     <div class="subdetail">Frontend Developer</div>
@@ -38,7 +35,6 @@
                 </div>
             </div>
             <div class="profile-holder">
-                <div class="image"><img src="images/compass.png" alt=""></div>
                 <div class="details">
                     <div class="name">Carmela S. Moya</div>
                     <div class="subdetail">QA / Support Developer</div>
@@ -46,7 +42,6 @@
                 </div>
             </div>
             <div class="profile-holder">
-                <div class="image"><img src="images/compass.png" alt=""></div>
                 <div class="details">
                     <div class="name">Charle B. Loreto</div>
                     <div class="subdetail">Developer</div>
@@ -59,14 +54,12 @@
         <div class="header">Supervised by</div>
         <div class="profiles">
             <div class="profile-holder">
-                <div class="image"><img src="images/compass.png" alt=""></div>
                 <div class="details">
                     <div class="name">Vincent Joseph Vicencio</div>
                     <div class="subdetail">Supervisor</div>
                 </div>
             </div>
             <div class="profile-holder">
-                <div class="image"><img src="images/compass.png" alt=""></div>
                 <div class="details">
                     <div class="name">Harvey Del Rosario</div>
                     <div class="subdetail">Supervisor</div>

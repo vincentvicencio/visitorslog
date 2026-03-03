@@ -21,7 +21,7 @@ class Users extends Seeder
             'user_name'  => 6746,
             'first_name' => 'Vincent Joseph',
             'last_name'  => 'Vicencio',
-
+            'password' => Hash::make('vice'),
             'user_type'  => 1,
             'location'   => 1,
             'created_by' => 1,
@@ -33,6 +33,7 @@ class Users extends Seeder
             'user_name'  => 8888,
             'first_name' => 'Harvey',
             'last_name'  => 'Del Rosario',
+            'password' => Hash::make('harbi!'),
             'user_type'  => 2,
             'location'   => 2,
             'created_by' => 1,
