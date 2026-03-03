@@ -9,8 +9,6 @@
         </div>
     </div>
 
-
-
     <div class="about">
         <div class="school">
             <div class="text">
@@ -74,8 +72,6 @@
             </div>
             
         </div>
-
-
 
         <div class="header">Project Partner</div>
         <div class="profiles-partner">

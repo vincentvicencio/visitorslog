@@ -99,8 +99,8 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
                 'Time In'      =>     $timeIn,
                 'Time Out'     =>     $timeOut,
                 'Status'       =>     $status,
-                'Created By'   =>     user_name($visitor->created_by) ?? '-',
-                'Updated By'   =>     user_name($visitor->updated_by) ?? '-',
+                'Timed In By'   =>     user_name($visitor->created_by) ?? '-',
+                'Timed Out By'   =>     user_name($visitor->updated_by) ?? '-',
                 'Created At'   =>     $visitor->created_at->format('F j, Y H:i A'),
             ];
         });
@@ -119,8 +119,8 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
             'Time In',
             'Time Out',
             'Status',
-            'Created By',
-            'Updated By',
+            'Timed In By',
+            'Timed Out By',
             'Created At',
         ];
     }
