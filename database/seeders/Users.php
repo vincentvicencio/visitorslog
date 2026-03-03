@@ -21,7 +21,6 @@ class Users extends Seeder
             'user_name'  => 6746,
             'first_name' => 'Vincent Joseph',
             'last_name'  => 'Vicencio',
-
             'user_type'  => 1,
             'location'   => 1,
             'created_by' => 1,

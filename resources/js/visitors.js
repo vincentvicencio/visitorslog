@@ -363,7 +363,7 @@ $(document).ready(function () {
                 { id: "visit", label: "Visit Date" },
                 { id: "time_in", label: "Time In" },
                 { id: "time_out", label: "Time Out" },
-                { id: "creator", label: "Logged by" },
+                { id: "creator", label: "Time In by" },
                 { id: "status", label: "Status" },
                 { id: "action", label: "Action" },
             ];

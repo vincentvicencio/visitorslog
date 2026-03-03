@@ -178,8 +178,8 @@ class ReportClassTable {
             { id: "visit",   label: "Visit Date" },
             { id: "time_in", label: "Time In" },
             { id: "time_out", label: "Time Out" },
-            { id: "logged_by", label: "Logged by" },
-            { id: "updated_by", label: "Updated by" },
+            { id: "logged_by", label: "Time In by" },
+            { id: "updated_by", label: "Timed Out by" },
             { id: "status",   label: "Status" },
             { id: "action",         label: "Action" },
         ];
