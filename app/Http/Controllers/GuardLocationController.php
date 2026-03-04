@@ -36,7 +36,7 @@ class GuardLocationController extends Controller
         $location = Location::findOrFail($validated['location_id']);
 
         session([
-            'guard_location_id' => (int) $location->id,
+            'guard_location_id' => (int) $location->location_id,
             'guard_location_name' => $location->name,
         ]);
 
