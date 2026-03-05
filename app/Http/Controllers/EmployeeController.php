@@ -87,11 +87,6 @@ class EmployeeController extends Controller
         return array_values(array_unique(array_filter($locationFilters, fn ($value) => !empty($value))));
     }
 
-    public function form()
-    {
-        return view('pages.visitorslog.form');
-    }
-
     public function list(Request $request){
 
         $keywords = strtolower($request->search);
@@ -219,7 +214,7 @@ class EmployeeController extends Controller
                                         <button 
                                             type="button"
                                             class="dropdown-item text-danger"
-                                            id="timeoutBtn"
+                                            id="empTimeoutBtn"
                                             data-id="'. $d->id .'">
                                             Timeout
                                         </button>
@@ -245,7 +240,7 @@ class EmployeeController extends Controller
             return response()->json([
                 'status'  => 1,
                 'title'   => 'Error',
-                'message' => 'Visitor not found'
+                'message' => 'Employee not found'
             ], 404);
         }
 
@@ -253,7 +248,7 @@ class EmployeeController extends Controller
             return response()->json([
                 'status'  => 1,
                 'title'   => 'Error',
-                'message' => 'Visitor already timed out'
+                'message' => 'Employee already timed out'
             ], 400);
         }
 
@@ -264,10 +259,8 @@ class EmployeeController extends Controller
             'status'     => 1,
             'updated_by' => Auth::user()->id,
         ]);
-
-        // log timeout event (action set to 'timeout')
         log_audit(
-            'visitors',
+            'employee logs',
             'timed out',
             $visitor->id,
             $oldData,
@@ -278,28 +271,28 @@ class EmployeeController extends Controller
         return response()->json([
             'status'     => 0,
             'title'      => 'Success',
-            'message'    => 'Visitor successfully timed out'
+            'message'    => 'Employee successfully timed out'
         ]);
     }
     public function view(Request $request)
     {
         $request->validate([
-            'id' => 'required|exists:visitors,id',
+            'id' => 'required|exists:emp_logs,id',
         ]);
 
-        $visitor = Visitor::where('id', $request->id)
+        $visitor = EmployeeLogs::where('id', $request->id)
             ->latest('id')
             ->first();
 
         if (!$visitor) {
             return response()->json([
-                'message' => 'Visitor not found or inactive'
+                'message' => 'Empyloyee not found or inactive'
             ], 404);
         }
 
         // log view action before redirecting
         log_audit(
-            'visitors',
+            'employee logs',
             'viewed',
             $visitor->id,
             null,
@@ -315,25 +308,6 @@ class EmployeeController extends Controller
         ]);
 
     }
-
-    public function search(Request $request)
-    {
-        $id   = $request->input('id'); // make sure this is numeric
-        $user = Visitor::find($id);
-
-        if ($user) {
-            return response()->json([
-                'success' => true,
-                'data'    => $user
-            ]);
-        }
-
-        return response()->json([
-            'success' => false,
-            'message' => 'User not found.'
-        ]);
-    }
-
     
     public function searchEmployees(Request $request)
     {
@@ -405,7 +379,7 @@ class EmployeeController extends Controller
 
             // Audit log for new employee log
             log_audit(
-                'emp_logs',
+                'employee logs',
                 'created',
                 $employeeLog->id,
                 null,

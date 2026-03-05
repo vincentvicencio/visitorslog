@@ -66,11 +66,11 @@ import Triggers from './common/triggers';
 
             setInterval(() => {
 
-                    if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
-                        $('#visitorsLogTable').DataTable().ajax.reload(null, false);
-                    }
+                if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
+                    $('#visitorsLogTable').DataTable().ajax.reload(null, false);
+                }
 
-                }, 5000);
+            }, 5000);
 
             // =========================================
             // CUSTOM SEARCH
@@ -109,6 +109,16 @@ import Triggers from './common/triggers';
                 self.hideEmployeeDropdown();
                 container.showModal('#logempModal')
             })
+
+            $(document).on('click', '#empTimeoutBtn', function () {
+                let Id = $(this).data('id');
+                Triggers.showNotification(
+                    '#notificationContainer',
+                    'Time Out',
+                    'Are you sure you want to time out this Employee?',
+                    Id
+                );
+            });
 
             // Submit Log Employee Button
             $('#submit_logemp_btn').off('click').on('click', async function (e) {
