@@ -17,15 +17,6 @@ return new class extends Migration
             $table->integer('location_id');
             $table->string('name');
         });
-
-        DB::table('locations')->insert([
-            ['location_id' => 1, 'name' => 'Facilities Centre - Front Door'],
-            ['location_id' => 1, 'name' => 'Facilities Centre - Back Door'],
-            ['location_id' => 2, 'name' => 'Summit'],
-            ['location_id' => 3, 'name' => 'Centris - Front Door'],
-            ['location_id' => 3, 'name' => 'Centris - Back Door'],
-            ['location_id' => 4, 'name' => 'Mezzanine'],
-        ]);
     }
 
     /**

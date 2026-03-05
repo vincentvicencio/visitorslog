@@ -331,7 +331,7 @@ $(document).ready(function () {
             }
         });
     });
-
+});
     class VisitorsLogTable {
         constructor() {
             this.defaultFields  = []
@@ -395,9 +395,17 @@ $(document).ready(function () {
                 const tableApi = $(self.table).DataTable();
 
                 // START POLLING
+                // setInterval(() => {
+                //     tableApi.ajax.reload(null, false); 
+                // }, 5000); 
+
                 setInterval(() => {
-                    tableApi.ajax.reload(null, false); 
-                }, 5000); 
+
+                    if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
+                        $('#visitorsLogTable').DataTable().ajax.reload(null, false);
+                    }
+
+                }, 5000);
 
                 // CUSTOM SEARCH
                 $('#typeSearch')
@@ -416,139 +424,148 @@ $(document).ready(function () {
         }
 
         async keylistener() {
-        const input_id_num = document.getElementById("id_number");
-        const input_fname = document.getElementById("first_name");
-        const input_mname = document.getElementById("middle_name");
-        const input_lname = document.getElementById("last_name");
-        const input_contact = document.getElementById("contact_number");
-        const input_contact_person = document.getElementById("contact_person");
-        const input_purpose = document.getElementById("purpose_of_visit");
+            const input_id_num = document.getElementById("id_number");
+            const input_fname = document.getElementById("first_name");
+            const input_mname = document.getElementById("middle_name");
+            const input_lname = document.getElementById("last_name");
+            const input_contact = document.getElementById("contact_number");
+            const input_contact_person = document.getElementById("contact_person");
+            const input_purpose = document.getElementById("purpose_of_visit");
 
-        input_id_num.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
+            if(input_id_num){
+                input_id_num.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
 
-            if (allowedKeys.includes(e.key)) return;
+                    if (allowedKeys.includes(e.key)) return;
 
-            // Block anything that's not a letter or space
-            if (!/^[0-9]$/.test(e.key)) {
-                e.preventDefault();
-            }
-            });
-            input_id_num.addEventListener("input", () => {
-            input_id_num.value = input_id_num.value.replace(/\D/g, "");
-            });
+                    // Block anything that's not a letter or space
+                    if (!/^[0-9]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                    });
+                    input_id_num.addEventListener("input", () => {
+                    input_id_num.value = input_id_num.value.replace(/\D/g, "");
+                    });
 
-        input_fname.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
+                input_fname.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
 
-            if (allowedKeys.includes(e.key)) return;
+                    if (allowedKeys.includes(e.key)) return;
 
-            // Block anything that's not a letter or space
-            if (!/^[a-zA-Z-.\s]$/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z-.\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
 
-        input_mname.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
+                input_mname.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
 
-            if (allowedKeys.includes(e.key)) return;
+                    if (allowedKeys.includes(e.key)) return;
 
-            // Block anything that's not a letter or space
-            if (!/^[a-zA-Z\s]$/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
 
-        input_lname.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
+                input_lname.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
 
-            if (allowedKeys.includes(e.key)) return;
+                    if (allowedKeys.includes(e.key)) return;
 
-            // Block anything that's not a letter or space
-            if (!/^[a-zA-Z\s]$/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
 
                 input_contact.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"];
-            if (allowedKeys.includes(e.key)) return;
+                    // Allow control keys
+                    const allowedKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"];
+                    if (allowedKeys.includes(e.key)) return;
 
-            // Allow only digits
-            if (!/^[0-9]$/.test(e.key)) {
-                e.preventDefault();
+                    // Allow only digits
+                    if (!/^[0-9]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+
+                    // Prevent typing more than 11 digits
+                    if (input_contact.value.length >= 11) {
+                        e.preventDefault();
+                    }
+                });
+
+                input_contact.addEventListener("input", () => {
+                    // Remove non-digit characters
+                    input_contact.value = input_contact.value.replace(/\D/g, "");
+
+                    // Limit max length to 11
+                    if (input_contact.value.length > 11) {
+                        input_contact.value = input_contact.value.slice(0, 11);
+                    }
+
+                    // Set validation for minimum length (7 digits)
+                    if (input_contact.value.length > 0 && input_contact.value.length < 7) {
+                        input_contact.setCustomValidity("Minimum 7 digits required");
+                    } else {
+                        input_contact.setCustomValidity(""); // clear error
+                    }
+                });
+
+                input_contact_person.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
+
+                    if (allowedKeys.includes(e.key)) return;
+
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+
+                input_purpose.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];            
+                    if (allowedKeys.includes(e.key)) return;
+
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
             }
 
-            // Prevent typing more than 11 digits
-            if (input_contact.value.length >= 11) {
-                e.preventDefault();
-            }
-        });
-
-        input_contact.addEventListener("input", () => {
-            // Remove non-digit characters
-            input_contact.value = input_contact.value.replace(/\D/g, "");
-
-            // Limit max length to 11
-            if (input_contact.value.length > 11) {
-                input_contact.value = input_contact.value.slice(0, 11);
-            }
-
-            // Set validation for minimum length (7 digits)
-            if (input_contact.value.length > 0 && input_contact.value.length < 7) {
-                input_contact.setCustomValidity("Minimum 7 digits required");
-            } else {
-                input_contact.setCustomValidity(""); // clear error
-            }
-        });
-
-        input_contact_person.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
-
-            if (allowedKeys.includes(e.key)) return;
-
-            // Block anything that's not a letter or space
-            if (!/^[a-zA-Z\s]$/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
-
-        input_purpose.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];            
-            if (allowedKeys.includes(e.key)) return;
-
-            // Block anything that's not a letter or space
-            if (!/^[a-zA-Z\s]$/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
+           
+        }
     }
-}
 
-    const visitorsLog = new VisitorsLogTable();
-    visitorsLog.onLoadPage();
+    // const visitorsLog = new VisitorsLogTable();
+    // visitorsLog.onLoadPage();
+    const instance = new VisitorsLogTable();
+    instance.onLoadPage();
+    export default instance;
 
-});
+    
+
+
 
 $(document).ready(function() {
     function fetchIDSuggestions() {

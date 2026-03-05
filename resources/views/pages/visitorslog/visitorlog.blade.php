@@ -10,12 +10,20 @@
             <div class="page-subtitle mb-3">Manage and track all visitor entries</div>
         </div>
         <a class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
-            text-white rounded-2 border-0 cursor-pointer px-3 py-2 text-decoration-none" href="{{ route('visitorslog.form') }}" id="addBtn"  target="_blank"> 
+            text-white rounded-2 border-0 cursor-pointer px-3 py-2 text-decoration-none" href="{{ route('visitorslog.form') }}" id="addBtn" target="_blank"> 
             Add Visitor
+        </a>
+        <a class="top-button position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center
+            text-white rounded-2 border-0 cursor-pointer px-3 py-2 text-decoration-none d-none" href="{{ route('employeeslog.form') }}" id="addBtnEmp"> 
+            Log Employees
         </a>
     </div>
     <!-- table holder -->
     <div class="visitor-log-sheet-table">
+        <div>
+            <button id="visitor">Visitor</button>
+            <button id="employee">Employee</button>
+        </div>
         <!-- search and filter -->
         <x-table-filter/>
 
@@ -25,6 +33,10 @@
 </div>
 
 @push('scripts')
-@vite(['resources/js/visitors.js'])
+@vite([
+    'resources/js/visitors.js',
+    'resources/js/employees.js',
+    'resources/js/logswitcher.js'
+])
 @endpush
 @endsection
