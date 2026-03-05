@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Register your alias here inside the main chain
-        $middleware->trustProxies(at: '*');
+        // $middleware->trustProxies(at: '*'); //remove this
         $middleware->alias([
             'prevent-back' => \App\Http\Middleware\PreventBackHistory::class,
             'user_type' => UsertypeMiddleware::class,
