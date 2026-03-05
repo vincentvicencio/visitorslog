@@ -19,21 +19,18 @@ class VisitorTypeSeeder extends Seeder
                 'created_by' => 1,
                 'updated_by' => 1,
                 'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'Trainee',
                 'created_by' => 1,
                 'updated_by' => 1,
                 'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'OJT',
                 'created_by' => 1,
                 'updated_by' => 1,
                 'created_at' => now(),
-                'updated_at' => now(),
             ]
         ]);
     }

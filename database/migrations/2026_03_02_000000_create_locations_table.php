@@ -14,16 +14,17 @@ return new class extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
+            $table->integer('location_id');
             $table->string('name');
         });
 
         DB::table('locations')->insert([
-            ['name' => 'Facilities Centre - Front Door'],
-            ['name' => 'Facilities Centre - Back Door'],
-            ['name' => 'Summit'],
-            ['name' => 'Centris - Front Door'],
-            ['name' => 'Centris - Back Door'],
-            ['name' => 'Mezzanine'],
+            ['location_id' => 1, 'name' => 'Facilities Centre - Front Door'],
+            ['location_id' => 1, 'name' => 'Facilities Centre - Back Door'],
+            ['location_id' => 2, 'name' => 'Summit'],
+            ['location_id' => 3, 'name' => 'Centris - Front Door'],
+            ['location_id' => 3, 'name' => 'Centris - Back Door'],
+            ['location_id' => 4, 'name' => 'Mezzanine'],
         ]);
     }
 

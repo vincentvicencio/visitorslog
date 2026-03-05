@@ -28,18 +28,19 @@
       position: absolute;
       display: flex;
       top: 50%;
-      // left: 63%;
       right: -45px;
       transform: translate(0, -50%);
       height: 80%;
       aspect-ratio: 1/1;
       overflow: hidden;
       border-radius: 50%;
-      background-color: #56adff;
+      // background-color: #56adff;s
+      background-color: white;
+      filter: sepia(50%);
 
       img{
         object-fit: cover;
-        opacity: 0.6;
+        filter: brightness(170%);
       }
     }
     .background-image-4{
@@ -96,9 +97,9 @@
       border-radius: 10px;
     }
 
-          .login-button{
+    .login-button{
       margin-top: 16px;
-            button{
+      button{
         width: 100%;
         background: linear-gradient(45deg, #3492E9, #145AB0, #0F4383);
         color: white;
@@ -108,8 +109,8 @@
         transition: 0.2s ease;
         font-weight: bold;
         letter-spacing: 1px;
-            }
-            button:hover{
+      }
+      button:hover{
         opacity: 0.8;
         background: linear-gradient(45deg, #3492E9, #3492E9, #3492E9);
       }
@@ -126,6 +127,12 @@
     left: 0;
   }
   @media (max-width: 700px) { 
+    .background-image-4{
+      position: absolute;
+      width: 180px !important;
+      top: 10px !important;
+      left: 10px !important;
+    }
     .main-card-panel{
       height: auto !important;
     }
@@ -136,13 +143,44 @@
       width: 100%;
     }
   }
+  @media (max-width: 530px) { 
+    .background-image-4{
+      position: absolute;
+      width: 100px !important;
+    }
+    .background-image-2{
+      right: -250px !important;
+    }
+
+    .form-mainheader{
+      font-size: 18px !important;
+    }
+    .form-subheader{
+      font-size: 14px !important;
+    }
+
+    .input-holder{
+      input{
+        padding: 10px !important;
+        font-size: 16px !important;
+      }
+    }
+
+    .login-button{
+      button{
+        font-size: 16px !important;
+      }
+    }
+    
+  }
 }
 
 
 
 
+
 .qwerty{
-        position: absolute;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -159,7 +197,7 @@
     display: none !important;
   }
   .main-card{
-    margin: 0px !important;
+    margin: 10px !important;
       }
     .center-card {
       justify-content: center;  

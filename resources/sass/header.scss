@@ -75,7 +75,7 @@
         border-radius: 10px;
         cursor: pointer;
         transition: 0.2s;
-        color: #0F4383;
+        color: #ffffff;
         letter-spacing: 1px;
     }
     .logout-button:hover{
@@ -100,6 +100,10 @@
         .name-holder{
             max-width:100px !important;
             color: white;
+        }
+        .username-holder{
+            margin-left: 50px !important;
+            margin-right: auto !important;
         }
     }
     @media (max-width: 880px) {
