@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('emp_number');
+            $table->string('emp_number', 20);
             $table->integer('record_id')->nullable();
             $table->string('module');
             $table->string('sub_module');

@@ -11,10 +11,10 @@ export default defineConfig({
             refresh: true,
         }),
     ],
-    server: { //remove this
-        host: '0.0.0.0',//remove this
-        hmr: {//remove this
-            host: 'localhost',//remove this
-        },//remove this
-    }, //remove this
+    // server: { 
+    //     host: '0.0.0.0',
+    //     hmr: {
+    //         host: 'localhost',
+    //     },
+    // }, 
 });

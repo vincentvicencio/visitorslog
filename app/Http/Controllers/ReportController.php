@@ -66,6 +66,7 @@ class ReportController extends Controller
 
         $rawquery = Visitor::with('visitorType')
                 ->withoutTrashed()
+                ->where('status', 1)
                 ->when($keywords, function ($query) use ($keywords) {
                     $query -> where(function ($q) use ($keywords) {
                         $q -> where('full_name', 'LIKE', "%{$keywords}%")

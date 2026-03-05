@@ -12,24 +12,9 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use App\Models\AuditLogs;
 
 class VisitorController extends Controller
 {
-
-    private function logAudit($recordId, $action, $oldData = null, $newData = null)
-    {
-        AuditLogs::create([
-            'emp_number'   => Auth::user()->emp_number ?? Auth::id(),
-            'record_id'    => $recordId,
-            'module'       => 'Visitor',
-            'sub_module'   => 'Visitor Log',
-            'action'       => $action,
-            'previous_data'=> $oldData,
-            'new_data'     => $newData,
-            'ip_address'   => request()->ip(),
-        ]);
-    }
     private function guardLocationRequired()
     {
         $user = Auth::user();
@@ -434,8 +419,22 @@ class VisitorController extends Controller
               });
         };
 
+        $count = \DB::table('visitors')
+            ->where('visitor_type', $visitorTypeId)
+            ->where(function ($sub) {
+                $sub->where('status', 0)
+                    ->orWhereNull('status');
+            })
+            ->count();
+        $forLocation = null;
+        if(Auth::user()->user_type != 3){
+            $forLocation = Auth::user()->location;
+        }else{
+            $forLocation = session()->get('guard_location_id');
+        }
         $ids = RegisteredID::where('visitor_type', $visitorTypeId)
             ->where('id_number', 'LIKE', "%{$query}%")
+            ->where('location', $forLocation)
             ->whereNotIn('id_number', $usedIdsQuery)
             ->select('id_number')
             ->distinct()
@@ -445,11 +444,22 @@ class VisitorController extends Controller
         $results = $ids->map(fn($v) => ['id' => $v->id_number, 'text' => $v->id_number])->values();
 
         if ($results->isEmpty()) {
-            return response()->json([
-                'results' => [],
-                'message' => 'All IDs are currently used'
-            ]);
+
+            if($count == 0){
+                return response()->json([
+                    'results' => [],
+                    'message' => 'There are no available IDs'
+                ]);
+            }else{
+                return response()->json([
+                    'results' => [],
+                    'message' => 'All IDs are currently used'
+                ]);
+            }
         }
+
+        
+        
 
         return response()->json([
             'results' => $results
@@ -468,16 +478,16 @@ class VisitorController extends Controller
 
         try {
             $request->validate([
-                'first_name'        => ['required', 'string', 'max:40'],
-                'middle_name'       => ['nullable', 'string', 'max:40'],
-                'last_name'         => ['required', 'string', 'max:40'],
+                'first_name'        => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z-.-- ]+$/'],
+                'middle_name'       => ['nullable', 'string', 'max:40', 'regex:/^[a-zA-Z-. ]+$/'],
+                'last_name'         => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z ]+$/'],
                 'visitor_type'      => 'required|exists:visitor_types,id',
                 'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
                 'image_path'        => ['required'],
                 'id_type'          => 'required|exists:idtypes,id',
                 'id_type_number'   => ['required'],
-                'purpose_of_visit' => ['required'],
-                'contact_person' => ['required'],
+                'purpose_of_visit' => ['required','regex:/^[a-zA-Z ]+$/'],
+                'contact_person' => ['required','regex:/^[a-zA-Z ]+$/'],
 
                 'id_number'    => [
                     'required',

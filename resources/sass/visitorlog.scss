@@ -199,6 +199,13 @@
             padding: 0 0px;
         }
     }
+
+    #mobile{
+        display: none;
+    }
+    #desktop{
+        display: flex;
+    }
 }
 .loginbackground1{
     display: flex;
@@ -240,6 +247,17 @@
 @media (max-width: 680px) {
     .form {
         flex-direction: column;
+
+        
+        .input-holder{
+            width: 100% !important;
+        }
+        #mobile{
+            display: flex !important;
+        }
+        #desktop{
+            display: none !important;
+        }
     }
     .details{
         width: 100% !important;
@@ -249,6 +267,7 @@
     }
     .panel-buttons{
         display: flex;
+        width: 100% !important;
     }
     .panel-buttons button{
         width: 50% !important;

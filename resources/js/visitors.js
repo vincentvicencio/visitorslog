@@ -421,6 +421,8 @@ $(document).ready(function () {
         const input_mname = document.getElementById("middle_name");
         const input_lname = document.getElementById("last_name");
         const input_contact = document.getElementById("contact_number");
+        const input_contact_person = document.getElementById("contact_person");
+        const input_purpose = document.getElementById("purpose_of_visit");
 
         input_id_num.addEventListener("keydown", (e) => {
             // Allow control keys
@@ -511,6 +513,33 @@ $(document).ready(function () {
                 input_contact.setCustomValidity("Minimum 7 digits required");
             } else {
                 input_contact.setCustomValidity(""); // clear error
+            }
+        });
+
+        input_contact_person.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];
+
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        input_purpose.addEventListener("keydown", (e) => {
+            // Allow control keys
+            const allowedKeys = [
+                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+            ];            
+            if (allowedKeys.includes(e.key)) return;
+
+            // Block anything that's not a letter or space
+            if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                e.preventDefault();
             }
         });
     }
