@@ -2,26 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ValidIdType;
+use App\Models\EmployeeLogs;
 use Illuminate\Http\Request;
-use App\Models\Visitor;
-use App\Models\VisitorType;
-use App\Models\RegisteredID;
-use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Location;
 
-class VisitorController extends Controller
+class EmployeeController extends Controller
 {
-    private function guardLocationRequired()
-    {
-        $user = Auth::user();
-
-        return $user && (int) $user->user_type === 3 && !session()->has('guard_location_id');
-    }
-
     private function resolveUserLocationFilters($user): array
     {
         if ((int) $user->user_type === 3) {
@@ -73,84 +63,18 @@ class VisitorController extends Controller
         return array_values(array_unique(array_filter($locationFilters, fn ($value) => !empty($value))));
     }
 
-    private function resolveLocationForSave($user): ?string
-    {
-        if ((int) $user->user_type === 3) {
-            if (session()->has('guard_location_name')) {
-                return (string) session('guard_location_name');
-            }
-
-            if (session()->has('guard_location_id')) {
-                return (string) session('guard_location_id');
-            }
-        }
-
-        $filters = $this->resolveUserLocationFilters($user);
-
-        return $filters[0] ?? null;
-    }
-
-    public function index()
-    {
-        if ($this->guardLocationRequired()) {
-            return redirect()->route('guard.location.show');
-        }
-
-        $visitors = Visitor::where(function ($query) {
-            $query->where('status', 0)->orWhereNull('status');
-            })
-                -> whereNull('time_out')
-                -> orderBy('id', 'desc')
-                -> get();
-
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                -> orderBy('id', 'desc')
-                -> get();
-
-        $empMap = collect(session('all_emp'))->keyBy('emp_code');
-
-        // if (session('from_form')) {
-        //     session()->forget('from_form');
-        //     return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
-        // }else{
-            return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes'));
-        // }
-    }
     public function form()
     {
-        if ($this->guardLocationRequired()) {
-            return redirect()->route('guard.location.show');
-        }
-
-        // session(['from_form' => true]);
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                -> orderBy('id', 'asc')
-                -> get();
-        $visitors     = Visitor::where('status', 0)
-                -> orderBy('id', 'asc')
-                -> get();
-        $validIdTypes = ValidIdType::where('deleted_at', null)
-                -> orderBy('id', 'desc')
-                -> get();
-
-        return view('pages.visitorslog.form', compact('visitorTypes', "visitors", "validIdTypes"));
+        return view('pages.visitorslog.form');
     }
 
     public function list(Request $request){
-        if ($this->guardLocationRequired()) {
-            return response()->json([
-                'status' => 1,
-                'message' => 'Please select guard location first.',
-                'redirect' => route('guard.location.show'),
-            ], 422);
-        }
 
         $keywords = strtolower($request->search);
         $limit    = $request->input('length');
 
 
-        $rawquery = Visitor::with('visitorType')
-                -> withoutTrashed()
+        $rawquery = EmployeeLogs:: withoutTrashed()
                 ->where(function ($query) {
 
                     $user = Auth::user();
@@ -166,21 +90,11 @@ class VisitorController extends Controller
                         $q->where('status', 0)
                         ->where('time_out', null);
                     });
-
-                    // // Then restrict to creator if NOT admin
-                    // if (Auth::user()->user_type != 1) {
-                    //     $query->where('created_by', Auth::user()->id);
-                    // }
                 })
 
                 -> when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
-                        $q->where   ('full_name', 'LIKE', "%{$keywords}%")
-                        ->orWhere   ('visitor_id', 'LIKE', "%{$keywords}%")
-                        ->orWhere   ('phone_number', 'LIKE', "%{$keywords}%")
-                        ->orWhereHas('visitorType', function ($qt) use ($keywords) {
-                            $qt->where('name', 'LIKE', "%{$keywords}%");
-                        });
+                        $q->where   ('full_name', 'LIKE', "%{$keywords}%");
                     });
                 });
         
@@ -245,18 +159,13 @@ class VisitorController extends Controller
 
             $newData[$i] = [
                 
+                'emp_code' => $d->emp_code,
 
                 'full_name' => $d->full_name,
 
                 'location' => '<div class="text-center">' . $locationLabel . '</div>',
 
-                'contact_number' => '<div class="text-center">' . $d->phone_number . '</div>',
-
-                'visitor_type' => '<div class="text-center">' . ($d->visitorType?->name ?? '-') . '</div>',
-
-                'visitor_id'   => '<div class="text-center">' . $d->visitor_id . '</div>',
-
-                'visit' =>  '<div class="text-center">' . 
+                'log_date' =>  '<div class="text-center">' . 
                                     $d->created_at->format("F d, Y") .'<br>
                                     '. $d->created_at->format('l')
                                  . '</div>',
@@ -267,15 +176,12 @@ class VisitorController extends Controller
                 'time_out' => '<div class="text-center">
                                 <small> '. $time_out .'</small><br>
                             </div>',
+
                 'creator' => '<div class="text-center">
                                 '. $createdby .'
                             </div>',
                 
                 'status'       => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
-
-                'created_at'   => '<div class="text-center">' . $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l') . '</div>',
-
-                'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
 
                 'action' => '<div class="dropdown">
                                         <button 
@@ -295,8 +201,6 @@ class VisitorController extends Controller
                             </div>',
             ];
             $i++;
-                                            // <i class="bi bi-clock-history"></i>
-                                            // <i class="bi bi-eye"></i>
         }
  
         return response()->json([
@@ -310,7 +214,7 @@ class VisitorController extends Controller
 
     public function timeout(Request $request)
     {
-        $visitor = Visitor::where('id', $request->id)->first();
+        $visitor = EmployeeLogs::where('id', $request->id)->first();
 
         if (!$visitor) {
             return response()->json([
@@ -405,67 +309,6 @@ class VisitorController extends Controller
         ]);
     }
 
-    public function idSuggestions(Request $request)
-    {
-        $visitorTypeId = $request->visitor_type;
-        $query = $request->q;
-        $usedIdsQuery = function ($q) use ($visitorTypeId) {
-            $q->select('visitor_id')
-              ->from('visitors')
-              ->where('visitor_type', $visitorTypeId)
-              ->where(function ($sub) {
-                  $sub->where('status', 0)
-                      ->orWhereNull('status');
-              });
-        };
-
-        $count = \DB::table('visitors')
-            ->where('visitor_type', $visitorTypeId)
-            ->where(function ($sub) {
-                $sub->where('status', 0)
-                    ->orWhereNull('status');
-            })
-            ->count();
-        $forLocation = null;
-        if(Auth::user()->user_type != 3){
-            $forLocation = Auth::user()->location;
-        }else{
-            $forLocation = session()->get('guard_location_id');
-        }
-        $ids = RegisteredID::where('visitor_type', $visitorTypeId)
-            ->where('id_number', 'LIKE', "%{$query}%")
-            ->where('location', $forLocation)
-            ->whereNotIn('id_number', $usedIdsQuery)
-            ->select('id_number')
-            ->distinct()
-            ->limit(10)
-            ->get();
-
-        $results = $ids->map(fn($v) => ['id' => $v->id_number, 'text' => $v->id_number])->values();
-
-        if ($results->isEmpty()) {
-
-            if($count == 0){
-                return response()->json([
-                    'results' => [],
-                    'message' => 'There are no available IDs'
-                ]);
-            }else{
-                return response()->json([
-                    'results' => [],
-                    'message' => 'All IDs are currently used'
-                ]);
-            }
-        }
-
-        
-        
-
-        return response()->json([
-            'results' => $results
-        ]);
-    }
-
     public function save(Request $request)
     {
         if ($this->guardLocationRequired()) {
@@ -478,9 +321,9 @@ class VisitorController extends Controller
 
         try {
             $request->validate([
-                'first_name'        => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s.\-\']+$/'],
-                'middle_name'       => ['nullable', 'string', 'max:40', 'regex:/^[a-zA-Z\s.\-\']+$/'],
-                'last_name'         => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s.\-\']+$/'],
+                'first_name'        => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z-.-- ]+$/'],
+                'middle_name'       => ['nullable', 'string', 'max:40', 'regex:/^[a-zA-Z-. ]+$/'],
+                'last_name'         => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z ]+$/'],
                 'visitor_type'      => 'required|exists:visitor_types,id',
                 'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
                 'image_path'        => ['required'],
@@ -641,4 +484,3 @@ class VisitorController extends Controller
         }
     }
 }
-
