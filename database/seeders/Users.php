@@ -27,7 +27,6 @@ class Users extends Seeder
             'created_by' => 1,
             'updated_by' => 1,
             'created_at' => now(),
-            'updated_at' => now(),
         ],
         [
             'user_name'  => 8888,
@@ -39,19 +38,6 @@ class Users extends Seeder
             'created_by' => 1,
             'updated_by' => 1,
             'created_at' => now(),
-            'updated_at' => now(),
-        ],
-        [
-            'user_name'  => 'andi.lim',
-            'first_name' => 'Andi',
-            'last_name'  => 'Lim',
-            'password'   => Hash::make('andilim'),
-            'user_type'  => 3,
-            'location'   => null,
-            'created_by' => 1,
-            'updated_by' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
         ]
     ]);
     }
