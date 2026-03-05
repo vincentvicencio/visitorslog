@@ -55,6 +55,7 @@ Route::middleware(['auth', 'single.session'])->group(function () {
         ->controller(EmployeeController::class)
         ->group(function () {
             Route::get('/form',             'form')->name('employeeslog.form');
+            Route::get('/search-employees', 'searchEmployees')->name('employeeslog.searchEmployees');
             Route::get('/view/{id}/{type}', function ($id, $type) {
                 $visitor = Visitor::where('id', $id)->latest('id')->firstOrFail();
                 $visitorTypes = VisitorType::whereNull('deleted_at')->orderBy('id', 'asc')->get();

@@ -38,5 +38,6 @@
     'resources/js/employees.js',
     'resources/js/logswitcher.js'
 ])
+
 @endpush
 @endsection

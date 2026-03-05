@@ -11,12 +11,14 @@ import Triggers from './common/triggers';
             this.module         = "employeeslog"
             this.form           = "#"
             this.modal          = "#"
-            this.formid         = "#"  
+            this.formid         = "#"
+            this.originalSearchTerm = "" // Store original search term
         }
 
     async initializePage(){
         this.list();
         this.initializeButtons();
+        this.initializeEmployeeSearchButton();
         this.keylistener();
     }
 
@@ -97,7 +99,21 @@ import Triggers from './common/triggers';
             // Add Button
             $('#addBtnEmp').off('click').on('click', async function (e) {
                 e.preventDefault();
-                datahandling.clearForm(self.form);
+                // Clear the form fields
+                $('#logemp_emp_code').val('');
+                $('#logemp_first_name').val('');
+                $('#logemp_last_name').val('');
+                $('#employee_name_container').addClass('d-none');
+                $('#searched_emp_code').val('');
+                $('#searched_emp_code_container').hide();
+                self.hideEmployeeDropdown();
+                container.showModal('#logempModal')
+            })
+
+            // Submit Log Employee Button
+            $('#submit_logemp_btn').off('click').on('click', async function (e) {
+                e.preventDefault();
+                await self.submitEmployeeLog();
             })
 
             // Clear error message while typing
@@ -166,6 +182,189 @@ import Triggers from './common/triggers';
                 input.value = input.value.replace(/[^a-zA-Z\s\-\']/g, "");
             });
         }
+    }
+
+    async handleEmployeeSearchClick(event) {
+            const searchTerm = $('#logemp_emp_code').val().trim();
+            // Require non-empty search term
+            if (!searchTerm) {
+                Triggers.showToast('Please enter an employee code or name.', 'Employee Search', 1);
+                return;
+            }
+    
+            // Store original search term
+            this.originalSearchTerm = searchTerm;
+    
+            const $btn = $(event.currentTarget);
+            $btn.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i>');
+    
+            $.ajax({
+                url: '/employeeslog/search-employees',
+                type: 'GET',
+                data: { q: searchTerm },
+                timeout: 10000,
+                success: (response) => {
+                    const results = response.results || [];
+                    
+                    // Check for exact emp code match
+                    const exactMatch = results.find(emp => emp.id.toLowerCase() === searchTerm.toLowerCase());
+                    
+                    if (exactMatch) {
+                        // Exact emp code found
+                        this.selectEmployee(exactMatch);
+                    } else if (results.length === 0) {
+                        // No results
+                        $('#logemp_first_name').val('');
+                        $('#logemp_last_name').val('');
+                        $('#employee_name_container').addClass('d-none');
+                        $('#searched_emp_code').val('');
+                        $('#searched_emp_code_container').hide();
+                        this.hideEmployeeDropdown();
+                        Triggers.showToast('Employee not found.','Employee Search', 1);
+                    } else if (results.length === 1) {
+                        // Single name match - auto-select
+                        this.selectEmployee(results[0]);
+                        this.hideEmployeeDropdown();
+                    } else {
+                        // Multiple name matches - show dropdown suggestions
+                        this.showEmployeeDropdown(results);
+                    }
+                    $btn.prop('disabled', false).html('<i class="bi bi-search"></i>');
+                },
+                error: () => {
+                    Triggers.showToast('Failed to search employee.','Employee Search', 1);
+                    $btn.prop('disabled', false).html('<i class="bi bi-search"></i>');
+                }
+            });
+        }
+
+        selectEmployee(employee) {
+            // For name searches, preserve the original search term in the search field
+            // For emp code searches, use the emp code
+            const searchTerm = this.originalSearchTerm;
+            const isExactCodeMatch = searchTerm.toLowerCase() === employee.id.toLowerCase();
+            
+            if (isExactCodeMatch) {
+                $('#logemp_emp_code').val(employee.id);
+            } else {
+                // Keep original search term (name search)
+                $('#logemp_emp_code').val(searchTerm);
+            }
+            
+            $('#logemp_first_name').val(employee.first_name || '');
+            $('#logemp_last_name').val(employee.last_name || '');
+            $('#employee_name_container').removeClass('d-none');
+            $('#searched_emp_code').val(employee.id);
+            $('#searched_emp_code_container').show();
+            this.hideEmployeeDropdown();
+            Triggers.showToast('Employee selected!','Employee Search', 0);
+        }
+
+        showEmployeeDropdown(results) {
+            const self = this;
+            
+            // Remove existing dropdown if present
+            $('#employeeDropdown').remove();
+            
+            // Create dropdown HTML with unique IDs for each item
+            const dropdownHtml = `
+                <div id="employeeDropdown" class="list-group position-absolute w-100" style="top: 100%; left: 0; z-index: 1050; max-height: 300px; overflow-y: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #ddd; background: white;">
+                    ${results.map((emp, idx) => `
+                        <div class="list-group-item list-group-item-action employee-option" style="cursor: pointer;" data-emp-idx="${idx}">
+                            <strong>${emp.id}</strong> - ${emp.first_name} ${emp.last_name}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Get the input container and add dropdown
+            const $inputGroup = $('#logemp_emp_code').closest('.input-group');
+            $inputGroup.css('position', 'relative');
+            $inputGroup.after(dropdownHtml);
+            
+            // Handle employee option clicks
+            $('.employee-option').each((index, el) => {
+                el.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const idx = parseInt($(el).data('emp-idx'));
+                    const employee = results[idx];
+                    
+                    if (employee) {
+                        self.selectEmployee({
+                            id: employee.id,
+                            first_name: employee.first_name,
+                            last_name: employee.last_name
+                        });
+                    }
+                }, false);
+            });
+        }
+
+        hideEmployeeDropdown() {
+            $('#employeeDropdown').remove();
+        }
+
+        async submitEmployeeLog() {
+            // Validate required fields
+            const empCode = $('#searched_emp_code').val().trim();
+            const firstName = $('#logemp_first_name').val().trim();
+            const lastName = $('#logemp_last_name').val().trim();
+
+            if (!empCode) {
+                Triggers.showToast('Please search and select an employee.', 'Employee Log', 1);
+                return;
+            }
+
+            if (!firstName || !lastName) {
+                Triggers.showToast('Employee name is incomplete.', 'Employee Log', 1);
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData($('#logemp_form')[0]);
+            formData.append('emp_code', empCode);
+            formData.append('first_name', firstName);
+            formData.append('last_name', lastName);
+            formData.append('full_name', firstName + ' ' + lastName);
+
+            try {
+                const response = await datahandling.processData(
+                    this.url + 'save',
+                    'POST',
+                    Object.fromEntries(formData)
+                );
+
+                if (response.status === 0) {
+                    Triggers.showToast(response.message, response.title, 0);
+                    // Close modal and refresh table
+                    container.hideModal('#logempModal');
+                    // Clear form
+                    $('#logemp_form')[0].reset();
+                    $('#logemp_emp_code').val('');
+                    $('#logemp_first_name').val('');
+                    $('#logemp_last_name').val('');
+                    $('#employee_name_container').addClass('d-none');
+                    $('#searched_emp_code').val('');
+                    $('#searched_emp_code_container').hide();
+                    // Reload table
+                    if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
+                        $('#visitorsLogTable').DataTable().ajax.reload(null, false);
+                    }
+                } else {
+                    Triggers.showToast(response.message, response.title || 'Error', 1);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Triggers.showToast('Failed to log employee.', 'Employee Log', 1);
+            }
+        }
+        initializeEmployeeSearchButton() {
+        const searchBtn = document.getElementById('search_emp_btn');
+        if (!searchBtn) return;
+        searchBtn.removeEventListener('click', this.handleEmployeeSearchClick);
+        searchBtn.addEventListener('click', this.handleEmployeeSearchClick.bind(this));
     }
 
 

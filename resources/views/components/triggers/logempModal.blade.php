@@ -9,26 +9,9 @@
                 <form id="logemp_form">
                     @csrf
                 <input type="hidden" id="logemp_db_id" name="record_id"> 
-                
-                <!-- <div class="mb-3">
-                    <label class="form-label">Select Role</label>
-                    <select id="logemp_type" name="user_type" class="form-control" required  autocomplete="off" aria-describedby="roleFeedback">
-                    </select>
-                    <div class="invalid-feedback" id="roleFeedback">Role is required</div>
-                </div> -->
-
-                <!-- <div id="logemp_fields_container" style="display: none;"> -->
-                    <!-- <div class="mb-3" id="location_container">
-                        <label class="form-label">Select Location</label>
-                        <select id="logemp_location" name="locations[]" class="form-control" autocomplete="off" aria-describedby="locationFeedback">
-                            <option value="">Select Location</option>
-                        </select>
-                        <div class="invalid-feedback" id="locationFeedback">Location is required</div>
-                    </div> -->
                     <div class="mb-3" id="emp_code_container">
-                        <label class="form-label">Employee Code</label>
                         <div class="input-group">
-                            <input type="text" id="logemp_emp_code" name="logemp_code" class="form-control" placeholder="Enter Employee Code" autocomplete="off" aria-describedby="empCodeFeedback">
+                            <input type="text" id="logemp_emp_code" name="logemp_code" class="form-control" placeholder="Enter Employee Code or Name" autocomplete="off" aria-describedby="empCodeFeedback">
                             <button class="btn btn-outline-primary" type="button" id="search_emp_btn">
                                 <i class="bi bi-search"></i>
                             </button>
@@ -53,16 +36,9 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="mb-3" id="password_container">
-                        <label class="form-label">Password</label>
-                        <input type="password" id="reg_password" name="password" class="form-control" placeholder="Password" required autocomplete="off" aria-describedby="passwordFeedback">
-                        <div class="invalid-feedback" id="passwordFeedback">Password is required</div>
-                        <small class="text-muted edit-only-text" style="display:none;"> Leave blank to keep current password </small>
-                    </div> -->
-                <!-- </div> -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary w-100" id="submit_logemp_btn">Register User</button>
+                <button type="button" class="btn btn-primary w-100" id="submit_logemp_btn">Log Employee</button>
             </form>
             </div>
         </div>

@@ -23,6 +23,7 @@
             @include('components.triggers.delete')
             @include('components.triggers.visitorTypeModal')
             @include('components.triggers.viewImage')
+            @include('components.triggers.logempModal')
             <!-- Notification -->
 
             @stack('scripts')

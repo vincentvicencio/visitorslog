@@ -12,6 +12,30 @@ use App\Models\Location;
 
 class EmployeeController extends Controller
 {
+    private function guardLocationRequired()
+    {
+        $user = Auth::user();
+
+        return $user && (int) $user->user_type === 3 && !session()->has('guard_location_id');
+    }
+
+    private function resolveLocationForSave($user): ?string
+    {
+        if ((int) $user->user_type === 3) {
+            if (session()->has('guard_location_name')) {
+                return (string) session('guard_location_name');
+            }
+
+            if (session()->has('guard_location_id')) {
+                return (string) session('guard_location_id');
+            }
+        }
+
+        $filters = $this->resolveUserLocationFilters($user);
+
+        return $filters[0] ?? null;
+    }
+
     private function resolveUserLocationFilters($user): array
     {
         if ((int) $user->user_type === 3) {
@@ -94,7 +118,8 @@ class EmployeeController extends Controller
 
                 -> when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
-                        $q->where   ('full_name', 'LIKE', "%{$keywords}%");
+                        $q->where   ('full_name', 'LIKE', "%{$keywords}%")
+                          ->orWhere('emp_code', 'LIKE', "%{$keywords}%");
                     });
                 });
         
@@ -309,11 +334,43 @@ class EmployeeController extends Controller
         ]);
     }
 
+    
+    public function searchEmployees(Request $request)
+    {
+        $search    = strtolower($request->input('q', ''));
+        $employees = collect(session('all_emp', []));
+        
+        // Filter employees based on search term
+        $filtered = $employees->filter(function ($emp) use ($search) {
+            if (empty($search)) return true;
+            
+            $empCode   = strtolower($emp['emp_code'] ?? '');
+            $firstName = strtolower($emp['first_name'] ?? '');
+            $lastName  = strtolower($emp['last_name'] ?? '');
+            
+            return str_contains($empCode, $search) || 
+                   str_contains($firstName, $search) || 
+                   str_contains($lastName, $search);
+        })->take(20); // Limit results
+        
+        $results = $filtered->map(function ($emp) {
+            return [
+                'id'         => $emp['emp_code'],
+                'text'       => $emp['emp_code'] . ' - ' . ($emp['first_name'] ?? '') . ' ' . ($emp['last_name'] ?? ''),
+                'first_name' => $emp['first_name'] ?? '',
+                'last_name'  => $emp['last_name'] ?? ''
+            ];
+        })->values()->toArray();
+        
+        return response()->json(['results' => $results]);
+    }
+
     public function save(Request $request)
     {
         if ($this->guardLocationRequired()) {
             return response()->json([
                 'status' => 1,
+                'title' => 'Error',
                 'message' => 'Please select guard location first.',
                 'redirect' => route('guard.location.show'),
             ], 422);
@@ -321,165 +378,61 @@ class EmployeeController extends Controller
 
         try {
             $request->validate([
-                'first_name'        => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z-.-- ]+$/'],
-                'middle_name'       => ['nullable', 'string', 'max:40', 'regex:/^[a-zA-Z-. ]+$/'],
-                'last_name'         => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z ]+$/'],
-                'visitor_type'      => 'required|exists:visitor_types,id',
-                'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
-                'image_path'        => ['required'],
-                'id_type'          => 'required|exists:idtypes,id',
-                'id_type_number'   => ['required'],
-                'purpose_of_visit' => ['required','regex:/^[a-zA-Z ]+$/'],
-                'contact_person' => ['required','regex:/^[a-zA-Z ]+$/'],
-
-                'id_number'    => [
-                    'required',
-                    'string',
-                    function ($attribute, $value, $fail) use ($request) {
-                        $existing = RegisteredID::where('id_number', $value)->first();
-                        $timein = Visitor::where('visitor_id', $value)
-                                    ->whereNull('time_out')
-                                    ->first();
-                        if ($timein) {
-                            $fail('This Visitor ID is already checked in and has not timed out.');
-                        }
-
-                        if (!$existing) {
-                            $fail('This Visitor ID is not registered.');
-                        } elseif ($existing->visitor_type != $request->visitor_type) {
-                            $fail('This Visitor ID is registered under a different visitor type.');
-                        }
-                    },
-                ],
-
+                'emp_code'      => 'required|string',
+                'first_name'    => 'required|string|max:40',
+                'last_name'     => 'required|string|max:40',
+                'full_name'     => 'required|string|max:100',
             ], [
-                'first_name.required'        => 'First Name is required',
-                'last_name.required'         => 'Last Name is required',    
-                'id_type_number.required'    => 'ID Number is required',
-                'id_type.required'           => 'Identification Card is required',
-                'purpose_of_visit.required'  => 'Purpose of Visit is required',
-                'contact_person.required'    => 'Contact Person is required',
-                'visitor_type.required'      => 'Visitor Type is required',
-                'contact_number.required'    => 'Contact Number is required',
-                'contact_number.max'         => 'Contact Number must not exceed 11 digits',
-                'contact_number.min'         => 'Contact Number must be at least 11 digits',
-                'contact_number.starts_with' => 'Contact Number must start with 09',
+                'emp_code.required'    => 'Employee Code is required',
+                'first_name.required'  => 'First Name is required',
+                'last_name.required'   => 'Last Name is required',
+                'full_name.required'   => 'Full Name is required',
             ]);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            // Error hierarchy
-            $priority = ['id_number', 'visitor_type', 'first_name', 'last_name', 'contact_number', 'image_path', 'id_type', 'id_type_number', 'purpose_of_visit', 'contact_person', 'middle_name'];
-            $errors = $e->errors();
-            $firstError = null;
-            foreach ($priority as $field) {
-                if (isset($errors[$field])) {
-                    $firstError = $errors[$field][0];
-                    break;
-                }
-            }
-            if (!$firstError) {
-                $firstError = collect($errors)->flatten()->first();
-            }
-            return response()->json([
-                'status' => 1,
-                'message' => $firstError,
-            ], 422);
-        }
-
-
-
-        try {
-            $imagePath = null;
-            if(!empty($request->image_path)) {
-                
-                $image     = $request->image_path;
-
-                // Remove metadata (data:image/png;base64,)
-                $image     = preg_replace('/^data:image\/\w+;base64,/', '', $image);
-
-                // Decode base64
-                $image     = base64_decode($image);
-                // Generate filename
-                $fileName  = 'visitors/' . Str::random(20) . '.png';
-
-                // Save to public disk
-                Storage::disk('public')->put($fileName, $image);
-
-                $imagePath = $fileName;
-            }else{
-                if ($request->hasFile('imageInput') && $request->file('imageInput')->isValid()) {
-                    $fileName  = 'visitors/' . Str::random(20) . '.png';
-                    $imagePath = $request->file('imageInput')->storeAs('visitors', $fileName, 'public');
-                }
-            }
-
-            $firstName = ucwords(strtolower($request->first_name));
-            $middleName = ucwords(strtolower($request->middle_name));
-            $lastName = ucwords(strtolower($request->last_name));
-            $address = ucwords(strtolower($request->address));
-            
-            $contactPerson = ucwords(strtolower($request->contact_person));
-            $purposeOfVisit = ucwords(strtolower($request->purpose_of_visit));
-            
-
-            $middleInitial = collect(preg_split('/\s+/', trim($middleName)))
-                ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
-                ->implode('');
 
             $user = Auth::user();
             $locationForSave = $this->resolveLocationForSave($user);
 
-            $visitor = new Visitor();
-            // clint - remove dot when there is no middle name
-            if (!empty($middleInitial)) {
-                $visitor->full_name = $firstName . ' ' . $middleInitial . '. ' . $lastName;
-            } else {
-                $visitor->full_name = $firstName . ' ' . $lastName;
-            }
-            // original code - kardo
-            // $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
-            $visitor->first_name   = $firstName;
-            $visitor->middle_name  = $middleName;
-            $visitor->last_name    = $lastName;
-            $visitor->phone_number = $request->contact_number ?? '?';
-            $visitor->visitor_type = $request->visitor_type;
-            $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $locationForSave ?? '?';
-            $visitor->address      = $address;
-            $visitor->id_type      = $request->id_type;
-            $visitor->valid_id     = $request->id_type_number;
-            $visitor->purpose      = $purposeOfVisit;
-            $visitor->contact_person = $contactPerson;
-            $visitor->created_at   = now();
-            $visitor->created_by   = Auth::user()->id;
-            $visitor->image_path   = $imagePath;
-            $visitor->time_in      = now();
-            $visitor->status       = 0;
-            $visitor->save();
+            $employeeLog = new EmployeeLogs();
+            $employeeLog->emp_code = $request->emp_code;
+            $employeeLog->first_name = $request->first_name;
+            $employeeLog->last_name = $request->last_name;
+            $employeeLog->full_name = $request->full_name;
+            $employeeLog->location = $locationForSave ?? '?';
+            $employeeLog->time_in = now();
+            $employeeLog->status = 0; // Active
+            $employeeLog->created_by = $user->id;
+            $employeeLog->save();
 
-            // audit log for new visitor
+            // Audit log for new employee log
             log_audit(
-                'visitors',
+                'emp_logs',
                 'created',
-                $visitor->id,
+                $employeeLog->id,
                 null,
-                $visitor->toArray(),
+                $employeeLog->toArray(),
                 'save'
             );
 
             return response()->json([
                 'status' => 0,
                 'title' => 'Success',
-                'message' => 'Visitor successfully added'
+                'message' => 'Employee successfully logged in'
             ], 200);
-            
-            
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->errors();
+            $firstError = collect($errors)->flatten()->first();
+            return response()->json([
+                'status' => 1,
+                'title' => 'Error',
+                'message' => $firstError ?? 'Validation error'
+            ], 422);
 
         } catch (\Exception $e) {
             return response()->json([
-                    'status' => 1,
-                    'title' => 'Invalid',
-                'message' => 'Error saving visitor: ' . $e->getMessage(),
+                'status' => 1,
+                'title' => 'Error',
+                'message' => 'Failed to log employee: ' . $e->getMessage()
             ], 500);
         }
     }
