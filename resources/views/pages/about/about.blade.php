@@ -1,6 +1,6 @@
 @extends('layout')
 @section('content')
-<div class="user-types-container mt-4">
+<div class="user-types-container about-header mt-4">
     {{-- header --}}
     <div class="page-header visitortype">
         <div class="header-content">
@@ -77,12 +77,14 @@
                 <div class="details">
                     <div class="name1">Magellan Solutions</div>
                 </div>
+                <div class="colorblur1 colorblur"></div>
             </div>
             <div class="profile-holder">
                 <div class="image2"><img src="images/bsu.png" alt=""></div>
                 <div class="details">
                     <div class="name2">Bulacan State University</div>
                 </div>
+                <div class="colorblur2 colorblur"></div>
             </div>
             
         </div>

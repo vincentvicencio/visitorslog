@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
             RegisteredId::class,
             Users::class,
             UserTypes::class,
-            VisitorsSeeder::class,
             VisitorTypeSeeder::class,
             IDTypesSeeder::class,
         ]);

@@ -21,7 +21,6 @@ class RegisteredId extends Seeder
             'created_by' => 1,
             'updated_by' => 1,
             'created_at' => now(),
-            'updated_at' => now(),
         ],
         [
             'visitor_type' => 2,
@@ -30,7 +29,6 @@ class RegisteredId extends Seeder
             'created_by' => 1,
             'updated_by' => 1,
             'created_at' => now(),
-            'updated_at' => now(),
         ],
         [
             'visitor_type' => 3,
@@ -39,7 +37,6 @@ class RegisteredId extends Seeder
             'created_by' => 1,
             'updated_by' => 1,
             'created_at' => now(),
-            'updated_at' => now(),
         ]
     ]);
     }

@@ -110,7 +110,7 @@
                                 <label for="address">Address</label>
                             </div>
                             {{-- buttons --}}
-                            <div class="panel-buttons">
+                            <div class="panel-buttons" id="desktop">
                                 <button type="submit" class="save" id="saveBtn">save</button>
                                 <button type="button" class="clear" id="clrBtn">clear</button>
                             </div>
@@ -133,6 +133,11 @@
                             <button type="button" class="capture-button" id="captureBtn">Capture</button>
                             <button type="button" class="capture-button" id="recaptureBtn">ReCapture</button>
                         
+                        </div>
+                        {{-- buttons --}}
+                        <div class="panel-buttons" id="mobile">
+                            <button type="submit" class="save" id="saveBtn">save</button>
+                            <button type="button" class="clear" id="clrBtn">clear</button>
                         </div>
 
                     </div>

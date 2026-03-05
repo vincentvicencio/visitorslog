@@ -127,8 +127,8 @@ class Registered_UsersController extends Controller
     try {
         if ($isGuard) {
             // Guard: Use provided first_name and last_name, generate username
-            $firstName = $request->input('first_name');
-            $lastName = $request->input('last_name');
+            $firstName = ucwords(strtolower($request->input('first_name')));
+            $lastName = ucwords(strtolower($request->input('last_name')));
             $baseUsername = strtolower(preg_replace('/\s+/', '', $firstName)) . '.' . strtolower(preg_replace('/\s+/', '', $lastName));
             $username = $baseUsername;
             $counter = 2;
