@@ -28,18 +28,19 @@
       position: absolute;
       display: flex;
       top: 50%;
-      // left: 63%;
       right: -45px;
       transform: translate(0, -50%);
       height: 80%;
       aspect-ratio: 1/1;
       overflow: hidden;
       border-radius: 50%;
-      background-color: #56adff;
+      // background-color: #56adff;s
+      background-color: white;
+      filter: sepia(50%);
 
       img{
         object-fit: cover;
-        opacity: 0.6;
+        filter: brightness(170%);
       }
     }
     .background-image-4{
