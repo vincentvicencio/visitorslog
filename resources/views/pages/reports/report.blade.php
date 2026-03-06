@@ -24,7 +24,7 @@
         </div>
     </div>
     <!-- table holder -->
-    <div class="visitor-log-sheet-table table-responsive-sm table-responsive-md table-responsive-lg bg-white">
+    <div class="visitor-log-sheet-table bg-white">
         <div class="bar">
             <div class="tab" id="visitor">
                 Visitor

@@ -353,7 +353,7 @@ class ReportController extends Controller
                 'action' => '<div class="dropdown text-center">
                                     <button 
                                         class="dropdown-item"
-                                        id="viewBtn"
+                                        id="empViewBtn"
                                         data-id="'. $d->id .'"
                                         data-type="reports">
                                         View
