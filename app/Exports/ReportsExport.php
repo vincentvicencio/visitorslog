@@ -85,7 +85,7 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
                 $visitor->last_name
             ])));
 
-            $timeIn = $visitor->time_in ? \Carbon\Carbon::parse($visitor->time_in)->format('h:i A') : '-';
+            $timeIn  = $visitor->time_in  ? \Carbon\Carbon::parse($visitor->time_in)->format('h:i A') : '-';
             $timeOut = $visitor->time_out ? \Carbon\Carbon::parse($visitor->time_out)->format('h:i A') : '-';
 
             return [
@@ -99,8 +99,8 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
                 'Time In'      =>     $timeIn,
                 'Time Out'     =>     $timeOut,
                 'Status'       =>     $status,
-                'Timed In By'   =>     user_name($visitor->created_by) ?? '-',
-                'Timed Out By'   =>     user_name($visitor->updated_by) ?? '-',
+                'Timed In By'  =>     user_name($visitor->created_by) ?? '-',
+                'Timed Out By' =>     user_name($visitor->updated_by) ?? '-',
                 'Created At'   =>     $visitor->created_at->format('F j, Y H:i A'),
             ];
         });

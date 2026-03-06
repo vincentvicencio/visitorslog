@@ -555,7 +555,7 @@ public function list(Request $request){
                               ->orWhere('last_name', 'LIKE', "%{$keywords}%")
                               ->orWhere('first_name', 'LIKE', "%{$keywords}%")
                               ->orWhere('last_name', 'LIKE', "%{$keywords}%")
-                            ->orWhereHas('userType', function ($q) use ($keywords) {
+                              ->orWhereHas('userType', function ($q) use ($keywords) {
                                 $q->where('name', 'LIKE', "%{$keywords}%");
                             });
                             
@@ -593,7 +593,6 @@ public function list(Request $request){
                 'created_at' => $d->created_at ? ($d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l')) : '-',
                 'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l')) : '-',
                 'action'            => '<div class="dropdown text-center">
-                                        
                                         <button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>
                                         <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Delete</button>
                                     </div>' 

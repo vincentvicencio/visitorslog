@@ -9,8 +9,6 @@
         </div>
     </div>
 
-
-
     <div class="about">
         <div class="school position-relative">
             <div class="text d-flex h-100 align-items-start justify-content-center flex-column">
@@ -67,8 +65,6 @@
             </div>
             
         </div>
-
-
 
         <div class="header">Project Partner</div>
         <div class="profiles-partner">
