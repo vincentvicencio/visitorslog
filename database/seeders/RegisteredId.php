@@ -14,30 +14,30 @@ class RegisteredId extends Seeder
     public function run(): void
     {
         DB::table('registered_visitor_ids')->insert([
-        [
-            'visitor_type' => 1,
-            'id_number' => 1000,
-            'location' => 1,
-            'created_by' => 1,
-            'updated_by' => 1,
-            'created_at' => now(),
-        ],
-        [
-            'visitor_type' => 2,
-            'id_number' => 2000,
-            'location' => 1,
-            'created_by' => 1,
-            'updated_by' => 1,
-            'created_at' => now(),
-        ],
-        [
-            'visitor_type' => 3,
-            'id_number' => 3000,
-            'location' => 1,
-            'created_by' => 1,
-            'updated_by' => 1,
-            'created_at' => now(),
-        ]
-    ]);
+            [
+                'visitor_type' => 1,
+                'id_number' => 1000,
+                'location' => 1,
+                'created_by' => 1,
+                'updated_by' => 1,
+                'created_at' => now(),
+            ],
+            [
+                'visitor_type' => 2,
+                'id_number' => 2000,
+                'location' => 1,
+                'created_by' => 1,
+                'updated_by' => 1,
+                'created_at' => now(),
+            ],
+            [
+                'visitor_type' => 3,
+                'id_number' => 3000,
+                'location' => 1,
+                'created_by' => 1,
+                'updated_by' => 1,
+                'created_at' => now(),
+            ]
+        ]);
     }
 }

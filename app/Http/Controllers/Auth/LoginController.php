@@ -123,6 +123,7 @@ class LoginController extends Controller
                     'id',
                     'emp_code',
                     'first_name',
+                    'middle_name',
                     'last_name',
                     'department_id',
                     'section_id',

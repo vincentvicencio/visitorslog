@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             UserTypes::class,
             VisitorTypeSeeder::class,
             IDTypesSeeder::class,
+            GuardLocationSeeder::class,
         ]);
     }
 }

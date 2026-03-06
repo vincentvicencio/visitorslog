@@ -478,11 +478,11 @@ class VisitorController extends Controller
 
         try {
             $request->validate([
-                'first_name'        => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z-.-- ]+$/'],
-                'middle_name'       => ['nullable', 'string', 'max:40', 'regex:/^[a-zA-Z-. ]+$/'],
-                'last_name'         => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z ]+$/'],
+                'first_name'        => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s.\-\']+$/'],
+                'middle_name'       => ['nullable', 'string', 'max:40', 'regex:/^[a-zA-Z\s.\-\']+$/'],
+                'last_name'         => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s.\-\']+$/'],
                 'visitor_type'      => 'required|exists:visitor_types,id',
-                'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
+                'contact_number'    => ['required','min:11','max:11','starts_with:09'],
                 'image_path'        => ['required'],
                 'id_type'          => 'required|exists:idtypes,id',
                 'id_type_number'   => ['required'],
