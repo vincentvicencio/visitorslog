@@ -59,14 +59,12 @@ Route::middleware(['auth', 'single.session'])->group(function () {
             Route::get('/search-employees', 'searchEmployees')->name('employeeslog.searchEmployees');
             Route::get('/view/{id}/{type}', function ($id, $type) {
                 $visitor = EmployeeLogs::where('id', $id)->latest('id')->firstOrFail();
-                $visitorTypes = VisitorType::whereNull('deleted_at')->orderBy('id', 'asc')->get();
-                $validIdTypes = ValidIdType::whereNull('deleted_at')->orderBy('id', 'asc')->get();
-                return view('pages.visitorslog.view', compact('visitor', 'visitorTypes', 'type', 'validIdTypes'));
-            })->name('view.page');
+                return view('pages.employeeslog.view', compact('visitor', 'type'));
+            })->name('viewEmp.page');
             Route::post('/list',            'list')->name('employeeslog.list');
             Route::post('/save',            'save')->name('employeeslog.save');
             Route::post('/timeout',         'timeout')->name('employeeslog.timeout');
-            Route::GET('/view',            'view')->name('employeeslog.view');
+            Route::post('/view',            'view')->name('employeeslog.view');
         });
         
     Route::middleware(['auth', 'user_type:1'])->group(function () {
@@ -105,6 +103,7 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                 Route::get('/',              'index')->name('reports');
                 Route::get('/export',        'exportReport')->name('reports.export');
                 Route::post('/list',         'list')->name('reports.list');
+                Route::post('/emplist',         'empList')->name('reports.emplist');
                 Route::post('/delete',       'delete')->name('reports.delete');
             });
         // VISITOR TYPE

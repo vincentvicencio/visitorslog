@@ -11,6 +11,9 @@ window.reportFilters = {
     visitor_type: ''
 };
 
+
+let tableReloadInterval = null;
+
 // Define the URL 
 let URL = '/reports/';
 
@@ -162,6 +165,11 @@ class ReportClassTable {
         this.formid         = "#"  
     }
 
+    async onLoadPage(){
+        this.empList();
+        this.initializeButtons();
+    }
+
     async initializePage(){
         this.list();
         this.initializeButtons();
@@ -196,7 +204,7 @@ class ReportClassTable {
         settable.createTableAjax(
             self.table,
             columns,
-            self.url,
+            self.url, // Use the full path directly
             columnDefs,
             self.module,
             10,
@@ -209,11 +217,107 @@ class ReportClassTable {
             .on('init.dt', function () {
                 const tableApi = $(self.table).DataTable();
 
-                tableApi.draw();
-                tableApi.on('draw', function () {
-                    $(tableApi.table().container()).find('.dataTables_scrollHeadInner').css('width', '100%');
-                    $(tableApi.table().node()).css('width', '99%');
-                });
+                // tableApi.draw();
+                // tableApi.on('draw', function () {
+                //     $(tableApi.table().container()).find('.dataTables_scrollHeadInner').css('width', '100%');
+                //     $(tableApi.table().node()).css('width', '99%');
+                // });
+
+                if (tableReloadInterval) {
+                    clearInterval(tableReloadInterval);
+                }
+
+                tableReloadInterval = setInterval(() => {
+                    if ($.fn.DataTable.isDataTable('#reportTable')) {
+                        $('#reportTable').DataTable().ajax.reload(null, false);
+                    }
+                }, 5000);
+
+                // =========================================
+                // CUSTOM SEARCH
+                // =========================================
+                $('#typeSearch')
+                    .off('keyup')
+                    .on('keyup', function () {
+                        tableApi.draw();
+                    });
+
+                // =========================================
+                // ENTRIES PER PAGE
+                // =========================================
+                $('#entriesPerPage')
+                    .off('change')
+                    .on('change', function () {
+                        tableApi.page.len(this.value).draw();
+                    });
+            });
+
+        setTimeout(() => {
+            const searchInput = document.getElementById('dt-search-0');             
+                if (searchInput) {
+                    searchInput.setAttribute('placeholder', 'Search here...');
+                }
+        },  100);
+    }
+
+    async empList() {
+        const self = this;
+
+        const tableHeader = [
+                { id: "emp_code", label: "Employee Code" },
+                { id: "full_name", label: "Name" },
+                { id: "location", label: "Location" },
+                { id: "log_date", label: "Log Date" },
+                { id: "time_in", label: "Time In" },
+                { id: "time_out", label: "Time Out" },
+                { id: "creator", label: "Logged by" },
+                { id: "updated_by", label: "Timed Out by" },
+                { id: "status", label: "Status" },
+                { id: "action", label: "Action" },
+            ];
+
+        const columns = tableHeader.map(col => ({
+            data: col.id, 
+            title: col.label,
+        }));
+
+        const columnDefs = [
+            { targets: [0, 1, 2, 3], orderable: false }
+        ];
+
+        settable.createTableAjax(
+            self.table,
+            columns,
+            self.url+"emp", // Use the full path directly
+            columnDefs,
+            self.module,
+            10,
+            window.reportFilters,
+            false
+        );
+
+        $(self.table)
+            .off('init.dt')
+            .on('init.dt', function () {
+                const tableApi = $(self.table).DataTable();
+
+                // tableApi.draw();
+                // tableApi.on('draw', function () {
+                //     $(tableApi.table().container()).find('.dataTables_scrollHeadInner').css('width', '100%');
+                //     $(tableApi.table().node()).css('width', '99%');
+                // });
+
+                
+
+                if (tableReloadInterval) {
+                    clearInterval(tableReloadInterval);
+                }
+
+                tableReloadInterval = setInterval(() => {
+                    if ($.fn.DataTable.isDataTable('#reportTable')) {
+                        $('#reportTable').DataTable().ajax.reload(null, false);
+                    }
+                }, 5000);
 
                 // =========================================
                 // CUSTOM SEARCH
@@ -261,5 +365,4 @@ class ReportClassTable {
 }
 const instance = new ReportClassTable();
 instance.initializePage();
-
 export default instance;

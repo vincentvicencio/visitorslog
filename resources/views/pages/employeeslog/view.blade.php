@@ -14,6 +14,8 @@
         <div class="addvisitormodal">
             <div class="panel">
                 {{-- header --}}
+                
+                <a class="btn-close" href="{{ route($type) }}"></a>
                 <div class="header fs-4">Employeee Details</div>
                 <div class="subheader mb-3">Register and record a new visitor entry</div>
                 <div class="form" id="addVisitorForm">
@@ -31,29 +33,29 @@
 
                         <br>
                         <div class="input-holder floating">
-                            <input type="text" name="first_name" id="first_name" class="form-control" readonly placeholder=" " value="">
+                            <input type="text" name="first_name" id="first_name" class="form-control" readonly placeholder=" " value="{{ $visitor->first_name }}">
                             <label for="first_name">First name</label>
                         </div>
                         {{-- Middle Name --}}
                         <div class="input-holder floating">
-                            <input type="text" name="middle_name" id="middle_name" class="form-control" readonly placeholder=" " value="">
+                            <input type="text" name="middle_name" id="middle_name" class="form-control" readonly placeholder=" " value="{{ $visitor->middle_name ?? '--' }}">
                             <label for="middle_name">Middle name</label>
                         </div>
                         {{-- Last Name --}}
                         <div class="input-holder floating">
-                            <input type="text" name="last_name" id="last_name" class="form-control" readonly placeholder=" " value="">
+                            <input type="text" name="last_name" id="last_name" class="form-control" readonly placeholder=" " value="{{ $visitor->last_name }}">
                             <label for="last_name">Last name</label>
                         </div>
                         <div class="input-holder floating">
-                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="" readonly>
+                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $visitor->emp_code }}" readonly>
                             <label for="purpose_of_visit">Employee Code</label>
                         </div>
                         <div class="input-holder floating">
-                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="" readonly>
+                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $visitor->location }}" readonly>
                             <label for="purpose_of_visit">Location</label>
                         </div>
                         <div class="input-holder floating">
-                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="Currently Logged out" readonly>
+                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $visitor->status }}" readonly>
                             <label for="purpose_of_visit">Status</label>
                         </div>
 

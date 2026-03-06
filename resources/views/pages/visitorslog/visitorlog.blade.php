@@ -37,11 +37,10 @@
     </div>
 </div>
 @push('scripts')
-@vite([
-    'resources/js/visitors.js',
-    'resources/js/employees.js',
-    'resources/js/logswitcher.js'
-])
-
+    @vite([
+        'resources/js/visitors.js',
+        'resources/js/employees.js',
+        'resources/js/logswitcher.js'
+    ])
 @endpush
 @endsection

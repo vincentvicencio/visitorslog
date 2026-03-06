@@ -7,6 +7,7 @@ use App\Models\Visitor;
 use App\Models\VisitorType;
 use App\Models\RegisteredID;
 use App\Models\Location;
+use App\Models\ValidIdType;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -122,13 +123,21 @@ class VisitorController extends Controller
         }
 
         // session(['from_form' => true]);
+        $visitors = Visitor::where(function ($query) {
+            $query->where('status', 0)->orWhereNull('status');
+            })
+                -> whereNull('time_out')
+                -> orderBy('id', 'desc')
+                -> get();
+
         $visitorTypes = VisitorType::where('deleted_at', null)
-                -> orderBy('id', 'asc')
+                -> orderBy('id', 'desc')
                 -> get();
-        $visitors     = Visitor::where('status', 0)
-                -> orderBy('id', 'asc')
+                
+        $validIdTypes = ValidIdType::where('deleted_at', null)
+                -> orderBy('id', 'desc')
                 -> get();
-        return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
+        return view('pages.visitorslog.form', compact('visitors', 'visitorTypes', "validIdTypes"));
     }
 
     public function list(Request $request){

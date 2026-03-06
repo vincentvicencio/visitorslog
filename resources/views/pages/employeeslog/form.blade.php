@@ -14,10 +14,10 @@
         <div class="addvisitormodal">
             <div class="panel">
             {{-- header --}}
-            {{-- @if(Auth::user()->user_type == 1)
+            @if(Auth::user()->user_type == 1)
                 <a class="btn-close" href="{{ route('visitorslog') }}" id="detailsBtn">
                 </a>
-            @endif --}}
+            @endif
                 <div class="header fs-3">Log Employee</div>
                 <div class="subheader mb-2">Create a new record of entry</div>
                 <form id="addVisitorForm" enctype="multipart/form-data">

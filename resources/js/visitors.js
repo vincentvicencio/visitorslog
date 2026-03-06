@@ -5,6 +5,8 @@ import $ from 'jquery';
 
 const deleteModalEl = document.getElementById('notificationContainer');
 const deleteModal = new Modal(deleteModalEl);
+                
+let tableReloadInterval = null;
 
 let URL = '/visitorslog/';
 
@@ -67,6 +69,7 @@ $(document).ready(function () {
     });
 
     
+    
     $(document).on('click', '#viewBtn', function () {
         let visitorId = $(this).data('id');
         let type = $(this).data('type');
@@ -75,6 +78,7 @@ $(document).ready(function () {
             Triggers.showToast('Invalid visitor ID.', 1);
             return;
         }
+
 
         $.ajax({
             url: URL+"view",
@@ -119,39 +123,6 @@ $(document).ready(function () {
         $('#image_path').val('');
         startWebcam();
     });
-
-    // $('#captureBtn').on('click', function () {
-    //     $('#imageInput').click();
-
-    //     $('#canvas').attr('width', $('#webcam').videoWidth);
-    //     $('#canvas').attr('height', $('#webcam').videoHeight);
-
-    //     $('#canvas').getContext('2d').drawImage($('#webcam'), 0, 0, $('#canvas').width(), $('#canvas').height());
-        
-    //     // Convert the canvas image to a data URL
-    //     const imageData = $('#canvas').toDataURL('image/png');    
-
-    //     $('#photoPreview').css('display', 'block');
-    //     $('#photoPreview').attr('src', imageData);
-    //     $('#webcam').css('display', 'none');
-    //     $('#image_path').val(imageData);
-    // });
-
-    // $('#recaptureBtn').on('click', function () {
-    //     $('#photoPreview').css('display', 'none');
-    //     $('#photoPreview').attr('src', '');
-    //     $('#imageInput').val(''); 
-    //     $('#webcam').css('display', 'block');
-    //     $('#image_path').val('');
-
-    // });
-
-    // Previous logic to initialize visitor ID dropdown was removed.  
-    // (function `initializeVisitorIdDropdown` no longer exists)
-    // Ensure id suggestions are handled in the later ready handler instead.
-
-    // If you need to re-enable similar behaviour, implement
-    // a named function and call it here, or use fetchIDSuggestions directly.
 
     $('#captureBtn').on('click', function () {
 
@@ -303,11 +274,7 @@ $(document).ready(function () {
                 Triggers.showToast(response.message, 'Success', 0);
                 setTimeout(() => {
                     $('.toast').fadeOut('slow');
-                    try {
                         deleteModal.hide();
-                    } catch (e) {
-                        console.error('Modal hide error:', e);
-                    }
                 }, 1000);
                 if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
                     $('#visitorsLogTable').DataTable().draw(false);
@@ -398,13 +365,14 @@ $(document).ready(function () {
                 // setInterval(() => {
                 //     tableApi.ajax.reload(null, false); 
                 // }, 5000); 
+                if (tableReloadInterval) {
+                    clearInterval(tableReloadInterval);
+                }
 
-                setInterval(() => {
-
+                tableReloadInterval = setInterval(() => {
                     if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
                         $('#visitorsLogTable').DataTable().ajax.reload(null, false);
                     }
-
                 }, 5000);
 
                 // CUSTOM SEARCH

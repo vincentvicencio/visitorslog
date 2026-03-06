@@ -6,11 +6,6 @@ use App\Models\EmployeeLogs;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Visitor;
-use App\Models\VisitorType;
-use App\Models\ValidIdType;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Location;
 
 class EmployeeController extends Controller
@@ -209,7 +204,7 @@ class EmployeeController extends Controller
                 'action' => '<div class="dropdown">
                                         <button 
                                             class="dropdown-item"
-                                            id="viewBtn"
+                                            id="empViewBtn"
                                             data-id="'. $d->id .'"
                                             data-type="visitorslog">
                                             View
@@ -262,6 +257,7 @@ class EmployeeController extends Controller
             'status'     => 1,
             'updated_by' => Auth::user()->id,
         ]);
+
         log_audit(
             'employee logs',
             'timed out',
@@ -279,58 +275,41 @@ class EmployeeController extends Controller
     }
     public function view(Request $request)
     {
-        return view('pages.employeeslog.view');
-        // $request->validate([
-        //     'id' => 'required|exists:emp_logs,id',
-        // ]);
+        $request->validate([
+            'id' => 'required|exists:emp_logs,id',
+        ]);
 
-        // $visitor = EmployeeLogs::where('id', $request->id)
-        //     ->latest('id')
-        //     ->first();
+        $visitor = EmployeeLogs::where('id', $request->id)
+            ->latest('id')
+            ->first();
 
-        // if (!$visitor) {
-        //     return response()->json([
-        //         'message' => 'Empyloyee not found or inactive'
-        //     ], 404);
-        // }
+        if (!$visitor) {
+            return response()->json([
+                'message' => 'Empyloyee not found or inactive'
+            ], 404);
+        }
 
-        // // log view action before redirecting
-        // log_audit(
-        //     'employee logs',
-        //     'viewed',
-        //     $visitor->id,
-        //     null,
-        //     null,
-        //     'view'
-        // );
+        // log view action before redirecting
+        log_audit(
+            'employee logs',
+            'viewed',
+            $visitor->id,
+            null,
+            null,
+            'view'
+        );
 
-        // return response()->json([
-        //     'redirect'   => route('view.page', [
-        //         'id'     => $visitor->id,
-        //         'type'   => $request->type,
-        //     ])
-        // ]);
+        return response()->json([
+            'redirect'   => route('viewEmp.page', [
+                'id'     => $visitor->id,
+                'type'   => $request->type,
+            ])
+        ]);
 
     }
 
     public function form (){
-        
-
-        $visitors = Visitor::where(function ($query) {
-            $query->where('status', 0)->orWhereNull('status');
-            })
-                -> whereNull('time_out')
-                -> orderBy('id', 'desc')
-                -> get();
-
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                -> orderBy('id', 'desc')
-                -> get();
-                
-        $validIdTypes = ValidIdType::where('deleted_at', null)
-                -> orderBy('id', 'desc')
-                -> get();
-        return view('pages.employeeslog.form', compact('visitors', 'visitorTypes', "validIdTypes"));
+        return view('pages.employeeslog.form');
     }
     
     public function searchEmployees(Request $request)

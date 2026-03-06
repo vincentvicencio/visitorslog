@@ -2,9 +2,17 @@ import settable from './common/settable';
 import container from './common/container';
 import datahandling from './common/datahandling';
 import Triggers from './common/triggers';
+import { Modal } from 'bootstrap';
+
+const deleteModalEl = document.getElementById('notificationContainer');
+const deleteModal = new Modal(deleteModalEl);
+
+let tableReloadInterval = null;
+
+let URL = '/employeeslog/';
 
     class EmployeesTable {
-         constructor() {
+        constructor() {
             this.defaultFields  = []
             this.url            = "/employeeslog/"
             this.table          = "#visitorsLogTable"
@@ -15,7 +23,7 @@ import Triggers from './common/triggers';
             this.originalSearchTerm = "" // Store original search term
         }
 
-    async initializePage(){
+    async onLoadPage(){
         this.list();
         this.initializeButtons();
         this.initializeEmployeeSearchButton();
@@ -64,12 +72,14 @@ import Triggers from './common/triggers';
 
             // tableApi.draw();
 
-            setInterval(() => {
+            if (tableReloadInterval) {
+                clearInterval(tableReloadInterval);
+            }
 
+            tableReloadInterval = setInterval(() => {
                 if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
                     $('#visitorsLogTable').DataTable().ajax.reload(null, false);
                 }
-
             }, 5000);
 
             // =========================================
@@ -97,18 +107,18 @@ import Triggers from './common/triggers';
             const self = this;
 
             // Add Button
-            $('#addBtnEmp').off('click').on('click', async function (e) {
-                e.preventDefault();
-                // Clear the form fields
-                $('#logemp_emp_code').val('');
-                $('#logemp_first_name').val('');
-                $('#logemp_last_name').val('');
-                $('#employee_name_container').addClass('d-none');
-                $('#searched_emp_code').val('');
-                $('#searched_emp_code_container').hide();
-                self.hideEmployeeDropdown();
-                container.showModal('#logempModal')
-            })
+            // $('#addBtnEmp').off('click').on('click', async function (e) {
+            //     e.preventDefault();
+            //     // Clear the form fields
+            //     $('#logemp_emp_code').val('');
+            //     $('#logemp_first_name').val('');
+            //     $('#logemp_last_name').val('');
+            //     $('#employee_name_container').addClass('d-none');
+            //     $('#searched_emp_code').val('');
+            //     $('#searched_emp_code_container').hide();
+            //     self.hideEmployeeDropdown();
+            //     container.showModal('#logempModal')
+            // })
 
             $(document).on('click', '#empTimeoutBtn', function () {
                 let Id = $(this).data('id');
@@ -119,6 +129,100 @@ import Triggers from './common/triggers';
                     Id
                 );
             });
+
+            
+    
+            $(document).on('click', '#empViewBtn', function () {
+                let visitorId = $(this).data('id');
+                let type = $(this).data('type');
+
+                if (!visitorId) {
+                    Triggers.showToast('Invalid Employee Code.', 1);
+                    return;
+                }
+
+
+                $.ajax({
+                    url: URL+"view",
+                    type: "POST",
+                    data: {
+                        id: visitorId,
+                        type: type,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    timeout: 15000, 
+                    success: function (response) {
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        } else {
+                            Triggers.showToast('No redirect URL provided.', 1);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('View error:', error, xhr);
+                        let msg = 'Unable to load visitor details.';
+                        
+                        if (status === 'timeout') {
+                            msg = 'Request timeout. Please try again.';
+                        } else if (xhr.responseJSON?.message) {
+                            msg = xhr.responseJSON.message;
+                        } else if (xhr.status === 404) {
+                            msg = 'Visitor not found.';
+                        } else if (xhr.status >= 500) {
+                            msg = 'Server error. Please try again later.';
+                        }
+                        
+                        Triggers.showToast(msg, 1);
+                    }
+                });
+            });
+
+            $(document).on('click', '#timeout_btn', function () {
+                let Id = $('#record_id').val();
+                
+                if (!Id) {
+                    Triggers.showToast('Invalid record ID.', 'Invalid', 1);
+                    return;
+                }
+                $.ajax({
+                    url: URL+"timeout",
+                    type: "POST",
+                    data: {
+                        id: Id,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    timeout: 15000,
+                    success: function (response) {
+                        Triggers.showToast(response.message, 'Success', 0);
+                        setTimeout(() => {
+                            $('.toast').fadeOut('slow');
+                                deleteModal.hide();
+                            
+                        }, 1000);
+                        if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
+                            $('#visitorsLogTable').DataTable().draw(false);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Timeout error:', error, xhr);
+                        let msg = 'TimeOut failed.';
+                        
+                        if (status === 'timeout') {
+                            msg = 'Request timeout. Please try again.';
+                        } else if (xhr.responseJSON?.message) {
+                            msg = xhr.responseJSON.message;
+                        } else if (xhr.status === 404) {
+                            msg = 'Record not found.';
+                        } else if (xhr.status >= 500) {
+                            msg = 'Server error. Please try again later.';
+                        }
+                        
+                        Triggers.showToast(msg, 'Error', 1);
+                    }
+                });
+            });
+
+
 
             // Submit Log Employee Button
             $('#submit_logemp_btn').off('click').on('click', async function (e) {
@@ -194,7 +298,7 @@ import Triggers from './common/triggers';
         }
     }
 
-    async handleEmployeeSearchClick(event) {
+        async handleEmployeeSearchClick(event) {
             const searchTerm = $('#logemp_emp_code').val().trim();
             // Require non-empty search term
             if (!searchTerm) {
@@ -371,15 +475,15 @@ import Triggers from './common/triggers';
             }
         }
         initializeEmployeeSearchButton() {
-        const searchBtn = document.getElementById('search_emp_btn');
-        if (!searchBtn) return;
-        searchBtn.removeEventListener('click', this.handleEmployeeSearchClick);
-        searchBtn.addEventListener('click', this.handleEmployeeSearchClick.bind(this));
-    }
+            const searchBtn = document.getElementById('search_emp_btn');
+            if (!searchBtn) return;
+            searchBtn.removeEventListener('click', this.handleEmployeeSearchClick);
+            searchBtn.addEventListener('click', this.handleEmployeeSearchClick.bind(this));
+        }
 
 
 }
 
 const instance = new EmployeesTable();
-
+// instance.initializePage();
 export default instance;
