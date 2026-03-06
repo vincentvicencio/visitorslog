@@ -60,8 +60,7 @@ class Container {
             .removeClass("bi-arrows-angle-contract")
             .addClass("bi-arrows-angle-expand")
 
-        
-
+    
         return false // isMaximized
     }
 
@@ -70,7 +69,7 @@ class Container {
         $(formPane).css({ right: "-50%", width: "50%" })
         $(contentPane).css({ width: "100%", transform : "translateX(0)" }).show()
 
-        $(`${formPane} .btn-maximize i`)
+        $(`${formPane} .btn-maximize i`)    
                 .removeClass("bi-arrows-angle-contract")
                 .addClass("bi-arrows-angle-expand")
 

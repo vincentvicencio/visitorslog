@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\RegisterIDController;
 use App\Http\Controllers\GuardLocationController;
 use App\Http\Controllers\VisitorTypeController;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
 use App\Models\Visitor;
 use App\Models\VisitorType;
+use App\Models\EmployeeLogs;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\User_TypesController;
@@ -41,12 +43,30 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                 return view('pages.visitorslog.view', compact('visitor', 'visitorTypes', 'type', 'validIdTypes'));
             })->name('view.page');
             Route::post('/list',            'list')->name('visitorslog.list');
+            Route::post('/employee-list',            'list')->name('visitorslog.list');
             Route::post('/save',            'save')->name('visitorslog.save');
             Route::post('/timeout',         'timeout')->name('visitorslog.timeout');
             Route::post('/view',            'view')->name('visitorslog.view');
             Route::any('{any}', function () {
                 return redirect()->route('visitorslog.form');
             })->where('any', '.*');
+        });
+    
+        Route::prefix('employeeslog')
+        ->controller(EmployeeController::class)
+        ->group(function () {
+            Route::get('/form',             'form')->name('employeeslog.form');
+            Route::get('/search-employees', 'searchEmployees')->name('employeeslog.searchEmployees');
+            Route::get('/view/{id}/{type}', function ($id, $type) {
+                $visitor = EmployeeLogs::where('id', $id)->latest('id')->firstOrFail();
+                $visitorTypes = VisitorType::whereNull('deleted_at')->orderBy('id', 'asc')->get();
+                $validIdTypes = ValidIdType::whereNull('deleted_at')->orderBy('id', 'asc')->get();
+                return view('pages.visitorslog.view', compact('visitor', 'visitorTypes', 'type', 'validIdTypes'));
+            })->name('view.page');
+            Route::post('/list',            'list')->name('employeeslog.list');
+            Route::post('/save',            'save')->name('employeeslog.save');
+            Route::post('/timeout',         'timeout')->name('employeeslog.timeout');
+            Route::post('/view',            'view')->name('employeeslog.view');
         });
         
     Route::middleware(['auth', 'user_type:1'])->group(function () {
