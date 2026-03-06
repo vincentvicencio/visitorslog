@@ -39,12 +39,14 @@ $(document).ready(function(){
     $(document).on('click', '#exportReportBtn', function () {
         try {
             const filters = window.reportFilters || {};
+            const reportType = $('#employee').hasClass('selected') ? 'employee' : 'visitor';
             
             // Build query string with filters
             const params = new URLSearchParams();
             if (filters.date_from) params.append('date_from', filters.date_from);
             if (filters.date_to) params.append('date_to', filters.date_to);
             if (filters.visitor_type) params.append('visitor_type', filters.visitor_type);
+            params.append('type', reportType);
             
             const searchValue = $('#typeSearch').val();
             if (searchValue) params.append('search', searchValue);
@@ -110,8 +112,6 @@ $(document).ready(function(){
 
 
 }); 
-
-
 
     $(document).on('click', '#viewBtn', function () {
         let visitorId = $(this).data('id');
@@ -288,7 +288,7 @@ class ReportClassTable {
         settable.createTableAjax(
             self.table,
             columns,
-            self.url+"emp", // Use the full path directly
+            self.url + "emp/", // createTableAjax appends "list" -> /reports/emp/list
             columnDefs,
             self.module,
             10,

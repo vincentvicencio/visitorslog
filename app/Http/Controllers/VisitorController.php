@@ -533,7 +533,7 @@ class VisitorController extends Controller
                 $image     = base64_decode($image);
 
                 // Generate filename
-
+                $fileName  = 'visitors/' . Str::random(20) . '.png';
 
                 // Save to public disk
                 Storage::disk('public')->put($fileName, $image);

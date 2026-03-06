@@ -100,11 +100,11 @@ Route::middleware(['auth', 'single.session'])->group(function () {
         Route::prefix('reports')
             ->controller(ReportController::class)
             ->group(function () {
-                Route::get('/',              'index')->name('reports');
-                Route::get('/export',        'exportReport')->name('reports.export');
-                Route::post('/list',         'list')->name('reports.list');
-                Route::post('/emplist',         'empList')->name('reports.emplist');
-                Route::post('/delete',       'delete')->name('reports.delete');
+                Route::get('/',                 'index')->name('reports');
+                Route::get('/export',           'exportReport')->name('reports.export');
+                Route::post('/list',            'list')->name('reports.list');
+                Route::post('/emp/list',        'empList')->name('reports.emp.list');
+                Route::post('/delete',          'delete')->name('reports.delete');
             });
         // VISITOR TYPE
         Route::prefix('visitortype')

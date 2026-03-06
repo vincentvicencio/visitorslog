@@ -106,19 +106,19 @@ let URL = '/employeeslog/';
         async initializeButtons() {
             const self = this;
 
-            // Add Button
-            // $('#addBtnEmp').off('click').on('click', async function (e) {
-            //     e.preventDefault();
-            //     // Clear the form fields
-            //     $('#logemp_emp_code').val('');
-            //     $('#logemp_first_name').val('');
-            //     $('#logemp_last_name').val('');
-            //     $('#employee_name_container').addClass('d-none');
-            //     $('#searched_emp_code').val('');
-            //     $('#searched_emp_code_container').hide();
-            //     self.hideEmployeeDropdown();
-            //     container.showModal('#logempModal')
-            // })
+           // Add Button
+            $('#addBtnEmp').off('click').on('click', async function (e) {
+                e.preventDefault();
+                // Clear the form fields
+                $('#logemp_emp_code').val('');
+                $('#logemp_first_name').val('');
+                $('#logemp_last_name').val('');
+                $('#employee_name_container').addClass('d-none');
+                $('#searched_emp_code').val('');
+                $('#searched_emp_code_container').hide();
+                self.hideEmployeeDropdown();
+                container.showModal('#logempModal')
+            })
 
             $(document).on('click', '#empTimeoutBtn', function () {
                 let Id = $(this).data('id');
