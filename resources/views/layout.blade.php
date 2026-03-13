@@ -23,7 +23,7 @@
             @include('components.triggers.delete')
             @include('components.triggers.visitorTypeModal')
             @include('components.triggers.viewImage')
-            @include('components.triggers.logempModal')
+            {{-- @include('components.triggers.logempModal') --}} {{-- redirects to form page instead --}}
             <!-- Notification -->
 
             @stack('scripts')

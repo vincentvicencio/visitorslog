@@ -51,11 +51,11 @@
                             <label for="purpose_of_visit">Employee Code</label>
                         </div>
                         <div class="input-holder floating">
-                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $visitor->location }}" readonly>
+                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $locationLabel }}" readonly>
                             <label for="purpose_of_visit">Location</label>
                         </div>
                         <div class="input-holder floating">
-                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $visitor->status }}" readonly>
+                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $statusLabel }}" readonly>
                             <label for="purpose_of_visit">Status</label>
                         </div>
 

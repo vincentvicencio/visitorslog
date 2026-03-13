@@ -133,6 +133,11 @@ class LoginController extends Controller
             $api_data = fetchdata_api('api_data', $payload);
 
             Session::put($sessionKey, $api_data);
+
+            // Cache app-wide so guard accounts (no auth_token) can use the list too
+            if (!empty($api_data)) {
+                \Illuminate\Support\Facades\Cache::put('all_emp_cache', $api_data, now()->addHours(24));
+            }
         }
         else{
             $api_data = Session::get($sessionKey);

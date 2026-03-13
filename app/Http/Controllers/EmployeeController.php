@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmployeeLogs;
+use App\Models\RegisteredUser;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -308,33 +309,84 @@ class EmployeeController extends Controller
 
     }
 
-    public function form (){
-        return view('pages.employeeslog.form');
+    public function form(){
+        $user = Auth::user();
+        $locationLabel = $this->resolveLocationForSave($user) ?? '';
+
+        // Try to resolve a human-readable name from all_location session
+        if (is_numeric($locationLabel)) {
+            $allLocations = collect(session('all_location', []));
+            $match = $allLocations->firstWhere('id', $locationLabel);
+            if ($match && !empty($match['name'])) {
+                $locationLabel = $match['name'];
+            } else {
+                $guardLocation = \App\Models\Location::find($locationLabel);
+                if ($guardLocation) {
+                    $locationLabel = $guardLocation->name;
+                }
+            }
+        }
+
+        return view('pages.employeeslog.form', compact('locationLabel'));
     }
     
     public function searchEmployees(Request $request)
     {
-        $search    = strtolower($request->input('q', ''));
+        $search    = strtolower(trim((string) $request->input('q', '')));
         $employees = collect(session('all_emp', []));
-        
+
+        // Fallback for users without auth_token-backed session data (e.g., guards)
+        if ($employees->isEmpty()) {
+            // Try the app-wide cache populated when any admin last logged in
+            $cached = \Illuminate\Support\Facades\Cache::get('all_emp_cache', []);
+            if (!empty($cached)) {
+                $employees = collect($cached);
+            } else {
+                // Last resort: unique employees from historical logs
+                $employees = EmployeeLogs::select('emp_code', 'first_name', 'last_name')
+                    ->distinct()
+                    ->orderBy('emp_code')
+                    ->get()
+                    ->map(function ($row) {
+                        return [
+                            'emp_code'    => (string) $row->emp_code,
+                            'first_name'  => (string) $row->first_name,
+                            'middle_name' => '',
+                            'last_name'   => (string) $row->last_name,
+                        ];
+                    });
+            }
+        }
+
         // Filter employees based on search term
         $filtered = $employees->filter(function ($emp) use ($search) {
             if (empty($search)) return true;
             
             $empCode   = strtolower($emp['emp_code'] ?? '');
             $firstName = strtolower($emp['first_name'] ?? '');
+            $middleName = strtolower($emp['middle_name'] ?? '');
             $lastName  = strtolower($emp['last_name'] ?? '');
+
+            $fullName = trim(preg_replace('/\s+/', ' ', $firstName . ' ' . $middleName . ' ' . $lastName));
+            $firstLast = trim(preg_replace('/\s+/', ' ', $firstName . ' ' . $lastName));
+            $lastFirst = trim(preg_replace('/\s+/', ' ', $lastName . ' ' . $firstName));
+            $normalizedSearch = trim(preg_replace('/\s+/', ' ', $search));
             
             return str_contains($empCode, $search) || 
                    str_contains($firstName, $search) || 
-                   str_contains($lastName, $search);
+                   str_contains($middleName, $search) || 
+                   str_contains($lastName, $search) ||
+                   str_contains($fullName, $normalizedSearch) ||
+                   str_contains($firstLast, $normalizedSearch) ||
+                   str_contains($lastFirst, $normalizedSearch);
         })->take(20); // Limit results
         
         $results = $filtered->map(function ($emp) {
             return [
                 'id'         => $emp['emp_code'],
-                'text'       => $emp['emp_code'] . ' - ' . ($emp['first_name'] ?? '') . ' ' . ($emp['last_name'] ?? ''),
+                'text'       => trim(($emp['emp_code'] ?? '') . ' - ' . ($emp['first_name'] ?? '') . ' ' . ($emp['middle_name'] ?? '') . ' ' . ($emp['last_name'] ?? '')),
                 'first_name' => $emp['first_name'] ?? '',
+                'middle_name' => $emp['middle_name'] ?? '',
                 'last_name'  => $emp['last_name'] ?? ''
             ];
         })->values()->toArray();

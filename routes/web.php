@@ -11,6 +11,7 @@ use App\Http\Controllers\VisitorController;
 use App\Models\Visitor;
 use App\Models\VisitorType;
 use App\Models\EmployeeLogs;
+use App\Models\Location;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\User_TypesController;
@@ -59,7 +60,24 @@ Route::middleware(['auth', 'single.session'])->group(function () {
             Route::get('/search-employees', 'searchEmployees')->name('employeeslog.searchEmployees');
             Route::get('/view/{id}/{type}', function ($id, $type) {
                 $visitor = EmployeeLogs::where('id', $id)->latest('id')->firstOrFail();
-                return view('pages.employeeslog.view', compact('visitor', 'type'));
+
+                $locationLabel = (string) ($visitor->location ?? '');
+                if (is_numeric($locationLabel)) {
+                    $allLocations = collect(session('all_location', []));
+                    $match = $allLocations->firstWhere('id', $locationLabel);
+                    if ($match && !empty($match['name'])) {
+                        $locationLabel = (string) $match['name'];
+                    } else {
+                        $guardLocation = Location::query()->find($locationLabel);
+                        if ($guardLocation) {
+                            $locationLabel = (string) $guardLocation->name;
+                        }
+                    }
+                }
+
+                $statusLabel = (int) $visitor->status === 1 ? 'Timed Out' : 'Active';
+
+                return view('pages.employeeslog.view', compact('visitor', 'type', 'locationLabel', 'statusLabel'));
             })->name('viewEmp.page');
             Route::post('/list',            'list')->name('employeeslog.list');
             Route::post('/save',            'save')->name('employeeslog.save');

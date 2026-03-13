@@ -14,13 +14,11 @@
         <div class="addvisitormodal">
             <div class="panel">
             {{-- header --}}
-            @if(Auth::user()->user_type == 1)
                 <a class="btn-close" href="{{ route('visitorslog') }}" id="detailsBtn">
                 </a>
-            @endif
                 <div class="header fs-3">Log Employee</div>
                 <div class="subheader mb-2">Create a new record of entry</div>
-                <form id="addVisitorForm" enctype="multipart/form-data">
+                <form id="logemp_form" enctype="multipart/form-data">
                     @csrf 
                     <div class="form">
                         <div class="details">
@@ -29,36 +27,35 @@
                                 Employee Details
                             </div>
 
-                        
                             <div class="search-bar input-holder floating w-100">
-                                <input type="text"id="typeSearch" placeholder="Enter Emp code or Name" class="search" >
-                                <button class="m-0"><i class="bi bi-search"></i></button>
+                                <input type="text" id="logemp_emp_code" placeholder="Enter Emp Code or Name" class="search" autocomplete="off">
+                                <button class="m-0" type="button" id="search_emp_btn"><i class="bi bi-search"></i></button>
                             </div>
                             <div class="input-holder floating">
-                                <input type="text" name="first_name" id="first_name" class="form-control"  placeholder=" " value="">
-                                <label for="first_name">First name</label>
+                                <input type="text" name="first_name" id="logemp_first_name" class="form-control" placeholder=" " value="" readonly>
+                                <label for="logemp_first_name">First name</label>
                             </div>
                             {{-- Middle Name --}}
                             <div class="input-holder floating">
-                                <input type="text" name="middle_name" id="middle_name" class="form-control"  placeholder=" " value="">
+                                <input type="text" name="middle_name" id="middle_name" class="form-control" placeholder=" " value="" readonly>
                                 <label for="middle_name">Middle name</label>
                             </div>
                             {{-- Last Name --}}
                             <div class="input-holder floating">
-                                <input type="text" name="last_name" id="last_name" class="form-control"  placeholder=" " value="">
-                                <label for="last_name">Last name</label>
+                                <input type="text" name="last_name" id="logemp_last_name" class="form-control" placeholder=" " value="" readonly>
+                                <label for="logemp_last_name">Last name</label>
                             </div>
                             <div class="input-holder floating">
-                                <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="" >
-                                <label for="purpose_of_visit">Employee Code</label>
+                                <input type="text" id="searched_emp_code" class="form-control" placeholder=" " readonly>
+                                <label>Employee Code</label>
                             </div>
                             <div class="input-holder floating">
-                                <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="" >
-                                <label for="purpose_of_visit">Location</label>
+                                <input type="text" class="form-control" placeholder=" " value="{{ $locationLabel }}" readonly>
+                                <label>Location</label>
                             </div>
                             <div class="input-holder floating">
-                                <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="Currently Logged out" >
-                                <label for="purpose_of_visit">Status</label>
+                                <input type="text" class="form-control" placeholder=" " value="Currently Logged out" readonly>
+                                <label>Status</label>
                             </div>
 
                             <br><br><br><br>
@@ -73,7 +70,7 @@
                         </div>
 
                         <div class="capture">
-                            <div class="header">Image</div>
+                            <div class="header">Capture Image</div>
                                 <div class="imgholder" style="overflow: hidden">
                                     <video id="webcam" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
                                     <canvas id="canvas" style="display:none;"></canvas>
@@ -96,5 +93,5 @@
         </div>
     </div>
 
-@vite('resources/js/visitors.js')
+@vite('resources/js/employees.js')
 @endsection

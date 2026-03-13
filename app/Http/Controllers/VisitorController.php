@@ -239,9 +239,21 @@ class VisitorController extends Controller
                 $status = 'Timed Out';
             }
 
-            $time_in = Carbon::parse($d->time_in)->format('h:i A');
+            $time_in = $d->time_in ? Carbon::parse($d->time_in)->format('h:i A') : '-';
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            $visitLabel = $d->created_at
+                ? $d->created_at->format('F d, Y') . '<br>' . $d->created_at->format('l')
+                : '-';
+
+            $createdAtLabel = $d->created_at
+                ? $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')
+                : '-';
+
+            $updatedAtLabel = $d->updated_at
+                ? $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')
+                : '-';
 
             $createdby = $d->created_by ? user_name($d->created_by) : '-';
             $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
@@ -260,10 +272,7 @@ class VisitorController extends Controller
 
                 'visitor_id'   => '<div class="text-center">' . $d->visitor_id . '</div>',
 
-                'visit' =>  '<div class="text-center">' . 
-                                    $d->created_at->format("F d, Y") .'<br>
-                                    '. $d->created_at->format('l')
-                                 . '</div>',
+                     'visit' =>  '<div class="text-center">' . $visitLabel . '</div>',
 
                 'time_in' => '<div class="text-center">
                                 <small> '. $time_in .'</small><br>
@@ -277,9 +286,9 @@ class VisitorController extends Controller
                 
                 'status'       => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
 
-                'created_at'   => '<div class="text-center">' . $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l') . '</div>',
+                'created_at'   => '<div class="text-center">' . $createdAtLabel . '</div>',
 
-                'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+                'updated_at'   => $updatedAtLabel,
 
                 'action' => '<div class="dropdown">
                                         <button 
@@ -547,7 +556,12 @@ class VisitorController extends Controller
             }
             
 
-            $middleInitial = mb_strtoupper(mb_substr(trim($request->middle_name), 0, 1));
+            $firstName = Str::title(trim((string) $request->first_name));
+            $middleName = Str::title(trim((string) $request->middle_name));
+            $lastName = Str::title(trim((string) $request->last_name));
+            $contactPerson = Str::title(trim((string) $request->contact_person));
+
+            $middleInitial = mb_strtoupper(mb_substr($middleName, 0, 1));
 
             $user = Auth::user();
             $locationForSave = $this->resolveLocationForSave($user);
@@ -555,20 +569,24 @@ class VisitorController extends Controller
             $visitor = new Visitor();
             // clint - remove dot when there is no middle name
             if (!empty($middleInitial)) {
-                $visitor->full_name = $request->first_name . ' ' . $middleInitial . '. ' . $request->last_name;
+                $visitor->full_name = $firstName . ' ' . $middleInitial . '. ' . $lastName;
             } else {
-                $visitor->full_name = $request->first_name . ' ' . $request->last_name;
+                $visitor->full_name = $firstName . ' ' . $lastName;
             }
             // original code - kardo
             // $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
-            $visitor->first_name   = $request->first_name;
-            $visitor->middle_name  = $request->middle_name;
-            $visitor->last_name    = $request->last_name;
+            $visitor->first_name   = $firstName;
+            $visitor->middle_name  = $middleName !== '' ? $middleName : null;
+            $visitor->last_name    = $lastName;
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
+            $visitor->id_type      = $request->id_type;
+            $visitor->valid_id     = $request->id_type_number;
             $visitor->location     = $locationForSave;
             $visitor->address      = $request->address;
+            $visitor->purpose      = $request->purpose_of_visit;
+            $visitor->contact_person = $contactPerson;
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
