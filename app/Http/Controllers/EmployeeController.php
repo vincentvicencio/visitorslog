@@ -408,13 +408,13 @@ class EmployeeController extends Controller
         try {
             $request->validate([
                 'emp_code'      => 'required|string',
-                'first_name'    => 'required|string|max:40',
-                'last_name'     => 'required|string|max:40',
+                // 'first_name'    => 'required|string|max:40',
+                // 'last_name'     => 'required|string|max:40',
                 'full_name'     => 'required|string|max:100',
             ], [
                 'emp_code.required'    => 'Employee Code is required',
-                'first_name.required'  => 'First Name is required',
-                'last_name.required'   => 'Last Name is required',
+                // 'first_name.required'  => 'First Name is required',
+                // 'last_name.required'   => 'Last Name is required',
                 'full_name.required'   => 'Full Name is required',
             ]);
 

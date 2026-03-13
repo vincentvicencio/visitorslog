@@ -329,10 +329,10 @@ let URL = '/employeeslog/';
                         this.selectEmployee(exactMatch);
                     } else if (results.length === 0) {
                         // No results
-                        $('#logemp_first_name').val('');
-                        $('#middle_name').val('');
-                        $('#logemp_last_name').val('');
-                        $('#employee_name_container').addClass('d-none');
+                        $('#logemp_full_name').val('');
+                        // $('#middle_name').val('');
+                        // $('#logemp_last_name').val('');
+                        // $('#employee_name_container').addClass('d-none');
                         $('#searched_emp_code').val('');
                         $('#searched_emp_code_container').hide();
                         this.hideEmployeeDropdown();
@@ -363,12 +363,18 @@ let URL = '/employeeslog/';
                 $('#logemp_emp_code').val(searchTerm);
             }
             
-            $('#logemp_first_name').val(employee.first_name || '');
-            $('#middle_name').val(employee.middle_name || '');
-            $('#logemp_last_name').val(employee.last_name || '');
-            $('#employee_name_container').removeClass('d-none');
+            // $('#logemp_first_name').val(employee.first_name || '');
+            // $('#middle_name').val(employee.middle_name || '');
+            // $('#logemp_last_name').val(employee.last_name || '');
+            const fullName = [employee.first_name, employee.middle_name, employee.last_name]
+            .filter(part => part && part.trim() !== '')
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+            $('#logemp_full_name').val(fullName);
+            // $('#employee_name_container').removeClass('d-none');
             $('#searched_emp_code').val(employee.id);
-            $('#searched_emp_code_container').show();
+            // $('#searched_emp_code_container').show();
             this.hideEmployeeDropdown();
             Triggers.showToast('Employee selected!','Employee Search', 0);
         }
@@ -429,12 +435,21 @@ let URL = '/employeeslog/';
         async submitEmployeeLog() {
             // Validate required fields
             const empCode = $('#searched_emp_code').val().trim();
-            const firstName = $('#logemp_first_name').val().trim();
-            const lastName = $('#logemp_last_name').val().trim();
+            // const firstName = $('#logemp_first_name').val().trim();
+            // const lastName = $('#logemp_last_name').val().trim();
+            const fullName = $('#logemp_full_name').val().trim();
+            const nameParts = fullName.split(' ').filter(Boolean);
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
 
             if (!empCode) {
                 Triggers.showToast('Please search and select an employee.', 'Employee Log', 1);
                 return;
+            }
+
+            if (!fullName) {
+            Triggers.showToast('Employee name is incomplete.', 'Employee Log', 1);
+            return;
             }
 
             if (!firstName || !lastName) {
@@ -445,11 +460,11 @@ let URL = '/employeeslog/';
             // Use a plain payload here because processData uses $.ajax default serialization.
             // Passing Blob/File values via Object.fromEntries(FormData) can throw Illegal invocation.
             const payload = {
-                emp_code: empCode,
-                first_name: firstName,
-                last_name: lastName,
-                full_name: `${firstName} ${lastName}`,
-                image_path: $('#image_path').val() || '',
+            emp_code: empCode,
+            first_name: firstName,
+            last_name: lastName,
+            full_name: fullName,
+            image_path: $('#image_path').val() || '',
             };
 
             try {
@@ -464,10 +479,10 @@ let URL = '/employeeslog/';
                     // Clear form
                     $('#logemp_form')[0].reset();
                     $('#logemp_emp_code').val('');
-                    $('#logemp_first_name').val('');
-                    $('#middle_name').val('');
-                    $('#logemp_last_name').val('');
-                    $('#employee_name_container').addClass('d-none');
+                    // $('#logemp_first_name').val('');
+                    // $('#middle_name').val('');
+                    // $('#logemp_last_name').val('');
+                    // $('#employee_name_container').addClass('d-none');
                     $('#searched_emp_code').val('');
                     $('#searched_emp_code_container').hide();
                     this.hideEmployeeDropdown();
