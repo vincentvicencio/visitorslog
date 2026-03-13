@@ -29,7 +29,7 @@
             <a href="{{ url('visitorslog') }}"
             class="sidebar-menu-button {{ Request::is('visitorslog') ? 'selected' : '' }}">
                 <i class="bi bi-person-lines-fill fs-6 p-2"></i>
-                Visitor Log Sheets
+                Log Sheets
             </a>
             @if(Auth::user()->user_type == 1)
                 <a href="{{ url('IDtype') }}"
