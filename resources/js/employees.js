@@ -27,6 +27,7 @@ let URL = '/employeeslog/';
         this.list();
         this.initializeButtons();
         this.initializeEmployeeSearchButton();
+        this.bindEmployeeDropdownDismissHandlers();
         this.keylistener();
     }
 
@@ -106,7 +107,7 @@ let URL = '/employeeslog/';
         async initializeButtons() {
             const self = this;
 
-            // Add Button
+           // Add Button — now redirects to employeeslog.form page (modal commented out)
             // $('#addBtnEmp').off('click').on('click', async function (e) {
             //     e.preventDefault();
             //     // Clear the form fields
@@ -323,24 +324,21 @@ let URL = '/employeeslog/';
                     // Check for exact emp code match
                     const exactMatch = results.find(emp => emp.id.toLowerCase() === searchTerm.toLowerCase());
                     
-                    if (exactMatch) {
-                        // Exact emp code found
+                    if (exactMatch && results.length === 1) {
+                        // Only auto-populate on an unambiguous exact emp code match
                         this.selectEmployee(exactMatch);
                     } else if (results.length === 0) {
                         // No results
-                        $('#logemp_first_name').val('');
-                        $('#logemp_last_name').val('');
-                        $('#employee_name_container').addClass('d-none');
+                        $('#logemp_full_name').val('');
+                        // $('#middle_name').val('');
+                        // $('#logemp_last_name').val('');
+                        // $('#employee_name_container').addClass('d-none');
                         $('#searched_emp_code').val('');
                         $('#searched_emp_code_container').hide();
                         this.hideEmployeeDropdown();
                         Triggers.showToast('Employee not found.','Employee Search', 1);
-                    } else if (results.length === 1) {
-                        // Single name match - auto-select
-                        this.selectEmployee(results[0]);
-                        this.hideEmployeeDropdown();
                     } else {
-                        // Multiple name matches - show dropdown suggestions
+                        // Always show dropdown so the user can confirm their selection
                         this.showEmployeeDropdown(results);
                     }
                     $btn.prop('disabled', false).html('<i class="bi bi-search"></i>');
@@ -365,11 +363,18 @@ let URL = '/employeeslog/';
                 $('#logemp_emp_code').val(searchTerm);
             }
             
-            $('#logemp_first_name').val(employee.first_name || '');
-            $('#logemp_last_name').val(employee.last_name || '');
-            $('#employee_name_container').removeClass('d-none');
+            // $('#logemp_first_name').val(employee.first_name || '');
+            // $('#middle_name').val(employee.middle_name || '');
+            // $('#logemp_last_name').val(employee.last_name || '');
+            const fullName = [employee.first_name, employee.middle_name, employee.last_name]
+            .filter(part => part && part.trim() !== '')
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+            $('#logemp_full_name').val(fullName);
+            // $('#employee_name_container').removeClass('d-none');
             $('#searched_emp_code').val(employee.id);
-            $('#searched_emp_code_container').show();
+            // $('#searched_emp_code_container').show();
             this.hideEmployeeDropdown();
             Triggers.showToast('Employee selected!','Employee Search', 0);
         }
@@ -391,10 +396,16 @@ let URL = '/employeeslog/';
                 </div>
             `;
             
-            // Get the input container and add dropdown
-            const $inputGroup = $('#logemp_emp_code').closest('.input-group');
-            $inputGroup.css('position', 'relative');
-            $inputGroup.after(dropdownHtml);
+            // Get the input container and append dropdown inside it so top:100% anchors correctly
+            const $inputContainer = $('#logemp_emp_code').closest('.input-group, .search-bar');
+            if ($inputContainer.length) {
+                $inputContainer.css('position', 'relative');
+                $inputContainer.append(dropdownHtml);
+            } else {
+                const $parent = $('#logemp_emp_code').parent();
+                $parent.css('position', 'relative');
+                $parent.append(dropdownHtml);
+            }
             
             // Handle employee option clicks
             $('.employee-option').each((index, el) => {
@@ -409,6 +420,7 @@ let URL = '/employeeslog/';
                         self.selectEmployee({
                             id: employee.id,
                             first_name: employee.first_name,
+                            middle_name: employee.middle_name,
                             last_name: employee.last_name
                         });
                     }
@@ -423,12 +435,21 @@ let URL = '/employeeslog/';
         async submitEmployeeLog() {
             // Validate required fields
             const empCode = $('#searched_emp_code').val().trim();
-            const firstName = $('#logemp_first_name').val().trim();
-            const lastName = $('#logemp_last_name').val().trim();
+            // const firstName = $('#logemp_first_name').val().trim();
+            // const lastName = $('#logemp_last_name').val().trim();
+            const fullName = $('#logemp_full_name').val().trim();
+            const nameParts = fullName.split(' ').filter(Boolean);
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
 
             if (!empCode) {
                 Triggers.showToast('Please search and select an employee.', 'Employee Log', 1);
                 return;
+            }
+
+            if (!fullName) {
+            Triggers.showToast('Employee name is incomplete.', 'Employee Log', 1);
+            return;
             }
 
             if (!firstName || !lastName) {
@@ -436,33 +457,40 @@ let URL = '/employeeslog/';
                 return;
             }
 
-            // Prepare form data
-            const formData = new FormData($('#logemp_form')[0]);
-            formData.append('emp_code', empCode);
-            formData.append('first_name', firstName);
-            formData.append('last_name', lastName);
-            formData.append('full_name', firstName + ' ' + lastName);
+            // Use a plain payload here because processData uses $.ajax default serialization.
+            // Passing Blob/File values via Object.fromEntries(FormData) can throw Illegal invocation.
+            const payload = {
+            emp_code: empCode,
+            first_name: firstName,
+            last_name: lastName,
+            full_name: fullName,
+            image_path: $('#image_path').val() || '',
+            };
 
             try {
                 const response = await datahandling.processData(
                     this.url + 'save',
                     'POST',
-                    Object.fromEntries(formData)
+                    payload
                 );
 
                 if (response.status === 0) {
                     Triggers.showToast(response.message, response.title, 0);
-                    // Close modal and refresh table
-                    container.hideModal('#logempModal');
                     // Clear form
                     $('#logemp_form')[0].reset();
                     $('#logemp_emp_code').val('');
-                    $('#logemp_first_name').val('');
-                    $('#logemp_last_name').val('');
-                    $('#employee_name_container').addClass('d-none');
+                    // $('#logemp_first_name').val('');
+                    // $('#middle_name').val('');
+                    // $('#logemp_last_name').val('');
+                    // $('#employee_name_container').addClass('d-none');
                     $('#searched_emp_code').val('');
                     $('#searched_emp_code_container').hide();
-                    // Reload table
+                    this.hideEmployeeDropdown();
+                    // Close modal only when on the log page
+                    if (document.getElementById('logempModal')) {
+                        container.hideModal('#logempModal');
+                    }
+                    // Reload table if on the log page
                     if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
                         $('#visitorsLogTable').DataTable().ajax.reload(null, false);
                     }
@@ -474,6 +502,83 @@ let URL = '/employeeslog/';
                 Triggers.showToast('Failed to log employee.', 'Employee Log', 1);
             }
         }
+        initializeFormPage() {
+            this.initializeEmployeeSearchButton();
+            this.bindEmployeeDropdownDismissHandlers();
+            const self = this;
+
+            $('#logemp_form').off('submit').on('submit', async function (e) {
+                e.preventDefault();
+                await self.submitEmployeeLog();
+            });
+
+            $(document).off('click', '#clrBtn').on('click', '#clrBtn', function () {
+                $('#logemp_form')[0].reset();
+                $('#photoPreview').css('display', 'none').attr('src', '');
+                $('#imageInput').val('');
+                $('#image_path').val('');
+                startWebcam();
+            });
+
+            $('#captureBtn').off('click').on('click', function () {
+                const video = document.getElementById('webcam');
+                const canvas = document.getElementById('canvas');
+                if (video && video.srcObject) {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = canvas.toDataURL('image/png');
+                    $('#photoPreview').css('display', 'block').attr('src', imageData);
+                    $('#webcam').css('display', 'none');
+                    $('#image_path').val(imageData);
+                } else {
+                    $('#imageInput').click();
+                }
+            });
+
+            $('#recaptureBtn').off('click').on('click', function () {
+                $('#photoPreview').css('display', 'none').attr('src', '');
+                $('#imageInput').val('');
+                $('#image_path').val('');
+                const video = document.getElementById('webcam');
+                if (video && video.srcObject) {
+                    $('#webcam').css('display', 'block');
+                }
+            });
+
+            startWebcam();
+        }
+
+        bindEmployeeDropdownDismissHandlers() {
+            const self = this;
+
+            
+            // Close suggestions when clicking anywhere outside the search area/dropdown.
+            $(document)
+                .off('mousedown.employeeDropdown')
+                .on('mousedown.employeeDropdown', function (e) {
+                    const $target = $(e.target);
+                    const insideDropdown = $target.closest('#employeeDropdown').length > 0;
+                    const insideSearch = $target.closest('#logemp_emp_code, #search_emp_btn').length > 0;
+
+                    if (!insideDropdown && !insideSearch) {
+                        self.hideEmployeeDropdown();
+                    }
+                });
+
+            $('#logemp_emp_code')
+                .off('keydown.employeeDropdown')
+                .on('keydown.employeeDropdown', function (e) {
+                    if (e.key === 'Escape') {
+                        self.hideEmployeeDropdown();
+                    }
+                })
+                .off('input.employeeDropdown')
+                .on('input.employeeDropdown', function () {
+                    self.hideEmployeeDropdown();
+                });
+        }
+
         initializeEmployeeSearchButton() {
             const searchBtn = document.getElementById('search_emp_btn');
             if (!searchBtn) return;
@@ -485,5 +590,35 @@ let URL = '/employeeslog/';
 }
 
 const instance = new EmployeesTable();
-// instance.initializePage();
+
+async function startWebcam() {
+    const video = document.getElementById('webcam');
+    const imageInput = document.getElementById('imageInput');
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (imageInput) imageInput.style.display = 'block';
+        if (video) video.style.display = 'none';
+        return;
+    }
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        if (video) {
+            video.srcObject = stream;
+            video.style.display = 'block';
+        }
+        if (imageInput) imageInput.style.display = 'none';
+    } catch (err) {
+        console.error('Webcam not available:', err);
+        if (imageInput) imageInput.style.display = 'block';
+        if (video) video.style.display = 'none';
+    }
+}
+
+$(document).ready(function () {
+    if (document.getElementById('logemp_form') && !document.getElementById('visitorsLogTable')) {
+        instance.initializeFormPage();
+    }
+});
+
 export default instance;

@@ -11,6 +11,21 @@ window.reportFilters = {
     visitor_type: ''
 };
 
+const getActiveReportType = () => ($('#employee').hasClass('selected') ? 'employee' : 'visitor');
+
+const syncFilterModalState = () => {
+    const isEmployeeReport = getActiveReportType() === 'employee';
+    const visitorTypeGroup = $('#visitorTypeFilterGroup');
+    const visitorTypeSelect = visitorTypeGroup.find('select[name="visitor_type"]');
+
+    visitorTypeGroup.toggleClass('d-none', isEmployeeReport);
+
+    if (isEmployeeReport) {
+        visitorTypeSelect.val('');
+        window.reportFilters.visitor_type = '';
+    }
+};
+
 
 let tableReloadInterval = null;
 
@@ -19,6 +34,8 @@ let URL = '/reports/';
 
 // --- SETTABLE FUNCTION OVERRIDE FOR FILTERING --- 
 $(document).ready(function(){
+    syncFilterModalState();
+
     // --- HANDLE DELETE BUTTON CLICK ---
     $(document).on('click', '.delete-btn', function () {
         const id = $(this).data('id');
@@ -28,6 +45,8 @@ $(document).ready(function(){
     });
     // --- INITIALIZE DATATABLE ---
     $(document).on('click', '#openFilterBtn', function () {
+        syncFilterModalState();
+
         const modalEl = document.getElementById('filterModal');
         const modalInstance =
             bootstrap.Modal.getInstance(modalEl) ||
@@ -39,12 +58,14 @@ $(document).ready(function(){
     $(document).on('click', '#exportReportBtn', function () {
         try {
             const filters = window.reportFilters || {};
+            const reportType = $('#employee').hasClass('selected') ? 'employee' : 'visitor';
             
             // Build query string with filters
             const params = new URLSearchParams();
             if (filters.date_from) params.append('date_from', filters.date_from);
             if (filters.date_to) params.append('date_to', filters.date_to);
             if (filters.visitor_type) params.append('visitor_type', filters.visitor_type);
+            params.append('type', reportType);
             
             const searchValue = $('#typeSearch').val();
             if (searchValue) params.append('search', searchValue);
@@ -63,6 +84,8 @@ $(document).ready(function(){
 
     $(document).on('submit', '#filterForm', function(e) {
         e.preventDefault();
+
+        syncFilterModalState();
 
         Object.assign(window.reportFilters, {
             date_from: $('input[name="date_from"]').val(),
@@ -96,6 +119,8 @@ $(document).ready(function(){
             visitor_type: ''
         });
 
+        syncFilterModalState();
+
         const filterModal = document.getElementById('filterModal');
         const modalInstance = bootstrap.Modal.getInstance(filterModal);
 
@@ -111,7 +136,9 @@ $(document).ready(function(){
 
 }); 
 
-
+$(document).on('click', '#visitor, #employee', function () {
+    syncFilterModalState();
+});
 
     $(document).on('click', '#viewBtn', function () {
         let visitorId = $(this).data('id');
@@ -288,7 +315,7 @@ class ReportClassTable {
         settable.createTableAjax(
             self.table,
             columns,
-            self.url+"emp", // Use the full path directly
+            self.url + "emp/", // createTableAjax appends "list" -> /reports/emp/list
             columnDefs,
             self.module,
             10,

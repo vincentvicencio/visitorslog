@@ -23,7 +23,7 @@
             @include('components.triggers.delete')
             @include('components.triggers.visitorTypeModal')
             @include('components.triggers.viewImage')
-            @include('components.triggers.logempModal')
+            {{-- @include('components.triggers.logempModal') --}} {{-- redirects to form page instead --}}
             <!-- Notification -->
 
             @stack('scripts')
@@ -34,6 +34,21 @@
 
         </div>
         @endif
+
+        <div class="modal fade" id="sessionExpiredModal" tabindex="-1" aria-labelledby="sessionExpiredModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow-lg border-0">
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <div class="fs-1 mb-2 text-primary"><i class="bi bi-clock-history"></i></div>
+                        <h5 class="fw-bold mb-2" id="sessionExpiredModalLabel">Session expired</h5>
+                        <p class="text-muted mb-4">Your session has expired. Please refresh to continue.</p>
+                        <button type="button" class="btn btn-primary px-4" id="sessionRefreshButton">
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         @include('layouts.footer')
         

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Exports\ReportsExport;
+use App\Exports\EmployeeExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
@@ -231,7 +232,6 @@ class ReportController extends Controller
             'search'       => $request->input('search', ''),
             'date_from'    => $request->input('date_from', ''),
             'date_to'      => $request->input('date_to', ''),
-            'visitor_type' => $request->input('visitor_type', ''),
         ];
         log_audit('reports', 'filtered', null, null, $filterData, 'filter');
 
@@ -375,19 +375,35 @@ class ReportController extends Controller
     public function exportReport(Request $request)
     {
         try{
-            $filters = [
+            // Single export endpoint: switch between visitor and employee logs by selected tab.
+            $type = strtolower((string) $request->input('type', 'visitor'));
+
+            $visitorFilters = [
                 'search'            => $request->input('search', ''),
                 'date_from'         => $request->input('date_from', ''),
                 'date_to'           => $request->input('date_to', ''),
                 'visitor_type'      => $request->input('visitor_type', ''),
+                'status'            => $request->input('status', ''),
             ];
 
-            // log export action
-            log_audit('reports', 'exported', null, null, $filters, 'export');
+            if ($type === 'employee') {
+                $employeeFilters = [
+                    'search'    => $request->input('search', ''),
+                    'date_from' => $request->input('date_from', ''),
+                    'date_to'   => $request->input('date_to', ''),
+                    'status'    => $request->input('status', ''),
+                ];
 
+                log_audit('employee_logs', 'exported', null, null, $employeeFilters, 'export');
+                $fileName = 'Employee_Logs_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+
+                return Excel::download(new EmployeeExport($employeeFilters), $fileName);
+            }
+
+            log_audit('reports', 'exported', null, null, $visitorFilters, 'export');
             $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-            
-            return Excel::download(new ReportsExport($filters), $fileName);
+
+            return Excel::download(new ReportsExport($visitorFilters), $fileName);
     
         }catch(\Exception $e){
             return response()->json([
@@ -397,6 +413,33 @@ class ReportController extends Controller
             ]); 
         }
         
+    }
+
+    public function exportEmpLogs(Request $request)
+    {
+        try{
+            // Employee logs export (uses EmployeeExport)
+            $filters = [
+                'search'    => $request->input('search', ''),
+                'date_from' => $request->input('date_from', ''),
+                'date_to'   => $request->input('date_to', ''),
+                'status'    => $request->input('status', ''),
+            ];
+
+            // log export action
+            log_audit('employee_logs', 'exported', null, null, $filters, 'export');
+
+            $fileName = 'Employee_Logs_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+
+            return Excel::download(new EmployeeExport($filters), $fileName);
+
+        }catch(\Exception $e){
+            return response()->json([
+                'status' => 1,
+                'title' => 'Error',
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     public function delete(Request $request){
