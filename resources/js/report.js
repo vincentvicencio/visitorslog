@@ -375,11 +375,11 @@ class ReportClassTable {
 
     async initializeButtons(){
         const self = this
-        // $('#btn_add').off('click').on('click', async function (e) {
-        //     e.preventDefault()
-        //     datahandling.clearForm(self.form)
-        //     container.showModal('#addTypeModal')
-        // })
+        $('#btn_add').off('click').on('click', async function (e) {
+            e.preventDefault()
+            datahandling.clearForm(self.form)
+            container.showModal('#addTypeModal')
+        })
         
         $(document).off('click', '#btn_submit').on('click', '#btn_submit', async function(e) {
             e.preventDefault();
