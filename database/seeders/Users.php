@@ -25,7 +25,6 @@ class Users extends Seeder
             'user_type'  => 1,
             'location'   => 1,
             'created_by' => 1,
-            'updated_by' => 1,
             'created_at' => now(),
         ],
         [
@@ -36,7 +35,6 @@ class Users extends Seeder
             'user_type'  => 2,
             'location'   => 2,
             'created_by' => 1,
-            'updated_by' => 1,
             'created_at' => now(),
         ]
     ]);

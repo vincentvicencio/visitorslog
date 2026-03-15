@@ -32,7 +32,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-3" id="visitorTypeFilterGroup">
                         <label class="form-label">Visitor Type</label>
                         <select name="visitor_type" class="form-select"  autocomplete="off">
                             <option value="">All Types</option>

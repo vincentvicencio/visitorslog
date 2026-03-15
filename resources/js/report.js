@@ -11,6 +11,21 @@ window.reportFilters = {
     visitor_type: ''
 };
 
+const getActiveReportType = () => ($('#employee').hasClass('selected') ? 'employee' : 'visitor');
+
+const syncFilterModalState = () => {
+    const isEmployeeReport = getActiveReportType() === 'employee';
+    const visitorTypeGroup = $('#visitorTypeFilterGroup');
+    const visitorTypeSelect = visitorTypeGroup.find('select[name="visitor_type"]');
+
+    visitorTypeGroup.toggleClass('d-none', isEmployeeReport);
+
+    if (isEmployeeReport) {
+        visitorTypeSelect.val('');
+        window.reportFilters.visitor_type = '';
+    }
+};
+
 
 let tableReloadInterval = null;
 
@@ -19,6 +34,8 @@ let URL = '/reports/';
 
 // --- SETTABLE FUNCTION OVERRIDE FOR FILTERING --- 
 $(document).ready(function(){
+    syncFilterModalState();
+
     // --- HANDLE DELETE BUTTON CLICK ---
     $(document).on('click', '.delete-btn', function () {
         const id = $(this).data('id');
@@ -28,6 +45,8 @@ $(document).ready(function(){
     });
     // --- INITIALIZE DATATABLE ---
     $(document).on('click', '#openFilterBtn', function () {
+        syncFilterModalState();
+
         const modalEl = document.getElementById('filterModal');
         const modalInstance =
             bootstrap.Modal.getInstance(modalEl) ||
@@ -66,6 +85,8 @@ $(document).ready(function(){
     $(document).on('submit', '#filterForm', function(e) {
         e.preventDefault();
 
+        syncFilterModalState();
+
         Object.assign(window.reportFilters, {
             date_from: $('input[name="date_from"]').val(),
             date_to: $('input[name="date_to"]').val(),
@@ -98,6 +119,8 @@ $(document).ready(function(){
             visitor_type: ''
         });
 
+        syncFilterModalState();
+
         const filterModal = document.getElementById('filterModal');
         const modalInstance = bootstrap.Modal.getInstance(filterModal);
 
@@ -112,6 +135,10 @@ $(document).ready(function(){
 
 
 }); 
+
+$(document).on('click', '#visitor, #employee', function () {
+    syncFilterModalState();
+});
 
     $(document).on('click', '#viewBtn', function () {
         let visitorId = $(this).data('id');

@@ -232,7 +232,6 @@ class ReportController extends Controller
             'search'       => $request->input('search', ''),
             'date_from'    => $request->input('date_from', ''),
             'date_to'      => $request->input('date_to', ''),
-            'visitor_type' => $request->input('visitor_type', ''),
         ];
         log_audit('reports', 'filtered', null, null, $filterData, 'filter');
 
@@ -379,7 +378,7 @@ class ReportController extends Controller
             // Single export endpoint: switch between visitor and employee logs by selected tab.
             $type = strtolower((string) $request->input('type', 'visitor'));
 
-            $filters = [
+            $visitorFilters = [
                 'search'            => $request->input('search', ''),
                 'date_from'         => $request->input('date_from', ''),
                 'date_to'           => $request->input('date_to', ''),
@@ -388,16 +387,23 @@ class ReportController extends Controller
             ];
 
             if ($type === 'employee') {
-                log_audit('employee_logs', 'exported', null, null, $filters, 'export');
+                $employeeFilters = [
+                    'search'    => $request->input('search', ''),
+                    'date_from' => $request->input('date_from', ''),
+                    'date_to'   => $request->input('date_to', ''),
+                    'status'    => $request->input('status', ''),
+                ];
+
+                log_audit('employee_logs', 'exported', null, null, $employeeFilters, 'export');
                 $fileName = 'Employee_Logs_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
 
-                return Excel::download(new EmployeeExport($filters), $fileName);
+                return Excel::download(new EmployeeExport($employeeFilters), $fileName);
             }
 
-            log_audit('reports', 'exported', null, null, $filters, 'export');
+            log_audit('reports', 'exported', null, null, $visitorFilters, 'export');
             $fileName = 'Visitor_Report_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
 
-            return Excel::download(new ReportsExport($filters), $fileName);
+            return Excel::download(new ReportsExport($visitorFilters), $fileName);
     
         }catch(\Exception $e){
             return response()->json([
