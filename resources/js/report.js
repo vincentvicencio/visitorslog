@@ -106,13 +106,11 @@ $(document).ready(function(){
     });
 
     // Handle Reset Button
-    $(document).on('click', '.btn-secondary[href*="/report"]', function(e) {
+    $(document).on('click', '#resetReportFilters', function(e) {
         e.preventDefault();
 
-        // Reset
         $('#filterForm')[0].reset();
 
-        // Reset filters
         Object.assign(window.reportFilters, {
             date_from: '',
             date_to: '',
@@ -121,16 +119,8 @@ $(document).ready(function(){
 
         syncFilterModalState();
 
-        const filterModal = document.getElementById('filterModal');
-        const modalInstance = bootstrap.Modal.getInstance(filterModal);
-
-        if (modalInstance) {
-            modalInstance.hide();
-        }
-
-        // Reload table with no filters
+        // Keep modal open.
         $('#reportTable').DataTable().draw();
-        
     });
 
 
