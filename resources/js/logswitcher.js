@@ -35,6 +35,7 @@ $(document).ready(function () {
 
     // Object.keys(tabs).forEach(k => tabs[k].addEventListener("click", () => updateView(k)));
     updateView(tabs.employee.classList.contains("selected") ? "employee" : "visitor");
+
     Object.keys(tabs).forEach(k => {
         tabs[k].addEventListener("click", () => {
             updateView(k);
