@@ -1,4 +1,7 @@
 .addvisitor {
+  .panel-buttons{
+    margin-top: auto !important;
+  }
     .addvisitormodal {
         position: fixed;
         inset: 0;
@@ -175,6 +178,7 @@
         border-bottom: 2px solid rgba(128, 128, 128, 0.3);
         text-transform: capitalize;
         margin: 0px 5px;
+        height: 37px !important;
     }
     .floating{
         padding: 0px 5px;

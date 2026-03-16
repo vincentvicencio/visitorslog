@@ -16,7 +16,7 @@ $(document).ready(function () {
     });
 
     const updateView = selected => {
-        container.classList.toggle("table-tab", selected === "visitor");
+        container.classList.add("table-tab");
         Object.entries(tabs).forEach(([key, tab]) => {
             const sel = key === selected;
             tab.classList.toggle("selected", sel);

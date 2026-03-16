@@ -15,8 +15,6 @@ class EmployeeLogs extends Model
     protected $fillable = [
         'emp_code',
         'full_name',
-        'first_name',
-        'last_name',
         'profile_pic',
         'location',
         'status',

@@ -33,19 +33,19 @@
 
                         <br>
                         <div class="input-holder floating">
-                            <input type="text" name="first_name" id="first_name" class="form-control" readonly placeholder=" " value="{{ $visitor->first_name }}">
-                            <label for="first_name">First name</label>
+                            <input type="text" name="full_name" id="full_name" class="form-control" readonly placeholder=" " value="{{ $visitor->full_name }}">
+                            <label for="first_name">Name</label>
                         </div>
                         {{-- Middle Name --}}
-                        <div class="input-holder floating">
+                        {{-- <div class="input-holder floating">
                             <input type="text" name="middle_name" id="middle_name" class="form-control" readonly placeholder=" " value="{{ $visitor->middle_name ?? '--' }}">
                             <label for="middle_name">Middle name</label>
-                        </div>
+                        </div> --}}
                         {{-- Last Name --}}
-                        <div class="input-holder floating">
+                        {{-- <div class="input-holder floating">
                             <input type="text" name="last_name" id="last_name" class="form-control" readonly placeholder=" " value="{{ $visitor->last_name }}">
                             <label for="last_name">Last name</label>
-                        </div>
+                        </div> --}}
                         <div class="input-holder floating">
                             <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $visitor->emp_code }}" readonly>
                             <label for="purpose_of_visit">Employee Code</label>

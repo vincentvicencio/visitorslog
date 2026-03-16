@@ -28,6 +28,7 @@
                             <div class="personaldetails w-100">
                                 Visitor Information
                             </div>
+                            
                             {{-- Visitor Type --}}
                             <div class="input-holder floating">
                                 <select name="visitor_type" id="visitor_type" class="form-control" required autocomplete="off">

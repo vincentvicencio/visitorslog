@@ -425,8 +425,9 @@ class EmployeeController extends Controller
 
             $employeeLog = new EmployeeLogs();
             $employeeLog->emp_code = $request->emp_code;
-            $employeeLog->first_name = $request->first_name;
-            $employeeLog->last_name = $request->last_name;
+            // $employeeLog->first_name = $request->first_name;
+            // $employeeLog->middle_name = $request->middle_name;
+            // $employeeLog->last_name = $request->last_name;
             $employeeLog->full_name = $request->full_name;
             $employeeLog->profile_pic = $request->image_path ?? null;
             $employeeLog->location = $locationForSave ?? '?';

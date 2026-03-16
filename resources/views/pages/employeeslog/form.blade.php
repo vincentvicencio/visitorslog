@@ -31,20 +31,6 @@
                                 <input type="text" id="logemp_emp_code" placeholder="Enter Emp Code or Name" class="search" autocomplete="off">
                                 <button class="m-0" type="button" id="search_emp_btn"><i class="bi bi-search"></i></button>
                             </div>
-                            <!-- <div class="input-holder floating">
-                                <input type="text" name="first_name" id="logemp_first_name" class="form-control" placeholder=" " value="" readonly>
-                                <label for="logemp_first_name">First name</label>
-                            </div>
-                            {{-- Middle Name --}}
-                            <div class="input-holder floating">
-                                <input type="text" name="middle_name" id="middle_name" class="form-control" placeholder=" " value="" readonly>
-                                <label for="middle_name">Middle name</label>
-                            </div>
-                            {{-- Last Name --}}
-                            <div class="input-holder floating">
-                                <input type="text" name="last_name" id="logemp_last_name" class="form-control" placeholder=" " value="" readonly>
-                                <label for="logemp_last_name">Last name</label>
-                            </div> -->
                              <div class="input-holder floating">
                                 <input type="text" id="searched_emp_code" class="form-control" placeholder=" " readonly>
                                 <label>Employee Code</label>
@@ -53,17 +39,6 @@
                                 <input type="text" name="full_name" id="logemp_full_name" class="form-control" placeholder=" " readonly>
                                 <label>Full Name</label>
                             </div>
-                           
-                            <!-- <div class="input-holder floating">
-                                <input type="text" class="form-control" placeholder=" " value="{{ $locationLabel }}" readonly>
-                                <label>Location</label>
-                            </div>
-                            <div class="input-holder floating">
-                                <input type="text" class="form-control" placeholder=" " value="Currently Logged out" readonly>
-                                <label>Status</label>
-                            </div> -->
-
-                            <br>
                             {{-- buttons --}}
                             <div class="panel-buttons" id="desktop">
                                 <button type="submit" class="save" id="saveBtn">Time in</button>

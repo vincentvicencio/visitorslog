@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
     @include('layouts.head')
 
     <body class="{{ Auth::check() && Auth::user()->user_type != 1 ? 'non-admin-body' : '' }}">

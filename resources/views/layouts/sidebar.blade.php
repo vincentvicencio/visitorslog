@@ -74,7 +74,7 @@
             @endif
         </div>
         <!-- Log out -->
-        <div class="logout-button d-flex mt-auto pe-4 fw-bold align-items-center justify-content-center" 
+        <div class="logout-button d-flex mt-auto pe-4 fw-bold align-items-center justify-content-center mobile" 
             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             
             <i class="bi bi-box-arrow-left p-2"></i>
