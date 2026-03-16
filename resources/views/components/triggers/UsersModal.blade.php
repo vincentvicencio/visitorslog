@@ -62,7 +62,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary w-100" id="submit_user_btn">Register User</button>
+                <button type="button" class="btn btn-primary w-100" id="submit_user_btn">Save</button>
             </form>
             </div>
         </div>

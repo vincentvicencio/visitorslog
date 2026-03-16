@@ -24,7 +24,7 @@
 
             <!-- button -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="textInputSubmit">Submit</button>
+                <button type="button" class="btn btn-primary" id="textInputSubmit">Save</button>
             </div>
 
         </div>

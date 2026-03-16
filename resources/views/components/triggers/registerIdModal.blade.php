@@ -48,7 +48,7 @@
 
             <!-- Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="registerIDSubmit">Submit</button>
+                <button type="button" class="btn btn-primary" id="registerIDSubmit">Save</button>
             </div>
 
         </div>
