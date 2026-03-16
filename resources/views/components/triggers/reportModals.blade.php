@@ -46,7 +46,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <a href="{{ url('/report') }}" class="btn btn-secondary">Reset</a>
+                    <button type="button" id="resetReportFilters" class="btn btn-secondary">Reset</button>
                     <button type="submit" class="btn btn-primary">Apply Filters</button>
                 </div>
             </form>
