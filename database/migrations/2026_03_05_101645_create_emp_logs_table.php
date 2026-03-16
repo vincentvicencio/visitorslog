@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('emp_code')->nullable();
             $table->string('full_name')->nullable();
             $table->string('first_name')->nullable();
+            $table->string('middle_name')->nullable();
             $table->string('last_name')->nullable();
             $table->string('location')->nullable();
             $table->timestamp('time_in')->nullable();
