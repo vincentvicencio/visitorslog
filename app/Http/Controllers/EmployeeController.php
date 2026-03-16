@@ -382,12 +382,14 @@ class EmployeeController extends Controller
         })->take(20); // Limit results
         
         $results = $filtered->map(function ($emp) {
+            $pic = fetch_profile_pic($emp['emp_code'] ?? '');
             return [
                 'id'         => $emp['emp_code'],
                 'text'       => trim(($emp['emp_code'] ?? '') . ' - ' . ($emp['first_name'] ?? '') . ' ' . ($emp['middle_name'] ?? '') . ' ' . ($emp['last_name'] ?? '')),
                 'first_name' => $emp['first_name'] ?? '',
                 'middle_name' => $emp['middle_name'] ?? '',
-                'last_name'  => $emp['last_name'] ?? ''
+                'last_name'  => $emp['last_name'] ?? '',
+                'profile_pic' => $pic['image'] ?? null,
             ];
         })->values()->toArray();
         
@@ -426,21 +428,32 @@ class EmployeeController extends Controller
             $employeeLog->first_name = $request->first_name;
             $employeeLog->last_name = $request->last_name;
             $employeeLog->full_name = $request->full_name;
+            $employeeLog->profile_pic = $request->image_path ?? null;
             $employeeLog->location = $locationForSave ?? '?';
             $employeeLog->time_in = now();
             $employeeLog->status = 0; // Active
             $employeeLog->created_by = $user->id;
             $employeeLog->save();
 
-            // Audit log for new employee log
-            log_audit(
-                'employee logs',
-                'created',
-                $employeeLog->id,
-                null,
-                $employeeLog->toArray(),
-                'save'
-            );
+            // Audit log for new employee log. Avoid storing entire base64 image in audit metadata.
+            try {
+                log_audit(
+                    'employee logs',
+                    'created',
+                    $employeeLog->id,
+                    null,
+                    [
+                        'emp_code' => $employeeLog->emp_code,
+                        'full_name' => $employeeLog->full_name,
+                        'location' => $employeeLog->location,
+                        'profile_pic' => $employeeLog->profile_pic ? 'included' : 'none',
+                    ],
+                    'save'
+                );
+            } catch (\Throwable $e) {
+                // Keep save success even if audit fails.
+                \Log::error('Audit save failed for EmployeeLog: ' . $e->getMessage());
+            }
 
             return response()->json([
                 'status' => 0,

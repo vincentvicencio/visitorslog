@@ -17,6 +17,7 @@ class EmployeeLogs extends Model
         'full_name',
         'first_name',
         'last_name',
+        'profile_pic',
         'location',
         'status',
         'time_in',

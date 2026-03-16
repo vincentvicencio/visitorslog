@@ -335,6 +335,7 @@ let URL = '/employeeslog/';
                         // $('#employee_name_container').addClass('d-none');
                         $('#searched_emp_code').val('');
                         $('#searched_emp_code_container').hide();
+                        $('#logemp_profile_pic').attr('src', '').hide();
                         this.hideEmployeeDropdown();
                         Triggers.showToast('Employee not found.','Employee Search', 1);
                     } else {
@@ -374,6 +375,17 @@ let URL = '/employeeslog/';
             $('#logemp_full_name').val(fullName);
             // $('#employee_name_container').removeClass('d-none');
             $('#searched_emp_code').val(employee.id);
+
+            if (employee.profile_pic) {
+                $('#photoPreview').css('display', 'block').attr('src', employee.profile_pic);
+                $('#image_path').val(employee.profile_pic);
+                $('#webcam').css('display', 'none');
+            } else {
+                $('#photoPreview').css('display', 'none').attr('src', '');
+                $('#image_path').val('');
+                $('#webcam').css('display', 'block');
+            }
+
             // $('#searched_emp_code_container').show();
             this.hideEmployeeDropdown();
             Triggers.showToast('Employee selected!','Employee Search', 0);
@@ -415,7 +427,6 @@ let URL = '/employeeslog/';
                     
                     const idx = parseInt($(el).data('emp-idx'));
                     const employee = results[idx];
-                    
                     if (employee) {
                         self.selectEmployee({
                             id: employee.id,
@@ -485,6 +496,9 @@ let URL = '/employeeslog/';
                     // $('#employee_name_container').addClass('d-none');
                     $('#searched_emp_code').val('');
                     $('#searched_emp_code_container').hide();
+                    $('#photoPreview').css('display', 'none').attr('src', '');
+                    $('#image_path').val('');
+                    $('#webcam').css('display', 'block');
                     this.hideEmployeeDropdown();
                     // Close modal only when on the log page
                     if (document.getElementById('logempModal')) {
@@ -515,8 +529,8 @@ let URL = '/employeeslog/';
             $(document).off('click', '#clrBtn').on('click', '#clrBtn', function () {
                 $('#logemp_form')[0].reset();
                 $('#photoPreview').css('display', 'none').attr('src', '');
-                $('#imageInput').val('');
                 $('#image_path').val('');
+                $('#imageInput').val('');
                 startWebcam();
             });
 

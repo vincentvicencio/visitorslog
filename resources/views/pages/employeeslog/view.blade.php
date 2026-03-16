@@ -65,6 +65,7 @@
                     <div class="capture">
                         <div class="header">Image</div>
                         <div class="imgholder">
+                            <img id="imagepreview" src="{{ $visitor->profile_pic ?? '/images/placeholder-user.png' }}" alt="Employee profile" style="width:100%; height:100%; object-fit:cover;">
                         </div>
                     </div>
                 </div>

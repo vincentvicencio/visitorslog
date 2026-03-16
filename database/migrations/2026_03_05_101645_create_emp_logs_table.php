@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('full_name')->nullable();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
+            $table->string('profile_pic')->nullable();
             $table->string('location')->nullable();
             $table->timestamp('time_in')->nullable();
             $table->timestamp('time_out')->nullable();
