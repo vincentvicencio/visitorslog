@@ -35,6 +35,55 @@ class EmployeeController extends Controller
         return $filters[0] ?? null;
     }
 
+    private function saveProfilePicFromBase64(?string $data, string $empCode): ?string
+    {
+        if (empty($data)) {
+            return null;
+        }
+
+        if (!str_starts_with($data, 'data:image/')) {
+            // Already a URL/path, keep as-is.
+            return $data;
+        }
+
+        try {
+            [$meta, $encoded] = explode(',', $data, 2);
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        $mime = null;
+        if (preg_match('/^data:(image\/\w+);base64$/', $meta, $m)) {
+            $mime = $m[1];
+        }
+
+        if (empty($mime) || empty($encoded)) {
+            return null;
+        }
+
+        $decoded = base64_decode($encoded);
+        if ($decoded === false) {
+            return null;
+        }
+
+        $extension = 'png';
+        if ($mime === 'image/jpeg') {
+            $extension = 'jpg';
+        } elseif ($mime === 'image/gif') {
+            $extension = 'gif';
+        } elseif ($mime === 'image/webp') {
+            $extension = 'webp';
+        }
+
+        $filename = sprintf('emp_%s_%s.%s', preg_replace('/[^A-Za-z0-9_\-]/', '_', (string) $empCode), time(), $extension);
+        $diskPath = 'employee_profile_pics/' . $filename;
+        $publicPath = '/storage/employee_profile_pics/' . $filename;
+
+        \Illuminate\Support\Facades\Storage::disk('public')->put($diskPath, $decoded);
+
+        return $publicPath;
+    }
+
     private function resolveUserLocationFilters($user): array
     {
         if ((int) $user->user_type === 3) {
@@ -420,6 +469,20 @@ class EmployeeController extends Controller
                 'full_name.required'   => 'Full Name is required',
             ]);
 
+            // Prevent duplicate active logged-in entries for the same emp_code
+            $alreadyLoggedIn = EmployeeLogs::where('emp_code', $request->emp_code)
+                ->where('status', 0)
+                ->whereNull('time_out')
+                ->exists();
+
+            if ($alreadyLoggedIn) {
+                return response()->json([
+                    'status' => 1,
+                    'title' => 'Error',
+                    'message' => 'Employee is already logged in',
+                ], 200);
+            }
+
             $user = Auth::user();
             $locationForSave = $this->resolveLocationForSave($user);
 
@@ -428,7 +491,7 @@ class EmployeeController extends Controller
             $employeeLog->first_name = $request->first_name;
             $employeeLog->last_name = $request->last_name;
             $employeeLog->full_name = $request->full_name;
-            $employeeLog->profile_pic = $request->image_path ?? null;
+            $employeeLog->profile_pic = $this->saveProfilePicFromBase64($request->image_path ?? null, $request->emp_code);
             $employeeLog->location = $locationForSave ?? '?';
             $employeeLog->time_in = now();
             $employeeLog->status = 0; // Active
