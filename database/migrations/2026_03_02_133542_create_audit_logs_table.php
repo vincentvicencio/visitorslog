@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('module');
             $table->string('sub_module');
             $table->string('action');
-            $table->longText('previous_data')->nullable();
-            $table->longText('new_data')->nullable();
+            $table->text('previous_data')->nullable();
+            $table->text('new_data')->nullable();
             $table->string('ip_address');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();

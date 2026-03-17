@@ -206,7 +206,6 @@ class ReportClassTable {
             { id: "logged_by", label: "Time In by" },
             { id: "updated_by", label: "Timed Out by" },
             { id: "status",   label: "Status" },
-            { id: "action",         label: "Action" },
         ];
 
         const columns = tableHeader.map(col => ({
@@ -290,7 +289,6 @@ class ReportClassTable {
                 { id: "creator", label: "Logged by" },
                 { id: "updated_by", label: "Timed Out by" },
                 { id: "status", label: "Status" },
-                { id: "action", label: "Action" },
             ];
 
         const columns = tableHeader.map(col => ({

@@ -203,17 +203,6 @@ class ReportController extends Controller
                 'created_at'   => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
 
                 'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
-
-                'action' => '<div class="dropdown text-center">
-                                    <button 
-                                        class="dropdown-item"
-                                        id="viewBtn"
-                                        data-id="'. $d->id .'"
-                                        data-type="reports">
-                                        View
-                                    </button>
-                                    <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '">Delete</button>
-                            </div>',
             ];
             $i++;
         }
@@ -348,17 +337,6 @@ class ReportController extends Controller
                             </div>',
             
                 'status' => $statuslayout,
-
-                'action' => '<div class="dropdown text-center">
-                                    <button 
-                                        class="dropdown-item"
-                                        id="empViewBtn"
-                                        data-id="'. $d->id .'"
-                                        data-type="reports">
-                                        View
-                                    </button>
-                                    <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->full_name. '">Delete</button>
-                            </div>',
             ];
             $i++;
         }
