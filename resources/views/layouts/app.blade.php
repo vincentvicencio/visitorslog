@@ -6,7 +6,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Magellan Solution | Login</title>
+    <title>Magellan Solutions | Login</title>
     <link rel="icon" type="image/png" href="/images/magellan logo.png">
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">

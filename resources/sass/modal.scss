@@ -10,6 +10,7 @@
     }
 }
 .modal-footer{
+    border-top: none !important;
     #resetReportFilters{
         width: 100%;
         border: none;
@@ -73,4 +74,23 @@
         background-color: #e9f0f8;
         color: #0F4383;
     }
+}
+
+.modal-header{
+      background-color: #4578b6 !important;
+      color: white !important;
+      button{
+        filter: invert(1);
+      }
+      .btn-close{
+        margin: 0 0 0 auto !important;
+      }
+}
+
+.modal-body{
+    padding: var(--bs-modal-padding) var(--bs-modal-padding) 0 var(--bs-modal-padding);
+}
+.form-label{
+    font-weight: bold;
+    color: #0F4383;
 }

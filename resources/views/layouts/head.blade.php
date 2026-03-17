@@ -16,12 +16,16 @@
                 'registerid' => 'ID Numbers',
                 'reports' => 'Reports',
                 'about' => 'About',
+                'visitorslog.form' => 'Visitor Log Form',
+                'employeeslog.form' => 'Employee Log Form',
+                'viewemp.page' => 'View Employee',
+                'view.page' => 'View Visitor',
             ];
 
             $route = strtolower(Route::currentRouteName());
         @endphp
 
-        {{ $titles[$route] ?? ucwords(str_replace(['.', '-', '_'], ' ', $route)) }} | Magellan Solution
+        {{ $titles[$route] ?? ucwords(str_replace(['.', '-', '_'], ' ', $route)) }} | Magellan Solutions
     </title>
 
         <link rel="icon" type="image/png" href="/images/magellan logo.png">
