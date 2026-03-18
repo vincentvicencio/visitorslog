@@ -152,8 +152,7 @@ class Registered_UsersController extends Controller
                 'first_name' => $firstName, 
                 'last_name'  => $lastName,
                 'location'   => null,
-                'user_type'  => $request->user_type,
-                'updated_by' => Auth::user()->id,
+                'user_type'  => $request->user_type
             ];
             
             // Only hash password if provided
@@ -237,8 +236,7 @@ class Registered_UsersController extends Controller
             'first_name' => $firstName, 
             'last_name'  => $lastName,
             'location'   => $locations[0] ?? null,
-            'user_type'  => $request->user_type,
-            'updated_by' => Auth::id(),
+            'user_type'  => $request->user_type
         ];
         
         // Only hash password if provided
@@ -555,7 +553,7 @@ public function list(Request $request){
                               ->orWhere('last_name', 'LIKE', "%{$keywords}%")
                               ->orWhere('first_name', 'LIKE', "%{$keywords}%")
                               ->orWhere('last_name', 'LIKE', "%{$keywords}%")
-                            ->orWhereHas('userType', function ($q) use ($keywords) {
+                              ->orWhereHas('userType', function ($q) use ($keywords) {
                                 $q->where('name', 'LIKE', "%{$keywords}%");
                             });
                             
@@ -593,7 +591,6 @@ public function list(Request $request){
                 'created_at' => $d->created_at ? ($d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l')) : '-',
                 'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l')) : '-',
                 'action'            => '<div class="dropdown text-center">
-                                        
                                         <button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>
                                         <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Delete</button>
                                     </div>' 

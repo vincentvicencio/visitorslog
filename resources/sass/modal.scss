@@ -9,6 +9,26 @@
         color: #0F4383;
     }
 }
+.modal-footer{
+    border-top: none !important;
+    #resetReportFilters{
+        width: 100%;
+        border: none;
+        background-color: gray;
+    }
+    #resetReportFilters:hover{
+        background-color: rgba(128, 128, 128, 0.4);
+    }
+    button{
+        width: 100%;
+        background-color: #145AB0;
+        transition: 0.2s ease;
+        border: none;
+    }
+    button:hover{
+        background-color: #145ab07c;
+    }
+}
 .select2-container--default {
     .select2-selection--multiple {
         border: 1px solid #cdd3da;
@@ -54,4 +74,23 @@
         background-color: #e9f0f8;
         color: #0F4383;
     }
+}
+
+.modal-header{
+      background-color: #4578b6 !important;
+      color: white !important;
+      button{
+        filter: invert(1);
+      }
+      .btn-close{
+        margin: 0 0 0 auto !important;
+      }
+}
+
+.modal-body{
+    padding: var(--bs-modal-padding) var(--bs-modal-padding) 0 var(--bs-modal-padding);
+}
+.form-label{
+    font-weight: bold;
+    color: #0F4383;
 }

@@ -5,20 +5,39 @@ import $ from 'jquery';
 
 const deleteModalEl = document.getElementById('notificationContainer');
 const deleteModal = new Modal(deleteModalEl);
+                
+let tableReloadInterval = null;
 
 let URL = '/visitorslog/';
 
 $(document).ready(function () {
+
+    function closeNotificationModal() {
+        const modalEl = document.getElementById('notificationContainer');
+        if (!modalEl) return;
+
+        const modalInstance = Modal.getInstance(modalEl) || Modal.getOrCreateInstance(modalEl);
+        modalInstance.hide();
+
+        // Defensive cleanup in case the backdrop/body class gets stuck.
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open').css('padding-right', '');
+    }
 
     $('#addVisitorForm').on('submit', function (e) {
         e.preventDefault();
 
         let formData = new FormData(this);
         
-        // Disable submit button and show loading state
-        const submitBtn = $(this).find('button[type="submit"]');
-        const originalText = submitBtn.text();
-        submitBtn.prop('disabled', true).text('Processing...');
+        // Handle desktop/mobile submit buttons independently to avoid text concatenation.
+        const submitButtons = $(this).find('button[type="submit"]');
+        submitButtons.each(function () {
+            const btn = $(this);
+            if (!btn.data('originalText')) {
+                btn.data('originalText', btn.text().trim());
+            }
+        });
+        submitButtons.prop('disabled', true).text('Processing...');
 
         $.ajax({
             url: URL+"save",
@@ -61,11 +80,16 @@ $(document).ready(function () {
                 Triggers.showToast(msg, title, 1);
             },
             complete: function () {
-                submitBtn.prop('disabled', false).text(originalText);
+                submitButtons.each(function () {
+                    const btn = $(this);
+                    const originalText = btn.data('originalText') || 'save';
+                    btn.prop('disabled', false).text(originalText);
+                });
             }
         });
     });
 
+    
     
     $(document).on('click', '#viewBtn', function () {
         let visitorId = $(this).data('id');
@@ -75,6 +99,7 @@ $(document).ready(function () {
             Triggers.showToast('Invalid visitor ID.', 1);
             return;
         }
+
 
         $.ajax({
             url: URL+"view",
@@ -119,39 +144,6 @@ $(document).ready(function () {
         $('#image_path').val('');
         startWebcam();
     });
-
-    // $('#captureBtn').on('click', function () {
-    //     $('#imageInput').click();
-
-    //     $('#canvas').attr('width', $('#webcam').videoWidth);
-    //     $('#canvas').attr('height', $('#webcam').videoHeight);
-
-    //     $('#canvas').getContext('2d').drawImage($('#webcam'), 0, 0, $('#canvas').width(), $('#canvas').height());
-        
-    //     // Convert the canvas image to a data URL
-    //     const imageData = $('#canvas').toDataURL('image/png');    
-
-    //     $('#photoPreview').css('display', 'block');
-    //     $('#photoPreview').attr('src', imageData);
-    //     $('#webcam').css('display', 'none');
-    //     $('#image_path').val(imageData);
-    // });
-
-    // $('#recaptureBtn').on('click', function () {
-    //     $('#photoPreview').css('display', 'none');
-    //     $('#photoPreview').attr('src', '');
-    //     $('#imageInput').val(''); 
-    //     $('#webcam').css('display', 'block');
-    //     $('#image_path').val('');
-
-    // });
-
-    // Previous logic to initialize visitor ID dropdown was removed.  
-    // (function `initializeVisitorIdDropdown` no longer exists)
-    // Ensure id suggestions are handled in the later ready handler instead.
-
-    // If you need to re-enable similar behaviour, implement
-    // a named function and call it here, or use fetchIDSuggestions directly.
 
     $('#captureBtn').on('click', function () {
 
@@ -274,7 +266,7 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('click', '#timeoutBtn', function () {
+    $(document).off('click', '#timeoutBtn').on('click', '#timeoutBtn', function () {
         let Id = $(this).data('id');
         Triggers.showNotification(
             '#notificationContainer',
@@ -284,13 +276,21 @@ $(document).ready(function () {
         );
     });
 
-    $(document).on('click', '#timeout_btn', function () {
+    $(document).off('click', '#timeout_btn').on('click', '#timeout_btn', function () {
+        const $yesBtn = $(this);
+        if ($yesBtn.data('processing')) {
+            return;
+        }
+
         let Id = $('#record_id').val();
         
         if (!Id) {
             Triggers.showToast('Invalid record ID.', 'Invalid', 1);
             return;
         }
+
+        $yesBtn.data('processing', true).prop('disabled', true);
+
         $.ajax({
             url: URL+"timeout",
             type: "POST",
@@ -303,11 +303,7 @@ $(document).ready(function () {
                 Triggers.showToast(response.message, 'Success', 0);
                 setTimeout(() => {
                     $('.toast').fadeOut('slow');
-                    try {
-                        deleteModal.hide();
-                    } catch (e) {
-                        console.error('Modal hide error:', e);
-                    }
+                    closeNotificationModal();
                 }, 1000);
                 if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
                     $('#visitorsLogTable').DataTable().draw(false);
@@ -328,10 +324,13 @@ $(document).ready(function () {
                 }
                 
                 Triggers.showToast(msg, 'Error', 1);
+            },
+            complete: function () {
+                $yesBtn.data('processing', false).prop('disabled', false);
             }
         });
     });
-
+});
     class VisitorsLogTable {
         constructor() {
             this.defaultFields  = []
@@ -395,9 +394,18 @@ $(document).ready(function () {
                 const tableApi = $(self.table).DataTable();
 
                 // START POLLING
-                setInterval(() => {
-                    tableApi.ajax.reload(null, false); 
-                }, 5000); 
+                // setInterval(() => {
+                //     tableApi.ajax.reload(null, false); 
+                // }, 5000); 
+                if (tableReloadInterval) {
+                    clearInterval(tableReloadInterval);
+                }
+
+                tableReloadInterval = setInterval(() => {
+                    if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
+                        $('#visitorsLogTable').DataTable().ajax.reload(null, false);
+                    }
+                }, 5000);
 
                 // CUSTOM SEARCH
                 $('#typeSearch')
@@ -416,139 +424,172 @@ $(document).ready(function () {
         }
 
         async keylistener() {
-        const input_id_num = document.getElementById("id_number");
-        const input_fname = document.getElementById("first_name");
-        const input_mname = document.getElementById("middle_name");
-        const input_lname = document.getElementById("last_name");
-        const input_contact = document.getElementById("contact_number");
-        const input_contact_person = document.getElementById("contact_person");
-        const input_purpose = document.getElementById("purpose_of_visit");
+            const input_id_num = document.getElementById("id_number");
+            const input_fname = document.getElementById("first_name");
+            const input_mname = document.getElementById("middle_name");
+            const input_lname = document.getElementById("last_name");
+            const input_contact = document.getElementById("contact_number");
+            const input_contact_person = document.getElementById("contact_person");
+            const input_purpose = document.getElementById("purpose_of_visit");
 
-        input_id_num.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
+            const normalizeMobileNumber = (rawValue) => {
+                let digits = (rawValue || "").replace(/\D/g, "");
 
-            if (allowedKeys.includes(e.key)) return;
+                if (digits.length === 0) return "09";
+                if (digits.startsWith("09")) return digits.slice(0, 11);
+                if (digits.startsWith("9")) return (`0${digits}`).slice(0, 11);
+                if (digits.startsWith("0")) return (`09${digits.slice(1)}`).slice(0, 11);
 
-            // Block anything that's not a letter or space
-            if (!/^[0-9]$/.test(e.key)) {
-                e.preventDefault();
-            }
-            });
-            input_id_num.addEventListener("input", () => {
-            input_id_num.value = input_id_num.value.replace(/\D/g, "");
-            });
+                return (`09${digits}`).slice(0, 11);
+            };
 
-        input_fname.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
+            if(input_id_num){
+                input_id_num.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
 
-            if (allowedKeys.includes(e.key)) return;
+                    if (allowedKeys.includes(e.key)) return;
 
-            // Block anything that's not a letter or space
-            if (!/^[a-zA-Z-.\s]$/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
+                    // Block anything that's not a letter or space
+                    if (!/^[0-9]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                    });
+                    input_id_num.addEventListener("input", () => {
+                    input_id_num.value = input_id_num.value.replace(/\D/g, "");
+                    });
 
-        input_mname.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
+                input_fname.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
 
-            if (allowedKeys.includes(e.key)) return;
+                    if (allowedKeys.includes(e.key)) return;
 
-            // Block anything that's not a letter or space
-            if (!/^[a-zA-Z\s]$/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z-.\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
 
-        input_lname.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
+                input_mname.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
 
-            if (allowedKeys.includes(e.key)) return;
+                    if (allowedKeys.includes(e.key)) return;
 
-            // Block anything that's not a letter or space
-            if (!/^[a-zA-Z\s]$/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+
+                input_lname.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
+
+                    if (allowedKeys.includes(e.key)) return;
+
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
 
                 input_contact.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"];
-            if (allowedKeys.includes(e.key)) return;
+                    // Allow control keys
+                    const allowedKeys = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"];
+                    if (allowedKeys.includes(e.key)) return;
 
-            // Allow only digits
-            if (!/^[0-9]$/.test(e.key)) {
-                e.preventDefault();
+                    // Allow only digits
+                    if (!/^[0-9]$/.test(e.key)) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Keep the required "09" prefix locked.
+                    const selectionStart = input_contact.selectionStart ?? 0;
+                    const selectionEnd = input_contact.selectionEnd ?? 0;
+                    if (selectionStart < 2 || selectionEnd < 2) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    // Prevent typing more than 11 digits unless replacing a selection.
+                    const isReplacingSelection = selectionStart !== selectionEnd;
+                    if (!isReplacingSelection && input_contact.value.length >= 11) {
+                        e.preventDefault();
+                    }
+                });
+
+                input_contact.addEventListener("focus", () => {
+                    if (!input_contact.value) {
+                        input_contact.value = "09";
+                    } else {
+                        input_contact.value = normalizeMobileNumber(input_contact.value);
+                    }
+                });
+
+                input_contact.addEventListener("input", () => {
+                    input_contact.value = normalizeMobileNumber(input_contact.value);
+
+                    // Require full 11-digit PH mobile number starting with 09.
+                    const isValid = /^09\d{9}$/.test(input_contact.value);
+                    if (!isValid) {
+                        input_contact.setCustomValidity("Enter an 11-digit number starting with 09");
+                    } else {
+                        input_contact.setCustomValidity("");
+                    }
+                });
+
+                input_contact_person.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
+
+                    if (allowedKeys.includes(e.key)) return;
+
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+
+                input_purpose.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];            
+                    if (allowedKeys.includes(e.key)) return;
+
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
             }
 
-            // Prevent typing more than 11 digits
-            if (input_contact.value.length >= 11) {
-                e.preventDefault();
-            }
-        });
-
-        input_contact.addEventListener("input", () => {
-            // Remove non-digit characters
-            input_contact.value = input_contact.value.replace(/\D/g, "");
-
-            // Limit max length to 11
-            if (input_contact.value.length > 11) {
-                input_contact.value = input_contact.value.slice(0, 11);
-            }
-
-            // Set validation for minimum length (7 digits)
-            if (input_contact.value.length > 0 && input_contact.value.length < 7) {
-                input_contact.setCustomValidity("Minimum 7 digits required");
-            } else {
-                input_contact.setCustomValidity(""); // clear error
-            }
-        });
-
-        input_contact_person.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];
-
-            if (allowedKeys.includes(e.key)) return;
-
-            // Block anything that's not a letter or space
-            if (!/^[a-zA-Z\s]$/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
-
-        input_purpose.addEventListener("keydown", (e) => {
-            // Allow control keys
-            const allowedKeys = [
-                "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
-            ];            
-            if (allowedKeys.includes(e.key)) return;
-
-            // Block anything that's not a letter or space
-            if (!/^[a-zA-Z\s]$/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
+           
+        }
     }
-}
 
-    const visitorsLog = new VisitorsLogTable();
-    visitorsLog.onLoadPage();
+    // const visitorsLog = new VisitorsLogTable();
+    // visitorsLog.onLoadPage();
+    const instance = new VisitorsLogTable();
+    instance.onLoadPage();
+    export default instance;
 
-});
+    
+
+
 
 $(document).ready(function() {
     function fetchIDSuggestions() {

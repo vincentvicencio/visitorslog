@@ -32,7 +32,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-3" id="visitorTypeFilterGroup">
                         <label class="form-label">Visitor Type</label>
                         <select name="visitor_type" class="form-select"  autocomplete="off">
                             <option value="">All Types</option>
@@ -46,7 +46,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <a href="{{ url('/report') }}" class="btn btn-secondary">Reset</a>
+                    <button type="button" id="resetReportFilters" class="btn btn-secondary">Reset</button>
                     <button type="submit" class="btn btn-primary">Apply Filters</button>
                 </div>
             </form>

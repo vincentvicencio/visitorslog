@@ -27,56 +27,55 @@
         <div class="menu fw-bold mt-3 py-1 ps-4">Menu</div>
         <div class="d-flex flex-column vh-100 mx-2">
             <a href="{{ url('visitorslog') }}"
-            class="sidebar-menu-button {{ Request::is('visitorslog') ? 'selected' : '' }}">
+            class="sidebar-menu-button {{ Request::is('visitorslog') ? 'selected' : '' }}" data-tab="visitorslog">
                 <i class="bi bi-person-lines-fill fs-6 p-2"></i>
-                Visitor Log Sheets
+                Log Sheets
             </a>
             @if(Auth::user()->user_type == 1)
                 <a href="{{ url('IDtype') }}"
-                class="sidebar-menu-button {{ Request::is('IDtype') ? 'selected' : '' }}">
+                class="sidebar-menu-button {{ Request::is('IDtype') ? 'selected' : '' }}" data-tab="IDtype">
                     <i class="bi bi-credit-card-2-front fs-6 p-2"></i>
                     ID type
                 </a>
                 <a href="{{ url('userTypes') }}"
-                class="sidebar-menu-button {{ Request::is('userTypes') ? 'selected' : '' }}">
+                class="sidebar-menu-button {{ Request::is('userTypes') ? 'selected' : '' }}" data-tab="userTypes">
                     <i class="bi bi-people-fill fs-6 p-2"></i>
                     User Type
                 </a>
 
                 <a href="{{ url('registerUser') }}"
-                class="sidebar-menu-button {{ Request::is('registerUser') ? 'selected' : '' }}">
+                class="sidebar-menu-button {{ Request::is('registerUser') ? 'selected' : '' }}" data-tab="registerUser">
                     <i class="bi bi-person-add fs-6 p-2"></i>
                     User
                 </a>
 
                 <a href="{{ url('visitortype') }}"
-                class="sidebar-menu-button {{ Request::is('visitortype') ? 'selected' : '' }}">
+                class="sidebar-menu-button {{ Request::is('visitortype') ? 'selected' : '' }}" data-tab="visitortype">
                     <i class="bi bi-person-badge fs-6 p-2"></i>
                     Visitor Type
                 </a>
 
                 <a href="{{ url('registerId') }}"
-                class="sidebar-menu-button {{ Request::is('registerId') ? 'selected' : '' }}">
+                class="sidebar-menu-button {{ Request::is('registerId') ? 'selected' : '' }}" data-tab="registerId">
                     <i class="bi bi-person-vcard fs-6 p-2"></i>
                     ID Numbers
                 </a>
 
                 <a href="{{ url('reports') }}"
-                class="sidebar-menu-button {{ Request::is('reports') ? 'selected' : '' }}">
+                class="sidebar-menu-button {{ Request::is('reports') ? 'selected' : '' }}" data-tab="reports">
                     <i class="bi bi-journals fs-6 p-2"></i>
                     Reports
                 </a>
                 <a href="{{ url('about') }}"
-                class="sidebar-menu-button {{ Request::is('about') ? 'selected' : '' }}">
+                class="sidebar-menu-button {{ Request::is('about') ? 'selected' : '' }}" data-tab="about">
                     <i class="bi bi-info-circle fs-6 p-2"></i>
                     About
                 </a>
             @endif
         </div>
         <!-- Log out -->
-        <div class="logout-button d-flex mt-auto pe-4 fw-bold align-items-center justify-content-center" 
-            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            
+        <div class="logout-button d-flex mt-auto pe-4 fw-bold align-items-center justify-content-center mobile" 
+            onclick="event.preventDefault(); document.getElementById('logout-form').submit();" id="logout">
             <i class="bi bi-box-arrow-left p-2"></i>
             <span>{{ __('Logout') }}</span>
 

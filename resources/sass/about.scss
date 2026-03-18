@@ -64,8 +64,18 @@
         position: relative;
 
         .details{
+            position: relative;
+            top: 5px;
             font-weight: bold;
             font-size: 20px;
+
+            .sub{
+                position: relative;
+                top: -10px;
+                font-size: 14px;
+                color: rgb(155, 155, 155);
+
+            }
         }
         .name1{
             color: #0F4383;

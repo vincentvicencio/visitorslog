@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ValidIdType;
 use Illuminate\Http\Request;
 use App\Models\Visitor;
 use App\Models\VisitorType;
 use App\Models\RegisteredID;
 use App\Models\Location;
+use App\Models\ValidIdType;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -18,7 +18,7 @@ class VisitorController extends Controller
     private function guardLocationRequired()
     {
         $user = Auth::user();
-
+        
         return $user && (int) $user->user_type === 3 && !session()->has('guard_location_id');
     }
 
@@ -76,9 +76,9 @@ class VisitorController extends Controller
     private function resolveLocationForSave($user): ?string
     {
         if ((int) $user->user_type === 3) {
-            if (session()->has('guard_location_name')) {
-                return (string) session('guard_location_name');
-            }
+            // if (session()->has('guard_location_name')) {
+            //     return (string) session('guard_location_name');
+            // }
 
             if (session()->has('guard_location_id')) {
                 return (string) session('guard_location_id');
@@ -113,7 +113,7 @@ class VisitorController extends Controller
         //     session()->forget('from_form');
         //     return view('pages.visitorslog.form', compact('visitorTypes', "visitors"));
         // }else{
-            return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes'));
+            return view('pages.visitorslog.visitorlog', compact('visitors', 'visitorTypes', 'empMap'));
         // }
     }
     public function form()
@@ -123,17 +123,21 @@ class VisitorController extends Controller
         }
 
         // session(['from_form' => true]);
-        $visitorTypes = VisitorType::where('deleted_at', null)
-                -> orderBy('id', 'asc')
-                -> get();
-        $visitors     = Visitor::where('status', 0)
-                -> orderBy('id', 'asc')
-                -> get();
-        $validIdTypes = ValidIdType::where('deleted_at', null)
+        $visitors = Visitor::where(function ($query) {
+            $query->where('status', 0)->orWhereNull('status');
+            })
+                -> whereNull('time_out')
                 -> orderBy('id', 'desc')
                 -> get();
 
-        return view('pages.visitorslog.form', compact('visitorTypes', "visitors", "validIdTypes"));
+        $visitorTypes = VisitorType::where('deleted_at', null)
+                -> orderBy('id', 'desc')
+                -> get();
+                
+        $validIdTypes = ValidIdType::where('deleted_at', null)
+                -> orderBy('id', 'desc')
+                -> get();
+        return view('pages.visitorslog.form', compact('visitors', 'visitorTypes', "validIdTypes"));
     }
 
     public function list(Request $request){
@@ -167,10 +171,10 @@ class VisitorController extends Controller
                         ->where('time_out', null);
                     });
 
-                    // // Then restrict to creator if NOT admin
-                    // if (Auth::user()->user_type != 1) {
-                    //     $query->where('created_by', Auth::user()->id);
-                    // }
+                    // Then restrict to creator if NOT admin
+                    if ((int) $user->user_type !== 1) {
+                        $query->where('created_by', $user->id);
+                    }
                 })
 
                 -> when($keywords, function ($query) use ($keywords) {
@@ -235,9 +239,21 @@ class VisitorController extends Controller
                 $status = 'Timed Out';
             }
 
-            $time_in = Carbon::parse($d->time_in)->format('h:i A');
+            $time_in = $d->time_in ? Carbon::parse($d->time_in)->format('h:i A') : '-';
 
             $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+
+            $visitLabel = $d->created_at
+                ? $d->created_at->format('F d, Y') . '<br>' . $d->created_at->format('l')
+                : '-';
+
+            $createdAtLabel = $d->created_at
+                ? $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l')
+                : '-';
+
+            $updatedAtLabel = $d->updated_at
+                ? $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l')
+                : '-';
 
             $createdby = $d->created_by ? user_name($d->created_by) : '-';
             $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
@@ -256,10 +272,7 @@ class VisitorController extends Controller
 
                 'visitor_id'   => '<div class="text-center">' . $d->visitor_id . '</div>',
 
-                'visit' =>  '<div class="text-center">' . 
-                                    $d->created_at->format("F d, Y") .'<br>
-                                    '. $d->created_at->format('l')
-                                 . '</div>',
+                     'visit' =>  '<div class="text-center">' . $visitLabel . '</div>',
 
                 'time_in' => '<div class="text-center">
                                 <small> '. $time_in .'</small><br>
@@ -273,9 +286,9 @@ class VisitorController extends Controller
                 
                 'status'       => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
 
-                'created_at'   => '<div class="text-center">' . $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l') . '</div>',
+                'created_at'   => '<div class="text-center">' . $createdAtLabel . '</div>',
 
-                'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+                'updated_at'   => $updatedAtLabel,
 
                 'action' => '<div class="dropdown">
                                         <button 
@@ -295,8 +308,6 @@ class VisitorController extends Controller
                             </div>',
             ];
             $i++;
-                                            // <i class="bi bi-clock-history"></i>
-                                            // <i class="bi bi-eye"></i>
         }
  
         return response()->json([
@@ -328,23 +339,11 @@ class VisitorController extends Controller
             ], 400);
         }
 
-        $oldData = $visitor->getOriginal();
-
         $visitor->update([
             'time_out'   => Carbon::now(),
             'status'     => 1,
             'updated_by' => Auth::user()->id,
         ]);
-
-        // log timeout event (action set to 'timeout')
-        log_audit(
-            'visitors',
-            'timed out',
-            $visitor->id,
-            $oldData,
-            $visitor->getAttributes(),
-            'timeout'
-        );
 
         return response()->json([
             'status'     => 0,
@@ -367,17 +366,6 @@ class VisitorController extends Controller
                 'message' => 'Visitor not found or inactive'
             ], 404);
         }
-
-        // log view action before redirecting
-        log_audit(
-            'visitors',
-            'viewed',
-            $visitor->id,
-            null,
-            null,
-            'view'
-        );
-
         return response()->json([
             'redirect'   => route('view.page', [
                 'id'     => $visitor->id,
@@ -478,11 +466,11 @@ class VisitorController extends Controller
 
         try {
             $request->validate([
-                'first_name'        => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z-.-- ]+$/'],
-                'middle_name'       => ['nullable', 'string', 'max:40', 'regex:/^[a-zA-Z-. ]+$/'],
-                'last_name'         => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z ]+$/'],
+                'first_name'        => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s.\-\']+$/'],
+                'middle_name'       => ['nullable', 'string', 'max:40', 'regex:/^[a-zA-Z\s.\-\']+$/'],
+                'last_name'         => ['required', 'string', 'max:40', 'regex:/^[a-zA-Z\s.\-\']+$/'],
                 'visitor_type'      => 'required|exists:visitor_types,id',
-                'contact_number'    => ['required','min:11','max:11','starts_with:09'],            
+                'contact_number'    => ['required','min:11','max:11','starts_with:09'],
                 'image_path'        => ['required'],
                 'id_type'          => 'required|exists:idtypes,id',
                 'id_type_number'   => ['required'],
@@ -493,10 +481,22 @@ class VisitorController extends Controller
                     'required',
                     'string',
                     function ($attribute, $value, $fail) use ($request) {
+                        $user = Auth::user();
+                        $resolvedLocation = $this->resolveLocationForSave($user);
+
+                        
                         $existing = RegisteredID::where('id_number', $value)->first();
+                        $checkloc = RegisteredID::where('id_number', $value)
+                                    ->where('location', $resolvedLocation)
+                                    ->first();
                         $timein = Visitor::where('visitor_id', $value)
                                     ->whereNull('time_out')
                                     ->first();
+
+                        if(!$checkloc){
+                            $fail('This Visitor ID is not registered in this location.');
+                        }
+
                         if ($timein) {
                             $fail('This Visitor ID is already checked in and has not timed out.');
                         }
@@ -511,11 +511,7 @@ class VisitorController extends Controller
 
             ], [
                 'first_name.required'        => 'First Name is required',
-                'last_name.required'         => 'Last Name is required',    
-                'id_type_number.required'    => 'ID Number is required',
-                'id_type.required'           => 'Identification Card is required',
-                'purpose_of_visit.required'  => 'Purpose of Visit is required',
-                'contact_person.required'    => 'Contact Person is required',
+                'last_name.required'         => 'Last Name is required',
                 'visitor_type.required'      => 'Visitor Type is required',
                 'contact_number.required'    => 'Contact Number is required',
                 'contact_number.max'         => 'Contact Number must not exceed 11 digits',
@@ -525,7 +521,7 @@ class VisitorController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Error hierarchy
-            $priority = ['id_number', 'visitor_type', 'first_name', 'last_name', 'contact_number', 'image_path', 'id_type', 'id_type_number', 'purpose_of_visit', 'contact_person', 'middle_name'];
+            $priority = ['id_number', 'visitor_type', 'first_name', 'last_name', 'contact_number', 'image_path', 'middle_name'];
             $errors = $e->errors();
             $firstError = null;
             foreach ($priority as $field) {
@@ -556,32 +552,29 @@ class VisitorController extends Controller
 
                 // Decode base64
                 $image     = base64_decode($image);
+
                 // Generate filename
+                
                 $fileName  = 'visitors/' . Str::random(20) . '.png';
 
                 // Save to public disk
                 Storage::disk('public')->put($fileName, $image);
 
-                $imagePath = $fileName;
+            $imagePath = $fileName;
             }else{
                 if ($request->hasFile('imageInput') && $request->file('imageInput')->isValid()) {
                     $fileName  = 'visitors/' . Str::random(20) . '.png';
                     $imagePath = $request->file('imageInput')->storeAs('visitors', $fileName, 'public');
                 }
             }
-
-            $firstName = ucwords(strtolower($request->first_name));
-            $middleName = ucwords(strtolower($request->middle_name));
-            $lastName = ucwords(strtolower($request->last_name));
-            $address = ucwords(strtolower($request->address));
-            
-            $contactPerson = ucwords(strtolower($request->contact_person));
-            $purposeOfVisit = ucwords(strtolower($request->purpose_of_visit));
             
 
-            $middleInitial = collect(preg_split('/\s+/', trim($middleName)))
-                ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
-                ->implode('');
+            $firstName = Str::title(trim((string) $request->first_name));
+            $middleName = Str::title(trim((string) $request->middle_name));
+            $lastName = Str::title(trim((string) $request->last_name));
+            $contactPerson = Str::title(trim((string) $request->contact_person));
+
+            $middleInitial = mb_strtoupper(mb_substr($middleName, 0, 1));
 
             $user = Auth::user();
             $locationForSave = $this->resolveLocationForSave($user);
@@ -596,33 +589,23 @@ class VisitorController extends Controller
             // original code - kardo
             // $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
             $visitor->first_name   = $firstName;
-            $visitor->middle_name  = $middleName;
+            $visitor->middle_name  = $middleName !== '' ? $middleName : null;
             $visitor->last_name    = $lastName;
             $visitor->phone_number = $request->contact_number ?? '?';
             $visitor->visitor_type = $request->visitor_type;
             $visitor->visitor_id   = $request->id_number;
-            $visitor->location     = $locationForSave ?? '?';
-            $visitor->address      = $address;
             $visitor->id_type      = $request->id_type;
             $visitor->valid_id     = $request->id_type_number;
-            $visitor->purpose      = $purposeOfVisit;
+            $visitor->location     = $locationForSave;
+            $visitor->address      = $request->address;
+            $visitor->purpose      = $request->purpose_of_visit;
             $visitor->contact_person = $contactPerson;
-            $visitor->created_at   = now();
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;
             $visitor->time_in      = now();
             $visitor->status       = 0;
             $visitor->save();
 
-            // audit log for new visitor
-            log_audit(
-                'visitors',
-                'created',
-                $visitor->id,
-                null,
-                $visitor->toArray(),
-                'save'
-            );
 
             return response()->json([
                 'status' => 0,
@@ -630,8 +613,6 @@ class VisitorController extends Controller
                 'message' => 'Visitor successfully added'
             ], 200);
             
-            
-
         } catch (\Exception $e) {
             return response()->json([
                     'status' => 1,

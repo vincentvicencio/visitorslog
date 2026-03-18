@@ -9,8 +9,6 @@
         </div>
     </div>
 
-
-
     <div class="about">
         <div class="school position-relative">
             <div class="text d-flex h-100 align-items-start justify-content-center flex-column">
@@ -68,14 +66,13 @@
             
         </div>
 
-
-
         <div class="header">Project Partner</div>
         <div class="profiles-partner">
             <div class="profile-holder">
                 <div class="image1"><img src="images/magellan logo.png" alt=""></div>
                 <div class="details">
                     <div class="name1">Magellan Solutions</div>
+                    <div class="sub">Outsourcing Company</div>
                 </div>
                 <div class="colorblur1 colorblur"></div>
             </div>
@@ -83,6 +80,7 @@
                 <div class="image2"><img src="images/bsu.png" alt=""></div>
                 <div class="details">
                     <div class="name2">Bulacan State University</div>
+                    <div class="sub">Educational Institution</div>
                 </div>
                 <div class="colorblur2 colorblur"></div>
             </div>

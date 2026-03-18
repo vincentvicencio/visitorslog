@@ -121,7 +121,11 @@
             display: none !important;
         }
         .menu{
-            margin-top: 20px !important;
+            margin-top: 35px !important;
+            opacity: 0 !important;
+        }
+        .mobile{
+            display: none !important;
         }
     }
 }

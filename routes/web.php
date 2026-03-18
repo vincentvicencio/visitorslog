@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\RegisterIDController;
 use App\Http\Controllers\GuardLocationController;
 use App\Http\Controllers\VisitorTypeController;
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VisitorController;
 use App\Models\Visitor;
 use App\Models\VisitorType;
+use App\Models\EmployeeLogs;
+use App\Models\Location;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\User_TypesController;
@@ -41,12 +44,45 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                 return view('pages.visitorslog.view', compact('visitor', 'visitorTypes', 'type', 'validIdTypes'));
             })->name('view.page');
             Route::post('/list',            'list')->name('visitorslog.list');
+            Route::post('/employee-list',            'list')->name('visitorslog.list');
             Route::post('/save',            'save')->name('visitorslog.save');
             Route::post('/timeout',         'timeout')->name('visitorslog.timeout');
             Route::post('/view',            'view')->name('visitorslog.view');
             Route::any('{any}', function () {
                 return redirect()->route('visitorslog.form');
             })->where('any', '.*');
+        });
+    
+        Route::prefix('employeeslog')
+        ->controller(EmployeeController::class)
+        ->group(function () {
+            Route::get('/form',             'form')->name('employeeslog.form');
+            Route::get('/search-employees', 'searchEmployees')->name('employeeslog.searchEmployees');
+            Route::get('/view/{id}/{type}', function ($id, $type) {
+                $visitor = EmployeeLogs::where('id', $id)->latest('id')->firstOrFail();
+
+                $locationLabel = (string) ($visitor->location ?? '');
+                if (is_numeric($locationLabel)) {
+                    $allLocations = collect(session('all_location', []));
+                    $match = $allLocations->firstWhere('id', $locationLabel);
+                    if ($match && !empty($match['name'])) {
+                        $locationLabel = (string) $match['name'];
+                    } else {
+                        $guardLocation = Location::query()->find($locationLabel);
+                        if ($guardLocation) {
+                            $locationLabel = (string) $guardLocation->name;
+                        }
+                    }
+                }
+
+                $statusLabel = (int) $visitor->status === 1 ? 'Timed Out' : 'Active';
+
+                return view('pages.employeeslog.view', compact('visitor', 'type', 'locationLabel', 'statusLabel'));
+            })->name('viewEmp.page');
+            Route::post('/list',            'list')->name('employeeslog.list');
+            Route::post('/save',            'save')->name('employeeslog.save');
+            Route::post('/timeout',         'timeout')->name('employeeslog.timeout');
+            Route::post('/view',            'view')->name('employeeslog.view');
         });
         
     Route::middleware(['auth', 'user_type:1'])->group(function () {
@@ -82,10 +118,11 @@ Route::middleware(['auth', 'single.session'])->group(function () {
         Route::prefix('reports')
             ->controller(ReportController::class)
             ->group(function () {
-                Route::get('/',              'index')->name('reports');
-                Route::get('/export',        'exportReport')->name('reports.export');
-                Route::post('/list',         'list')->name('reports.list');
-                Route::post('/delete',       'delete')->name('reports.delete');
+                Route::get('/',                 'index')->name('reports');
+                Route::get('/export',           'exportReport')->name('reports.export');
+                Route::post('/list',            'list')->name('reports.list');
+                Route::post('/emp/list',        'empList')->name('reports.emp.list');
+                Route::post('/delete',          'delete')->name('reports.delete');
             });
         // VISITOR TYPE
         Route::prefix('visitortype')

@@ -15,7 +15,7 @@
                 <form method="POST" action="{{ route('login') }}" class="d-flex flex-column justify-content-center h-100 p-3">
                 <div class="form-header">
                     <div class="form-mainheader">WELCOME TO MAGELLAN SOLUTIONS</div>
-                    <div class="form-subheader">Sign In to Visitor Log</div>
+                    <div class="form-subheader">Sign In to Log Sheet</div>
                     </div>                    
                     @csrf
                     <!-- EMAIL ADDRESS -->
