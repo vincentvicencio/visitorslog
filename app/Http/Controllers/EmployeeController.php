@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Location;
+use Illuminate\Support\Facades\Http;
 
 class EmployeeController extends Controller
 {
@@ -382,28 +383,35 @@ class EmployeeController extends Controller
     {
         $search    = strtolower(trim((string) $request->input('q', '')));
         $employees = collect(session('all_emp', []));
+        // $sessionEmployee = $allEmployees->firstWhere('emp_code', $user->user_name);
 
         // Fallback for users without auth_token-backed session data (e.g., guards)
         if ($employees->isEmpty()) {
-            // Try the app-wide cache populated when any admin last logged in
-            $cached = \Illuminate\Support\Facades\Cache::get('all_emp_cache', []);
-            if (!empty($cached)) {
-                $employees = collect($cached);
-            } else {
-                // Last resort: unique employees from historical logs
-                $employees = EmployeeLogs::select('emp_code', 'first_name', 'last_name')
-                    ->distinct()
-                    ->orderBy('emp_code')
-                    ->get()
-                    ->map(function ($row) {
-                        return [
-                            'emp_code'    => (string) $row->emp_code,
-                            'first_name'  => (string) $row->first_name,
-                            'middle_name' => '',
-                            'last_name'   => (string) $row->last_name,
-                        ];
-                    });
+            $response = Http::post(env('CENTRALHUB_API') . '/login_api', [
+                'emp_code' => env('WEBDEV_APICRED'),
+                'password' => env('WEBDEV_APIPASS'),
+                'app_name' => 'VISITORS_LOG',
+            ]);
+     
+            $token = $response->successful() ? data_get($response->json(), 'token') : null;
+            if ($token) {
+                session(['auth_token' => $token]);
+                $payload = [
+                'model'  => 'emp_details',
+                'select' => [
+                    'id',
+                    'emp_code',
+                    'first_name',
+                    'middle_name',
+                    'last_name',
+                    'department_id',
+                    'section_id',
+                    'location_id'
+                ]
+                ];
+                $employees = collect(fetchdata_api('api_data', $payload));
             }
+
         }
 
         // Filter employees based on search term
