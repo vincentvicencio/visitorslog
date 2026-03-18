@@ -25,7 +25,7 @@
     <div class="divider">|</div>
     <div class="align-items-center justify-content-center d-flex">
       <div class="logout-button d-flex mt-auto fw-bold align-items-center justify-content-center " 
-              onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+              onclick="event.preventDefault(); document.getElementById('logout-form').submit();" id="logout">
               
         <!-- <i class="bi bi-box-arrow-left p-2"></i> -->
         <span>{{ __('Logout') }}</span>

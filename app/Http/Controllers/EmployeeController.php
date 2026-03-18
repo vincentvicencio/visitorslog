@@ -21,9 +21,9 @@ class EmployeeController extends Controller
     private function resolveLocationForSave($user): ?string
     {
         if ((int) $user->user_type === 3) {
-            // if (session()->has('guard_location_name')) {
-            //     return (string) session('guard_location_name');
-            // }
+            if (session()->has('guard_location_name')) {
+                return (string) session('guard_location_name');
+            }
 
             if (session()->has('guard_location_id')) {
                 return (string) session('guard_location_id');

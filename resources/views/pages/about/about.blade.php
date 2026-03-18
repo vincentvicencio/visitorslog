@@ -72,6 +72,7 @@
                 <div class="image1"><img src="images/magellan logo.png" alt=""></div>
                 <div class="details">
                     <div class="name1">Magellan Solutions</div>
+                    <div class="sub">Outsourcing Company</div>
                 </div>
                 <div class="colorblur1 colorblur"></div>
             </div>
@@ -79,6 +80,7 @@
                 <div class="image2"><img src="images/bsu.png" alt=""></div>
                 <div class="details">
                     <div class="name2">Bulacan State University</div>
+                    <div class="sub">Educational Institution</div>
                 </div>
                 <div class="colorblur2 colorblur"></div>
             </div>

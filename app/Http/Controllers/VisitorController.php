@@ -18,7 +18,7 @@ class VisitorController extends Controller
     private function guardLocationRequired()
     {
         $user = Auth::user();
-
+        
         return $user && (int) $user->user_type === 3 && !session()->has('guard_location_id');
     }
 
@@ -481,10 +481,22 @@ class VisitorController extends Controller
                     'required',
                     'string',
                     function ($attribute, $value, $fail) use ($request) {
+                        $user = Auth::user();
+                        $resolvedLocation = $this->resolveLocationForSave($user);
+
+                        
                         $existing = RegisteredID::where('id_number', $value)->first();
+                        $checkloc = RegisteredID::where('id_number', $value)
+                                    ->where('location', $resolvedLocation)
+                                    ->first();
                         $timein = Visitor::where('visitor_id', $value)
                                     ->whereNull('time_out')
                                     ->first();
+
+                        if(!$checkloc){
+                            $fail('This Visitor ID is not registered in this location.');
+                        }
+
                         if ($timein) {
                             $fail('This Visitor ID is already checked in and has not timed out.');
                         }

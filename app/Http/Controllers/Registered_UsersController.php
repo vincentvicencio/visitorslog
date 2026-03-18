@@ -152,8 +152,7 @@ class Registered_UsersController extends Controller
                 'first_name' => $firstName, 
                 'last_name'  => $lastName,
                 'location'   => null,
-                'user_type'  => $request->user_type,
-                'updated_by' => Auth::user()->id,
+                'user_type'  => $request->user_type
             ];
             
             // Only hash password if provided
@@ -237,8 +236,7 @@ class Registered_UsersController extends Controller
             'first_name' => $firstName, 
             'last_name'  => $lastName,
             'location'   => $locations[0] ?? null,
-            'user_type'  => $request->user_type,
-            'updated_by' => Auth::id(),
+            'user_type'  => $request->user_type
         ];
         
         // Only hash password if provided

@@ -33,8 +33,50 @@ $(document).ready(function () {
         });
     };
 
-    // Object.keys(tabs).forEach(k => tabs[k].addEventListener("click", () => updateView(k)));
-    updateView(tabs.employee.classList.contains("selected") ? "employee" : "visitor");
+    // updateView(tabs.employee.classList.contains("selected") ? "employee" : "visitor");
+    const navLinks = document.querySelectorAll(".sidebar-menu-button");
+
+    navLinks.forEach(link => {
+        link.addEventListener("click", () => {
+            const tab = link.getAttribute("data-tab");
+            if(tab === "visitor") {
+                sessionStorage.setItem("logtab", "visitor");
+            }
+            sessionStorage.setItem("logtab", "visitor");
+        });
+    });
+
+    const logoutButton = document.getElementById('logout');
+    logoutButton.addEventListener('click', () => {
+        sessionStorage.setItem('logtab', 'visitor');
+    });
+
+
+    updateView(sessionStorage.getItem('logtab') || "visitor");
+
+    if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
+        $('#visitorsLogTable').DataTable().destroy();
+        $('#visitorsLogTable').empty();
+    }
+
+    if ($.fn.DataTable.isDataTable('#reportTable')) {
+        $('#reportTable').DataTable().destroy();
+        $('#reportTable').empty();
+    }
+
+    if(sessionStorage.getItem('logtab') === 'employee') {
+        employees.onLoadPage();
+        reports.onLoadPage();
+        $('#addBtn').addClass('d-none');
+        $('#addBtnEmp').removeClass('d-none');
+    }else{
+        visitors.onLoadPage();
+        reports.initializePage();
+        $('#addBtn').removeClass('d-none');
+        $('#addBtnEmp').addClass('d-none');
+    }
+
+    
 
     Object.keys(tabs).forEach(k => {
         tabs[k].addEventListener("click", () => {
@@ -55,6 +97,7 @@ $(document).ready(function () {
                 reports.initializePage();
                 $('#addBtn').removeClass('d-none');
                 $('#addBtnEmp').addClass('d-none');
+                sessionStorage.setItem('logtab', 'visitor');
             }
 
             if (k === "employee") {
@@ -62,6 +105,7 @@ $(document).ready(function () {
                 reports.onLoadPage();
                 $('#addBtn').addClass('d-none');
                 $('#addBtnEmp').removeClass('d-none');
+                sessionStorage.setItem('logtab', 'employee');
             }
         });
     });
