@@ -471,6 +471,9 @@ class EmployeeController extends Controller
                 ->latest()
                 ->first();
 
+            $latestLogCount = EmployeeLogs::where('emp_code', $request->emp_code)
+                ->count();
+
             $isSameStatus = $latestLog && $latestLog->status == $request->status;
 
             if ($isSameStatus) {
@@ -485,7 +488,7 @@ class EmployeeController extends Controller
                 ], 200);
             }
 
-            if($latestLog == 0){
+            if($latestLogCount == 0 && $request->status == 1){
                 return response()->json([
                     'status' => 1,
                     'title' => 'Invalid',
