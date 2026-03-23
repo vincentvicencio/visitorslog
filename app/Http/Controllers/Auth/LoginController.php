@@ -100,6 +100,13 @@ class LoginController extends Controller
     {
 
         $registeredUser = RegisteredUser::where('user_name', $request->emp_code)->first();
+        if($registeredUser->status !== 'Enabled'){
+            Auth::guard('employee')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect('/login');
+        }
+
         if ($registeredUser->user_type != 3){
             $registeredUser->update(['password' => NULL]);
         }

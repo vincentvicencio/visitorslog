@@ -112,6 +112,8 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                 Route::post('/list',              'list')->name('registerUser.list');
                 Route::post('/getlocation',       'location')->name('locations.lookup');
                 Route::post('/get-user-type',     'getUserTypes')->name('getUserTypes');
+                Route::post('/enable/{id}',       'enableUser')->name('registerUser.enableUser');
+                Route::post('/disable/{id}',      'disableUser')->name('registerUser.disableUser');
             });
 
         // REPORT

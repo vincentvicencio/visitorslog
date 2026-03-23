@@ -329,6 +329,7 @@ class UsersTable {
             { id: "updated_by",      label: "Updated By"   },
             { id: "created_at",      label: "Created Date" },
             { id: "updated_at",      label: "Updated Date" },
+            { id: "status",          label: "Status"       },
             { id: "action",          label: "Action"       },
         ];
 
@@ -338,7 +339,7 @@ class UsersTable {
         }));
 
         const columnDefs = [
-            { targets: [0, 1, 2, 3], orderable: false }
+            { targets: [0, 1, 2, 3, 6, 7], orderable: false }
         ]; 
 
         settable.createTableAjax(
@@ -576,6 +577,50 @@ class UsersTable {
                 await self.onLoadForm(userId);
             }
         });
+
+                // Handle Enable Click
+        $(document).on('click', '.btn-enable', async function() {
+            const id = $(this).data('id');
+            try {
+                const response = await $.ajax({
+                    url: `/registerUser/enable/${id}`, // Ensure this route exists
+                    type: 'POST',
+                    data: { _token: $('meta[name="csrf-token"]').attr('content') }
+                });
+                
+                if (response.status === 'success') {
+                    Triggers.showToast(response.message, 'Success', 0);
+                    $('#usersTable').DataTable().ajax.reload(null, false); // Reload without resetting paging
+                }
+            } catch (error) {
+                Triggers.showToast('Failed to enable user', 'Error', 1);
+            }
+        });
+
+        // Handle Disable Click
+        $(document).on('click', '.btn-disable', async function() {
+            const id = $(this).data('id');
+            try {
+                const response = await $.ajax({
+                    url: `/registerUser/disable/${id}`, // Ensure this route exists
+                    type: 'POST',
+                    data: { _token: $('meta[name="csrf-token"]').attr('content') }
+                });
+
+                if (response.status === 'success') {
+                    Triggers.showToast(response.message, 'Success', 0);
+                    $('#usersTable').DataTable().ajax.reload(null, false);
+                }else if(response.status === 'Invalid'){ 
+                    Triggers.showToast('Admin user cannot be disabled', 'Invalid', 1);
+                }
+
+            } catch (error) {
+                Triggers.showToast('Failed to disable user', 'Error', 1);
+            }
+        });
+
+
+
     }
         
     async onLoadForm(record_id) {
