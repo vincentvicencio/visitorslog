@@ -22,7 +22,7 @@ class EmployeeExport implements FromCollection, WithHeadings, WithStyles
     public function collection()
     {
         $query = EmployeeLogs::query()
-            ->where('status', 1)
+            // ->where('status', 1)
             ->withoutTrashed();
 
         // Apply search filter
@@ -64,20 +64,19 @@ class EmployeeExport implements FromCollection, WithHeadings, WithStyles
                 }
             }
 
-            $timeIn  = $log->time_in ? Carbon::parse($log->time_in)->format('h:i A') : '-';
-            $timeOut = $log->time_out ? Carbon::parse($log->time_out)->format('h:i A') : '-';
-            $status = (int) $log->status === 1 ? 'Timed Out' : 'Active';
+            $time = $log->time ? Carbon::parse($log->time)->format('h:i A') : '-';
+            $activity = $log->activity ?: '-';
+            $status = (int) $log->status === 1 ? 'Out' : 'In';
 
         return [
                 'Emp Code'      => $log->emp_code ?? '-',
                 'Full Name'     => $log->full_name ?? trim(($log->first_name ?? '') . ' ' . ($log->last_name ?? '')),
                 'Location'      => $locationLabel ?: '-',
-                'Visit Logged'  => $log->created_at ? Carbon::parse($log->created_at)->format('F d, Y') : '-',
-                'Time In'       => $timeIn,
-                'Time Out'      => $timeOut,
-                'Logged By'     => $log->created_by ? user_name($log->created_by) : '-',
-                'Timed Out By'  => $log->updated_by ? user_name($log->updated_by) : '-',
+                'Log Date'      => $log->created_at ? Carbon::parse($log->created_at)->format('F d, Y') : '-',
+                'Time'          => $time,
+                'Activity'      => $activity,
                 'Status'        => $status,
+                'Logged By'     => $log->created_by ? user_name($log->created_by) : '-',
             ];
         });
     }
@@ -88,12 +87,12 @@ class EmployeeExport implements FromCollection, WithHeadings, WithStyles
             'Emp Code',
             'Full Name',
             'Location',
-            'Visit Logged',
-            'Time In',
-            'Time Out',
+            'Log Date',
+            'Time',
+            'Activity',
+            'Status',
             'Logged By',
-            'Timed Out By',
-            'Status'    
+            'Timed Out By'
         ];
     }
 
