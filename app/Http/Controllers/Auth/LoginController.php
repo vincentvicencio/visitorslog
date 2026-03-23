@@ -116,8 +116,8 @@ class LoginController extends Controller
 
         if ((int) $registeredUser->user_type === 3 && !session()->has('guard_location_id')) {
             return redirect()->route('guard.location.show');
-        }
-
+        }                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
         return redirect()->route('visitorslog');
 
     }
