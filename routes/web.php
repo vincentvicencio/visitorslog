@@ -75,7 +75,7 @@ Route::middleware(['auth', 'single.session'])->group(function () {
                     }
                 }
 
-                $statusLabel = (int) $visitor->status === 1 ? 'Timed Out' : 'Active';
+                $statusLabel = (int) $visitor->status === 1 ? 'Out' : 'In';
 
                 return view('pages.employeeslog.view', compact('visitor', 'type', 'locationLabel', 'statusLabel'));
             })->name('viewEmp.page');

@@ -58,6 +58,11 @@
                                 <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " required autocomplete="off">
                                 <label for="purpose_of_visit">Purpose of Visit</label>
                             </div>
+                            {{-- Affiliation --}}
+                            <div class="input-holder floating">
+                                <input type="text" name="affiliation" id="affiliation" class="form-control" placeholder=" " required autocomplete="off">
+                                <label for="affiliation">Affiliation</label>
+                            </div>
 
                             <br>
                             <div class="personaldetails w-100 mt-3">

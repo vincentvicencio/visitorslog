@@ -256,7 +256,6 @@ class VisitorController extends Controller
                 : '-';
 
             $createdby = $d->created_by ? user_name($d->created_by) : '-';
-            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
             
 
             $newData[$i] = [
@@ -272,7 +271,7 @@ class VisitorController extends Controller
 
                 'visitor_id'   => '<div class="text-center">' . $d->visitor_id . '</div>',
 
-                     'visit' =>  '<div class="text-center">' . $visitLabel . '</div>',
+                'visit' =>  '<div class="text-center">' . $visitLabel . '</div>',
 
                 'time_in' => '<div class="text-center">
                                 <small> '. $time_in .'</small><br>
@@ -476,6 +475,7 @@ class VisitorController extends Controller
                 'id_type_number'   => ['required'],
                 'purpose_of_visit' => ['required','regex:/^[a-zA-Z ]+$/'],
                 'contact_person' => ['required','regex:/^[a-zA-Z ]+$/'],
+                'affiliation' => ['required','regex:/^[a-zA-Z ]+$/'],
 
                 'id_number'    => [
                     'required',
@@ -573,8 +573,13 @@ class VisitorController extends Controller
             $middleName = Str::title(trim((string) $request->middle_name));
             $lastName = Str::title(trim((string) $request->last_name));
             $contactPerson = Str::title(trim((string) $request->contact_person));
+            $address = Str::title(trim((string) $request->address));
+            $purpose = Str::title(trim((string) $request->purpose_of_visit));
+            $affiliation = Str::title(trim((string) $request->affiliation));
 
-            $middleInitial = mb_strtoupper(mb_substr($middleName, 0, 1));
+            $middleInitial = collect(preg_split('/\s+/', trim($middleName)))
+                ->map(fn($word) => mb_strtoupper(mb_substr($word, 0, 1)))
+                ->implode('');
 
             $user = Auth::user();
             $locationForSave = $this->resolveLocationForSave($user);
@@ -586,8 +591,7 @@ class VisitorController extends Controller
             } else {
                 $visitor->full_name = $firstName . ' ' . $lastName;
             }
-            // original code - kardo
-            // $visitor->full_name   = $request->first_name .' '. $middleInitial .'. '. $request->last_name;
+
             $visitor->first_name   = $firstName;
             $visitor->middle_name  = $middleName !== '' ? $middleName : null;
             $visitor->last_name    = $lastName;
@@ -597,8 +601,9 @@ class VisitorController extends Controller
             $visitor->id_type      = $request->id_type;
             $visitor->valid_id     = $request->id_type_number;
             $visitor->location     = $locationForSave;
-            $visitor->address      = $request->address;
-            $visitor->purpose      = $request->purpose_of_visit;
+            $visitor->address      = $address;
+            $visitor->purpose      = $purpose;
+            $visitor->affiliation  = $affiliation;
             $visitor->contact_person = $contactPerson;
             $visitor->created_by   = Auth::user()->id;
             $visitor->image_path   = $imagePath;

@@ -16,7 +16,7 @@
                 {{-- header --}}
                 <a class="btn-close" href="{{ route($type) }}"></a>
                 <div class="header fs-4">Visitor Details</div>
-                <div class="subheader mb-3">Register and record a new visitor entry</div>
+                <div class="subheader mb-3">View visitor entry</div>
                 <div class="form" id="addVisitorForm">
                     @csrf
                     <div class="details">
@@ -55,6 +55,11 @@
                         <div class="input-holder floating">
                             <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $visitor->purpose }}" readonly>
                             <label for="purpose_of_visit">Purpose of Visit</label>
+                        </div>
+                        {{-- Affiliation --}}
+                        <div class="input-holder floating">
+                            <input type="text" name="affiliation" id="affiliation" class="form-control" placeholder=" " value="{{ $visitor->affiliation }}" readonly>
+                            <label for="affiliation">Affiliation</label>
                         </div>
 
                         <br>
@@ -109,7 +114,7 @@
                     </div>
                     {{-- for capturing image --}}
                     <div class="capture">
-                        <div class="header">Capture Image</div>
+                        <div class="header">Image</div>
                         <div class="imgholder">
                             @if ( $visitor->image_path == null)
                                 <span style="color: rgba(128, 128, 128, 0.568); font-weight: bold;">No Image Provided</span> 

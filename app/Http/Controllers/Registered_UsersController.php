@@ -598,7 +598,7 @@ public function list(Request $request){
                 'action' => '<div class="dropdown text-center">'.
                             ($d->status === 'Enabled'
                                 ? '<button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>' . '<button class="text-danger dropdown-item btn-disable" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Disable</button>'
-                                : '<button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'"> Delete</button>' . '<button class="text-success dropdown-item btn-enable" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Enable</button>').
+                                : '<button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Delete</button>' . '<button class="text-success dropdown-item btn-enable" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Enable</button>').
             '</div>'
             ];
             $i++;
@@ -724,34 +724,36 @@ public function list(Request $request){
     {
         try {
             $user = RegisteredUser::findOrFail($id);
+            $adminCount = RegisteredUser::where('user_type', 1)
+                ->where('status', 'Enabled')
+                ->count();
 
-            if($user->user_type == 1){
+            if($user->user_type == 1 && $adminCount == 1){
                 return response()->json([
-                'status'  => 'Invalid', 
-                'message' => 'Admin cannot be disabled.'
-            ]);
-            }
-            else{
+                    'status'  => 'Invalid', 
+                    'message' => 'Admin cannot be disabled.'
+                ]);
+            }else{
                 $oldData = $user->toArray();
 
                 $user->update([
-                'status'     => 'Disabled',
-                'updated_by' => Auth::user()->id
-            ]);
+                    'status'     => 'Disabled',
+                    'updated_by' => Auth::user()->id
+                ]);
 
-            log_audit(
-                'registered_users',
-                'disabled',
-                $user->id,
-                $oldData,
-                $user->getAttributes(),
-                'disable'
-            );
+                log_audit(
+                    'registered_users',
+                    'disabled',
+                    $user->id,
+                    $oldData,
+                    $user->getAttributes(),
+                    'disable'
+                );
 
-            return response()->json([
-                'status'  => 'success', 
-                'message' => 'User disabled successfully.'
-            ]);
+                return response()->json([
+                    'status'  => 'success', 
+                    'message' => 'User disabled successfully.'
+                ]);
             }
         } catch (\Exception $e) {
             return response()->json([
