@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('image_path')->nullable();
             $table->string('purpose')->nullable();
             $table->string('contact_person')->nullable();
+            $table->string('affiliation')->nullable();
             $table->string('valid_id')->nullable();
             $table->integer('id_type')->nullable();
             $table->timestamp('time_in')->nullable();

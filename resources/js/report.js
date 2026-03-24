@@ -284,11 +284,10 @@ class ReportClassTable {
                 { id: "full_name", label: "Name" },
                 { id: "location", label: "Location" },
                 { id: "log_date", label: "Log Date" },
-                { id: "time_in", label: "Time In" },
-                { id: "time_out", label: "Time Out" },
-                { id: "creator", label: "Logged by" },
-                { id: "updated_by", label: "Timed Out by" },
+                { id: "time", label: "Time" },
+                { id: "activity", label: "Activity" },
                 { id: "status", label: "Status" },
+                { id: "creator", label: "Logged by" },
             ];
 
         const columns = tableHeader.map(col => ({

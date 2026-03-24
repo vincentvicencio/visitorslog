@@ -17,11 +17,10 @@ return new class extends Migration
             $table->string('full_name')->nullable();
             $table->text('profile_pic')->nullable();
             $table->string('location')->nullable();
-            $table->timestamp('time_in')->nullable();
-            $table->timestamp('time_out')->nullable();
+            $table->timestamp('time')->nullable();
             $table->tinyInteger('status')->nullable();
+            $table->string('activity')->nullable();
             $table->string('created_by')->nullable();
-            $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();

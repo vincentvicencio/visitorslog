@@ -39,20 +39,29 @@
                                 <input type="text" name="full_name" id="logemp_full_name" class="form-control" placeholder=" " readonly>
                                 <label>Full Name</label>
                             </div>
+                            <div class="input-holder floating">
+                                <select name="status" id="status" class="form-control" required autocomplete="off">
+                                    <option value="" disabled selected>Select Status</option> 
+                                    <option value=0>In</option> 
+                                    <option value=1>Out</option> 
+                                </select>
+                                <label for="status">Status</label>
+                            </div>
+                            <div class= "input-holder floating">
+                                <input type="text" name="activity" id="activity" class="form-control" placeholder=" " required autocomplete="off">
+                                <label>Activity</label>
+                            </div>
                             {{-- buttons --}}
                             <div class="panel-buttons" id="desktop">
-                                <button type="submit" class="save" id="saveBtn">Time in</button>
+                                <button type="submit" class="save" id="saveBtn">Log</button>
                                 <button type="button" class="clear" id="clrBtn">clear</button>
                             </div>
 
                         </div>
 
                         <div class="capture">
-                            <div class="header">Capture Image</div>
+                            <div class="header">Image</div>
                                 <div class="imgholder" style="overflow: hidden">
-                                    <video id="webcam" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-                                    <canvas id="canvas" style="display:none;"></canvas>
-                                    <input type="file" name="imageInput" id="imageInput" accepts="image/*" capture="user" hidden>
                                     <img id="photoPreview" src="" style="display:none; width: 100%; height: 100%; object-fit: cover;">
                                     <input type="hidden" id="image_path" name="image_path">
                                     <input type='hidden' id="webcamUse" value="0">
@@ -60,7 +69,7 @@
                         </div>
                         {{-- buttons --}}
                         <div class="panel-buttons" id="mobile">
-                            <button type="submit" class="save" id="saveBtn">Time in</button>
+                            <button type="submit" class="save" id="saveBtn">Log</button>
                             <button type="button" class="clear" id="clrBtn">clear</button>
                         </div>
 

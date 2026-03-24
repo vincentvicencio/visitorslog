@@ -431,6 +431,7 @@ $(document).ready(function () {
             const input_contact = document.getElementById("contact_number");
             const input_contact_person = document.getElementById("contact_person");
             const input_purpose = document.getElementById("purpose_of_visit");
+            const input_affiliation = document.getElementById("affiliation");
 
             const normalizeMobileNumber = (rawValue) => {
                 let digits = (rawValue || "").replace(/\D/g, "");
@@ -550,6 +551,20 @@ $(document).ready(function () {
                 });
 
                 input_contact_person.addEventListener("keydown", (e) => {
+                    // Allow control keys
+                    const allowedKeys = [
+                        "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                    ];
+
+                    if (allowedKeys.includes(e.key)) return;
+
+                    // Block anything that's not a letter or space
+                    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+
+                input_affiliation.addEventListener("keydown", (e) => {
                     // Allow control keys
                     const allowedKeys = [
                         "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"

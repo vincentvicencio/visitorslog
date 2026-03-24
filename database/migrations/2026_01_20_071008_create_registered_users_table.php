@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('updated_by')->nullable();
             $table->string('deleted_by')->nullable();
             $table->timestamp('created_at')->nullable();
+            $table->string('status')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->timestamp( 'deleted_at')->nullable();
         });

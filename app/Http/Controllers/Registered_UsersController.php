@@ -152,6 +152,7 @@ class Registered_UsersController extends Controller
                 'first_name' => $firstName, 
                 'last_name'  => $lastName,
                 'location'   => null,
+                'status'    => 'Enabled',
                 'user_type'  => $request->user_type
             ];
             
@@ -236,6 +237,7 @@ class Registered_UsersController extends Controller
             'first_name' => $firstName, 
             'last_name'  => $lastName,
             'location'   => $locations[0] ?? null,
+            'status'    => 'Enabled',
             'user_type'  => $request->user_type
         ];
         
@@ -582,7 +584,7 @@ public function list(Request $request){
         $i       = 0;
       
         foreach ($data as $d) { 
-       
+
             $newData[$i] = [
                 'user_name'  => $d->first_name . ' ' . $d->last_name, // show emp_code in first column
                 'user_type'  => $d->userType->name ?? '-',
@@ -590,10 +592,14 @@ public function list(Request $request){
                 'updated_by' => $d->updated_by ? user_name($d->updated_by) : '-',
                 'created_at' => $d->created_at ? ($d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l')) : '-',
                 'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l')) : '-',
-                'action'            => '<div class="dropdown text-center">
-                                        <button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>
-                                        <button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Delete</button>
-                                    </div>' 
+                'status' => $d->status === 'Enabled' 
+                                        ? '<span class="badge bg-success">Enabled</span>' 
+                                        : '<span class="badge bg-secondary">Disabled</span>',
+                'action' => '<div class="dropdown text-center">'.
+                            ($d->status === 'Enabled'
+                                ? '<button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>' . '<button class="text-danger dropdown-item btn-disable" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Disable</button>'
+                                : '<button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Delete</button>' . '<button class="text-success dropdown-item btn-enable" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Enable</button>').
+            '</div>'
             ];
             $i++;
         } 
@@ -680,5 +686,80 @@ public function list(Request $request){
             'name'        => $request->RegisteredID,
             'updated_by'  => Auth::user()->id,
         ]);
+    }
+
+    public function enableUser($id)
+    {
+        try {
+            $user = RegisteredUser::findOrFail($id);
+            $oldData = $user->toArray();
+
+            $user->update([
+                'status'     => 'Enabled',
+                'updated_by' => Auth::user()->id
+            ]);
+
+            log_audit(
+                'registered_users',
+                'enabled',
+                $user->id,
+                $oldData,
+                $user->getAttributes(),
+                'enable'
+            );
+
+            return response()->json([
+                'status'  => 'success', 
+                'message' => 'User enabled successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error', 
+                'message' => 'Failed to enable user.'
+            ], 500);
+        }
+    }
+
+    public function disableUser($id)
+    {
+        try {
+            $user = RegisteredUser::findOrFail($id);
+            $adminCount = RegisteredUser::where('user_type', 1)
+                ->where('status', 'Enabled')
+                ->count();
+
+            if($user->user_type == 1 && $adminCount == 1){
+                return response()->json([
+                    'status'  => 'Invalid', 
+                    'message' => 'Admin cannot be disabled.'
+                ]);
+            }else{
+                $oldData = $user->toArray();
+
+                $user->update([
+                    'status'     => 'Disabled',
+                    'updated_by' => Auth::user()->id
+                ]);
+
+                log_audit(
+                    'registered_users',
+                    'disabled',
+                    $user->id,
+                    $oldData,
+                    $user->getAttributes(),
+                    'disable'
+                );
+
+                return response()->json([
+                    'status'  => 'success', 
+                    'message' => 'User disabled successfully.'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error', 
+                'message' => 'Mama mo blue'
+            ], 500);
+        }
     }
 }

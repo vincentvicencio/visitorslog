@@ -16,8 +16,8 @@
                 {{-- header --}}
                 
                 <a class="btn-close" href="{{ route($type) }}"></a>
-                <div class="header fs-4">Employeee Details</div>
-                <div class="subheader mb-3">Register and record a new visitor entry</div>
+                <div class="header fs-4">Employee Details</div>
+                <div class="subheader mb-3">View employee entry</div>
                 <div class="form" id="addVisitorForm">
                     @csrf
                     <div class="details">
@@ -47,16 +47,20 @@
                             <label for="last_name">Last name</label>
                         </div> --}}
                         <div class="input-holder floating">
-                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $visitor->emp_code }}" readonly>
-                            <label for="purpose_of_visit">Employee Code</label>
+                            <input type="text" name="" id="" class="form-control" placeholder=" " value="{{ $visitor->emp_code }}" readonly>
+                            <label for="">Employee Code</label>
                         </div>
                         <div class="input-holder floating">
-                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $locationLabel }}" readonly>
-                            <label for="purpose_of_visit">Location</label>
+                            <input type="text" name="" id="" class="form-control" placeholder=" " value="{{ $locationLabel }}" readonly>
+                            <label for="">Location</label>
                         </div>
                         <div class="input-holder floating">
-                            <input type="text" name="purpose_of_visit" id="purpose_of_visit" class="form-control" placeholder=" " value="{{ $statusLabel }}" readonly>
-                            <label for="purpose_of_visit">Status</label>
+                            <input type="text" name="" id="" class="form-control" placeholder=" " value="{{ $statusLabel }}" readonly>
+                            <label for="">Status</label>
+                        </div>
+                        <div class="input-holder floating">
+                            <input type="text" name="" id="" class="form-control" placeholder=" " value="{{ $visitor->activity }}" readonly>
+                            <label for="">Activity</label>
                         </div>
 
                         <br><br><br><br><br><br>

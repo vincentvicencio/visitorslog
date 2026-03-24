@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Location;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class EmployeeController extends Controller
 {
@@ -151,12 +152,6 @@ class EmployeeController extends Controller
                         // First filter by location (non-admin only)
                         $query->whereIn('location', $userLocations);
                     }
-
-                    // Then filter active / not timed out
-                    $query->where(function ($q) {
-                        $q->where('status', 0)
-                        ->where('time_out', null);
-                    });
                 })
 
                 -> when($keywords, function ($query) use ($keywords) {
@@ -210,20 +205,26 @@ class EmployeeController extends Controller
             }
 
             $status = '';
+            $statuslayout = '';
 
             if($d->status == 0){
-                $status = 'Active';
+                $status = 'In';
             }else{
-                $status = 'Timed Out';
+                $status = 'Out';
             }
 
-            $time_in = Carbon::parse($d->time_in)->format('h:i A');
+            if ($status === 'Out') {
+                $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger rounded-2"> '. $status .'</div></div>';
+            }
+            else{
+                $statuslayout = '<div class="status-cell"><div class="status rounded-2" > '. $status .'</div></div>';
+            }
 
-            $time_out = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+            $time = Carbon::parse($d->time)->format('h:i A');
 
             $createdby = $d->created_by ? user_name($d->created_by) : '-';
-            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
-            
+
+            $activity = $d->activity ? $d->activity : '-';
 
             $newData[$i] = [
                 
@@ -238,18 +239,18 @@ class EmployeeController extends Controller
                                     '. $d->created_at->format('l')
                                  . '</div>',
 
-                'time_in' => '<div class="text-center">
-                                <small> '. $time_in .'</small><br>
+                'time' => '<div class="text-center">
+                                <small> '. $time .'</small><br>
                             </div>',
-                'time_out' => '<div class="text-center">
-                                <small> '. $time_out .'</small><br>
+                'activity' => '<div class="text-center">
+                                '. $activity .'<br>
                             </div>',
+
+                'status'   => $statuslayout,
 
                 'creator' => '<div class="text-center">
                                 '. $createdby .'
                             </div>',
-                
-                'status'       => '<div class="status-cell"><div class="status rounded-2"> '. $status .'</div></div>',
 
                 'action' => '<div class="dropdown">
                                         <button 
@@ -258,13 +259,6 @@ class EmployeeController extends Controller
                                             data-id="'. $d->id .'"
                                             data-type="visitorslog">
                                             View
-                                        </button>
-                                        <button 
-                                            type="button"
-                                            class="dropdown-item text-danger"
-                                            id="empTimeoutBtn"
-                                            data-id="'. $d->id .'">
-                                            Timeout
                                         </button>
                             </div>',
             ];
@@ -466,42 +460,55 @@ class EmployeeController extends Controller
         try {
             $request->validate([
                 'emp_code'      => 'required|string',
-                // 'first_name'    => 'required|string|max:40',
-                // 'last_name'     => 'required|string|max:40',
                 'full_name'     => 'required|string|max:100',
+                'activity'      => 'nullable|string',
             ], [
                 'emp_code.required'    => 'Employee Code is required',
-                // 'first_name.required'  => 'First Name is required',
-                // 'last_name.required'   => 'Last Name is required',
                 'full_name.required'   => 'Full Name is required',
             ]);
 
-            $alreadyLoggedIn = EmployeeLogs::where('emp_code', $request->emp_code)
-                ->where('status', 0)
-                ->whereNull('time_out')
-                ->exists();
+            $latestLog = EmployeeLogs::where('emp_code', $request->emp_code)
+                ->latest()
+                ->first();
 
-            if ($alreadyLoggedIn) {
+            $latestLogCount = EmployeeLogs::where('emp_code', $request->emp_code)
+                ->count();
+
+            $isSameStatus = $latestLog && $latestLog->status == $request->status;
+
+            if ($isSameStatus) {
+                $message = $latestLog->status == 0
+                    ? 'Employee is currently in'
+                    : 'Employee is currently out';
+
                 return response()->json([
                     'status' => 1,
                     'title' => 'Invalid',
-                    'message' => 'Employee is already logged in',
+                    'message' => $message,
+                ], 200);
+            }
+
+            if($latestLogCount == 0 && $request->status == 1){
+                return response()->json([
+                    'status' => 1,
+                    'title' => 'Invalid',
+                    'message' => 'Employee has not logged in yet.',
                 ], 200);
             }
 
             $user = Auth::user();
             $locationForSave = $this->resolveLocationForSave($user);
 
+            $activity = Str::title(trim((string) $request->activity ?? '-'));
+
             $employeeLog = new EmployeeLogs();
             $employeeLog->emp_code = $request->emp_code;
-            // $employeeLog->first_name = $request->first_name;
-            // $employeeLog->middle_name = $request->middle_name;
-            // $employeeLog->last_name = $request->last_name;
             $employeeLog->full_name = $request->full_name;
             $employeeLog->profile_pic = $this->saveProfilePicFromBase64($request->image_path ?? null, $request->emp_code);
             $employeeLog->location = $locationForSave ?? '?';
-            $employeeLog->time_in = now();
-            $employeeLog->status = 0; // Active
+            $employeeLog->time = now();
+            $employeeLog->activity = $activity;
+            $employeeLog->status = $request->status; // Active
             $employeeLog->created_by = $user->id;
             $employeeLog->save();
 
@@ -524,11 +531,17 @@ class EmployeeController extends Controller
                 // Keep save success even if audit fails.
                 \Log::error('Audit save failed for EmployeeLog: ' . $e->getMessage());
             }
-
+            
+            $message = '';
+            if($request->status == 1){
+                $message = 'Employee successfully logged out';
+            }else{
+                $message = 'Employee successfully logged in';
+            }
             return response()->json([
                 'status' => 0,
                 'title' => 'Success',
-                'message' => 'Employee successfully logged in'
+                'message' => $message
             ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {

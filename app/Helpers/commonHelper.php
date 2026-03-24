@@ -34,8 +34,8 @@ if(!function_exists(("user_name"))){
     function user_name($id){
         $user = RegisteredUser::find($id);
    
-        $first_name = $user->first_name ?? '';
-        $last_name = $user->last_name ?? '';
+        $first_name = $user->first_name ?? '-';
+        $last_name = $user->last_name ?? '-';
 
         return $first_name . ' ' . $last_name;
     }

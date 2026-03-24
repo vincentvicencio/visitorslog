@@ -131,20 +131,6 @@ class ReportController extends Controller
                 }
             }
 
-            $image = '';
-
-            if ($d->image_path == null) {
-                $image = 'No Image Provided';
-            }else{
-                $image ='<button 
-                    class="btn-sm view-button text-white border-0 rounded-2 px-3 py-1"
-                        id="viewImageBtn"
-                        data-id="'. $d->id .'"
-                        data-image="'. Storage::url($d->image_path) .'">
-                        View
-                    </button>';
-            }
-
             $status = '';
 
             if($d->status == 0){
@@ -161,14 +147,13 @@ class ReportController extends Controller
             $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
                     
             if ($status === 'Timed Out') {
-                $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger"> '. $status .'</div></div>';
+                $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger rounded-2"> '. $status .'</div></div>';
             }
             else{
-                $statuslayout = '<div class="status-cell"><div class="status" > '. $status .'</div></div>';
+                $statuslayout = '<div class="status-cell"><div class="status rounded-2" > '. $status .'</div></div>';
             }
 
             $newData[$i] = [
-                
 
                 'full_name' => $d->full_name,
 
@@ -203,6 +188,7 @@ class ReportController extends Controller
                 'created_at'   => $d->created_at->format('F j, Y') . '<br>' . $d->created_at->format('l'),
 
                 'updated_at'   => $d->updated_at->format('F j, Y') . '<br>' . $d->updated_at->format('l'),
+                
             ];
             $i++;
         }
@@ -229,7 +215,6 @@ class ReportController extends Controller
         $limit    = $request->input('length');
 
         $rawquery = EmployeeLogs::withoutTrashed()
-                ->where('status', 1)
                 -> when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
                         $q->where   ('full_name', 'LIKE', "%{$keywords}%")
@@ -291,23 +276,20 @@ class ReportController extends Controller
             $status = '';
 
             if($d->status == 0){
-                $status = 'Active';
+                $status = 'In';
             }else{
-                $status = 'Timed Out';
+                $status = 'Out';
             }
 
-            $time_in    = Carbon::parse($d->time_in)->format('h:i A');
-
-            $time_out   = $d->time_out ? Carbon::parse($d->time_out)->format('h:i A') : '-';
+            $time    = Carbon::parse($d->time)->format('h:i A');
 
             $createdby = $d->created_by ? user_name($d->created_by) : '-';
-            $updatedby = $d->updated_by ? user_name($d->updated_by) : '-';
                     
-            if ($status === 'Timed Out') {
-                $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger"> '. $status .'</div></div>';
+            if ($status === 'Out') {
+                $statuslayout = '<div class="status-cell"><div class="status text-danger border border-danger rounded-2"> '. $status .'</div></div>';
             }
             else{
-                $statuslayout = '<div class="status-cell"><div class="status" > '. $status .'</div></div>';
+                $statuslayout = '<div class="status-cell"><div class="status rounded-2" > '. $status .'</div></div>';
             }
 
             $newData[$i] = [
@@ -316,27 +298,25 @@ class ReportController extends Controller
 
                 'full_name' => $d->full_name,
 
-                'location' => '<div class="text-center">' . $locationLabel . '</div>','log_date' =>  '<div class="text-center">' . 
+                'location' => '<div class="text-center">' . $locationLabel . '</div>',
+
+                'log_date' =>  '<div class="text-center">' . 
                                     $d->created_at->format("F d, Y") .'<br>
                                     '. $d->created_at->format('l')
                                  . '</div>',
 
-                'time_in' => '<div class="text-center">
-                                <small> '. $time_in .'</small><br>
+                'time' => '<div class="text-center">
+                                <small> '. $time .'</small><br>
                             </div>',
-                'time_out' => '<div class="text-center">
-                                <small> '. $time_out .'</small><br>
+                'activity' => '<div class="text-center">
+                                '. $d->activity .'<br>
                             </div>',
+
+                'status'   => $statuslayout,
 
                 'creator' => '<div class="text-center">
                                 '. $createdby .'
                             </div>',
-
-                'updated_by' => '<div class="text-center">
-                                '. $updatedby .'
-                            </div>',
-            
-                'status' => $statuslayout,
             ];
             $i++;
         }

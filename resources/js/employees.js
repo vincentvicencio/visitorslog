@@ -40,10 +40,10 @@ let URL = '/employeeslog/';
                 { id: "full_name", label: "Name" },
                 { id: "location", label: "Location" },
                 { id: "log_date", label: "Log Date" },
-                { id: "time_in", label: "Time In" },
-                { id: "time_out", label: "Time Out" },
-                { id: "creator", label: "Logged by" },
+                { id: "time", label: "Time" },
+                { id: "activity", label: "Activity" },
                 { id: "status", label: "Status" },
+                { id: "creator", label: "Logged by" },
                 { id: "action", label: "Action" },
             ];
 
@@ -121,18 +121,6 @@ let URL = '/employeeslog/';
             //     container.showModal('#logempModal')
             // })
 
-            $(document).on('click', '#empTimeoutBtn', function () {
-                let Id = $(this).data('id');
-                Triggers.showNotification(
-                    '#notificationContainer',
-                    'Time Out',
-                    'Are you sure you want to time out this Employee?',
-                    Id
-                );
-            });
-
-            
-    
             $(document).on('click', '#empViewBtn', function () {
                 let visitorId = $(this).data('id');
                 let type = $(this).data('type');
@@ -174,51 +162,6 @@ let URL = '/employeeslog/';
                         }
                         
                         Triggers.showToast(msg, 1);
-                    }
-                });
-            });
-
-            $(document).on('click', '#timeout_btn', function () {
-                let Id = $('#record_id').val();
-                
-                if (!Id) {
-                    Triggers.showToast('Invalid record ID.', 'Invalid', 1);
-                    return;
-                }
-                $.ajax({
-                    url: URL+"timeout",
-                    type: "POST",
-                    data: {
-                        id: Id,
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    timeout: 15000,
-                    success: function (response) {
-                        Triggers.showToast(response.message, 'Success', 0);
-                        setTimeout(() => {
-                            $('.toast').fadeOut('slow');
-                                deleteModal.hide();
-                            
-                        }, 1000);
-                        if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
-                            $('#visitorsLogTable').DataTable().draw(false);
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Timeout error:', error, xhr);
-                        let msg = 'TimeOut failed.';
-                        
-                        if (status === 'timeout') {
-                            msg = 'Request timeout. Please try again.';
-                        } else if (xhr.responseJSON?.message) {
-                            msg = xhr.responseJSON.message;
-                        } else if (xhr.status === 404) {
-                            msg = 'Record not found.';
-                        } else if (xhr.status >= 500) {
-                            msg = 'Server error. Please try again later.';
-                        }
-                        
-                        Triggers.showToast(msg, 'Error', 1);
                     }
                 });
             });
@@ -473,10 +416,10 @@ let URL = '/employeeslog/';
             // Passing Blob/File values via Object.fromEntries(FormData) can throw Illegal invocation.
             const payload = {
             emp_code: empCode,
-            first_name: firstName,
-            last_name: lastName,
             full_name: fullName,
             image_path: $('#image_path').val() || '',
+            activity: $('#activity').val(),
+            status: $('#status').val(),
             };
 
             try {
@@ -534,34 +477,6 @@ let URL = '/employeeslog/';
                 $('#imageInput').val('');
                 startWebcam();
             });
-
-            $('#captureBtn').off('click').on('click', function () {
-                const video = document.getElementById('webcam');
-                const canvas = document.getElementById('canvas');
-                if (video && video.srcObject) {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                    const imageData = canvas.toDataURL('image/png');
-                    $('#photoPreview').css('display', 'block').attr('src', imageData);
-                    $('#webcam').css('display', 'none');
-                    $('#image_path').val(imageData);
-                } else {
-                    $('#imageInput').click();
-                }
-            });
-
-            $('#recaptureBtn').off('click').on('click', function () {
-                $('#photoPreview').css('display', 'none').attr('src', '');
-                $('#imageInput').val('');
-                $('#image_path').val('');
-                const video = document.getElementById('webcam');
-                if (video && video.srcObject) {
-                    $('#webcam').css('display', 'block');
-                }
-            });
-
-            startWebcam();
         }
 
         bindEmployeeDropdownDismissHandlers() {
@@ -605,30 +520,6 @@ let URL = '/employeeslog/';
 }
 
 const instance = new EmployeesTable();
-
-async function startWebcam() {
-    const video = document.getElementById('webcam');
-    const imageInput = document.getElementById('imageInput');
-
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        if (imageInput) imageInput.style.display = 'block';
-        if (video) video.style.display = 'none';
-        return;
-    }
-
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-        if (video) {
-            video.srcObject = stream;
-            video.style.display = 'block';
-        }
-        if (imageInput) imageInput.style.display = 'none';
-    } catch (err) {
-        console.error('Webcam not available:', err);
-        if (imageInput) imageInput.style.display = 'block';
-        if (video) video.style.display = 'none';
-    }
-}
 
 $(document).ready(function () {
     if (document.getElementById('logemp_form') && !document.getElementById('visitorsLogTable')) {

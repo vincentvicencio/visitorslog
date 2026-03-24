@@ -26,6 +26,7 @@ class Users extends Seeder
             'location'   => 1,
             'created_by' => 1,
             'created_at' => now(),
+            'status'     => 'Enabled',
         ],
         [
             'user_name'  => 8888,
@@ -36,6 +37,7 @@ class Users extends Seeder
             'location'   => 2,
             'created_by' => 1,
             'created_at' => now(),
+            'status'     => 'Enabled',
         ]
     ]);
     }

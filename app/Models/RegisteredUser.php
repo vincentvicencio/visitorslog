@@ -22,6 +22,7 @@ class RegisteredUser extends Authenticatable
     'deleted_by',
     'deleted_at',
     'location',
+    'status',
     ];
 
     public function userType()
