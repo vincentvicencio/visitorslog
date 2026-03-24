@@ -593,12 +593,14 @@ public function list(Request $request){
                 'created_at' => $d->created_at ? ($d->created_at->format('F j, Y'). '<br>'. $d->created_at->format('l')) : '-',
                 'updated_at' => $d->updated_at ? ($d->updated_at->format('F j, Y'). '<br>'. $d->updated_at->format('l')) : '-',
                 'status' => $d->status === 'Enabled' 
-                                        ? '<span class="badge bg-success">Enabled</span>' 
-                                        : '<span class="badge bg-secondary">Disabled</span>',
+                                        ? '<span class="d-inline-flex focus-ring py-1 px-2 text-decoration-none border rounded-2 border-success text-success">Active</span>' 
+                                        : '<span class="d-inline-flex focus-ring py-1 px-2 text-decoration-none border rounded-2 border-danger text-danger">Disabled</span>',
                 'action' => '<div class="dropdown text-center">'.
                             ($d->status === 'Enabled'
-                                ? '<button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>' . '<button class="text-danger dropdown-item btn-disable" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Disable</button>'
-                                : '<button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Delete</button>' . '<button class="text-success dropdown-item btn-enable" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Enable</button>').
+                                ? '<button class="dropdown-item btn-edit" data-id="'. $d->id .'"> Edit</button>' . 
+                                  '<button class="text-danger dropdown-item btn-disable" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Disable</button>'
+                                : '<button class="text-danger dropdown-item btn-delete" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Delete</button>' . 
+                                  '<button class="text-success dropdown-item btn-enable" data-id="'. $d->id .'" data-details="'. $d->first_name. '"> Enable</button>').
             '</div>'
             ];
             $i++;
