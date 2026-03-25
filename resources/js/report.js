@@ -229,13 +229,13 @@ class ReportClassTable {
             false
         );
 
-        $(self.table)
-            .off('xhr.dt.visitorCount')
-            .on('xhr.dt.visitorCount', function (_e, _settings, json) {
-                if (!visitorCountEl.length || !json) return;
-                const count = Number(json.currently_in_count);
-                visitorCountEl.text(Number.isNaN(count) ? 0 : count);
-            });
+        // $(self.table)
+        //     .off('xhr.dt.visitorCount')
+        //     .on('xhr.dt.visitorCount', function (_e, _settings, json) {
+        //         if (!visitorCountEl.length || !json) return;
+        //         const count = Number(json.currently_in_count);
+        //         visitorCountEl.text(Number.isNaN(count) ? 0 : count);
+        //     });
 
         $(self.table)
             .off('init.dt')

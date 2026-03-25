@@ -13,13 +13,21 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
         $weekStart = Carbon::today()->subDays(6);
+        $visitDateExpression = DB::raw('COALESCE(time_in, created_at)');
 
         $todayVisitors = Visitor::query()
-            ->whereDate(DB::raw('COALESCE(time_in, created_at)'), $today)
+            ->whereDate($visitDateExpression, $today)
             ->count();
 
-        $visitorsIn = Visitor::query()->where('status', 0)->count();
-        $visitorsOut = Visitor::query()->where('status', 1)->count();
+        $visitorsIn = Visitor::query()
+            ->whereDate($visitDateExpression, $today)
+            ->where('status', 0)
+            ->count();
+
+        $visitorsOut = Visitor::query()
+            ->whereDate($visitDateExpression, $today)
+            ->where('status', 1)
+            ->count();
 
         $todayEmployeeLogs = EmployeeLogs::query()
             ->whereDate('time', $today)
@@ -39,7 +47,7 @@ class DashboardController extends Controller
 
         $weeklyRaw = Visitor::query()
             ->selectRaw('DATE(COALESCE(time_in, created_at)) as day, COUNT(*) as total')
-            ->whereDate(DB::raw('COALESCE(time_in, created_at)'), '>=', $weekStart)
+            ->whereDate($visitDateExpression, '>=', $weekStart)
             ->groupBy('day')
             ->pluck('total', 'day');
 

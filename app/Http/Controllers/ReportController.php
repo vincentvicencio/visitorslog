@@ -88,7 +88,6 @@ class ReportController extends Controller
             });
 
         $rawquery = (clone $baseQuery);
-        $currentlyInCount = (clone $baseQuery)->count();
         
         $totalRecords = (clone $rawquery)->count();
         
@@ -202,7 +201,6 @@ class ReportController extends Controller
             'recordsTotal'      => $totalRecords,
             'recordsFiltered'   => $totalFiltered,
             'data'              => $newData,
-            'currently_in_count'=> $currentlyInCount
         ]);
     }
 

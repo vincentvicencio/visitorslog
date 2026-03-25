@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\User_TypesController;
 use App\Http\Controllers\Registered_UsersController;
 use App\Http\Controllers\IDTypeController;
-use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return redirect()->route('visitorslog');

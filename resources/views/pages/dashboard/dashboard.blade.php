@@ -32,20 +32,17 @@
                 </div>
                 <div class="value">{{ number_format($visitorsOut) }}</div>
             </div>
-            <div class="data-panel">
-                <div class="data-labels">
-                    <div class="label">Employee Logs Today</div>
-                    <div class="meta">Total employee entries</div>
-                </div>
-                <div class="value">{{ number_format($todayEmployeeLogs) }}</div>
-            </div>
         </div>
 
 
         <div class="row">
             <div class="dash-graph graph-one">
                 <div class="graph-header">Visitor Type Distribution Today</div>
-                <canvas id="visitorPieChart"></canvas>
+                <canvas
+                    id="visitorPieChart"
+                    data-labels='@json($visitorTypeBreakdown->pluck("name")->values())'
+                    data-values='@json($visitorTypeBreakdown->pluck("total")->values())'
+                ></canvas>
             @if($visitorTypeBreakdown->isEmpty())
                 <p class="dash-meta mb-0">No visitor type records found for today.</p>
             @endif
@@ -77,37 +74,4 @@
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-    const visitorLabels = @json($visitorTypeBreakdown->pluck('name'));
-    const visitorData = @json($visitorTypeBreakdown->pluck('total'));
-
-    const ctx = document.getElementById('visitorPieChart').getContext('2d');
-
-    new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: visitorLabels,
-            datasets: [{
-                data: visitorData,
-                backgroundColor: [
-                    '#3498db',
-                    '#2ecc71',
-                    '#f1c40f',
-                    '#e74c3c',
-                    '#9b59b6',
-                    '#1abc9c'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-</script>
 @endsection

@@ -5,15 +5,9 @@ import reports from './report';
 $(document).ready(function () {
 
     const container = document.querySelector(".visitor-log-sheet-table");
-    const visitorsCurrentlyIn = document.getElementById("visitorsCurrentlyIn");
     const tabs = {
         visitor: document.getElementById("visitor"),
         employee: document.getElementById("employee")
-    };
-
-    const toggleVisitorsCurrentlyIn = selected => {
-        if (!visitorsCurrentlyIn) return;
-        visitorsCurrentlyIn.classList.toggle("d-none", selected === "employee");
     };
 
     const createCurve = pos => Object.assign(document.createElement("div"), {
@@ -59,7 +53,6 @@ $(document).ready(function () {
 
 
     updateView(sessionStorage.getItem('logtab') || "visitor");
-    toggleVisitorsCurrentlyIn(sessionStorage.getItem('logtab') || "visitor");
 
     if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
         $('#visitorsLogTable').DataTable().destroy();
@@ -88,7 +81,6 @@ $(document).ready(function () {
     Object.keys(tabs).forEach(k => {
         tabs[k].addEventListener("click", () => {
             updateView(k);
-            toggleVisitorsCurrentlyIn(k);
 
             if ($.fn.DataTable.isDataTable('#visitorsLogTable')) {
                 $('#visitorsLogTable').DataTable().destroy();
