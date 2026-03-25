@@ -62,9 +62,8 @@ class ReportController extends Controller
 
         $limit    = $request->input('length');
 
-        $rawquery = Visitor::with('visitorType')
-                ->withoutTrashed()
-                ->where('status', 1)
+        $baseQuery = Visitor::with('visitorType')
+            ->withoutTrashed()
                 ->when($keywords, function ($query) use ($keywords) {
                     $query -> where(function ($q) use ($keywords) {
                         $q -> where('full_name', 'LIKE', "%{$keywords}%")
@@ -87,22 +86,27 @@ class ReportController extends Controller
             ->when($request->visitor_type, function ($query) use ($request) {
                 $query->where('visitor_type', $request->visitor_type);
             });
+
+        $rawquery = (clone $baseQuery);
+        $currentlyInCount = (clone $baseQuery)->count();
         
-        $totalRecords = $rawquery->get()->count();
+        $totalRecords = (clone $rawquery)->count();
         
         if ($request->input('draw') > 1) { 
             $start         = $request->input('start'); 
             $column        = $request->input('order.0.column');
             $direction     = $request->input('order.0.dir');
             $order         = $request->input('columns')[$column]['data']; 
-            $temp          = $rawquery->get(); 
-            $rawQuery      = $limit > 0 ? $rawquery->skip($start)->take($limit) : $rawquery; 
-            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get(); 
-            $totalFiltered = count($temp);
+            $queryForPage  = (clone $rawquery)->orderBy("updated_at", "desc");
+            $totalFiltered = (clone $rawquery)->count();
+            $data          = $limit > 0
+                ? $queryForPage->skip($start)->take($limit)->get()
+                : $queryForPage->get();
        
         } else { 
        
-            $data          = $rawquery->orderby("updated_at", "desc")->take($limit)->get();
+            $queryForPage  = (clone $rawquery)->orderBy("updated_at", "desc");
+            $data          = $limit > 0 ? $queryForPage->take($limit)->get() : $queryForPage->get();
      
             $totalFiltered = $totalRecords;
         }
@@ -197,7 +201,8 @@ class ReportController extends Controller
             'draw'              => intval($request->input('draw')),
             'recordsTotal'      => $totalRecords,
             'recordsFiltered'   => $totalFiltered,
-            'data'              => $newData            
+            'data'              => $newData,
+            'currently_in_count'=> $currentlyInCount
         ]);
     }
 

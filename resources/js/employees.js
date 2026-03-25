@@ -481,8 +481,6 @@ let URL = '/employeeslog/';
 
         bindEmployeeDropdownDismissHandlers() {
             const self = this;
-
-            
             // Close suggestions when clicking anywhere outside the search area/dropdown.
             $(document)
                 .off('mousedown.employeeDropdown')

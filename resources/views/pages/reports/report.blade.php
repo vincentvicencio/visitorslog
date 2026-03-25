@@ -10,6 +10,7 @@
             <div class="page-subtitle mb-3">Track every logged visitor</div>
         </div>
         <div class="report-buttons d-flex gap-2 position-absolute top-50 end-0 translate-middle-y">
+            <div id="visitorsCurrentlyIn">Visitors Currently In: <span id="visitorCount">0</span></div>
             <button id="exportReportBtn"
                 class="top-button d-flex align-items-center justify-content-center
                 text-white rounded-2 border-0 cursor-pointer px-3 py-2"

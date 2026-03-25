@@ -193,6 +193,7 @@ class ReportClassTable {
     }
     async list() {
         const self = this;
+        const visitorCountEl = $('#visitorCount');
 
         const tableHeader = [
             { id: "full_name", label: "Name" },
@@ -227,6 +228,14 @@ class ReportClassTable {
             window.reportFilters,
             false
         );
+
+        $(self.table)
+            .off('xhr.dt.visitorCount')
+            .on('xhr.dt.visitorCount', function (_e, _settings, json) {
+                if (!visitorCountEl.length || !json) return;
+                const count = Number(json.currently_in_count);
+                visitorCountEl.text(Number.isNaN(count) ? 0 : count);
+            });
 
         $(self.table)
             .off('init.dt')
