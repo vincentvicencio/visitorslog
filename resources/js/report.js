@@ -8,7 +8,9 @@ import settable from './common/settable';
 window.reportFilters = {
     date_from: '',
     date_to: '',
-    visitor_type: ''
+    location: '',
+    visitor_type: '',
+    status: ''
 };
 
 const getActiveReportType = () => ($('#employee').hasClass('selected') ? 'employee' : 'visitor');
@@ -17,8 +19,13 @@ const syncFilterModalState = () => {
     const isEmployeeReport = getActiveReportType() === 'employee';
     const visitorTypeGroup = $('#visitorTypeFilterGroup');
     const visitorTypeSelect = visitorTypeGroup.find('select[name="visitor_type"]');
+    const statusLabel0 = $('#statusLabel0');
+    const statusLabel1 = $('#statusLabel1');
 
     visitorTypeGroup.toggleClass('d-none', isEmployeeReport);
+
+    statusLabel0.text(isEmployeeReport ? 'In' : 'Active');
+    statusLabel1.text(isEmployeeReport ? 'Out' : 'Timed Out');
 
     if (isEmployeeReport) {
         visitorTypeSelect.val('');
@@ -64,7 +71,9 @@ $(document).ready(function(){
             const params = new URLSearchParams();
             if (filters.date_from) params.append('date_from', filters.date_from);
             if (filters.date_to) params.append('date_to', filters.date_to);
+            if (filters.location) params.append('location', filters.location);
             if (filters.visitor_type) params.append('visitor_type', filters.visitor_type);
+            if (filters.status) params.append('status', filters.status);
             params.append('type', reportType);
             
             const searchValue = $('#typeSearch').val();
@@ -87,21 +96,37 @@ $(document).ready(function(){
 
         syncFilterModalState();
 
+        // Get all checked status values
+        const statusValues = [];
+        $('input[name="status"]:checked').each(function() {
+            statusValues.push($(this).val());
+        });
+
         Object.assign(window.reportFilters, {
             date_from: $('input[name="date_from"]').val(),
             date_to: $('input[name="date_to"]').val(),
-            visitor_type: $('select[name="visitor_type"]').val()
+            location: $('select[name="location"]').val(),
+            visitor_type: $('select[name="visitor_type"]').val(),
+            status: statusValues.join(',') // Pass as comma-separated string
         });
-
-        if ($.fn.DataTable.isDataTable('#reportTable')) {
-            $('#reportTable').DataTable().draw(); 
-        }
 
         const filterModal = document.getElementById('filterModal');
         const modalInstance = bootstrap.Modal.getInstance(filterModal);
 
         if (modalInstance) {
             modalInstance.hide();
+        }
+
+        // Reinitialize the table with new filters
+        try {
+            const activeTab = $('#employee').hasClass('selected') ? 'employee' : 'visitor';
+            if (activeTab === 'visitor') {
+                instance.list();
+            } else {
+                instance.empList();
+            }
+        } catch (err) {
+            console.error('Error reinitializing table:', err);
         }
     });
 
@@ -110,17 +135,25 @@ $(document).ready(function(){
         e.preventDefault();
 
         $('#filterForm')[0].reset();
+        $('input[name="status"]').prop('checked', false);
 
         Object.assign(window.reportFilters, {
             date_from: '',
             date_to: '',
-            visitor_type: ''
+            location: '',
+            visitor_type: '',
+            status: ''
         });
 
         syncFilterModalState();
 
-        // Keep modal open.
-        $('#reportTable').DataTable().draw();
+        // Reinitialize the table with reset filters
+        const activeTab = $('#employee').hasClass('selected') ? 'employee' : 'visitor';
+        if (activeTab === 'visitor') {
+            instance.list();
+        } else {
+            instance.empList();
+        }
     });
 
 

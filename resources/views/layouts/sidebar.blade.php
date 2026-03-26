@@ -28,7 +28,7 @@
         <div class="d-flex flex-column vh-100 mx-2">
             <a href="{{ url('dashboard') }}"
             class="sidebar-menu-button {{ Request::is('dashboard') ? 'selected' : '' }}" data-tab="dashboard">
-                <i class="bi bi-person-lines-fill fs-6 p-2"></i>
+                <i class="bi bi-bar-chart-line fs-6 p-2"></i>
                 Dashboard
             </a>
             <a href="{{ url('visitorslog') }}"

@@ -20,8 +20,32 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         $visitorTypes = VisitorType::all();
+        $companyLocations = collect(session('all_location', []))
+            ->map(function ($item) {
+                return [
+                    'id' => (string) data_get($item, 'id'),
+                    'name' => (string) data_get($item, 'name'),
+                ];
+            })
+            ->filter(function ($item) {
+                return $item['id'] !== '' && $item['name'] !== '';
+            });
 
-        return view('pages.reports.report', compact('visitorTypes'));
+        $guardLocations = Location::query()
+            ->get(['location_id', 'name'])
+            ->map(function ($item) {
+                return [
+                    'id' => (string) $item->location_id,
+                    'name' => (string) $item->name,
+                ];
+            });
+
+        $locations = $companyLocations
+            ->merge($guardLocations)
+            ->unique('id')
+            ->values();
+
+        return view('pages.reports.report', compact('visitorTypes', 'locations'));
     }
 
     public function destroy($id)
@@ -54,8 +78,11 @@ class ReportController extends Controller
             'search'       => $request->input('search', ''),
             'date_from'    => $request->input('date_from', ''),
             'date_to'      => $request->input('date_to', ''),
+            'location'     => $request->input('location', ''),
             'visitor_type' => $request->input('visitor_type', ''),
+            'status'       => $request->input('status', ''),
         ];
+
         log_audit('reports', 'filtered', null, null, $filterData, 'filter');
 
         $keywords = strtolower($request->search);
@@ -82,10 +109,40 @@ class ReportController extends Controller
             ->when($request->date_to, function ($query) use ($request) {
                 $query->whereDate('created_at', '<=', $request->date_to);
             })
+            // 4. NEW: Filter by Location
+            ->when($request->location !== null && $request->location !== '', function ($query) use ($request) {
+                $selectedLocation = (string) $request->location;
+                $locationNames = Location::query()
+                    ->where('location_id', $selectedLocation)
+                    ->pluck('name')
+                    ->map(function ($name) {
+                        return (string) $name;
+                    })
+                    ->filter(function ($name) {
+                        return $name !== '';
+                    })
+                    ->values()
+                    ->all();
+
+                $query->where(function ($locationQuery) use ($selectedLocation, $locationNames) {
+                    $locationQuery->where('location', $selectedLocation);
+
+                    if (!empty($locationNames)) {
+                        $locationQuery->orWhereIn('location', $locationNames);
+                    }
+                });
+            })
             // 4. NEW: Filter by Visitor Type Dropdown
             ->when($request->visitor_type, function ($query) use ($request) {
                 $query->where('visitor_type', $request->visitor_type);
-            });
+            })
+            // 5. NEW: Filter by Status (Active/Timed Out)
+            ->when($request->has('status') && $request->input('status') !== '', function ($query) use ($request) {
+                   $statuses = array_map('intval', array_filter(explode(',', $request->status), function($v) { return $v !== ''; }));
+                   if (!empty($statuses)) {
+                       $query->whereIn('status', $statuses);
+                   }
+               });
 
         $rawquery = (clone $baseQuery);
         
@@ -210,12 +267,43 @@ class ReportController extends Controller
             'search'       => $request->input('search', ''),
             'date_from'    => $request->input('date_from', ''),
             'date_to'      => $request->input('date_to', ''),
+            'location'     => $request->input('location', ''),
+            'status'       => $request->input('status', ''),
         ];
         log_audit('reports', 'filtered', null, null, $filterData, 'filter');
 
         $keywords = strtolower($request->search);
 
         $limit    = $request->input('length');
+
+        $selectedLocation = (string) $request->input('location', '');
+        $locationNames = [];
+
+        if ($selectedLocation !== '') {
+            $companyLocation = collect(session('all_location', []))->first(function ($item) use ($selectedLocation) {
+                return (string) data_get($item, 'id') === $selectedLocation;
+            });
+
+            $guardLocationNames = Location::query()
+                ->where('location_id', $selectedLocation)
+                ->pluck('name')
+                ->map(function ($name) {
+                    return (string) $name;
+                })
+                ->filter(function ($value) {
+                    return $value !== '';
+                })
+                ->values()
+                ->all();
+
+            $companyLocationName = (string) data_get($companyLocation, 'name', '');
+            $locationNames = array_values(array_filter(array_unique(array_merge(
+                [$companyLocationName],
+                $guardLocationNames
+            )), function ($value) {
+                return $value !== '';
+            }));
+        }
 
         $rawquery = EmployeeLogs::withoutTrashed()
                 -> when($keywords, function ($query) use ($keywords) {
@@ -231,6 +319,26 @@ class ReportController extends Controller
             // 3. NEW: Filter by Date To
             ->when($request->date_to, function ($query) use ($request) {
                 $query->whereDate('created_at', '<=', $request->date_to);
+            })
+            // 4. NEW: Filter by Location
+            ->when($selectedLocation !== '', function ($query) use ($selectedLocation, $locationNames) {
+                $query->where(function ($locationQuery) use ($selectedLocation, $locationNames) {
+                    $locationQuery->where('location', $selectedLocation);
+
+                    if (!empty($locationNames)) {
+                        $locationQuery->orWhereIn('location', $locationNames);
+                    }
+                });
+            })
+            // 4. NEW: Filter by Status (In/Out)
+            ->when($request->has('status') && $request->input('status') !== '', function ($query) use ($request) {
+                $statuses = array_map('intval', array_filter(explode(',', $request->status), function ($v) {
+                    return $v !== '';
+                }));
+
+                if (!empty($statuses)) {
+                    $query->whereIn('status', $statuses);
+                }
             });
         
         $totalRecords = $rawquery->get()->count();
@@ -343,6 +451,7 @@ class ReportController extends Controller
                 'search'            => $request->input('search', ''),
                 'date_from'         => $request->input('date_from', ''),
                 'date_to'           => $request->input('date_to', ''),
+                'location'          => $request->input('location', ''),
                 'visitor_type'      => $request->input('visitor_type', ''),
                 'status'            => $request->input('status', ''),
             ];
@@ -352,6 +461,7 @@ class ReportController extends Controller
                     'search'    => $request->input('search', ''),
                     'date_from' => $request->input('date_from', ''),
                     'date_to'   => $request->input('date_to', ''),
+                    'location'  => $request->input('location', ''),
                     'status'    => $request->input('status', ''),
                 ];
 
@@ -384,6 +494,7 @@ class ReportController extends Controller
                 'search'    => $request->input('search', ''),
                 'date_from' => $request->input('date_from', ''),
                 'date_to'   => $request->input('date_to', ''),
+                'location'  => $request->input('location', ''),
                 'status'    => $request->input('status', ''),
             ];
 

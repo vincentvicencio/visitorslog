@@ -30,12 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
             datasets: [{
                 data: visitorData,
                 backgroundColor: [
-                    '#3498db',
-                    '#2ecc71',
-                    '#f1c40f',
-                    '#e74c3c',
-                    '#9b59b6',
-                    '#1abc9c'
+                    '#0B3D91',
+                    '#145DA0',
+                    '#1E81B0',
+                    '#2E8BC0',
+                    '#76B5E9',
+                    '#B3D9FF'
                 ]
             }]
         },
