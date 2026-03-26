@@ -26,12 +26,18 @@
 
         <div class="menu fw-bold mt-3 py-1 ps-4">Menu</div>
         <div class="d-flex flex-column vh-100 mx-2">
+            <a href="{{ url('dashboard') }}"
+            class="sidebar-menu-button {{ Request::is('dashboard') ? 'selected' : '' }}" data-tab="dashboard">
+                <i class="bi bi-person-lines-fill fs-6 p-2"></i>
+                Dashboard
+            </a>
             <a href="{{ url('visitorslog') }}"
             class="sidebar-menu-button {{ Request::is('visitorslog') ? 'selected' : '' }}" data-tab="visitorslog">
                 <i class="bi bi-person-lines-fill fs-6 p-2"></i>
                 Log Sheets
             </a>
             @if(Auth::user()->user_type == 1)
+
                 <a href="{{ url('IDtype') }}"
                 class="sidebar-menu-button {{ Request::is('IDtype') ? 'selected' : '' }}" data-tab="IDtype">
                     <i class="bi bi-credit-card-2-front fs-6 p-2"></i>

@@ -467,34 +467,34 @@ class EmployeeController extends Controller
                 'full_name.required'   => 'Full Name is required',
             ]);
 
-            $latestLog = EmployeeLogs::where('emp_code', $request->emp_code)
-                ->latest()
-                ->first();
+            // $latestLog = EmployeeLogs::where('emp_code', $request->emp_code)
+            //     ->latest()
+            //     ->first();
 
-            $latestLogCount = EmployeeLogs::where('emp_code', $request->emp_code)
-                ->count();
+            // $latestLogCount = EmployeeLogs::where('emp_code', $request->emp_code)
+            //     ->count();
 
-            $isSameStatus = $latestLog && $latestLog->status == $request->status;
+            // $isSameStatus = $latestLog && $latestLog->status == $request->status;
 
-            if ($isSameStatus) {
-                $message = $latestLog->status == 0
-                    ? 'Employee is currently in'
-                    : 'Employee is currently out';
+            // if ($isSameStatus) {
+            //     $message = $latestLog->status == 0
+            //         ? 'Employee is currently in'
+            //         : 'Employee is currently out';
 
-                return response()->json([
-                    'status' => 1,
-                    'title' => 'Invalid',
-                    'message' => $message,
-                ], 200);
-            }
+            //     return response()->json([
+            //         'status' => 1,
+            //         'title' => 'Invalid',
+            //         'message' => $message,
+            //     ], 200);
+            // }
 
-            if($latestLogCount == 0 && $request->status == 1){
-                return response()->json([
-                    'status' => 1,
-                    'title' => 'Invalid',
-                    'message' => 'Employee has not logged in yet.',
-                ], 200);
-            }
+            // if($latestLogCount == 0 && $request->status == 1){
+            //     return response()->json([
+            //         'status' => 1,
+            //         'title' => 'Invalid',
+            //         'message' => 'Employee has not logged in yet.',
+            //     ], 200);
+            // }
 
             $user = Auth::user();
             $locationForSave = $this->resolveLocationForSave($user);
