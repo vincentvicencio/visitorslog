@@ -582,6 +582,7 @@ public function list(Request $request){
  
         $newData = [];
         $i       = 0;
+
       
         foreach ($data as $d) { 
 

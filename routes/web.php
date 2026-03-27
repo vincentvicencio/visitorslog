@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\User_TypesController;
 use App\Http\Controllers\Registered_UsersController;
 use App\Http\Controllers\IDTypeController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return redirect()->route('visitorslog');
@@ -164,6 +165,12 @@ Route::middleware(['auth', 'single.session'])->group(function () {
             ->controller(AboutController::class)
             ->group(function () {
                 Route::get('/',             'index')->name('about');
+            });
+        
+        Route::prefix('dashboard')
+            ->controller(DashboardController::class)
+            ->group(function () {
+                Route::get('/',             'index')->name('dashboard');
             });
     });
 });

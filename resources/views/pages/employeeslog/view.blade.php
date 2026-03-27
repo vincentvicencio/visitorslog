@@ -17,7 +17,7 @@
                 
                 <a class="btn-close" href="{{ route($type) }}"></a>
                 <div class="header fs-4">Employee Details</div>
-                <div class="subheader mb-3">View visitor entry</div>
+                <div class="subheader mb-3">View employee entry</div>
                 <div class="form" id="addVisitorForm">
                     @csrf
                     <div class="details">

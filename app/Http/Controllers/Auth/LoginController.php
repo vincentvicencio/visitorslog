@@ -35,7 +35,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/visitorslog';
+    protected $redirectTo = '/dashboard';
 
     /**
      * Create a new controller instance.
@@ -118,7 +118,7 @@ class LoginController extends Controller
             return redirect()->route('guard.location.show');
         }                                                                                                                                                                                                                                               
                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-        return redirect()->route('visitorslog');
+        return redirect()->route('dashboard');
 
     }
     
