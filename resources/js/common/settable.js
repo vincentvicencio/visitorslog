@@ -124,7 +124,10 @@ class Datatable {
                 $(window)
                     .off('resize.visitorsLogTable')
                     .on('resize.visitorsLogTable', function () {
-                        tableApi.columns.adjust().responsive.recalc();
+                        tableApi.columns.adjust();
+                        if (tableApi.responsive) {
+                            tableApi.responsive.recalc();
+                        }
                     });
 
             // Make bottom row flex container

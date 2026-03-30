@@ -1,4 +1,5 @@
 import './bootstrap';
+import './dashboard';
 
 import * as bootstrap from 'bootstrap';
 

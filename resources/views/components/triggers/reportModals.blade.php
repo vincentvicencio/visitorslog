@@ -19,7 +19,7 @@
                 <h5 class="modal-title" id="filterModalLabel">Filter Reports</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ url('/report') }}" method="GET" id = "filterForm">
+            <form id="filterForm">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -32,6 +32,16 @@
                         </div>
                     </div>
 
+                    <div class="mb-3" id="locationFilterGroup">
+                        <label class="form-label">Location</label>
+                        <select name="location" class="form-select" autocomplete="off">
+                            <option value="">All Locations</option>
+                            @foreach ($locations as $location)
+                                <option value="{{ $location['id'] }}">{{ $location['name'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <div class="mb-3" id="visitorTypeFilterGroup">
                         <label class="form-label">Visitor Type</label>
                         <select name="visitor_type" class="form-select"  autocomplete="off">
@@ -42,6 +52,24 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="mb-3" id="statusFilterGroup">
+                        <label class="form-label">Status</label>
+                        <div class="d-flex gap-4 align-items-center">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input status-checkbox" type="checkbox" name="status" value="0" id="statusActive">
+                                <label class="form-check-label" for="statusActive">
+                                    <span id="statusLabel0">Active</span>
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input status-checkbox" type="checkbox" name="status" value="1" id="statusTimedOut">
+                                <label class="form-check-label" for="statusTimedOut">
+                                    <span id="statusLabel1">Timed Out</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
