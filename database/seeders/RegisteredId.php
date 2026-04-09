@@ -22,6 +22,7 @@ class RegisteredId extends Seeder
                 'updated_by' => 1,
                 'created_at' => now(),
             ],
+
             [
                 'visitor_type_id' => 2,
                 'id_number' => 2000,
@@ -30,6 +31,7 @@ class RegisteredId extends Seeder
                 'updated_by' => 1,
                 'created_at' => now(),
             ],
+            
             [
                 'visitor_type_id' => 3,
                 'id_number' => 3000,

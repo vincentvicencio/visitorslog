@@ -21,9 +21,25 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
 
     public function collection()
     {
+        \Log::info('ReportsExport Filters:', $this->filters);
+        
         $query = Visitor::with('visitorType')
-            ->where('status', 1)
             ->withoutTrashed();
+
+        // Apply status filter - handle comma-separated values like "0" or "0,1"
+        if (isset($this->filters['status']) && $this->filters['status'] !== '') {
+            $statuses = array_map('intval', array_filter(explode(',', (string)$this->filters['status']), function($v) { return trim($v) !== ''; }));
+            \Log::info('Applying status filter:', $statuses);
+            if (!empty($statuses)) {
+                $query->whereIn('status', $statuses);
+            }
+        }
+
+        // Apply location filter
+        if (isset($this->filters['location']) && $this->filters['location'] !== '') {
+            \Log::info('Applying location filter:', [$this->filters['location']]);
+            $query->where('location', $this->filters['location']);
+        }
 
         // Apply search filter
         if (!empty($this->filters['search'])) {

@@ -15,17 +15,19 @@ class VisitorTypeSeeder extends Seeder
         //
         DB::table('visitor_types')->insert([
             [
-                'name' => 'Applicant',
+                'name'       => 'Applicant',
                 'created_by' => 1,
                 'created_at' => now(),
             ],
+
             [
-                'name' => 'Trainee',
+                'name'       => 'Trainee',
                 'created_by' => 1,
                 'created_at' => now(),
             ],
+
             [
-                'name' => 'OJT',
+                'name'       => 'OJT',
                 'created_by' => 1,
                 'created_at' => now(),
             ]

@@ -20,11 +20,13 @@ class UserTypes extends Seeder
             'created_by' => 1,
             'created_at' => now(),
         ],
+        
         [
             'name'       => 'Receptionist',
             'created_by' => 1,
             'created_at' => now(),
         ],
+        
         [
             'name'       => 'Guard',
             'created_by' => 1,
