@@ -36,7 +36,7 @@
                 <i class="bi bi-person-lines-fill fs-6 p-2"></i>
                 Log Sheets
             </a>
-            @if(Auth::user()->user_type == 1)
+            @if(Auth::user()->user_type_id == 1)
 
                 <a href="{{ url('IDtype') }}"
                 class="sidebar-menu-button {{ Request::is('IDtype') ? 'selected' : '' }}" data-tab="IDtype">

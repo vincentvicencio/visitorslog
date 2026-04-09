@@ -16,8 +16,8 @@ class UsertypeMiddleware
 
         $user = Auth::user();
 
-        // Make sure user_type column exists in users table
-        if (!in_array($user->user_type, $allowedTypes)) {
+        // Make sure user_type_id column exists in users table
+        if (!in_array($user->user_type_id, $allowedTypes)) {
             return redirect()->route('visitorslog')
                 ->with('error', 'You are not authorized to access that page.');
         }

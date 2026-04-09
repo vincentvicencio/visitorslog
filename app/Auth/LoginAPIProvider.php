@@ -45,14 +45,14 @@ class LoginAPIProvider implements UserProvider
     public function retrieveByCredentials(array $credentials)
     {
         $reg = RegisteredUser::withoutTrashed()
-            ->where('user_name', $credentials['emp_code'])
+            ->where('username', $credentials['emp_code'])
             ->first();
         if (! $reg) {
             return null;
         }
 
         // 1) user_type != 3 → authenticate via API
-        if ($reg->user_type != 3) {
+        if ($reg->user_type_id != 3) {
             $resp = Http::post($this->apiUrl, [
                 'emp_code' => $credentials['emp_code'],
                 'password' => $credentials['password'],
@@ -82,7 +82,7 @@ class LoginAPIProvider implements UserProvider
         $stored = $user->getAuthPassword();
 
         // 1) API‐users (user_type != 3) already validated above
-        if ($user->user_type != 3) {
+        if ($user->user_type_id != 3) {
             return true;
         }
 

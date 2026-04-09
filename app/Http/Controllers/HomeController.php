@@ -32,7 +32,7 @@ public function index(Request $request)
     $search = $request->input('search');
     
     $registeredUsers = \App\Models\RegisteredUser::when($search, function ($query, $search) {
-        return $query->where('user_name', 'like', "%{$search}%")
+        return $query->where('username', 'like', "%{$search}%")
                      ->orWhere('first_name', 'like', "%{$search}%")
                      ->orWhere('last_name', 'like', "%{$search}%");
     })->get();

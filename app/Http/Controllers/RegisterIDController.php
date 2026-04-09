@@ -73,7 +73,7 @@ class RegisterIDController extends Controller
         $data       = [
             'id_number'       => $request->name,
             'location'        => $request->visitorIDLocation,
-            'visitor_type'    => $request->visitorType,
+            'visitor_type_id' => $request->visitorType,
         ];
 
         if ($record_id > 0) {

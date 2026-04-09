@@ -54,7 +54,7 @@ class Registered_UsersController extends Controller
             'required',
             'string',
             function ($attribute, $value, $fail) use ($recordId) {
-                $query = RegisteredUser::where('user_name', $value)
+                $query = RegisteredUser::where('username', $value)
                     ->whereNull('deleted_at');
                 // Exclude current record when editing (cast to int for comparison)
                 if (!empty($recordId)) {
@@ -134,26 +134,26 @@ class Registered_UsersController extends Controller
             $counter = 2;
             
             // Check if username already exists and make it unique (exclude current record when editing)
-            $usernameQuery = RegisteredUser::where('user_name', $username);
+            $usernameQuery = RegisteredUser::where('username', $username);
             if ($isEditing) {
                 $usernameQuery->where('id', '!=', $recordId);
             }
             while ($usernameQuery->exists()) {
                 $username = $baseUsername . '.' . $counter;
                 $counter++;
-                $usernameQuery = RegisteredUser::where('user_name', $username);
+                $usernameQuery = RegisteredUser::where('username', $username);
                 if ($isEditing) {
                     $usernameQuery->where('id', '!=', $recordId);
                 }
             }
             
             $guardData = [
-                'user_name'  => $username,
+                'username'   => $username,
                 'first_name' => $firstName, 
                 'last_name'  => $lastName,
                 'location'   => null,
                 'status'    => 'Enabled',
-                'user_type'  => $request->user_type
+                'user_type_id' => $request->user_type
             ];
             
             // Only hash password if provided
@@ -233,12 +233,12 @@ class Registered_UsersController extends Controller
         }
 
         $userData = [
-            'user_name'  => $empCode,
+            'username'   => $empCode,
             'first_name' => $firstName, 
             'last_name'  => $lastName,
             'location'   => $locations[0] ?? null,
             'status'    => 'Enabled',
-            'user_type'  => $request->user_type
+            'user_type_id' => $request->user_type
         ];
         
         // Only hash password if provided
@@ -351,7 +351,7 @@ class Registered_UsersController extends Controller
     $allLocations = collect(session('all_location'));
 
     // 3. Find this specific employee in the session data by their code
-    $sessionEmployee = $allEmployees->firstWhere('emp_code', $user->user_name);
+    $sessionEmployee = $allEmployees->firstWhere('emp_code', $user->username);
 
     // 4. Get the Location Names
     // If $user->location is an array of IDs, map them to location objects
@@ -366,15 +366,15 @@ class Registered_UsersController extends Controller
     }
     
     // Get the user type name to determine if it's Admin/Receptionist
-    $userType = User_types::find($user->user_type);
+    $userType = User_types::find($user->user_type_id);
     $roleName = $userType ? $userType->name : '';
 
     return response()->json([
         'id'            => $user->id,
-        'emp_code'      => $user->user_name,
+        'emp_code'      => $user->username,
         'first_name'    => $user->first_name,
         'last_name'     => $user->last_name,
-        'role_id'       => $user->user_type,
+        'role_id'       => $user->user_type_id,
         'role_name'     => $roleName,
         'location_id'   => $locationIds, // Return as array of IDs for multi-select
         'location_names'=> $locationNames // Display names
@@ -409,7 +409,7 @@ public function edit(Request $request, $id)
         $request->validate($validationRules);
         
         // For non-Guard roles, verify emp_code matches
-        if (!$isGuard && $request->emp_code !== $user->user_name) {
+        if (!$isGuard && $request->emp_code !== $user->username) {
             return response()->json([
                 'status' => 'error', 
                 'message' => 'The Entered Employee Code Does not Match'
@@ -417,7 +417,7 @@ public function edit(Request $request, $id)
         }
 
         $updateData = [
-            'user_type'  => $request->user_type,
+            'user_type_id' => $request->user_type,
             'updated_by' => Auth::user()->id,
         ];
         
@@ -431,14 +431,14 @@ public function edit(Request $request, $id)
             $counter  = 2;
             
             // Ensure username is unique, ignoring current user
-            while (RegisteredUser::where('user_name', $username)->where('id', '!=', $user->id)->exists()) {
+            while (RegisteredUser::where('username', $username)->where('id', '!=', $user->id)->exists()) {
                 $username = $baseUsername . '.' . $counter;
                 $counter++;
             }
             
-            $updateData['user_name'] = $username;
+            $updateData['username'] = $username;
         } else {
-            $updateData['user_name'] = $request->emp_code;
+            $updateData['username'] = $request->emp_code;
         }
 
         if ($isGuard) {
@@ -550,7 +550,7 @@ public function list(Request $request){
         $rawquery = RegisteredUser::with('userType')
                     ->whereNull('deleted_at')
                     ->when($keywords, function ($query) use ($keywords) {
-                        $query->where('user_name', 'LIKE', "%{$keywords}%")
+                        $query->where('username', 'LIKE', "%{$keywords}%")
                               ->orWhere('first_name', 'LIKE', "%{$keywords}%")
                               ->orWhere('last_name', 'LIKE', "%{$keywords}%")
                               ->orWhere('first_name', 'LIKE', "%{$keywords}%")
@@ -727,11 +727,11 @@ public function list(Request $request){
     {
         try {
             $user = RegisteredUser::findOrFail($id);
-            $adminCount = RegisteredUser::where('user_type', 1)
+            $adminCount = RegisteredUser::where('user_type_id', 1)
                 ->where('status', 'Enabled')
                 ->count();
 
-            if($user->user_type == 1 && $adminCount == 1){
+            if($user->user_type_id == 1 && $adminCount == 1){
                 return response()->json([
                     'status'  => 'Invalid', 
                     'message' => 'Admin cannot be disabled.'

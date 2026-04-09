@@ -12,11 +12,11 @@ class RegisteredUser extends Authenticatable
     use SoftDeletes;
     protected $table = 'registered_users';
     protected $fillable = [
-    'user_name',
+    'username',
     'first_name',
     'last_name',
     'password',
-    'user_type',
+    'user_type_id',
     'created_by',
     'updated_by',
     'deleted_by',
@@ -27,7 +27,7 @@ class RegisteredUser extends Authenticatable
 
     public function userType()
     {
-        return $this->belongsTo(User_types::class, 'user_type', 'id');
+        return $this->belongsTo(User_types::class, 'user_type_id', 'id');
     }
 
     // App\Models\RegisteredUser.php (or your relevant model)

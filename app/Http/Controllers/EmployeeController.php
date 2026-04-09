@@ -16,12 +16,12 @@ class EmployeeController extends Controller
     {
         $user = Auth::user();
 
-        return $user && (int) $user->user_type === 3 && !session()->has('guard_location_id');
+        return $user && (int) $user->user_type_id === 3 && !session()->has('guard_location_id');
     }
 
     private function resolveLocationForSave($user): ?string
     {
-        if ((int) $user->user_type === 3) {
+        if ((int) $user->user_type_id === 3) {
             if (session()->has('guard_location_name')) {
                 return (string) session('guard_location_name');
             }
@@ -87,7 +87,7 @@ class EmployeeController extends Controller
 
     private function resolveUserLocationFilters($user): array
     {
-        if ((int) $user->user_type === 3) {
+        if ((int) $user->user_type_id === 3) {
             $filters = [];
 
             if (session()->has('guard_location_id')) {
@@ -146,7 +146,7 @@ class EmployeeController extends Controller
                 ->where(function ($query) {
 
                     $user = Auth::user();
-                    if ((int) $user->user_type !== 1) {
+                    if ((int) $user->user_type_id !== 1) {
                         $userLocations = $this->resolveUserLocationFilters($user);
 
                         // First filter by location (non-admin only)

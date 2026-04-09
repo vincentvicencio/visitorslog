@@ -35,7 +35,7 @@ class DashboardController extends Controller
 
         $visitorTypeBreakdown = DB::table('visitor_types as vt')
             ->leftJoin('visitors as v', function ($join) use ($today) {
-                $join->on('v.visitor_type', '=', 'vt.id')
+                $join->on('v.visitors_type_id', '=', 'vt.id')
                     ->whereNull('v.deleted_at')
                     ->whereDate(DB::raw('COALESCE(v.time_in, v.created_at)'), $today);
             })

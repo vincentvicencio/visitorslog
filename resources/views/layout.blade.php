@@ -2,8 +2,8 @@
 <html lang="en">
     @include('layouts.head')
 
-    <body class="{{ Auth::check() && Auth::user()->user_type != 1 ? 'non-admin-body' : '' }}">
-        @if (!View::hasSection('hideSidebar') && Auth::user()->user_type == 1)
+    <body class="{{ Auth::check() && Auth::user()->user_type_id != 1 ? 'non-admin-body' : '' }}">
+        @if (!View::hasSection('hideSidebar') && Auth::user()->user_type_id == 1)
                 @include('layouts.sidebar')
         @endif
         @if(! page_name('main') || page_name('main') == 'login' ) @yield('content')
@@ -29,7 +29,7 @@
             @yield('footer-scripts')
 
             
-            <div type="hidden" id="usertypeCheck" data-type="{{ Auth::user()->user_type == 1 ? 1 : 0 }}"></div>
+            <div type="hidden" id="usertypeCheck" data-type="{{ Auth::user()->user_type_id == 1 ? 1 : 0 }}"></div>
 
         </div>
         @endif

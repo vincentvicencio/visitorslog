@@ -18,22 +18,22 @@ class Users extends Seeder
     {
         DB::table('registered_users')->insert([
         [
-            'user_name'  => 6746,
+            'username'  => 6746,
             'first_name' => 'Vincent Joseph',
             'last_name'  => 'Vicencio',
             'password'   => null,
-            'user_type'  => 1,
+            'user_type_id'  => 1,
             'location'   => 1,
             'created_by' => 1,
             'created_at' => now(),
             'status'     => 'Enabled',
         ],
         [
-            'user_name'  => 8888,
+            'username'  => 8888,
             'first_name' => 'Harvey',
             'last_name'  => 'Del Rosario',
             'password'   => null,
-            'user_type'  => 2,
+            'user_type_id'  => 2,
             'location'   => 2,
             'created_by' => 1,
             'created_at' => now(),

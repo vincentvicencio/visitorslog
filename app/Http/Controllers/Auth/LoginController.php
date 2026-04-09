@@ -99,7 +99,7 @@ class LoginController extends Controller
     public function authenticated(Request $request, $user)
     {
 
-        $registeredUser = RegisteredUser::where('user_name', $request->emp_code)->first();
+        $registeredUser = RegisteredUser::where('username', $request->emp_code)->first();
         if($registeredUser->status !== 'Enabled'){
             Auth::guard('employee')->logout();
             $request->session()->invalidate();
@@ -107,14 +107,14 @@ class LoginController extends Controller
             return redirect('/login');
         }
 
-        if ($registeredUser->user_type != 3){
+        if ($registeredUser->user_type_id != 3){
             $registeredUser->update(['password' => NULL]);
         }
 
         $this->fetch_emp_data('all_emp');
         $this->fetch_api_data('all_location', 'location');
 
-        if ((int) $registeredUser->user_type === 3 && !session()->has('guard_location_id')) {
+        if ((int) $registeredUser->user_type_id === 3 && !session()->has('guard_location_id')) {
             return redirect()->route('guard.location.show');
         }                                                                                                                                                                                                                                               
                                                                                                                                                                                                                                                                                                                                                                                                                                                                             

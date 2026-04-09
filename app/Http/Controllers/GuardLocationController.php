@@ -10,7 +10,7 @@ class GuardLocationController extends Controller
 {
     public function show()
     {
-        if (!Auth::check() || (int) Auth::user()->user_type !== 3) {
+        if (!Auth::check() || (int) Auth::user()->user_type_id !== 3) {
             return redirect()->route('visitorslog');
         }
 
@@ -25,7 +25,7 @@ class GuardLocationController extends Controller
 
     public function store(Request $request)
     {
-        if (!Auth::check() || (int) Auth::user()->user_type !== 3) {
+        if (!Auth::check() || (int) Auth::user()->user_type_id !== 3) {
             return redirect()->route('visitorslog');
         }
 

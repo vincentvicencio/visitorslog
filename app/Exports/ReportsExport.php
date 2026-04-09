@@ -32,7 +32,7 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
                 $q->where('first_name',      'LIKE', "%{$keywords}%")
                     ->orWhere('middle_name', 'LIKE', "%{$keywords}%")
                     ->orWhere('last_name',   'LIKE', "%{$keywords}%")
-                    ->orWhere('visitor_id',  'LIKE', "%{$keywords}%")
+                    ->orWhere('visitors_ids_number',  'LIKE', "%{$keywords}%")
                     ->orWhere('phone_number','LIKE', "%{$keywords}%")
                     ->orWhereHas('visitorType', function ($qt) use ($keywords) {
                         $qt->where('name', 'LIKE', "%{$keywords}%");
@@ -51,7 +51,7 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
 
         // Apply visitor type filter
         if (!empty($this->filters['visitor_type'])) {
-            $query->where('visitor_type', $this->filters['visitor_type']);
+            $query->where('visitors_type_id', $this->filters['visitor_type']);
         }
 
         $data = $query->orderBy('id', 'desc')->get();
@@ -93,7 +93,7 @@ class ReportsExport implements FromCollection, WithHeadings, WithStyles
                 'Location'     =>     $locationLabel,
                 'Phone'        =>     $visitor->phone_number,
                 'Visitor Type' =>     $visitor->visitorType?->name ?? '-',
-                'ID Number'    =>     $visitor->visitor_id,
+                'ID Number'    =>     $visitor->visitors_ids_number,
                 'Date Visited' =>     $visitor->created_at->format('F d, Y'),
                 'Day'          =>     $visitor->created_at->format('l'),
                 'Time In'      =>     $timeIn,

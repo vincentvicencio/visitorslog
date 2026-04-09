@@ -26,7 +26,7 @@
                         {{-- Visitor Type --}}
                         <div class="input-holder floating">
                             @php
-                                $matchedType = $visitorTypes->firstWhere('id', $visitor->visitor_type);
+                                $matchedType = $visitorTypes->firstWhere('id', $visitor->visitors_type_id);
                             @endphp
 
                             <input type="text"
@@ -41,7 +41,7 @@
                         {{-- ID Number --}}
                         <div class="input-holder floating">
                             <input type="hidden" name="id" id="id" class="form-control" placeholder="" value="{{ $visitor->id }}">
-                            <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " readonly value="{{ $visitor->visitor_id }}">
+                            <input type="text" name="id_number" id="id_number" class="form-control" placeholder=" " readonly value="{{ $visitor->visitors_ids_number }}">
                             <label for="id_number">ID Number</label>
                         </div>
 
@@ -91,7 +91,7 @@
                         {{-- ID Type --}}
                         <div class="input-holder floating">
                             @php
-                                $matchedIDType = $validIdTypes->firstWhere('id', $visitor->id_type);
+                                $matchedIDType = $validIdTypes->firstWhere('id', $visitor->id_type_id);
                             @endphp
 
                             <input type="text"

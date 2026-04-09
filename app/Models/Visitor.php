@@ -18,8 +18,8 @@ class Visitor extends Model
         'middle_name',
         'last_name',
         'phone_number',
-        'visitor_type',
-        'visitor_id',
+        'visitors_type_id',
+        'visitors_ids_number',
         'location',
         'address',
         'image_path',
@@ -29,7 +29,7 @@ class Visitor extends Model
         'purpose',
         'contact_person',
         'valid_id',
-        'id_type',
+        'id_type_id',
         'created_by',
         'updated_by',
         'deleted_by',
@@ -39,12 +39,12 @@ class Visitor extends Model
 
     public function visitorType()
     {
-        return $this->belongsTo(VisitorType::class, 'visitor_type');
+        return $this->belongsTo(VisitorType::class, 'visitors_type_id');
     }
 
     public function validIdType()
     {
-        return $this->belongsTo(ValidIdType::class, 'id_type');
+        return $this->belongsTo(ValidIdType::class, 'id_type_id');
     }
 
     public function getEmpName($empCode)
@@ -74,7 +74,7 @@ class Visitor extends Model
 
     public function userType()
     {
-        return $this->belongsTo(\App\Models\User_types::class, 'user_type', 'id');
+        return $this->belongsTo(\App\Models\User_types::class, 'user_type_id', 'id');
     }
     public function getLocationNameAttribute()
     {

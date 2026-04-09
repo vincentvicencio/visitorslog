@@ -15,7 +15,7 @@ class RegisteredId extends Seeder
     {
         DB::table('registered_visitor_ids')->insert([
             [
-                'visitor_type' => 1,
+                'visitor_type_id' => 1,
                 'id_number' => 1000,
                 'location' => 1,
                 'created_by' => 1,
@@ -23,7 +23,7 @@ class RegisteredId extends Seeder
                 'created_at' => now(),
             ],
             [
-                'visitor_type' => 2,
+                'visitor_type_id' => 2,
                 'id_number' => 2000,
                 'location' => 1,
                 'created_by' => 1,
@@ -31,7 +31,7 @@ class RegisteredId extends Seeder
                 'created_at' => now(),
             ],
             [
-                'visitor_type' => 3,
+                'visitor_type_id' => 3,
                 'id_number' => 3000,
                 'location' => 1,
                 'created_by' => 1,

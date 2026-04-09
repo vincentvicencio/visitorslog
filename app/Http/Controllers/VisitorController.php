@@ -19,12 +19,12 @@ class VisitorController extends Controller
     {
         $user = Auth::user();
         
-        return $user && (int) $user->user_type === 3 && !session()->has('guard_location_id');
+        return $user && (int) $user->user_type_id === 3 && !session()->has('guard_location_id');
     }
 
     private function resolveUserLocationFilters($user): array
     {
-        if ((int) $user->user_type === 3) {
+        if ((int) $user->user_type_id === 3) {
             $filters = [];
 
             if (session()->has('guard_location_id')) {
@@ -75,7 +75,7 @@ class VisitorController extends Controller
 
     private function resolveLocationForSave($user): ?string
     {
-        if ((int) $user->user_type === 3) {
+        if ((int) $user->user_type_id === 3) {
             // if (session()->has('guard_location_name')) {
             //     return (string) session('guard_location_name');
             // }
@@ -158,7 +158,7 @@ class VisitorController extends Controller
                 ->where(function ($query) {
 
                     $user = Auth::user();
-                    if ((int) $user->user_type !== 1) {
+                    if ((int) $user->user_type_id !== 1) {
                         $userLocations = $this->resolveUserLocationFilters($user);
 
                         // First filter by location (non-admin only)
@@ -172,7 +172,7 @@ class VisitorController extends Controller
                     });
 
                     // Then restrict to creator if NOT admin
-                    if ((int) $user->user_type !== 1) {
+                    if ((int) $user->user_type_id !== 1) {
                         $query->where('created_by', $user->id);
                     }
                 })
@@ -180,7 +180,7 @@ class VisitorController extends Controller
                 -> when($keywords, function ($query) use ($keywords) {
                     $query->where(function ($q) use ($keywords) {
                         $q->where   ('full_name', 'LIKE', "%{$keywords}%")
-                        ->orWhere   ('visitor_id', 'LIKE', "%{$keywords}%")
+                        ->orWhere   ('visitors_ids_number', 'LIKE', "%{$keywords}%")
                         ->orWhere   ('phone_number', 'LIKE', "%{$keywords}%")
                         ->orWhereHas('visitorType', function ($qt) use ($keywords) {
                             $qt->where('name', 'LIKE', "%{$keywords}%");
@@ -269,7 +269,7 @@ class VisitorController extends Controller
 
                 'visitor_type' => '<div class="text-center">' . ($d->visitorType?->name ?? '-') . '</div>',
 
-                'visitor_id'   => '<div class="text-center">' . $d->visitor_id . '</div>',
+                'visitor_id'   => '<div class="text-center">' . $d->visitors_ids_number . '</div>',
 
                 'visit' =>  '<div class="text-center">' . $visitLabel . '</div>',
 
@@ -397,9 +397,9 @@ class VisitorController extends Controller
         $visitorTypeId = $request->visitor_type;
         $query = $request->q;
         $usedIdsQuery = function ($q) use ($visitorTypeId) {
-            $q->select('visitor_id')
+                        $q->select('visitors_ids_number')
               ->from('visitors')
-              ->where('visitor_type', $visitorTypeId)
+                            ->where('visitors_type_id', $visitorTypeId)
               ->where(function ($sub) {
                   $sub->where('status', 0)
                       ->orWhereNull('status');
@@ -407,19 +407,19 @@ class VisitorController extends Controller
         };
 
         $count = \DB::table('visitors')
-            ->where('visitor_type', $visitorTypeId)
+            ->where('visitors_type_id', $visitorTypeId)
             ->where(function ($sub) {
                 $sub->where('status', 0)
                     ->orWhereNull('status');
             })
             ->count();
         $forLocation = null;
-        if(Auth::user()->user_type != 3){
+        if(Auth::user()->user_type_id != 3){
             $forLocation = Auth::user()->location;
         }else{
             $forLocation = session()->get('guard_location_id');
         }
-        $ids = RegisteredID::where('visitor_type', $visitorTypeId)
+        $ids = RegisteredID::where('visitor_type_id', $visitorTypeId)
             ->where('id_number', 'LIKE', "%{$query}%")
             ->where('location', $forLocation)
             ->whereNotIn('id_number', $usedIdsQuery)
@@ -488,7 +488,7 @@ class VisitorController extends Controller
                         $checkloc = RegisteredID::where('id_number', $value)
                                     ->where('location', $resolvedLocation)
                                     ->first();
-                        $timein = Visitor::where('visitor_id', $value)
+                        $timein = Visitor::where('visitors_ids_number', $value)
                                     ->whereNull('time_out')
                                     ->first();
 
@@ -502,7 +502,7 @@ class VisitorController extends Controller
 
                         if (!$existing) {
                             $fail('This Visitor ID is not registered.');
-                        } elseif ($existing->visitor_type != $request->visitor_type) {
+                        } elseif ($existing->visitor_type_id != $request->visitor_type) {
                             $fail('This Visitor ID is registered under a different visitor type.');
                         }
                     },
@@ -595,9 +595,9 @@ class VisitorController extends Controller
             $visitor->middle_name  = $middleName !== '' ? $middleName : null;
             $visitor->last_name    = $lastName;
             $visitor->phone_number = $request->contact_number ?? '?';
-            $visitor->visitor_type = $request->visitor_type;
-            $visitor->visitor_id   = $request->id_number;
-            $visitor->id_type      = $request->id_type;
+            $visitor->visitors_type_id = $request->visitor_type;
+            $visitor->visitors_ids_number = $request->id_number;
+            $visitor->id_type_id   = $request->id_type;
             $visitor->valid_id     = $request->id_type_number;
             $visitor->location     = $locationForSave;
             $visitor->address      = $address;

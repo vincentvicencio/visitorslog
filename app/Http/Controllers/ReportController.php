@@ -94,7 +94,7 @@ class ReportController extends Controller
                 ->when($keywords, function ($query) use ($keywords) {
                     $query -> where(function ($q) use ($keywords) {
                         $q -> where('full_name', 'LIKE', "%{$keywords}%")
-                        -> orWhere('visitor_id', 'LIKE', "%{$keywords}%")
+                        -> orWhere('visitors_ids_number', 'LIKE', "%{$keywords}%")
                         -> orWhere('phone_number', 'LIKE', "%{$keywords}%")
                         -> orWhereHas('visitorType', function ($qt) use ($keywords) {
                             $qt -> where('name', 'LIKE', "%{$keywords}%");
@@ -134,7 +134,7 @@ class ReportController extends Controller
             })
             // 4. NEW: Filter by Visitor Type Dropdown
             ->when($request->visitor_type, function ($query) use ($request) {
-                $query->where('visitor_type', $request->visitor_type);
+                $query->where('visitors_type_id', $request->visitor_type);
             })
             // 5. NEW: Filter by Status (Active/Timed Out)
             ->when($request->has('status') && $request->input('status') !== '', function ($query) use ($request) {
@@ -223,7 +223,7 @@ class ReportController extends Controller
 
                 'visitor_type' =>  $d->visitorType?->name ?? '-',
 
-                'visitor_id'   =>  $d->visitor_id,
+                'visitor_id'   =>  $d->visitors_ids_number,
 
                 'visit' =>  $d->created_at->format("F d, Y") .'<br>
                         '. $d->created_at->format('l'),

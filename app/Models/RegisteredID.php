@@ -12,7 +12,7 @@ class RegisteredID extends Model
     protected $table = 'registered_visitor_ids';
 
     protected $fillable = [
-        'visitor_type',
+        'visitor_type_id',
         'id_number',
         'location',
         'created_by',
@@ -46,7 +46,7 @@ class RegisteredID extends Model
 
     public function visitorType()
     {
-        return $this->belongsTo(VisitorType::class, 'visitor_type');
+        return $this->belongsTo(VisitorType::class, 'visitor_type_id');
     }
 
    // RegisteredID model
@@ -54,7 +54,7 @@ class RegisteredID extends Model
     {
         return $this->hasMany(
             Visitor::class,
-            'visitor_id',
+            'visitors_ids_number',
             'id_number'
         )->whereNull('time_out');
     }

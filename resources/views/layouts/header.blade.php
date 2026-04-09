@@ -1,7 +1,7 @@
-<div id="header" class="{{ Auth::check() && Auth::user()->user_type != 1 ? 'always-show' : '' }}">
+<div id="header" class="{{ Auth::check() && Auth::user()->user_type_id != 1 ? 'always-show' : '' }}">
 
   <div class="navbar navbar-expand-ms shadow-sm fixed-top align-items-center px-3" >
-    @if(Auth::user()->user_type == 1)
+    @if(Auth::user()->user_type_id == 1)
         <button class="btn position-absolute start-0  p-3 text-white" id="sidebarToggle">
                 <i class="bi bi-list"></i>
         </button>
